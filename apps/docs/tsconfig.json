@@ -1,19 +1,14 @@
 {
-  "extends": "@repo/typescript-config/nextjs.json",
-  "compilerOptions": {
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "strictNullChecks": true
-  },
+  "extends": "astro/tsconfigs/strict",
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next-env.d.ts",
-    "next.config.js",
-    ".next/types/**/*.ts"
+    ".astro/types.d.ts",
+    "**/*"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "react"
+  }
 }

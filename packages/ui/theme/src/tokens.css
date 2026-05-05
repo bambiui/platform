@@ -1,0 +1,241 @@
+/*
+  @theme inline: Tailwind references these as CSS variables at runtime,
+  enabling dark/light theme switching via :root and .dark overrides.
+
+  To customize tokens in your app:
+
+    Tailwind / CSS:
+      :root { --bambi-primary: oklch(60% 0.25 30); }
+      .dark  { --bambi-primary: oklch(70% 0.25 30); }
+
+    SCSS:
+      :root { --bambi-primary: #3b82f6; }
+*/
+
+@theme inline {
+  /* Base */
+  --color-background: var(--bambi-background);
+  --color-foreground: var(--bambi-foreground);
+
+  /* Surface */
+  --color-card: var(--bambi-card);
+  --color-card-foreground: var(--bambi-card-foreground);
+  --color-popover: var(--bambi-popover);
+  --color-popover-foreground: var(--bambi-popover-foreground);
+
+  /* Brand */
+  --color-primary: var(--bambi-primary);
+  --color-primary-foreground: var(--bambi-primary-foreground);
+  --color-secondary: var(--bambi-secondary);
+  --color-secondary-foreground: var(--bambi-secondary-foreground);
+  --color-accent: var(--bambi-accent);
+  --color-accent-foreground: var(--bambi-accent-foreground);
+
+  /* State */
+  --color-muted: var(--bambi-muted);
+  --color-muted-foreground: var(--bambi-muted-foreground);
+  --color-destructive: var(--bambi-destructive);
+  --color-destructive-foreground: var(--bambi-destructive-foreground);
+  --color-success: var(--bambi-success);
+  --color-success-foreground: var(--bambi-success-foreground);
+  --color-warning: var(--bambi-warning);
+  --color-warning-foreground: var(--bambi-warning-foreground);
+
+  /* Utility */
+  --color-border: var(--bambi-border);
+  --color-input: var(--bambi-input);
+  --color-ring: var(--bambi-ring);
+
+  /* Border radius */
+  --radius-sm: var(--bambi-radius-sm);
+  --radius-md: var(--bambi-radius-md);
+  --radius-lg: var(--bambi-radius-lg);
+  --radius-xl: var(--bambi-radius-xl);
+  --radius-full: var(--bambi-radius-full);
+
+  /* Typography — families */
+  --font-sans: var(--bambi-font-sans);
+  --font-mono: var(--bambi-font-mono);
+
+  /* Typography — scale */
+  --text-xs: var(--bambi-text-xs);
+  --text-sm: var(--bambi-text-sm);
+  --text-base: var(--bambi-text-base);
+  --text-lg: var(--bambi-text-lg);
+
+  /* Font weights */
+  --font-weight-normal: var(--bambi-font-weight-normal);
+  --font-weight-medium: var(--bambi-font-weight-medium);
+  --font-weight-semibold: var(--bambi-font-weight-semibold);
+  --font-weight-bold: var(--bambi-font-weight-bold);
+
+  /* Shadows */
+  --shadow-sm: var(--bambi-shadow-sm);
+  --shadow-md: var(--bambi-shadow-md);
+  --shadow-lg: var(--bambi-shadow-lg);
+}
+
+:root {
+  --bambi-background: oklch(100% 0 0);
+  --bambi-foreground: oklch(9% 0 0);
+  --bambi-card: oklch(100% 0 0);
+  --bambi-card-foreground: oklch(9% 0 0);
+  --bambi-popover: oklch(100% 0 0);
+  --bambi-popover-foreground: oklch(9% 0 0);
+  --bambi-primary: oklch(55% 0.22 250);
+  --bambi-primary-foreground: oklch(98% 0 0);
+  --bambi-secondary: oklch(96% 0 0);
+  --bambi-secondary-foreground: oklch(9% 0 0);
+  --bambi-accent: oklch(93% 0 0);
+  --bambi-accent-foreground: oklch(9% 0 0);
+  --bambi-muted: oklch(93% 0 0);
+  --bambi-muted-foreground: oklch(42% 0 0);
+  --bambi-destructive: oklch(55% 0.22 25);
+  --bambi-destructive-foreground: oklch(98% 0 0);
+  --bambi-success: oklch(55% 0.17 145);
+  --bambi-success-foreground: oklch(98% 0 0);
+  --bambi-warning: oklch(75% 0.17 70);
+  --bambi-warning-foreground: oklch(15% 0 0);
+  --bambi-border: oklch(70% 0 0);
+  --bambi-input: oklch(70% 0 0);
+  --bambi-ring: oklch(55% 0.22 250);
+  --bambi-radius-sm: 0.25rem;
+  --bambi-radius-md: 0.375rem;
+  --bambi-radius-lg: 0.5rem;
+  --bambi-radius-xl: 0.75rem;
+  --bambi-radius-full: 9999px;
+  --bambi-font-sans: system-ui, sans-serif;
+  --bambi-font-mono: ui-monospace, monospace;
+  --bambi-text-xs: 0.75rem;
+  --bambi-text-sm: 0.875rem;
+  --bambi-text-base: 1rem;
+  --bambi-text-lg: 1.125rem;
+  --bambi-font-weight-normal: 400;
+  --bambi-font-weight-medium: 500;
+  --bambi-font-weight-semibold: 600;
+  --bambi-font-weight-bold: 700;
+  --bambi-shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.05);
+  --bambi-shadow-md: 0 4px 6px -1px oklch(0% 0 0 / 0.1), 0 2px 4px -2px oklch(0% 0 0 / 0.1);
+  --bambi-shadow-lg: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -4px oklch(0% 0 0 / 0.1);
+
+  /* ─── Typography ─────────────────────────────────── */
+  --bambi-typography-color: var(--bambi-foreground);
+  --bambi-typography-font-family: var(--bambi-font-sans);
+  --bambi-text-body-size: var(--bambi-text-base);
+  --bambi-text-body-line-height: 1.75;
+  --bambi-text-lead-size: var(--bambi-text-lg);
+  --bambi-text-lead-color: var(--bambi-muted-foreground);
+  --bambi-text-lead-line-height: 1.75;
+  --bambi-text-small-size: var(--bambi-text-sm);
+  --bambi-text-small-weight: var(--bambi-font-weight-medium);
+  --bambi-text-muted-size: var(--bambi-text-sm);
+  --bambi-text-muted-color: var(--bambi-muted-foreground);
+  --bambi-text-label-size: var(--bambi-text-sm);
+  --bambi-text-label-weight: var(--bambi-font-weight-medium);
+  --bambi-heading-color: var(--bambi-foreground);
+  --bambi-heading-font-family: var(--bambi-font-sans);
+  --bambi-heading-weight: var(--bambi-font-weight-semibold);
+  --bambi-heading-line-height: 1.2;
+  --bambi-heading-1-size: 2.25rem;
+  --bambi-heading-2-size: 1.875rem;
+  --bambi-heading-3-size: 1.5rem;
+  --bambi-heading-4-size: 1.25rem;
+  --bambi-heading-5-size: var(--bambi-text-lg);
+  --bambi-heading-6-size: var(--bambi-text-base);
+  --bambi-heading-6-weight: var(--bambi-font-weight-medium);
+
+  /* ─── Button ─────────────────────────────────────── */
+  --bambi-button-gap: 0.375rem;
+  --bambi-button-border-width: 1px;
+  --bambi-button-line-height: 1;
+  --bambi-button-padding-sm: 0.375rem 0.75rem;
+  --bambi-button-padding-md: 0.5rem 1rem;
+  --bambi-button-padding-lg: 0.625rem 1.25rem;
+  --bambi-button-padding-icon: 0.5rem;
+  --bambi-button-font-family: var(--bambi-font-sans);
+  --bambi-button-font-size-sm: var(--bambi-text-xs);
+  --bambi-button-font-size-md: var(--bambi-text-sm);
+  --bambi-button-font-size-lg: var(--bambi-text-base);
+  --bambi-button-font-weight: var(--bambi-font-weight-medium);
+  --bambi-button-radius: var(--bambi-radius-md);
+  --bambi-button-radius-sm: var(--bambi-radius-sm);
+  --bambi-button-radius-full: var(--bambi-radius-full);
+  --bambi-button-transition: opacity 0.15s ease, background-color 0.15s ease;
+  --bambi-button-hover-opacity: 0.9;
+  --bambi-button-disabled-opacity: 0.5;
+  --bambi-button-focus-ring-width: 2px;
+  --bambi-button-focus-ring-offset: 2px;
+  --bambi-button-ring: var(--bambi-ring);
+  --bambi-button-spinner-border-width: 2px;
+  --bambi-button-spinner-duration: 0.6s;
+  --bambi-button-link-underline-offset: 4px;
+  --bambi-button-primary-bg: var(--bambi-primary);
+  --bambi-button-primary-foreground: var(--bambi-primary-foreground);
+  --bambi-button-secondary-bg: var(--bambi-secondary);
+  --bambi-button-secondary-foreground: var(--bambi-secondary-foreground);
+  --bambi-button-secondary-border: var(--bambi-border);
+  --bambi-button-ghost-color: var(--bambi-foreground);
+  --bambi-button-ghost-hover-bg: var(--bambi-accent);
+  --bambi-button-ghost-hover-color: var(--bambi-accent-foreground);
+  --bambi-button-destructive-bg: var(--bambi-destructive);
+  --bambi-button-destructive-foreground: var(--bambi-destructive-foreground);
+  --bambi-button-outline-color: var(--bambi-primary);
+  --bambi-button-outline-border: var(--bambi-primary);
+  --bambi-button-outline-hover-bg: color-mix(in oklch, var(--bambi-button-outline-color) 10%, transparent);
+  --bambi-button-link-color: var(--bambi-primary);
+  --bambi-button-success-bg: var(--bambi-success);
+  --bambi-button-success-foreground: var(--bambi-success-foreground);
+  --bambi-button-warning-bg: var(--bambi-warning);
+  --bambi-button-warning-foreground: var(--bambi-warning-foreground);
+
+  /* ─── Tabs ───────────────────────────────────────── */
+  --bambi-tab-list-bg: var(--bambi-muted);
+  --bambi-tab-list-radius: var(--bambi-radius-md);
+  --bambi-tab-list-padding: 0.25rem;
+  --bambi-tab-gap: 0.125rem;
+  --bambi-tab-bg: transparent;
+  --bambi-tab-active-bg: var(--bambi-background);
+  --bambi-tab-active-shadow: var(--bambi-shadow-sm);
+  --bambi-tab-color: var(--bambi-muted-foreground);
+  --bambi-tab-active-color: var(--bambi-foreground);
+  --bambi-tab-disabled-opacity: 0.5;
+  --bambi-tab-font-family: var(--bambi-font-sans);
+  --bambi-tab-font-size: var(--bambi-text-sm);
+  --bambi-tab-font-weight: var(--bambi-font-weight-medium);
+  --bambi-tab-padding: 0.375rem 0.75rem;
+  --bambi-tab-radius: var(--bambi-radius-sm);
+  --bambi-tab-transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  --bambi-tab-panel-pt: 1rem;
+  --bambi-tab-ring: var(--bambi-ring);
+  --bambi-tab-focus-ring-width: 2px;
+  --bambi-tab-focus-ring-offset: 2px;
+}
+
+.dark {
+  --bambi-background: oklch(9% 0 0);
+  --bambi-foreground: oklch(98% 0 0);
+  --bambi-card: oklch(11% 0 0);
+  --bambi-card-foreground: oklch(98% 0 0);
+  --bambi-popover: oklch(11% 0 0);
+  --bambi-popover-foreground: oklch(98% 0 0);
+  --bambi-primary: oklch(65% 0.22 250);
+  --bambi-primary-foreground: oklch(9% 0 0);
+  --bambi-secondary: oklch(14% 0 0);
+  --bambi-secondary-foreground: oklch(98% 0 0);
+  --bambi-accent: oklch(18% 0 0);
+  --bambi-accent-foreground: oklch(98% 0 0);
+  --bambi-muted: oklch(14% 0 0);
+  --bambi-muted-foreground: oklch(60% 0 0);
+  --bambi-destructive: oklch(60% 0.22 25);
+  --bambi-destructive-foreground: oklch(98% 0 0);
+  --bambi-success: oklch(65% 0.17 145);
+  --bambi-success-foreground: oklch(98% 0 0);
+  --bambi-warning: oklch(80% 0.17 70);
+  --bambi-warning-foreground: oklch(15% 0 0);
+  --bambi-border: oklch(40% 0 0);
+  --bambi-input: oklch(40% 0 0);
+  --bambi-ring: oklch(65% 0.22 250);
+  --bambi-shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.3);
+  --bambi-shadow-md: 0 4px 6px -1px oklch(0% 0 0 / 0.4), 0 2px 4px -2px oklch(0% 0 0 / 0.4);
+  --bambi-shadow-lg: 0 10px 15px -3px oklch(0% 0 0 / 0.4), 0 4px 6px -4px oklch(0% 0 0 / 0.4);
+}

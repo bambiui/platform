@@ -1,28 +1,33 @@
 {
   "name": "docs",
-  "version": "0.1.0",
   "type": "module",
-  "private": true,
+  "version": "0.0.1",
   "scripts": {
-    "dev": "next dev --port 3001",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
-    "next": "16.2.0",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "@types/node": "^22.15.3",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
-    "eslint": "^9.39.1",
-    "typescript": "5.9.2"
+    "@astrojs/react": "^5.0.4",
+    "@astrojs/starlight": "^0.38.5",
+    "@astrojs/svelte": "^8.1.0",
+    "@astrojs/vue": "^6.0.1",
+    "@bambi-astro/button": "workspace:*",
+    "@bambi-react/button": "workspace:*",
+    "@bambi-svelte/button": "workspace:*",
+    "@bambi-vue/button": "workspace:*",
+    "@bambi-ui/button": "workspace:*",
+    "@bambi-ui/theme": "workspace:*",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.2.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "sharp": "^0.34.5",
+    "svelte": "^5.55.5",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.33"
   }
 }

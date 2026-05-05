@@ -1,0 +1,28 @@
+{
+  "name": "@bambi-vue/button",
+  "version": "0.0.1",
+  "description": "Accessible, themeable Button component for bambi-ui — Vue 3",
+  "keywords": ["bambi-ui", "vue", "button", "accessibility", "typescript"],
+  "private": false,
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "dependencies": {
+    "@bambi-ui/button": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2",
+    "vue": "^3.5.0",
+    "vue-tsc": "^2.0.0"
+  },
+  "files": ["src"]
+}

@@ -1,0 +1,58 @@
+{
+  "name": "@bambi-react/button",
+  "version": "0.0.1",
+  "description": "Accessible, themeable Button component for bambi-ui — 8 variants, 4 sizes, loading state, icon support",
+  "keywords": [
+    "bambi-ui",
+    "react",
+    "button",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "component",
+    "ui",
+    "typescript"
+  ],
+  "private": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yusuffelekoglu/bambi-ui.git",
+    "directory": "packages/button"
+  },
+  "homepage": "https://github.com/yusuffelekoglu/bambi-ui/tree/main/packages/button#readme",
+  "bugs": {
+    "url": "https://github.com/yusuffelekoglu/bambi-ui/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.tsx --format esm --dts --clean",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bambi-ui/button": "workspace:*",
+    "@bambi-ui/theme": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.2"
+  },
+  "files": [
+    "dist"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "@bambi-ui/theme",
+  "version": "0.0.1",
+  "description": "Design tokens and theming utilities for bambi-ui — CSS custom properties, Tailwind v4 integration, and the cn utility",
+  "keywords": [
+    "bambi-ui",
+    "react",
+    "theme",
+    "design-tokens",
+    "css-variables",
+    "tailwind",
+    "oklch",
+    "theming",
+    "typescript"
+  ],
+  "private": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yusuffelekoglu/bambi-ui.git",
+    "directory": "packages/theme"
+  },
+  "homepage": "https://github.com/yusuffelekoglu/bambi-ui/tree/main/packages/theme#readme",
+  "bugs": {
+    "url": "https://github.com/yusuffelekoglu/bambi-ui/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "5.9.2"
+  },
+  "files": [
+    "dist",
+    "src/tokens.css"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@bambi-astro/button",
+  "version": "0.0.1",
+  "description": "Accessible, themeable Button component for bambi-ui — Astro",
+  "keywords": ["bambi-ui", "astro", "button", "accessibility", "typescript"],
+  "private": false,
+  "license": "MIT",
+  "publishConfig": { "access": "public" },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@bambi-ui/button": "workspace:*"
+  },
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2"
+  },
+  "files": ["src"]
+}

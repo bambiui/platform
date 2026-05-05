@@ -11,7 +11,7 @@ import vue from '@astrojs/vue';
 export default defineConfig({
     integrations: [starlight({
         title: 'Bambi UI',
-        social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+        social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yusuffelekoglu/bambi-ui' }],
         customCss: ['./src/styles/global.css', './src/styles/preview.css'],
         sidebar: [
             {

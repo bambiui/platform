@@ -1,2 +1,76 @@
 @import '@bambi-ui/theme/tokens.css';
 @import '@bambi-ui/button/index.css';
+
+/* Hide per-section tab navigation for framework tabs — selection is in the global header */
+starlight-tabs[data-sync-key='framework'] > .tablist-wrapper {
+  display: none;
+}
+
+.astro-4hqup6uv {
+  background-color: var(--bambi-card);
+}
+/* ── Map Bambi tokens → Starlight design tokens ── */
+
+/* Dark mode (Starlight default) */
+:root {
+  /* Accent */
+  --sl-color-accent-low:  color-mix(in oklch, var(--bambi-primary) 22%, var(--bambi-background));
+  --sl-color-accent:      var(--bambi-primary);
+  --sl-color-accent-high: color-mix(in oklch, var(--bambi-primary) 80%, oklch(99% 0 0));
+  --sl-color-bg-accent:   var(--bambi-primary);
+  /* Surfaces */
+  --sl-color-bg:          var(--bambi-background);
+  --sl-color-bg-nav:      var(--bambi-card);
+  --sl-color-bg-sidebar:  var(--bambi-card);
+  --sl-color-bg-inline-code: color-mix(in oklch, var(--bambi-muted) 60%, var(--bambi-background));
+  /* Borders */
+  --sl-color-hairline:       var(--bambi-separator);
+  --sl-color-hairline-light: var(--bambi-border);
+  --sl-color-hairline-shade: var(--bambi-background);
+  /* Code block frame (dark default, set on :root) */
+  --ec-frm-edBg:            var(--bambi-card);
+  --ec-frm-edTabBarBg:      var(--bambi-background);
+  --ec-frm-edActTabBg:      var(--bambi-card);
+  --ec-frm-trmBg:           var(--bambi-card);
+  --ec-frm-trmTtbBg:        var(--bambi-background);
+  --ec-brdCol:              var(--bambi-border);
+  --ec-frm-edActTabIndTopCol: var(--bambi-primary);
+  --ec-frm-edTabBarBrdCol:    var(--bambi-border);
+  --ec-frm-edTabBarBrdBtmCol: var(--bambi-border);
+  --ec-frm-trmTtbBrdBtmCol:   var(--bambi-border);
+}
+
+/* Light mode */
+:root[data-theme='light'] {
+  /* Accent */
+  --sl-color-accent-low:  color-mix(in oklch, var(--bambi-primary) 12%, oklch(100% 0 0));
+  --sl-color-accent:      var(--bambi-primary);
+  --sl-color-accent-high: color-mix(in oklch, var(--bambi-primary) 65%, oklch(5% 0 0));
+  --sl-color-bg-accent:   var(--bambi-primary);
+  /* Surfaces */
+  --sl-color-bg:          var(--bambi-background);
+  --sl-color-bg-nav:      var(--bambi-card);
+  --sl-color-bg-sidebar:  var(--bambi-card);
+  --sl-color-bg-inline-code: color-mix(in oklch, var(--bambi-muted) 60%, var(--bambi-background));
+  /* Borders */
+  --sl-color-hairline:       var(--bambi-separator);
+  --sl-color-hairline-light: var(--bambi-border);
+  --sl-color-hairline-shade: var(--bambi-card);
+}
+
+/*
+  Expressive-code sets --ec-frm-* directly on .expressive-code in light mode
+  (inside @layer starlight.components). Unlayered rules here override regardless of specificity.
+*/
+:root[data-theme='light'] .expressive-code {
+  --ec-frm-edBg:              var(--bambi-card);
+  --ec-frm-edTabBarBg:        color-mix(in oklch, var(--bambi-background) 60%, var(--bambi-card));
+  --ec-frm-edActTabBg:        var(--bambi-card);
+  --ec-frm-trmBg:             var(--bambi-card);
+  --ec-frm-trmTtbBg:          color-mix(in oklch, var(--bambi-background) 60%, var(--bambi-card));
+  --ec-brdCol:                var(--bambi-border);
+  --ec-frm-edActTabIndTopCol: var(--bambi-primary);
+  --ec-frm-edTabBarBrdCol:    var(--bambi-border);
+  --ec-frm-edTabBarBrdBtmCol: var(--bambi-separator);
+  --ec-frm-trmTtbBrdBtmCol:   var(--bambi-separator);
+}

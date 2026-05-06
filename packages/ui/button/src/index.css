@@ -20,7 +20,6 @@
 .bambi-button[data-size="sm"] {
   padding: var(--bambi-button-padding-sm);
   font-size: var(--bambi-button-font-size-sm);
-  border-radius: var(--bambi-button-radius-sm);
 }
 .bambi-button[data-size="md"] {
   padding: var(--bambi-button-padding-md);
@@ -136,7 +135,7 @@
   margin: -0.5em 0 0 -0.5em;
   border: var(--bambi-button-spinner-border-width) solid currentColor;
   border-top-color: transparent;
-  border-radius: var(--bambi-button-radius-full);
+  border-radius: var(--bambi-radius-full);
   animation: bambi-spin var(--bambi-button-spinner-duration) linear infinite;
 }
 

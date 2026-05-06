@@ -1,0 +1,103 @@
+---
+import DefaultThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+import type { Props } from '@astrojs/starlight/props';
+---
+
+<div class="bambi-framework-select" id="bambi-framework-select" role="group" aria-label="Framework">
+  <button class="fw-btn" data-fw="React">React</button>
+  <button class="fw-btn" data-fw="Svelte">Svelte</button>
+  <button class="fw-btn" data-fw="Vue">Vue</button>
+  <button class="fw-btn" data-fw="Astro">Astro</button>
+</div>
+
+<DefaultThemeSelect {...Astro.props} />
+
+<script>
+  const STORAGE_KEY = 'starlight-synced-tabs__framework';
+
+  function syncButtonState(activeFramework: string) {
+    document.querySelectorAll<HTMLButtonElement>('#bambi-framework-select .fw-btn').forEach((btn) => {
+      btn.setAttribute('aria-pressed', String(btn.dataset.fw === activeFramework));
+    });
+  }
+
+  function switchFramework(framework: string) {
+    localStorage.setItem(STORAGE_KEY, framework);
+    syncButtonState(framework);
+
+    const firstGroup = document.querySelector<HTMLElement>('starlight-tabs[data-sync-key="framework"]');
+    if (!firstGroup) return;
+    const tab = [...firstGroup.querySelectorAll<HTMLAnchorElement>('[role="tab"]')]
+      .find((t) => t.textContent?.trim() === framework);
+    tab?.click();
+  }
+
+  function init() {
+    const container = document.getElementById('bambi-framework-select');
+    if (!container) return;
+
+    const saved = localStorage.getItem(STORAGE_KEY) || 'React';
+    syncButtonState(saved);
+
+    container.querySelectorAll<HTMLButtonElement>('.fw-btn').forEach((btn) => {
+      btn.addEventListener('click', () => switchFramework(btn.dataset.fw!));
+    });
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+
+  // View code toggle (event delegation — works across page navigations)
+  let viewCodeListenerAdded = false;
+  function initViewCode() {
+    if (viewCodeListenerAdded) return;
+    viewCodeListenerAdded = true;
+    document.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.view-code-btn');
+      if (!btn) return;
+      const card = btn.closest<HTMLElement>('.demo-code-card');
+      if (!card) return;
+      const expanded = card.classList.toggle('expanded');
+      btn.textContent = expanded ? 'Hide code' : 'View code';
+    });
+  }
+  initViewCode();
+  document.addEventListener('astro:page-load', initViewCode);
+</script>
+
+<style>
+  .bambi-framework-select {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    padding: 0.25rem;
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    margin-inline-end: 0.5rem;
+  }
+
+  .fw-btn {
+    padding: 0.2rem 0.625rem;
+    border-radius: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--sl-color-gray-2);
+    transition: background 0.12s, color 0.12s;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+
+  .fw-btn:hover {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+  }
+
+  .fw-btn[aria-pressed='true'] {
+    background: var(--sl-color-text-accent);
+    color: var(--sl-color-black);
+  }
+</style>

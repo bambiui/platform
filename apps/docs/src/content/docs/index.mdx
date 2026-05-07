@@ -6,13 +6,17 @@ hero:
   title: Bambi UI
   tagline: Accessible, themeable components for React, Svelte, Vue, and Astro — one design system, every framework.
   actions:
-    - text: Get started
+    - text: Documents
       link: /components/button
       icon: right-arrow
       variant: primary
-    - text: View on GitHub
-      link: https://github.com/yusuffelekoglu/bambi-ui
+    - text: Token Builder
+      link: /builder
       icon: external
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/yusuffelekoglu/bambi-ui
+      icon: github
       variant: minimal
 ---
 
@@ -23,10 +27,10 @@ import { CardGrid, Card } from '@astrojs/starlight/components';
     The same component API across React, Svelte, Vue, and Astro. Switch frameworks without relearning your design system.
   </Card>
   <Card title="Design tokens" icon="setting">
-    All styles are CSS custom properties. Override any token in your own CSS — no config files, no rebuild.
+    All styles are CSS custom properties. Override any token in your own CSS — no config files, no rebuild required.
   </Card>
-  <Card title="Source-shipped" icon="rocket">
-    Svelte, Vue, and Astro packages ship source files directly. Your bundler compiles them — minimal footprint, full tree-shaking.
+  <Card title="Token Builder" icon="laptop">
+    Inspect and live-edit every token on an infinite canvas. Generate a full color palette from a single primary hue using OKLCH.
   </Card>
   <Card title="Accessible by default" icon="approve-check-circle">
     WCAG-compliant ARIA attributes, visible focus rings, and correct `type` defaults out of the box.

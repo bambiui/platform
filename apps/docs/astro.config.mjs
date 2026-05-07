@@ -23,7 +23,6 @@ export default defineConfig({
             },
         ],
         sidebar: [
-            { label: 'Theme Builder', slug: 'themes' },
             {
                 label: 'Components',
                 items: [

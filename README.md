@@ -2,6 +2,8 @@
 
 A multi-framework UI component library — React, Svelte, Vue, and Astro — with a shared design token system and zero runtime overhead.
 
+**[Documentation](https://bambi-ui.com)** · **[Token Builder](https://bambi-ui.com/builder)** · **[GitHub](https://github.com/yusuffelekoglu/bambi-ui)**
+
 ## Packages
 
 | Package | Description |
@@ -12,6 +14,13 @@ A multi-framework UI component library — React, Svelte, Vue, and Astro — wit
 | [`@bambi-svelte/button`](packages/svelte/button) | Button component for Svelte 5 |
 | [`@bambi-vue/button`](packages/vue/button) | Button component for Vue 3 |
 | [`@bambi-astro/button`](packages/astro/button) | Button component for Astro |
+
+## Apps
+
+| App | Description |
+|---|---|
+| [`apps/docs`](apps/docs) | Starlight documentation site |
+| [`apps/builder`](apps/builder) | Infinite-canvas design token editor, served at `/builder` |
 
 ## Getting started
 
@@ -90,7 +99,7 @@ All additional HTML `<button>` attributes are forwarded to the element.
 
 ## Development
 
-Requirements: Node ≥ 18, pnpm 9
+Requirements: Node ≥ 22, pnpm 9
 
 ```sh
 # Install dependencies
@@ -102,9 +111,25 @@ pnpm build
 # Start the docs site
 pnpm --filter docs dev
 
+# Start the token builder
+pnpm --filter builder dev
+
 # Type-check everything
 pnpm check-types
 ```
+
+## Deployment
+
+Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything and merge builder output into the docs dist:
+
+```sh
+pnpm deploy-static
+# output → apps/docs/dist/
+#   /          → docs site
+#   /builder   → token builder
+```
+
+See [`apps/builder/README.md`](apps/builder/README.md) for Cloudflare Pages project settings.
 
 ## License
 

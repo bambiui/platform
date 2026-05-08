@@ -28,44 +28,44 @@ A multi-framework UI component library CLI — React, Svelte, Vue, and Astro com
 Run the CLI in your app:
 
 ```sh
-npx bambiui init
+npx @bambiui/cli init
 ```
 
 ### 2. Add a component
 
 ```sh
-npx bambiui add button
+npx @bambiui/cli add button
 ```
 
 Framework override is available when detection is not enough:
 
 ```sh
-npx bambiui add button --framework react
-npx bambiui add button --framework svelte
-npx bambiui add button --framework vue
-npx bambiui add button --framework astro
+npx @bambiui/cli add button --framework react
+npx @bambiui/cli add button --framework svelte
+npx @bambiui/cli add button --framework vue
+npx @bambiui/cli add button --framework astro
 ```
 
-The command creates the component under `src/components/ui/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` creates the component styles at `src/styles/bambi-button.css`. Import both CSS files from your app's global stylesheet.
+The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps the component CSS next to the component source and imports it automatically.
 
 By default the CLI fetches source from the GitHub raw registry. For local development or a future hosted registry API, override the base:
 
 ```sh
-npx bambiui init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
+npx @bambiui/cli init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
 ```
 
 ### 3. Use the component
 
 ```tsx
 // React
-import { Button } from './components/ui/button';
+import { Button } from './components/ui/button/button';
 <Button intent="primary">Click me</Button>
 ```
 
 ```svelte
 <!-- Svelte -->
 <script>
-  import Button from './components/ui/Button.svelte';
+  import Button from './components/ui/button/Button.svelte';
 </script>
 <Button intent="primary">Click me</Button>
 ```
@@ -73,7 +73,7 @@ import { Button } from './components/ui/button';
 ```vue
 <!-- Vue -->
 <script setup>
-import Button from './components/ui/Button.vue';
+import Button from './components/ui/button/Button.vue';
 </script>
 <template>
   <Button intent="primary">Click me</Button>
@@ -83,7 +83,7 @@ import Button from './components/ui/Button.vue';
 ```astro
 ---
 // Astro
-import Button from './components/ui/Button.astro';
+import Button from './components/ui/button/Button.astro';
 ---
 <Button intent="primary">Click me</Button>
 ```

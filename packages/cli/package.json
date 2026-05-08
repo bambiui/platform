@@ -1,14 +1,17 @@
 {
-  "name": "bambiui",
-  "version": "0.0.1",
+  "name": "@bambiui/cli",
+  "version": "0.0.2",
   "description": "CLI for adding BambiUI component source files to your app.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "bambiui": "./src/index.js"
+    "bambiui": "src/index.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "src"

@@ -7,32 +7,35 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const DEFAULT_REGISTRY_URL =
   "https://raw.githubusercontent.com/bambiui/platform/main";
 
+const DEFAULT_COMPONENT_DIR = "src/components/ui";
+const DEFAULT_TOKENS_FILE = "src/styles/bambi.css";
+
 const components = {
   button: {
     style: {
       from: "packages/components/button/src/button.css",
-      fileName: "bambi-button.css",
+      fileName: "button.css",
     },
     files: {
       react: [
-        { from: "packages/components/button/src/react.tsx", to: "button.tsx" },
-        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { from: "packages/components/button/src/types.ts", to: "types.ts" },
+        { kind: "react", from: "packages/components/button/src/react.tsx", to: "button.tsx" },
+        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
+        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       svelte: [
-        { from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" },
-        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { from: "packages/components/button/src/types.ts", to: "types.ts" },
+        { kind: "svelte", from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" },
+        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
+        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       vue: [
-        { from: "packages/components/button/src/vue.vue", to: "Button.vue" },
-        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { from: "packages/components/button/src/types.ts", to: "types.ts" },
+        { kind: "vue", from: "packages/components/button/src/vue.vue", to: "Button.vue" },
+        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
+        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       astro: [
-        { from: "packages/components/button/src/astro.astro", to: "Button.astro" },
-        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { from: "packages/components/button/src/types.ts", to: "types.ts" },
+        { kind: "astro", from: "packages/components/button/src/astro.astro", to: "Button.astro" },
+        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
+        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
     },
   },
@@ -45,6 +48,48 @@ const frameworkFiles = {
   astro: ["astro.config.mjs", "astro.config.ts"],
 };
 
+function createDefaultConfig(framework, overrides = {}) {
+  return {
+    framework,
+    registryUrl: overrides.registryUrl ?? DEFAULT_REGISTRY_URL,
+    componentDir: overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
+    tokensFile: overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
+    components: {
+      button: {
+        directory: "button",
+        styleFile: "button.css",
+        files: {
+          react: "button.tsx",
+          svelte: "Button.svelte",
+          vue: "Button.vue",
+          astro: "Button.astro",
+          recipe: "recipe.ts",
+          types: "types.ts",
+        },
+      },
+    },
+  };
+}
+
+function mergeConfig(config, defaults) {
+  return {
+    ...defaults,
+    ...config,
+    components: {
+      ...defaults.components,
+      ...config.components,
+      button: {
+        ...defaults.components.button,
+        ...config.components?.button,
+        files: {
+          ...defaults.components.button.files,
+          ...config.components?.button?.files,
+        },
+      },
+    },
+  };
+}
+
 function parseArgs(argv) {
   const [command, maybeComponent, ...tail] = argv;
   const hasComponent = maybeComponent && !maybeComponent.startsWith("-");
@@ -56,8 +101,8 @@ function parseArgs(argv) {
     force: false,
     framework: undefined,
     registryUrl: process.env.BAMBIUI_REGISTRY_URL,
-    styleDir: "src/styles",
-    styleFile: "src/styles/bambi.css",
+    styleFile: DEFAULT_TOKENS_FILE,
+    tokensFile: undefined,
   };
 
   for (let index = 0; index < rest.length; index += 1) {
@@ -93,8 +138,8 @@ Options:
   --framework react|svelte|vue|astro   Framework override
   --component-dir <path>               Component destination (default: src/components/ui)
   --registry-url <url>                 Registry base URL (default: GitHub raw)
-  --style-dir <path>                   Component CSS destination directory (default: src/styles)
-  --style-file <path>                  Global token CSS destination for init (default: src/styles/bambi.css)
+  --tokens-file <path>                 Global token CSS destination (default: src/styles/bambi.css)
+  --style-file <path>                  Alias for --tokens-file
   --cwd <path>                         Target project (default: current directory)
   --force                              Overwrite existing files
 `;
@@ -132,8 +177,23 @@ async function readConfig(cwd) {
   return config ?? {};
 }
 
-function getRegistryUrl(flags, config) {
-  return flags.registryUrl ?? config.registryUrl ?? DEFAULT_REGISTRY_URL;
+async function getConfig(cwd, flags = {}) {
+  const detectedFramework = flags.framework ?? await detectFramework(cwd);
+  const defaults = createDefaultConfig(detectedFramework, flags);
+  const config = await readConfig(cwd);
+
+  return {
+    ...mergeConfig(config, defaults),
+    ...(flags.framework ? { framework: flags.framework } : {}),
+    ...(flags.registryUrl ? { registryUrl: flags.registryUrl } : {}),
+    ...(flags.componentDir ? { componentDir: flags.componentDir } : {}),
+    ...(flags.tokensFile ? { tokensFile: flags.tokensFile } : {}),
+    ...(flags.styleFile ? { tokensFile: flags.styleFile } : {}),
+  };
+}
+
+function getRegistryUrl(config) {
+  return config.registryUrl ?? DEFAULT_REGISTRY_URL;
 }
 
 function getRegistryFileUrl(registryUrl, registryPath) {
@@ -164,14 +224,38 @@ async function readRegistryFile(registryUrl, registryPath) {
   return readFile(fileURLToPath(fileUrl), "utf8");
 }
 
-async function copyRegistryFile(registryUrl, from, to, force) {
+function moduleSpecifier(fileName) {
+  const parsed = path.parse(fileName);
+  return `./${parsed.name}`;
+}
+
+function transformComponentSource(content, replacements = {}) {
+  let next = content;
+
+  if (replacements.recipe) {
+    next = next.replace(/from "\.\/recipe"/g, `from "${moduleSpecifier(replacements.recipe)}"`);
+  }
+
+  if (replacements.types) {
+    next = next.replace(/from "\.\/types"/g, `from "${moduleSpecifier(replacements.types)}"`);
+  }
+
+  if (replacements.style) {
+    next = next.replace(/import "\.\/button\.css";/g, `import "./${replacements.style}";`);
+  }
+
+  return next;
+}
+
+async function copyRegistryFile(registryUrl, from, to, force, transform) {
   await mkdir(path.dirname(to), { recursive: true });
 
   if (existsSync(to) && !force) {
     return { skipped: true, path: to };
   }
 
-  await writeFile(to, await readRegistryFile(registryUrl, from));
+  const content = await readRegistryFile(registryUrl, from);
+  await writeFile(to, transform ? transform(content) : content);
   return { skipped: false, path: to };
 }
 
@@ -183,27 +267,45 @@ async function addComponent(componentName, flags) {
   }
 
   const cwd = path.resolve(flags.cwd);
-  const config = await readConfig(cwd);
-  const framework = flags.framework ?? config.framework ?? await detectFramework(cwd);
-  const componentDir = flags.componentDir ?? config.componentDir ?? "src/components/ui";
-  const registryUrl = getRegistryUrl(flags, config);
-  const styleDir = flags.styleDir ?? config.styleDir ?? "src/styles";
+  const config = await getConfig(cwd, flags);
+  const framework = flags.framework ?? config.framework;
+  const componentDir = flags.componentDir ?? config.componentDir;
+  const registryUrl = getRegistryUrl(config);
+  const componentConfig = config.components?.[componentName] ?? {};
+  const componentDirectory = componentConfig.directory ?? componentName;
   const files = component.files[framework];
 
   if (!files) {
     throw new Error(`Unknown framework "${framework}". Use react, svelte, vue, or astro.`);
   }
 
+  const targetDir = path.join(cwd, componentDir, componentDirectory);
+  const fileNames = {
+    react: componentConfig.files?.react ?? "button.tsx",
+    svelte: componentConfig.files?.svelte ?? "Button.svelte",
+    vue: componentConfig.files?.vue ?? "Button.vue",
+    astro: componentConfig.files?.astro ?? "Button.astro",
+    recipe: componentConfig.files?.recipe ?? "recipe.ts",
+    types: componentConfig.files?.types ?? "types.ts",
+    style: componentConfig.styleFile ?? component.style.fileName,
+  };
   const results = [];
 
   for (const file of files) {
-    results.push(await copyRegistryFile(registryUrl, file.from, path.join(cwd, componentDir, file.to), flags.force));
+    const targetName = fileNames[file.kind] ?? file.to;
+    const transform = file.kind === "recipe"
+      ? (content) => transformComponentSource(content, { types: fileNames.types })
+      : file.kind === framework
+        ? (content) => transformComponentSource(content, fileNames)
+        : undefined;
+
+    results.push(await copyRegistryFile(registryUrl, file.from, path.join(targetDir, targetName), flags.force, transform));
   }
 
   results.push(await copyRegistryFile(
     registryUrl,
     component.style.from,
-    path.join(cwd, styleDir, component.style.fileName),
+    path.join(targetDir, fileNames.style),
     flags.force,
   ));
 
@@ -224,14 +326,8 @@ async function writeProjectFile(filePath, content, force) {
 async function initProject(flags) {
   const cwd = path.resolve(flags.cwd);
   const framework = flags.framework ?? await detectFramework(cwd);
-  const registryUrl = flags.registryUrl ?? DEFAULT_REGISTRY_URL;
-  const config = {
-    framework,
-    componentDir: flags.componentDir,
-    registryUrl,
-    styleDir: flags.styleDir,
-    styleFile: flags.styleFile,
-  };
+  const config = createDefaultConfig(framework, flags);
+  const registryUrl = getRegistryUrl(config);
 
   return [
     await writeProjectFile(
@@ -239,7 +335,7 @@ async function initProject(flags) {
       `${JSON.stringify(config, null, 2)}\n`,
       flags.force,
     ),
-    await copyRegistryFile(registryUrl, "packages/tokens/src/tokens.css", path.join(cwd, flags.styleFile), flags.force),
+    await copyRegistryFile(registryUrl, "packages/tokens/src/tokens.css", path.join(cwd, config.tokensFile), flags.force),
   ];
 }
 

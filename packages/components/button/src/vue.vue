@@ -2,6 +2,7 @@
 import { computed, useAttrs } from "vue";
 import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "./types";
+import "./button.css";
 
 defineOptions({ inheritAttrs: false });
 

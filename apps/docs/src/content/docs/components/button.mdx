@@ -20,33 +20,33 @@ export const PlusIcon = () => (
 Add the button source and shared styles to your app:
 
 ```sh
-npx bambiui init
+npx @bambiui/cli init
 ```
 
 <Tabs syncKey="framework">
   <TabItem label="React">
     ```sh
-    npx bambiui add button --framework react
+    npx @bambiui/cli add button --framework react
     ```
   </TabItem>
   <TabItem label="Svelte">
     ```sh
-    npx bambiui add button --framework svelte
+    npx @bambiui/cli add button --framework svelte
     ```
   </TabItem>
   <TabItem label="Vue">
     ```sh
-    npx bambiui add button --framework vue
+    npx @bambiui/cli add button --framework vue
     ```
   </TabItem>
   <TabItem label="Astro">
     ```sh
-    npx bambiui add button --framework astro
+    npx @bambiui/cli add button --framework astro
     ```
   </TabItem>
 </Tabs>
 
-Import the generated CSS file from your app's global stylesheet:
+Import the generated token file once from your app's global stylesheet. Component CSS is installed next to the component source and imported by the component.
 
 ```css
 @import './styles/bambi.css';
@@ -71,7 +71,7 @@ Import the generated CSS file from your app's global stylesheet:
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`import { Button } from './components/ui/button';
+          <Code lang="tsx" code={`import { Button } from './components/ui/button/button';
 
 <Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
@@ -103,7 +103,7 @@ Import the generated CSS file from your app's global stylesheet:
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import Button from './components/ui/Button.svelte';
+  import Button from './components/ui/button/Button.svelte';
 </script>
 
 <Button intent="primary">Primary</Button>
@@ -136,7 +136,7 @@ Import the generated CSS file from your app's global stylesheet:
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import Button from './components/ui/Button.vue';
+import Button from './components/ui/button/Button.vue';
 </script>
 
 <template>
@@ -171,7 +171,7 @@ import Button from './components/ui/Button.vue';
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/Button.astro';
+import Button from './components/ui/button/Button.astro';
 ---
 
 <Button intent="primary">Primary</Button>
@@ -577,7 +577,7 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import Button from './components/ui/Button.svelte';
+  import Button from './components/ui/button/Button.svelte';
 </script>
 
 <Button class="btn-rounded" intent="primary">Primary</Button>
@@ -610,7 +610,7 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import Button from './components/ui/Button.vue';
+import Button from './components/ui/button/Button.vue';
 </script>
 
 <template>
@@ -645,7 +645,7 @@ import Button from './components/ui/Button.vue';
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/Button.astro';
+import Button from './components/ui/button/Button.astro';
 ---
 
 <Button class="btn-rounded" intent="primary">Primary</Button>
@@ -841,7 +841,7 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/Button.astro';
+import Button from './components/ui/button/Button.astro';
 ---
 
 <Button intent="primary" loading>Save</Button>

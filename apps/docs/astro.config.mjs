@@ -15,6 +15,11 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 export default defineConfig({
     integrations: [starlight({
         title: 'Bambi UI',
+        logo: {
+            src: './src/assets/bambi-logo.svg',
+            alt: 'Bambi UI',
+        },
+        favicon: '/favicon.svg',
         social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yusuffelekoglu/bambi-ui' }],
         customCss: ['./src/styles/global.css', './src/styles/preview.css'],
         components: {

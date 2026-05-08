@@ -71,7 +71,7 @@ Import the generated token file once from your app's global stylesheet. Componen
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`import { Button } from './components/ui/button/button';
+          <Code lang="tsx" code={`import { Button } from './components/ui/button';
 
 <Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
@@ -103,7 +103,7 @@ Import the generated token file once from your app's global stylesheet. Componen
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import Button from './components/ui/button/Button.svelte';
+  import { Button } from './components/ui/button';
 </script>
 
 <Button intent="primary">Primary</Button>
@@ -136,7 +136,7 @@ Import the generated token file once from your app's global stylesheet. Componen
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import Button from './components/ui/button/Button.vue';
+import { Button } from './components/ui/button';
 </script>
 
 <template>
@@ -171,7 +171,7 @@ import Button from './components/ui/button/Button.vue';
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/button/Button.astro';
+import { Button } from './components/ui/button';
 ---
 
 <Button intent="primary">Primary</Button>
@@ -577,7 +577,7 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import Button from './components/ui/button/Button.svelte';
+  import { Button } from './components/ui/button';
 </script>
 
 <Button class="btn-rounded" intent="primary">Primary</Button>
@@ -610,7 +610,7 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import Button from './components/ui/button/Button.vue';
+import { Button } from './components/ui/button';
 </script>
 
 <template>
@@ -645,7 +645,7 @@ import Button from './components/ui/button/Button.vue';
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/button/Button.astro';
+import { Button } from './components/ui/button';
 ---
 
 <Button class="btn-rounded" intent="primary">Primary</Button>
@@ -841,7 +841,7 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import Button from './components/ui/button/Button.astro';
+import { Button } from './components/ui/button';
 ---
 
 <Button intent="primary" loading>Save</Button>

@@ -10,6 +10,20 @@ const DEFAULT_REGISTRY_URL =
 const DEFAULT_COMPONENT_DIR = "src/components/ui";
 const DEFAULT_TOKENS_FILE = "src/styles/bambi.css";
 
+const colors = {
+  blue: "\x1b[34m",
+  bold: "\x1b[1m",
+  cyan: "\x1b[36m",
+  dim: "\x1b[2m",
+  green: "\x1b[32m",
+  reset: "\x1b[0m",
+  yellow: "\x1b[33m",
+};
+
+function color(value, tone) {
+  return `${colors[tone]}${value}${colors.reset}`;
+}
+
 const components = {
   button: {
     style: {
@@ -48,45 +62,21 @@ const frameworkFiles = {
   astro: ["astro.config.mjs", "astro.config.ts"],
 };
 
+const frameworkOptions = ["react", "svelte", "vue", "astro"];
+
 function createDefaultConfig(framework, overrides = {}) {
   return {
     framework,
-    registryUrl: overrides.registryUrl ?? DEFAULT_REGISTRY_URL,
     componentDir: overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
     tokensFile: overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
-    components: {
-      button: {
-        directory: "button",
-        styleFile: "button.css",
-        files: {
-          react: "button.tsx",
-          svelte: "Button.svelte",
-          vue: "Button.vue",
-          astro: "Button.astro",
-          recipe: "recipe.ts",
-          types: "types.ts",
-        },
-      },
-    },
   };
 }
 
-function mergeConfig(config, defaults) {
+function mergeConfig(config, defaults, flags = {}) {
   return {
-    ...defaults,
-    ...config,
-    components: {
-      ...defaults.components,
-      ...config.components,
-      button: {
-        ...defaults.components.button,
-        ...config.components?.button,
-        files: {
-          ...defaults.components.button.files,
-          ...config.components?.button?.files,
-        },
-      },
-    },
+    framework: flags.framework ?? config.framework ?? defaults.framework,
+    componentDir: flags.componentDir ?? config.componentDir ?? defaults.componentDir,
+    tokensFile: flags.tokensFile ?? flags.styleFile ?? config.tokensFile ?? config.styleFile ?? defaults.tokensFile,
   };
 }
 
@@ -100,6 +90,7 @@ function parseArgs(argv) {
     cwd: process.cwd(),
     force: false,
     framework: undefined,
+    yes: false,
     registryUrl: process.env.BAMBIUI_REGISTRY_URL,
     styleFile: DEFAULT_TOKENS_FILE,
     tokensFile: undefined,
@@ -110,6 +101,11 @@ function parseArgs(argv) {
 
     if (arg === "--force") {
       flags.force = true;
+      continue;
+    }
+
+    if (arg === "--yes" || arg === "-y") {
+      flags.yes = true;
       continue;
     }
 
@@ -142,6 +138,7 @@ Options:
   --style-file <path>                  Alias for --tokens-file
   --cwd <path>                         Target project (default: current directory)
   --force                              Overwrite existing files
+  --yes, -y                            Accept detected defaults without prompts
 `;
 }
 
@@ -182,18 +179,11 @@ async function getConfig(cwd, flags = {}) {
   const defaults = createDefaultConfig(detectedFramework, flags);
   const config = await readConfig(cwd);
 
-  return {
-    ...mergeConfig(config, defaults),
-    ...(flags.framework ? { framework: flags.framework } : {}),
-    ...(flags.registryUrl ? { registryUrl: flags.registryUrl } : {}),
-    ...(flags.componentDir ? { componentDir: flags.componentDir } : {}),
-    ...(flags.tokensFile ? { tokensFile: flags.tokensFile } : {}),
-    ...(flags.styleFile ? { tokensFile: flags.styleFile } : {}),
-  };
+  return mergeConfig(config, defaults, flags);
 }
 
-function getRegistryUrl(config) {
-  return config.registryUrl ?? DEFAULT_REGISTRY_URL;
+function getRegistryUrl(flags) {
+  return flags.registryUrl ?? DEFAULT_REGISTRY_URL;
 }
 
 function getRegistryFileUrl(registryUrl, registryPath) {
@@ -247,6 +237,23 @@ function transformComponentSource(content, replacements = {}) {
   return next;
 }
 
+function getFrameworkFileName(framework) {
+  return {
+    react: "button.tsx",
+    svelte: "Button.svelte",
+    vue: "Button.vue",
+    astro: "Button.astro",
+  }[framework];
+}
+
+function getIndexContent(framework) {
+  if (framework === "react") {
+    return `export { Button } from "./button";\nexport type { ButtonAppearance, ButtonBaseProps, ButtonIntent, ButtonSize } from "./button";\n`;
+  }
+
+  return `export { default as Button } from "./${getFrameworkFileName(framework)}";\nexport type { ButtonAppearance, ButtonBaseProps, ButtonIntent, ButtonSize } from "./types";\n`;
+}
+
 async function copyRegistryFile(registryUrl, from, to, force, transform) {
   await mkdir(path.dirname(to), { recursive: true });
 
@@ -257,6 +264,24 @@ async function copyRegistryFile(registryUrl, from, to, force, transform) {
   const content = await readRegistryFile(registryUrl, from);
   await writeFile(to, transform ? transform(content) : content);
   return { skipped: false, path: to };
+}
+
+async function writeGeneratedFile(filePath, content, force) {
+  await mkdir(path.dirname(filePath), { recursive: true });
+
+  if (existsSync(filePath) && !force) {
+    return { skipped: true, path: filePath };
+  }
+
+  await writeFile(filePath, content);
+  return { skipped: false, path: filePath };
+}
+
+function printResults(results) {
+  for (const result of results) {
+    const label = result.skipped ? "skipped" : "created";
+    process.stdout.write(`  ${label} ${path.relative(process.cwd(), result.path)}\n`);
+  }
 }
 
 async function addComponent(componentName, flags) {
@@ -270,9 +295,8 @@ async function addComponent(componentName, flags) {
   const config = await getConfig(cwd, flags);
   const framework = flags.framework ?? config.framework;
   const componentDir = flags.componentDir ?? config.componentDir;
-  const registryUrl = getRegistryUrl(config);
-  const componentConfig = config.components?.[componentName] ?? {};
-  const componentDirectory = componentConfig.directory ?? componentName;
+  const registryUrl = getRegistryUrl(flags);
+  const componentDirectory = componentName;
   const files = component.files[framework];
 
   if (!files) {
@@ -281,13 +305,13 @@ async function addComponent(componentName, flags) {
 
   const targetDir = path.join(cwd, componentDir, componentDirectory);
   const fileNames = {
-    react: componentConfig.files?.react ?? "button.tsx",
-    svelte: componentConfig.files?.svelte ?? "Button.svelte",
-    vue: componentConfig.files?.vue ?? "Button.vue",
-    astro: componentConfig.files?.astro ?? "Button.astro",
-    recipe: componentConfig.files?.recipe ?? "recipe.ts",
-    types: componentConfig.files?.types ?? "types.ts",
-    style: componentConfig.styleFile ?? component.style.fileName,
+    react: "button.tsx",
+    svelte: "Button.svelte",
+    vue: "Button.vue",
+    astro: "Button.astro",
+    recipe: "recipe.ts",
+    types: "types.ts",
+    style: component.style.fileName,
   };
   const results = [];
 
@@ -309,6 +333,8 @@ async function addComponent(componentName, flags) {
     flags.force,
   ));
 
+  results.push(await writeGeneratedFile(path.join(targetDir, "index.ts"), getIndexContent(framework), flags.force));
+
   return results;
 }
 
@@ -326,8 +352,9 @@ async function writeProjectFile(filePath, content, force) {
 async function initProject(flags) {
   const cwd = path.resolve(flags.cwd);
   const framework = flags.framework ?? await detectFramework(cwd);
-  const config = createDefaultConfig(framework, flags);
-  const registryUrl = getRegistryUrl(config);
+  const defaults = createDefaultConfig(framework, flags);
+  const config = await promptForConfig(defaults, flags);
+  const registryUrl = getRegistryUrl(flags);
 
   return [
     await writeProjectFile(
@@ -337,6 +364,130 @@ async function initProject(flags) {
     ),
     await copyRegistryFile(registryUrl, "packages/tokens/src/tokens.css", path.join(cwd, config.tokensFile), flags.force),
   ];
+}
+
+async function promptForConfig(defaults, flags) {
+  if (flags.yes || !process.stdin.isTTY) {
+    return defaults;
+  }
+
+  const { createInterface } = await import("node:readline/promises");
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+
+  process.stdout.write(`${color("Bambi UI", "bold")} ${color("setup", "cyan")}\n`);
+  process.stdout.write(`${color("Detected defaults", "green")}\n\n`);
+  process.stdout.write(`  ${color("framework", "dim")}    ${color(defaults.framework, "yellow")}\n`);
+  process.stdout.write(`  ${color("componentDir", "dim")} ${color(defaults.componentDir, "yellow")}\n`);
+  process.stdout.write(`  ${color("tokensFile", "dim")}   ${color(defaults.tokensFile, "yellow")}\n\n`);
+
+  try {
+    const useDefaults = await rl.question(`Use these defaults? ${color("(Y/n)", "dim")} `);
+
+    if (!useDefaults.trim() || useDefaults.trim().toLowerCase().startsWith("y")) {
+      return defaults;
+    }
+
+    rl.close();
+  } finally {
+    rl.close();
+  }
+
+  process.stdout.write(`\n${color("Customize config", "green")}\n`);
+  process.stdout.write(`${color("Press enter to keep the shown value.", "dim")}\n\n`);
+
+  const framework = await selectFramework(defaults.framework);
+  const customRl = createInterface({ input: process.stdin, output: process.stdout });
+
+  try {
+    const componentDir = await customRl.question(`Component directory (${defaults.componentDir}): `);
+    const tokensFile = await customRl.question(`Tokens file (${defaults.tokensFile}): `);
+
+    return {
+      framework,
+      componentDir: componentDir.trim() || defaults.componentDir,
+      tokensFile: tokensFile.trim() || defaults.tokensFile,
+    };
+  } finally {
+    customRl.close();
+  }
+}
+
+async function selectFramework(defaultFramework) {
+  const readline = await import("node:readline");
+  const input = process.stdin;
+  const output = process.stdout;
+  const startIndex = Math.max(0, frameworkOptions.indexOf(defaultFramework));
+  let selectedIndex = startIndex;
+
+  readline.emitKeypressEvents(input);
+
+  if (input.isTTY) {
+    input.setRawMode(true);
+  }
+
+  function render() {
+    const choices = frameworkOptions
+      .map((framework, index) => {
+        const label = framework === selectedIndexFramework() ? color(framework, "yellow") : framework;
+        return index === selectedIndex ? `${color("›", "cyan")} ${label}` : `  ${color(framework, "dim")}`;
+      })
+      .join("  ");
+
+    output.write(`\rFramework ${color("(use ←/→, enter)", "dim")} ${choices}\x1b[K`);
+  }
+
+  function selectedIndexFramework() {
+    return frameworkOptions[selectedIndex];
+  }
+
+  render();
+
+  return new Promise((resolve) => {
+    function cleanup() {
+      input.off("keypress", onKeypress);
+      if (input.isTTY) {
+        input.setRawMode(false);
+      }
+      output.write("\n");
+    }
+
+    function onKeypress(_, key) {
+      if (key?.name === "return" || key?.name === "enter") {
+        const framework = selectedIndexFramework();
+        cleanup();
+        resolve(framework);
+        return;
+      }
+
+      if (key?.name === "left" || key?.name === "up") {
+        selectedIndex = (selectedIndex - 1 + frameworkOptions.length) % frameworkOptions.length;
+        render();
+        return;
+      }
+
+      if (key?.name === "right" || key?.name === "down") {
+        selectedIndex = (selectedIndex + 1) % frameworkOptions.length;
+        render();
+        return;
+      }
+
+      if (key?.ctrl && key.name === "c") {
+        cleanup();
+        process.exitCode = 130;
+        resolve(selectedIndexFramework());
+      }
+    }
+
+    input.on("keypress", onKeypress);
+  });
+}
+
+function getImportHint(componentDir, componentName) {
+  const sourceRelativeDir = componentDir.startsWith("src/")
+    ? componentDir.slice("src/".length)
+    : componentDir;
+
+  return `import { Button } from "./${path.posix.join(sourceRelativeDir, componentName)}";`;
 }
 
 async function main() {
@@ -350,10 +501,9 @@ async function main() {
   if (command === "init") {
     const results = await initProject(flags);
 
-    for (const result of results) {
-      const label = result.skipped ? "skipped" : "created";
-      process.stdout.write(`${label} ${path.relative(process.cwd(), result.path)}\n`);
-    }
+    process.stdout.write("\nBambi UI is ready.\n");
+    printResults(results);
+    process.stdout.write("\nImport the token file once in your global stylesheet or app entry.\n");
 
     return;
   }
@@ -362,12 +512,14 @@ async function main() {
     throw new Error(`Unknown command "${command}".\n\n${help()}`);
   }
 
+  const cwd = path.resolve(flags.cwd);
+  const config = await getConfig(cwd, flags);
+  const framework = flags.framework ?? config.framework;
   const results = await addComponent(component, flags);
 
-  for (const result of results) {
-    const label = result.skipped ? "skipped" : "created";
-    process.stdout.write(`${label} ${path.relative(process.cwd(), result.path)}\n`);
-  }
+  process.stdout.write(`\nAdded ${component} for ${framework}.\n`);
+  printResults(results);
+  process.stdout.write(`\nUse it with:\n  ${getImportHint(config.componentDir, component)}\n`);
 }
 
 main().catch(async (error) => {

@@ -58,14 +58,14 @@ npx @bambiui/cli init --registry-url https://raw.githubusercontent.com/bambiui/p
 
 ```tsx
 // React
-import { Button } from './components/ui/button/button';
+import { Button } from './components/ui/button';
 <Button intent="primary">Click me</Button>
 ```
 
 ```svelte
 <!-- Svelte -->
 <script>
-  import Button from './components/ui/button/Button.svelte';
+  import { Button } from './components/ui/button';
 </script>
 <Button intent="primary">Click me</Button>
 ```
@@ -73,7 +73,7 @@ import { Button } from './components/ui/button/button';
 ```vue
 <!-- Vue -->
 <script setup>
-import Button from './components/ui/button/Button.vue';
+import { Button } from './components/ui/button';
 </script>
 <template>
   <Button intent="primary">Click me</Button>
@@ -83,7 +83,7 @@ import Button from './components/ui/button/Button.vue';
 ```astro
 ---
 // Astro
-import Button from './components/ui/button/Button.astro';
+import { Button } from './components/ui/button';
 ---
 <Button intent="primary">Click me</Button>
 ```

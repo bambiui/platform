@@ -20,7 +20,7 @@ export default defineConfig({
             alt: 'Bambi UI',
         },
         favicon: '/favicon.svg',
-        social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yusuffelekoglu/bambi-ui' }],
+        social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/bambiui/platform' }],
         customCss: ['./src/styles/global.css', './src/styles/preview.css'],
         components: {
             ThemeSelect: './src/overrides/ThemeSelect.astro',

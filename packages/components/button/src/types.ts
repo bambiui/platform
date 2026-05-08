@@ -1,8 +1,14 @@
-export type ButtonIntent = "primary" | "secondary" | "danger" | "success" | "warning";
+export const buttonIntents = ["primary", "secondary", "danger", "success", "warning"] as const;
 
-export type ButtonAppearance = "solid" | "outline" | "ghost" | "link";
+export const buttonAppearances = ["solid", "outline", "ghost", "link"] as const;
 
-export type ButtonSize = "sm" | "md" | "lg" | "icon";
+export const buttonSizes = ["sm", "md", "lg", "icon"] as const;
+
+export type ButtonIntent = (typeof buttonIntents)[number];
+
+export type ButtonAppearance = (typeof buttonAppearances)[number];
+
+export type ButtonSize = (typeof buttonSizes)[number];
 
 export interface ButtonBaseProps {
   intent?: ButtonIntent;
@@ -10,3 +16,5 @@ export interface ButtonBaseProps {
   size?: ButtonSize;
   loading?: boolean;
 }
+
+export type ButtonDefaults = Required<Pick<ButtonBaseProps, "intent" | "appearance" | "size" | "loading">>;

@@ -1,4 +1,5 @@
 import { type ButtonHTMLAttributes, type Ref } from "react";
+import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "./types";
 
 export type {
@@ -23,10 +24,10 @@ export function Button({
   className,
   ref,
   type = "button",
-  intent = "primary",
-  appearance = "solid",
-  size = "md",
-  loading = false,
+  intent = buttonRecipe.defaults.intent,
+  appearance = buttonRecipe.defaults.appearance,
+  size = buttonRecipe.defaults.size,
+  loading = buttonRecipe.defaults.loading,
   disabled,
   ...props
 }: ButtonProps) {
@@ -41,7 +42,7 @@ export function Button({
       aria-busy={loading || undefined}
       aria-disabled={(loading || disabled) || undefined}
       disabled={disabled}
-      className={cn("bambi-button", className)}
+      className={cn(buttonRecipe.className, className)}
       {...props}
     >
       {loading && <span className="bambi-button-spinner" aria-hidden="true" />}

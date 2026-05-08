@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const DEFAULT_REGISTRY_URL =
-  "https://raw.githubusercontent.com/yusuffelekoglu/bambi-ui/main";
+  "https://raw.githubusercontent.com/bambiui/platform/main";
 
 const components = {
   button: {
@@ -16,18 +16,22 @@ const components = {
     files: {
       react: [
         { from: "packages/components/button/src/react.tsx", to: "button.tsx" },
+        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
         { from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       svelte: [
         { from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" },
+        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
         { from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       vue: [
         { from: "packages/components/button/src/vue.vue", to: "Button.vue" },
+        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
         { from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
       astro: [
         { from: "packages/components/button/src/astro.astro", to: "Button.astro" },
+        { from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
         { from: "packages/components/button/src/types.ts", to: "types.ts" },
       ],
     },

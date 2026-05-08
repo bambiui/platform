@@ -1,8 +1,14 @@
-export type BambiIntent = "primary" | "secondary" | "danger" | "success" | "warning";
+export const bambiIntents = ["primary", "secondary", "danger", "success", "warning"] as const;
 
-export type BambiAppearance = "solid" | "outline" | "ghost" | "link";
+export const bambiAppearances = ["solid", "outline", "ghost", "link"] as const;
 
-export type BambiSize = "sm" | "md" | "lg" | "icon";
+export const bambiSizes = ["sm", "md", "lg", "icon"] as const;
+
+export type BambiIntent = (typeof bambiIntents)[number];
+
+export type BambiAppearance = (typeof bambiAppearances)[number];
+
+export type BambiSize = (typeof bambiSizes)[number];
 
 export interface ButtonBaseProps {
   intent?: BambiIntent;
@@ -10,6 +16,8 @@ export interface ButtonBaseProps {
   size?: BambiSize;
   loading?: boolean;
 }
+
+export type ButtonDefaults = Required<Pick<ButtonBaseProps, "intent" | "appearance" | "size" | "loading">>;
 
 export type ButtonIntent = BambiIntent;
 export type ButtonAppearance = BambiAppearance;

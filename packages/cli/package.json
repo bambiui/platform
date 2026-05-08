@@ -1,5 +1,5 @@
 {
-  "name": "@bambiui/cli",
+  "name": "bambiui",
   "version": "0.0.1",
   "description": "CLI for adding BambiUI component source files to your app.",
   "license": "MIT",

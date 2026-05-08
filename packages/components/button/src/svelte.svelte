@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from "svelte/elements";
+  import { buttonRecipe } from "./recipe";
   import type { ButtonBaseProps } from "./types";
 
   interface Props extends HTMLButtonAttributes, ButtonBaseProps {
@@ -9,17 +10,17 @@
   let {
     children,
     type = "button",
-    intent = "primary",
-    appearance = "solid",
-    size = "md",
-    loading = false,
+    intent = buttonRecipe.defaults.intent,
+    appearance = buttonRecipe.defaults.appearance,
+    size = buttonRecipe.defaults.size,
+    loading = buttonRecipe.defaults.loading,
     disabled,
     class: className,
     ...attrs
   }: Props = $props();
 
   const cls = $derived(
-    ["bambi-button", className].filter(Boolean).join(" ")
+    [buttonRecipe.className, className].filter(Boolean).join(" ")
   );
 </script>
 

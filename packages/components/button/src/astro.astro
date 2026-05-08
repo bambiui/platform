@@ -1,4 +1,5 @@
 ---
+import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "./types";
 
 interface Props extends ButtonBaseProps {
@@ -10,17 +11,17 @@ interface Props extends ButtonBaseProps {
 }
 
 const {
-  intent = "primary",
-  appearance = "solid",
-  size = "md",
-  loading = false,
+  intent = buttonRecipe.defaults.intent,
+  appearance = buttonRecipe.defaults.appearance,
+  size = buttonRecipe.defaults.size,
+  loading = buttonRecipe.defaults.loading,
   type = "button",
   class: className,
   disabled,
   ...attrs
 } = Astro.props;
 
-const cls = ["bambi-button", className].filter(Boolean).join(" ");
+const cls = [buttonRecipe.className, className].filter(Boolean).join(" ");
 ---
 <button
   type={type}

@@ -2,7 +2,7 @@
 
 A multi-framework UI component library CLI — React, Svelte, Vue, and Astro components copied into your app as source.
 
-**[Documentation](https://bambi-ui.com)** · **[Token Builder](https://bambi-ui.com/builder)** · **[GitHub](https://github.com/yusuffelekoglu/bambi-ui)**
+**[Documentation](https://bambi-ui.com)** · **[Token Builder](https://bambi-ui.com/builder)** · **[GitHub](https://github.com/bambiui/platform)**
 
 ## Workspace
 
@@ -51,7 +51,7 @@ The command creates the component under `src/components/ui/`. `init` creates glo
 By default the CLI fetches source from the GitHub raw registry. For local development or a future hosted registry API, override the base:
 
 ```sh
-npx bambiui init --registry-url https://raw.githubusercontent.com/yusuffelekoglu/bambi-ui/main
+npx bambiui init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
 ```
 
 ### 3. Use the component

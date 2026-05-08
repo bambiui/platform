@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed, useAttrs } from "vue";
+import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "./types";
 
 defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<ButtonBaseProps & { class?: string; disabled?: boolean; type?: "button" | "submit" | "reset" }>(),
-  { intent: "primary", appearance: "solid", size: "md", loading: false, type: "button" }
+  { ...buttonRecipe.defaults, type: "button" }
 );
 
 const attrs = useAttrs();
 
 const cls = computed(() =>
-  ["bambi-button", props.class].filter(Boolean).join(" ")
+  [buttonRecipe.className, props.class].filter(Boolean).join(" ")
 );
 </script>
 

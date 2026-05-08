@@ -1,20 +1,37 @@
-import type { ButtonAppearance, ButtonIntent, ButtonSize } from "@bambiui/core";
+import {
+  bambiAppearances,
+  bambiIntents,
+  bambiSizes,
+  type ButtonDefaults,
+} from "@bambiui/core";
 
-export interface RecipeDefinition {
-  base: string[];
-  variants: Record<string, readonly string[]>;
+export interface RecipeDefinition<
+  Defaults extends Record<string, unknown>,
+  Variants extends Record<string, readonly string[]>,
+> {
+  className: string;
+  defaults: Defaults;
+  variants: Variants;
 }
 
-export function createRecipe<T extends RecipeDefinition>(recipe: T) {
+export function createRecipe<T extends RecipeDefinition<Record<string, unknown>, Record<string, readonly string[]>>>(
+  recipe: T,
+) {
   return recipe;
 }
 
 export const buttonRecipe = createRecipe({
-  base: ["bambi-button"],
+  className: "bambi-button",
+  defaults: {
+    intent: "primary",
+    appearance: "solid",
+    size: "md",
+    loading: false,
+  } satisfies ButtonDefaults,
   variants: {
-    intent: ["primary", "secondary", "danger", "success", "warning"] satisfies ButtonIntent[],
-    appearance: ["solid", "outline", "ghost", "link"] satisfies ButtonAppearance[],
-    size: ["sm", "md", "lg", "icon"] satisfies ButtonSize[],
-    state: ["loading", "disabled"],
+    intent: bambiIntents,
+    appearance: bambiAppearances,
+    size: bambiSizes,
+    state: ["loading", "disabled"] as const,
   },
 });

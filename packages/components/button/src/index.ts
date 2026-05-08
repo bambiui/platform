@@ -1,3 +1,5 @@
+export { buttonRecipe, type ButtonRecipe } from "./recipe";
+
 export type {
   ButtonAppearance,
   ButtonBaseProps,

@@ -3,10 +3,10 @@ title: Theme Tokens
 description: Global design tokens — colors, radius, typography, and shadows.
 ---
 
-All tokens are CSS custom properties defined in `@bambi-ui/theme/tokens.css`. Import once at the root of your app:
+All tokens are CSS custom properties defined in `@bambiui/tokens/tokens.css`. Import once at the root of your app:
 
 ```css
-@import '@bambi-ui/theme/tokens.css';
+@import '@bambiui/tokens/tokens.css';
 ```
 
 Override any token in your own `:root` block to customise the theme globally:
@@ -43,8 +43,8 @@ Colors use the [OKLCH](https://developer.mozilla.org/en-US/docs/Web/CSS/color_va
 
 | Token | Light | Dark |
 |---|---|---|
-| `--bambi-destructive` | `oklch(55% 0.22 25)` | `oklch(60% 0.22 25)` |
-| `--bambi-destructive-foreground` | `oklch(98% 0 0)` | `oklch(98% 0 0)` |
+| `--bambi-danger` | `oklch(55% 0.22 25)` | `oklch(60% 0.22 25)` |
+| `--bambi-danger-foreground` | `oklch(98% 0 0)` | `oklch(98% 0 0)` |
 | `--bambi-success` | `oklch(55% 0.17 145)` | `oklch(65% 0.17 145)` |
 | `--bambi-success-foreground` | `oklch(98% 0 0)` | `oklch(98% 0 0)` |
 | `--bambi-warning` | `oklch(75% 0.17 70)` | `oklch(80% 0.17 70)` |
@@ -132,7 +132,7 @@ The token file ships an `@theme inline` block that maps Bambi tokens to Tailwind
 
 ```css
 /* globals.css */
-@import '@bambi-ui/theme/tokens.css';
+@import '@bambiui/tokens/tokens.css';
 ```
 
 ```html

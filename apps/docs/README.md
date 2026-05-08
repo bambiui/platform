@@ -35,7 +35,7 @@ apps/docs/
         components/
           button.mdx        # Button component documentation
     styles/
-      global.css            # Imports @bambi-ui/theme/tokens.css + @bambi-ui/button/index.css
+      global.css            # Imports @bambiui/tokens/tokens.css + internal button CSS
       preview.css           # .preview, .preview-row, .preview-col utility classes
 ```
 
@@ -52,7 +52,7 @@ apps/docs/
 ## Key configuration notes
 
 - **`vite.ssr.noExternal`**: Any workspace package imported in MDX must be listed here, otherwise Astro's SSR bundler won't process it.
-- **CSS imports**: The token and button CSS are loaded via Starlight's `customCss` array, not PostCSS `@import` — PostCSS cannot resolve package.json `exports` fields.
+- **CSS imports**: The token andgenerated button CSS are loaded via Starlight's `customCss` array, not PostCSS `@import` — PostCSS cannot resolve package.json `exports` fields.
 - **Framework integrations**: `@astrojs/react`, `@astrojs/svelte`, `@astrojs/vue` are all registered, enabling all four frameworks in a single MDX file.
 
 ## Preview classes

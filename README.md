@@ -1,19 +1,18 @@
-# Bambi UI
+# BambiUI
 
-A multi-framework UI component library — React, Svelte, Vue, and Astro — with a shared design token system and zero runtime overhead.
+A multi-framework UI component library CLI — React, Svelte, Vue, and Astro components copied into your app as source.
 
 **[Documentation](https://bambi-ui.com)** · **[Token Builder](https://bambi-ui.com/builder)** · **[GitHub](https://github.com/yusuffelekoglu/bambi-ui)**
 
-## Packages
+## Workspace
 
-| Package | Description |
+| Package/App | Description |
 |---|---|
-| [`@bambi-ui/theme`](packages/ui/theme) | Design tokens (CSS custom properties) + `cn()` utility |
-| [`@bambi-ui/button`](packages/ui/button) | Shared button types and base CSS |
-| [`@bambi-react/button`](packages/react/button) | Button component for React 19 |
-| [`@bambi-svelte/button`](packages/svelte/button) | Button component for Svelte 5 |
-| [`@bambi-vue/button`](packages/vue/button) | Button component for Vue 3 |
-| [`@bambi-astro/button`](packages/astro/button) | Button component for Astro |
+| [`packages/cli`](packages/cli) | `bambiui` CLI that adds component source files to user projects |
+| [`packages/core`](packages/core) | Shared contracts and framework-agnostic types |
+| [`packages/tokens`](packages/tokens) | Primitive, semantic, intent, state, and component tokens |
+| [`packages/recipes`](packages/recipes) | Shared recipe definitions for variants, sizes, and states |
+| [`packages/components`](packages/components) | Source components for React, Svelte, Vue, and Astro |
 
 ## Apps
 
@@ -24,63 +23,69 @@ A multi-framework UI component library — React, Svelte, Vue, and Astro — wit
 
 ## Getting started
 
-### 1. Install
+### 1. Initialize
 
-Pick the package for your framework:
+Run the CLI in your app:
 
 ```sh
-# React
-npm install @bambi-react/button @bambi-ui/theme
-
-# Svelte
-npm install @bambi-svelte/button @bambi-ui/theme
-
-# Vue
-npm install @bambi-vue/button @bambi-ui/theme
-
-# Astro
-npm install @bambi-astro/button @bambi-ui/theme
+npx bambiui init
 ```
 
-### 2. Add CSS to your global stylesheet
+### 2. Add a component
 
-```css
-@import '@bambi-ui/theme/tokens.css';
-@import '@bambi-ui/button/index.css';
+```sh
+npx bambiui add button
+```
+
+Framework override is available when detection is not enough:
+
+```sh
+npx bambiui add button --framework react
+npx bambiui add button --framework svelte
+npx bambiui add button --framework vue
+npx bambiui add button --framework astro
+```
+
+The command creates the component under `src/components/ui/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` creates the component styles at `src/styles/bambi-button.css`. Import both CSS files from your app's global stylesheet.
+
+By default the CLI fetches source from the GitHub raw registry. For local development or a future hosted registry API, override the base:
+
+```sh
+npx bambiui init --registry-url https://raw.githubusercontent.com/yusuffelekoglu/bambi-ui/main
 ```
 
 ### 3. Use the component
 
 ```tsx
 // React
-import { Button } from '@bambi-react/button';
-<Button variant="primary">Click me</Button>
+import { Button } from './components/ui/button';
+<Button intent="primary">Click me</Button>
 ```
 
 ```svelte
 <!-- Svelte -->
 <script>
-  import { Button } from '@bambi-svelte/button';
+  import Button from './components/ui/Button.svelte';
 </script>
-<Button variant="primary">Click me</Button>
+<Button intent="primary">Click me</Button>
 ```
 
 ```vue
 <!-- Vue -->
 <script setup>
-import { Button } from '@bambi-vue/button';
+import Button from './components/ui/Button.vue';
 </script>
 <template>
-  <Button variant="primary">Click me</Button>
+  <Button intent="primary">Click me</Button>
 </template>
 ```
 
 ```astro
 ---
 // Astro
-import { Button } from '@bambi-astro/button';
+import Button from './components/ui/Button.astro';
 ---
-<Button variant="primary">Click me</Button>
+<Button intent="primary">Click me</Button>
 ```
 
 ## Component props
@@ -89,7 +94,8 @@ All framework implementations share the same props:
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `string` | `"primary"` | Visual style — `primary` `secondary` `outline` `ghost` `link` `destructive` `success` `warning` |
+| `intent` | `string` | `"primary"` | Meaning — `primary` `secondary` `danger` `success` `warning` |
+| `appearance` | `string` | `"solid"` | Rendering style — `solid` `outline` `ghost` `link` |
 | `size` | `string` | `"md"` | Button size — `sm` `md` `lg` `icon` |
 | `loading` | `boolean` | `false` | Shows a spinner, sets `aria-busy`, disables pointer events |
 | `disabled` | `boolean` | `false` | Native disabled state |
@@ -105,7 +111,7 @@ Requirements: Node ≥ 22, pnpm 9
 # Install dependencies
 pnpm install
 
-# Build all packages
+# Build docs and builder
 pnpm build
 
 # Start the docs site

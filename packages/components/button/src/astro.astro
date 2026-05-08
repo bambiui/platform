@@ -1,0 +1,39 @@
+---
+import type { ButtonBaseProps } from "./types";
+
+interface Props extends ButtonBaseProps {
+  class?: string;
+  disabled?: boolean;
+  id?: string;
+  type?: "button" | "submit" | "reset";
+  [key: string]: unknown;
+}
+
+const {
+  intent = "primary",
+  appearance = "solid",
+  size = "md",
+  loading = false,
+  type = "button",
+  class: className,
+  disabled,
+  ...attrs
+} = Astro.props;
+
+const cls = ["bambi-button", className].filter(Boolean).join(" ");
+---
+<button
+  type={type}
+  class={cls}
+  data-intent={intent}
+  data-appearance={appearance}
+  data-size={size}
+  data-loading={loading || undefined}
+  aria-busy={loading || undefined}
+  aria-disabled={(loading || disabled) || undefined}
+  disabled={disabled}
+  {...attrs}
+>
+  {loading && <span class="bambi-button-spinner" aria-hidden="true" />}
+  <span class="bambi-button-content"><slot /></span>
+</button>

@@ -1,11 +1,15 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { fileURLToPath } from 'url';
+import { resolve } from 'path';
 import starlight from '@astrojs/starlight';
 
 import react from '@astrojs/react';
 
 import svelte from '@astrojs/svelte';
 import vue from '@astrojs/vue';
+
+const root = fileURLToPath(new URL('../../', import.meta.url));
 
 // https://astro.build/config
 export default defineConfig({
@@ -16,12 +20,6 @@ export default defineConfig({
         components: {
             ThemeSelect: './src/overrides/ThemeSelect.astro',
         },
-        head: [
-            {
-                tag: 'script',
-                content: `(function(){try{var s=localStorage.getItem('bambi-theme');if(!s)return;var d=JSON.parse(s),root=document.documentElement;window.__bambiTheme=d;function isDark(){var t=root.dataset.theme||localStorage.getItem('starlight-theme');if(t==='light')return false;if(t==='dark')return true;return!window.matchMedia('(prefers-color-scheme: light)').matches;}function apply(){var src=window.__bambiTheme||d;var t=Object.assign({},isDark()?src.dark:src.light,src.radius);Object.keys(t).forEach(function(k){root.style.setProperty(k,t[k]);});}apply();new MutationObserver(function(ms){ms.forEach(function(m){if(m.attributeName==='data-theme')apply();});}).observe(root,{attributes:true,attributeFilter:['data-theme']});}catch(e){}})();`,
-            },
-        ],
         sidebar: [
             {
                 label: 'Components',
@@ -39,8 +37,14 @@ export default defineConfig({
         ],
         }), react(), svelte(), vue()],
     vite: {
-        ssr: {
-            noExternal: ['@bambi-react/button', '@bambi-ui/theme', '@bambi-ui/button', '@bambi-svelte/button', '@bambi-vue/button'],
+        resolve: {
+            alias: {
+                '@bambiui/components/button/react': resolve(root, 'packages/components/button/src/react.tsx'),
+                '@bambiui/components/button/svelte': resolve(root, 'packages/components/button/src/svelte.svelte'),
+                '@bambiui/components/button/vue': resolve(root, 'packages/components/button/src/vue.vue'),
+                '@bambiui/components/button/astro': resolve(root, 'packages/components/button/src/astro.astro'),
+            },
+            dedupe: ['vue', 'react', 'react-dom', 'svelte'],
         },
     },
 });

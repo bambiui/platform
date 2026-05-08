@@ -1,13 +1,13 @@
 ---
 title: Button
-description: Accessible, themeable button component with 8 variants and 4 sizes.
+description: Accessible, themeable button component with intent, appearance, size, and state layers.
 ---
 
 import { Tabs, TabItem, Code } from '@astrojs/starlight/components';
-import { Button as ReactButton } from '@bambi-react/button';
-import { Button as SvelteButton } from '@bambi-svelte/button';
-import { Button as VueButton } from '@bambi-vue/button';
-import { Button as AstroButton } from '@bambi-astro/button';
+import { Button as ReactButton } from '@bambiui/components/button/react';
+import SvelteButton from '@bambiui/components/button/svelte';
+import VueButton from '@bambiui/components/button/vue';
+import AstroButton from '@bambiui/components/button/astro';
 
 export const PlusIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -17,143 +17,70 @@ export const PlusIcon = () => (
 
 ## Installation
 
-Add design tokens to your global CSS:
+Add the button source and shared styles to your app:
 
-```css
-@import '@bambi-ui/theme/tokens.css';
-@import '@bambi-ui/button/index.css';
+```sh
+npx bambiui init
 ```
-
-Install the package for your framework:
 
 <Tabs syncKey="framework">
   <TabItem label="React">
-    <Tabs syncKey="pkg">
-      <TabItem label="npm">
-        ```sh
-        npm install @bambi-react/button
-        ```
-      </TabItem>
-      <TabItem label="pnpm">
-        ```sh
-        pnpm add @bambi-react/button
-        ```
-      </TabItem>
-      <TabItem label="yarn">
-        ```sh
-        yarn add @bambi-react/button
-        ```
-      </TabItem>
-      <TabItem label="bun">
-        ```sh
-        bun add @bambi-react/button
-        ```
-      </TabItem>
-    </Tabs>
+    ```sh
+    npx bambiui add button --framework react
+    ```
   </TabItem>
   <TabItem label="Svelte">
-    <Tabs syncKey="pkg">
-      <TabItem label="npm">
-        ```sh
-        npm install @bambi-svelte/button
-        ```
-      </TabItem>
-      <TabItem label="pnpm">
-        ```sh
-        pnpm add @bambi-svelte/button
-        ```
-      </TabItem>
-      <TabItem label="yarn">
-        ```sh
-        yarn add @bambi-svelte/button
-        ```
-      </TabItem>
-      <TabItem label="bun">
-        ```sh
-        bun add @bambi-svelte/button
-        ```
-      </TabItem>
-    </Tabs>
+    ```sh
+    npx bambiui add button --framework svelte
+    ```
   </TabItem>
   <TabItem label="Vue">
-    <Tabs syncKey="pkg">
-      <TabItem label="npm">
-        ```sh
-        npm install @bambi-vue/button
-        ```
-      </TabItem>
-      <TabItem label="pnpm">
-        ```sh
-        pnpm add @bambi-vue/button
-        ```
-      </TabItem>
-      <TabItem label="yarn">
-        ```sh
-        yarn add @bambi-vue/button
-        ```
-      </TabItem>
-      <TabItem label="bun">
-        ```sh
-        bun add @bambi-vue/button
-        ```
-      </TabItem>
-    </Tabs>
+    ```sh
+    npx bambiui add button --framework vue
+    ```
   </TabItem>
   <TabItem label="Astro">
-    <Tabs syncKey="pkg">
-      <TabItem label="npm">
-        ```sh
-        npm install @bambi-astro/button
-        ```
-      </TabItem>
-      <TabItem label="pnpm">
-        ```sh
-        pnpm add @bambi-astro/button
-        ```
-      </TabItem>
-      <TabItem label="yarn">
-        ```sh
-        yarn add @bambi-astro/button
-        ```
-      </TabItem>
-      <TabItem label="bun">
-        ```sh
-        bun add @bambi-astro/button
-        ```
-      </TabItem>
-    </Tabs>
+    ```sh
+    npx bambiui add button --framework astro
+    ```
   </TabItem>
 </Tabs>
 
-## Variants
+Import the generated CSS file from your app's global stylesheet:
+
+```css
+@import './styles/bambi.css';
+```
+
+## Intent And Appearance
 
 <Tabs syncKey="framework">
   <TabItem label="React">
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <ReactButton variant="primary">Primary</ReactButton>
-          <ReactButton variant="secondary">Secondary</ReactButton>
-          <ReactButton variant="outline">Outline</ReactButton>
-          <ReactButton variant="ghost">Ghost</ReactButton>
-          <ReactButton variant="link">Link</ReactButton>
-          <ReactButton variant="destructive">Destructive</ReactButton>
-          <ReactButton variant="success">Success</ReactButton>
-          <ReactButton variant="warning">Warning</ReactButton>
+          <ReactButton intent="primary">Primary</ReactButton>
+          <ReactButton intent="secondary">Secondary</ReactButton>
+          <ReactButton appearance="outline">Outline</ReactButton>
+          <ReactButton appearance="ghost">Ghost</ReactButton>
+          <ReactButton appearance="link">Link</ReactButton>
+          <ReactButton intent="danger">Danger</ReactButton>
+          <ReactButton intent="success">Success</ReactButton>
+          <ReactButton intent="warning">Warning</ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`import { Button } from '@bambi-react/button';
+          <Code lang="tsx" code={`import { Button } from './components/ui/button';
 
-<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
-<Button variant="destructive">Destructive</Button>
-<Button variant="success">Success</Button>
-<Button variant="warning">Warning</Button>`} />
+<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -163,30 +90,30 @@ Install the package for your framework:
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <SvelteButton variant="primary">Primary</SvelteButton>
-          <SvelteButton variant="secondary">Secondary</SvelteButton>
-          <SvelteButton variant="outline">Outline</SvelteButton>
-          <SvelteButton variant="ghost">Ghost</SvelteButton>
-          <SvelteButton variant="link">Link</SvelteButton>
-          <SvelteButton variant="destructive">Destructive</SvelteButton>
-          <SvelteButton variant="success">Success</SvelteButton>
-          <SvelteButton variant="warning">Warning</SvelteButton>
+          <SvelteButton intent="primary">Primary</SvelteButton>
+          <SvelteButton intent="secondary">Secondary</SvelteButton>
+          <SvelteButton appearance="outline">Outline</SvelteButton>
+          <SvelteButton appearance="ghost">Ghost</SvelteButton>
+          <SvelteButton appearance="link">Link</SvelteButton>
+          <SvelteButton intent="danger">Danger</SvelteButton>
+          <SvelteButton intent="success">Success</SvelteButton>
+          <SvelteButton intent="warning">Warning</SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import { Button } from '@bambi-svelte/button';
+  import Button from './components/ui/Button.svelte';
 </script>
 
-<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
-<Button variant="destructive">Destructive</Button>
-<Button variant="success">Success</Button>
-<Button variant="warning">Warning</Button>`} />
+<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -196,31 +123,31 @@ Install the package for your framework:
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <VueButton variant="primary">Primary</VueButton>
-          <VueButton variant="secondary">Secondary</VueButton>
-          <VueButton variant="outline">Outline</VueButton>
-          <VueButton variant="ghost">Ghost</VueButton>
-          <VueButton variant="link">Link</VueButton>
-          <VueButton variant="destructive">Destructive</VueButton>
-          <VueButton variant="success">Success</VueButton>
-          <VueButton variant="warning">Warning</VueButton>
+          <VueButton intent="primary">Primary</VueButton>
+          <VueButton intent="secondary">Secondary</VueButton>
+          <VueButton appearance="outline">Outline</VueButton>
+          <VueButton appearance="ghost">Ghost</VueButton>
+          <VueButton appearance="link">Link</VueButton>
+          <VueButton intent="danger">Danger</VueButton>
+          <VueButton intent="success">Success</VueButton>
+          <VueButton intent="warning">Warning</VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import { Button } from '@bambi-vue/button';
+import Button from './components/ui/Button.vue';
 </script>
 
 <template>
-  <Button variant="primary">Primary</Button>
-  <Button variant="secondary">Secondary</Button>
-  <Button variant="outline">Outline</Button>
-  <Button variant="ghost">Ghost</Button>
-  <Button variant="link">Link</Button>
-  <Button variant="destructive">Destructive</Button>
-  <Button variant="success">Success</Button>
-  <Button variant="warning">Warning</Button>
+  <Button intent="primary">Primary</Button>
+  <Button intent="secondary">Secondary</Button>
+  <Button appearance="outline">Outline</Button>
+  <Button appearance="ghost">Ghost</Button>
+  <Button appearance="link">Link</Button>
+  <Button intent="danger">Danger</Button>
+  <Button intent="success">Success</Button>
+  <Button intent="warning">Warning</Button>
 </template>`} />
         </div>
         <button class="view-code-btn">View code</button>
@@ -231,30 +158,30 @@ import { Button } from '@bambi-vue/button';
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <AstroButton variant="primary">Primary</AstroButton>
-          <AstroButton variant="secondary">Secondary</AstroButton>
-          <AstroButton variant="outline">Outline</AstroButton>
-          <AstroButton variant="ghost">Ghost</AstroButton>
-          <AstroButton variant="link">Link</AstroButton>
-          <AstroButton variant="destructive">Destructive</AstroButton>
-          <AstroButton variant="success">Success</AstroButton>
-          <AstroButton variant="warning">Warning</AstroButton>
+          <AstroButton intent="primary">Primary</AstroButton>
+          <AstroButton intent="secondary">Secondary</AstroButton>
+          <AstroButton appearance="outline">Outline</AstroButton>
+          <AstroButton appearance="ghost">Ghost</AstroButton>
+          <AstroButton appearance="link">Link</AstroButton>
+          <AstroButton intent="danger">Danger</AstroButton>
+          <AstroButton intent="success">Success</AstroButton>
+          <AstroButton intent="warning">Warning</AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import { Button } from '@bambi-astro/button';
+import Button from './components/ui/Button.astro';
 ---
 
-<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="link">Link</Button>
-<Button variant="destructive">Destructive</Button>
-<Button variant="success">Success</Button>
-<Button variant="warning">Warning</Button>`} />
+<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -352,24 +279,24 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <ReactButton size="icon" variant="primary" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="secondary" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="outline" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="ghost" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="destructive" aria-label="Delete"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="success" aria-label="Create"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" variant="warning" aria-label="Caution"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" intent="success" aria-label="Create"><PlusIcon /></ReactButton>
+          <ReactButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`<Button size="icon" variant="primary" aria-label="Add">
+          <Code lang="tsx" code={`<Button size="icon" intent="primary" aria-label="Add">
   <PlusIcon />
 </Button>
-<Button size="icon" variant="secondary" aria-label="Add">
+<Button size="icon" intent="secondary" aria-label="Add">
   <PlusIcon />
 </Button>
-<Button size="icon" variant="destructive" aria-label="Delete">
+<Button size="icon" intent="danger" aria-label="Delete">
   <PlusIcon />
 </Button>`} />
         </div>
@@ -381,24 +308,24 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <SvelteButton size="icon" variant="primary" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="secondary" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="outline" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="ghost" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="destructive" aria-label="Delete"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="success" aria-label="Create"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" variant="warning" aria-label="Caution"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" intent="success" aria-label="Create"><PlusIcon /></SvelteButton>
+          <SvelteButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="svelte" code={`<Button size="icon" variant="primary" aria-label="Add">
+          <Code lang="svelte" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="secondary" aria-label="Add">
+<Button size="icon" intent="secondary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="destructive" aria-label="Delete">
+<Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
         </div>
@@ -410,24 +337,24 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <VueButton size="icon" variant="primary" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="secondary" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="outline" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="ghost" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="destructive" aria-label="Delete"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="success" aria-label="Create"><PlusIcon /></VueButton>
-          <VueButton size="icon" variant="warning" aria-label="Caution"><PlusIcon /></VueButton>
+          <VueButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></VueButton>
+          <VueButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></VueButton>
+          <VueButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></VueButton>
+          <VueButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></VueButton>
+          <VueButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></VueButton>
+          <VueButton size="icon" intent="success" aria-label="Create"><PlusIcon /></VueButton>
+          <VueButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="vue" code={`<Button size="icon" variant="primary" aria-label="Add">
+          <Code lang="vue" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="secondary" aria-label="Add">
+<Button size="icon" intent="secondary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="destructive" aria-label="Delete">
+<Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
         </div>
@@ -439,24 +366,24 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <AstroButton size="icon" variant="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="destructive" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" variant="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" intent="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" intent="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" appearance="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" appearance="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" intent="danger" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" intent="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
+          <AstroButton size="icon" intent="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="astro" code={`<Button size="icon" variant="primary" aria-label="Add">
+          <Code lang="astro" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="secondary" aria-label="Add">
+<Button size="icon" intent="secondary" aria-label="Add">
   <svg>...</svg>
 </Button>
-<Button size="icon" variant="destructive" aria-label="Delete">
+<Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
         </div>
@@ -475,26 +402,26 @@ Buttons combining an icon and a text label.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <ReactButton variant="primary"><PlusIcon />Add</ReactButton>
-          <ReactButton variant="secondary"><PlusIcon />Add</ReactButton>
-          <ReactButton variant="outline"><PlusIcon />Add</ReactButton>
-          <ReactButton variant="ghost"><PlusIcon />Add</ReactButton>
-          <ReactButton variant="destructive"><PlusIcon />Delete</ReactButton>
-          <ReactButton variant="success"><PlusIcon />Create</ReactButton>
-          <ReactButton variant="warning"><PlusIcon />Caution</ReactButton>
+          <ReactButton intent="primary"><PlusIcon />Add</ReactButton>
+          <ReactButton intent="secondary"><PlusIcon />Add</ReactButton>
+          <ReactButton appearance="outline"><PlusIcon />Add</ReactButton>
+          <ReactButton appearance="ghost"><PlusIcon />Add</ReactButton>
+          <ReactButton intent="danger"><PlusIcon />Delete</ReactButton>
+          <ReactButton intent="success"><PlusIcon />Create</ReactButton>
+          <ReactButton intent="warning"><PlusIcon />Caution</ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`<Button variant="primary">
+          <Code lang="tsx" code={`<Button intent="primary">
   <PlusIcon />
   Add
 </Button>
-<Button variant="destructive">
+<Button intent="danger">
   <TrashIcon />
   Delete
 </Button>
-<Button variant="success">
+<Button intent="success">
   <CheckIcon />
   Create
 </Button>`} />
@@ -507,26 +434,26 @@ Buttons combining an icon and a text label.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <SvelteButton variant="primary"><PlusIcon />Add</SvelteButton>
-          <SvelteButton variant="secondary"><PlusIcon />Add</SvelteButton>
-          <SvelteButton variant="outline"><PlusIcon />Add</SvelteButton>
-          <SvelteButton variant="ghost"><PlusIcon />Add</SvelteButton>
-          <SvelteButton variant="destructive"><PlusIcon />Delete</SvelteButton>
-          <SvelteButton variant="success"><PlusIcon />Create</SvelteButton>
-          <SvelteButton variant="warning"><PlusIcon />Caution</SvelteButton>
+          <SvelteButton intent="primary"><PlusIcon />Add</SvelteButton>
+          <SvelteButton intent="secondary"><PlusIcon />Add</SvelteButton>
+          <SvelteButton appearance="outline"><PlusIcon />Add</SvelteButton>
+          <SvelteButton appearance="ghost"><PlusIcon />Add</SvelteButton>
+          <SvelteButton intent="danger"><PlusIcon />Delete</SvelteButton>
+          <SvelteButton intent="success"><PlusIcon />Create</SvelteButton>
+          <SvelteButton intent="warning"><PlusIcon />Caution</SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="svelte" code={`<Button variant="primary">
+          <Code lang="svelte" code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
-<Button variant="destructive">
+<Button intent="danger">
   <svg>...</svg>
   Delete
 </Button>
-<Button variant="success">
+<Button intent="success">
   <svg>...</svg>
   Create
 </Button>`} />
@@ -539,26 +466,26 @@ Buttons combining an icon and a text label.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <VueButton variant="primary"><PlusIcon />Add</VueButton>
-          <VueButton variant="secondary"><PlusIcon />Add</VueButton>
-          <VueButton variant="outline"><PlusIcon />Add</VueButton>
-          <VueButton variant="ghost"><PlusIcon />Add</VueButton>
-          <VueButton variant="destructive"><PlusIcon />Delete</VueButton>
-          <VueButton variant="success"><PlusIcon />Create</VueButton>
-          <VueButton variant="warning"><PlusIcon />Caution</VueButton>
+          <VueButton intent="primary"><PlusIcon />Add</VueButton>
+          <VueButton intent="secondary"><PlusIcon />Add</VueButton>
+          <VueButton appearance="outline"><PlusIcon />Add</VueButton>
+          <VueButton appearance="ghost"><PlusIcon />Add</VueButton>
+          <VueButton intent="danger"><PlusIcon />Delete</VueButton>
+          <VueButton intent="success"><PlusIcon />Create</VueButton>
+          <VueButton intent="warning"><PlusIcon />Caution</VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="vue" code={`<Button variant="primary">
+          <Code lang="vue" code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
-<Button variant="destructive">
+<Button intent="danger">
   <svg>...</svg>
   Delete
 </Button>
-<Button variant="success">
+<Button intent="success">
   <svg>...</svg>
   Create
 </Button>`} />
@@ -571,26 +498,26 @@ Buttons combining an icon and a text label.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <AstroButton variant="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton variant="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton variant="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton variant="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton variant="destructive"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</AstroButton>
-          <AstroButton variant="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</AstroButton>
-          <AstroButton variant="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</AstroButton>
+          <AstroButton intent="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
+          <AstroButton intent="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
+          <AstroButton appearance="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
+          <AstroButton appearance="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
+          <AstroButton intent="danger"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</AstroButton>
+          <AstroButton intent="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</AstroButton>
+          <AstroButton intent="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="astro" code={`<Button variant="primary">
+          <Code lang="astro" code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
-<Button variant="destructive">
+<Button intent="danger">
   <svg>...</svg>
   Delete
 </Button>
-<Button variant="success">
+<Button intent="success">
   <svg>...</svg>
   Create
 </Button>`} />
@@ -610,13 +537,13 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <ReactButton variant="primary" style={{'--bambi-button-radius': '9999px'}}>Primary</ReactButton>
-          <ReactButton variant="secondary" style={{'--bambi-button-radius': '9999px'}}>Secondary</ReactButton>
-          <ReactButton variant="outline" style={{'--bambi-button-radius': '9999px'}}>Outline</ReactButton>
-          <ReactButton variant="ghost" style={{'--bambi-button-radius': '9999px'}}>Ghost</ReactButton>
-          <ReactButton variant="destructive" style={{'--bambi-button-radius': '9999px'}}>Destructive</ReactButton>
-          <ReactButton variant="success" style={{'--bambi-button-radius': '9999px'}}>Success</ReactButton>
-          <ReactButton variant="warning" style={{'--bambi-button-radius': '9999px'}}>Warning</ReactButton>
+          <ReactButton intent="primary" style={{'--bambi-button-radius': '9999px'}}>Primary</ReactButton>
+          <ReactButton intent="secondary" style={{'--bambi-button-radius': '9999px'}}>Secondary</ReactButton>
+          <ReactButton appearance="outline" style={{'--bambi-button-radius': '9999px'}}>Outline</ReactButton>
+          <ReactButton appearance="ghost" style={{'--bambi-button-radius': '9999px'}}>Ghost</ReactButton>
+          <ReactButton intent="danger" style={{'--bambi-button-radius': '9999px'}}>Danger</ReactButton>
+          <ReactButton intent="success" style={{'--bambi-button-radius': '9999px'}}>Success</ReactButton>
+          <ReactButton intent="warning" style={{'--bambi-button-radius': '9999px'}}>Warning</ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
@@ -626,9 +553,9 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
 }`} />
           <Code lang="tsx" code={`import './button.css';
 
-<Button className="btn-rounded" variant="primary">Primary</Button>
-<Button className="btn-rounded" variant="secondary">Secondary</Button>
-<Button className="btn-rounded" variant="outline">Outline</Button>`} />
+<Button className="btn-rounded" intent="primary">Primary</Button>
+<Button className="btn-rounded" intent="secondary">Secondary</Button>
+<Button className="btn-rounded" appearance="outline">Outline</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -638,24 +565,24 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <SvelteButton variant="primary" style="--bambi-button-radius: 9999px">Primary</SvelteButton>
-          <SvelteButton variant="secondary" style="--bambi-button-radius: 9999px">Secondary</SvelteButton>
-          <SvelteButton variant="outline" style="--bambi-button-radius: 9999px">Outline</SvelteButton>
-          <SvelteButton variant="ghost" style="--bambi-button-radius: 9999px">Ghost</SvelteButton>
-          <SvelteButton variant="destructive" style="--bambi-button-radius: 9999px">Destructive</SvelteButton>
-          <SvelteButton variant="success" style="--bambi-button-radius: 9999px">Success</SvelteButton>
-          <SvelteButton variant="warning" style="--bambi-button-radius: 9999px">Warning</SvelteButton>
+          <SvelteButton intent="primary" style="--bambi-button-radius: 9999px">Primary</SvelteButton>
+          <SvelteButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</SvelteButton>
+          <SvelteButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</SvelteButton>
+          <SvelteButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</SvelteButton>
+          <SvelteButton intent="danger" style="--bambi-button-radius: 9999px">Danger</SvelteButton>
+          <SvelteButton intent="success" style="--bambi-button-radius: 9999px">Success</SvelteButton>
+          <SvelteButton intent="warning" style="--bambi-button-radius: 9999px">Warning</SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<script>
-  import { Button } from '@bambi-svelte/button';
+  import Button from './components/ui/Button.svelte';
 </script>
 
-<Button class="btn-rounded" variant="primary">Primary</Button>
-<Button class="btn-rounded" variant="secondary">Secondary</Button>
-<Button class="btn-rounded" variant="outline">Outline</Button>
+<Button class="btn-rounded" intent="primary">Primary</Button>
+<Button class="btn-rounded" intent="secondary">Secondary</Button>
+<Button class="btn-rounded" appearance="outline">Outline</Button>
 
 <style>
   .btn-rounded {
@@ -671,25 +598,25 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <VueButton variant="primary" style="--bambi-button-radius: 9999px">Primary</VueButton>
-          <VueButton variant="secondary" style="--bambi-button-radius: 9999px">Secondary</VueButton>
-          <VueButton variant="outline" style="--bambi-button-radius: 9999px">Outline</VueButton>
-          <VueButton variant="ghost" style="--bambi-button-radius: 9999px">Ghost</VueButton>
-          <VueButton variant="destructive" style="--bambi-button-radius: 9999px">Destructive</VueButton>
-          <VueButton variant="success" style="--bambi-button-radius: 9999px">Success</VueButton>
-          <VueButton variant="warning" style="--bambi-button-radius: 9999px">Warning</VueButton>
+          <VueButton intent="primary" style="--bambi-button-radius: 9999px">Primary</VueButton>
+          <VueButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</VueButton>
+          <VueButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</VueButton>
+          <VueButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</VueButton>
+          <VueButton intent="danger" style="--bambi-button-radius: 9999px">Danger</VueButton>
+          <VueButton intent="success" style="--bambi-button-radius: 9999px">Success</VueButton>
+          <VueButton intent="warning" style="--bambi-button-radius: 9999px">Warning</VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<script setup>
-import { Button } from '@bambi-vue/button';
+import Button from './components/ui/Button.vue';
 </script>
 
 <template>
-  <Button class="btn-rounded" variant="primary">Primary</Button>
-  <Button class="btn-rounded" variant="secondary">Secondary</Button>
-  <Button class="btn-rounded" variant="outline">Outline</Button>
+  <Button class="btn-rounded" intent="primary">Primary</Button>
+  <Button class="btn-rounded" intent="secondary">Secondary</Button>
+  <Button class="btn-rounded" appearance="outline">Outline</Button>
 </template>
 
 <style scoped>
@@ -706,24 +633,24 @@ import { Button } from '@bambi-vue/button';
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <AstroButton variant="primary" style="--bambi-button-radius: 9999px">Primary</AstroButton>
-          <AstroButton variant="secondary" style="--bambi-button-radius: 9999px">Secondary</AstroButton>
-          <AstroButton variant="outline" style="--bambi-button-radius: 9999px">Outline</AstroButton>
-          <AstroButton variant="ghost" style="--bambi-button-radius: 9999px">Ghost</AstroButton>
-          <AstroButton variant="destructive" style="--bambi-button-radius: 9999px">Destructive</AstroButton>
-          <AstroButton variant="success" style="--bambi-button-radius: 9999px">Success</AstroButton>
-          <AstroButton variant="warning" style="--bambi-button-radius: 9999px">Warning</AstroButton>
+          <AstroButton intent="primary" style="--bambi-button-radius: 9999px">Primary</AstroButton>
+          <AstroButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</AstroButton>
+          <AstroButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</AstroButton>
+          <AstroButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</AstroButton>
+          <AstroButton intent="danger" style="--bambi-button-radius: 9999px">Danger</AstroButton>
+          <AstroButton intent="success" style="--bambi-button-radius: 9999px">Success</AstroButton>
+          <AstroButton intent="warning" style="--bambi-button-radius: 9999px">Warning</AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import { Button } from '@bambi-astro/button';
+import Button from './components/ui/Button.astro';
 ---
 
-<Button class="btn-rounded" variant="primary">Primary</Button>
-<Button class="btn-rounded" variant="secondary">Secondary</Button>
-<Button class="btn-rounded" variant="outline">Outline</Button>
+<Button class="btn-rounded" intent="primary">Primary</Button>
+<Button class="btn-rounded" intent="secondary">Secondary</Button>
+<Button class="btn-rounded" appearance="outline">Outline</Button>
 
 <style>
   .btn-rounded {
@@ -745,8 +672,8 @@ import { Button } from '@bambi-astro/button';
       <div class="demo-preview-card">
         <div class="preview-col">
           <ReactButton style={{width:'100%'}}>Full Width Primary</ReactButton>
-          <ReactButton style={{width:'100%'}} variant="secondary">Full Width Secondary</ReactButton>
-          <ReactButton style={{width:'100%'}} variant="outline">Full Width Outline</ReactButton>
+          <ReactButton style={{width:'100%'}} intent="secondary">Full Width Secondary</ReactButton>
+          <ReactButton style={{width:'100%'}} appearance="outline">Full Width Outline</ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
@@ -754,10 +681,10 @@ import { Button } from '@bambi-astro/button';
           <Code lang="tsx" code={`<Button style={{ width: '100%' }}>
   Full Width Primary
 </Button>
-<Button style={{ width: '100%' }} variant="secondary">
+<Button style={{ width: '100%' }} intent="secondary">
   Full Width Secondary
 </Button>
-<Button style={{ width: '100%' }} variant="outline">
+<Button style={{ width: '100%' }} appearance="outline">
   Full Width Outline
 </Button>`} />
         </div>
@@ -770,15 +697,15 @@ import { Button } from '@bambi-astro/button';
       <div class="demo-preview-card">
         <div class="preview-col">
           <SvelteButton style="width:100%">Full Width Primary</SvelteButton>
-          <SvelteButton style="width:100%" variant="secondary">Full Width Secondary</SvelteButton>
-          <SvelteButton style="width:100%" variant="outline">Full Width Outline</SvelteButton>
+          <SvelteButton style="width:100%" intent="secondary">Full Width Secondary</SvelteButton>
+          <SvelteButton style="width:100%" appearance="outline">Full Width Outline</SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="svelte" code={`<Button style="width: 100%">Full Width Primary</Button>
-<Button style="width: 100%" variant="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" variant="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -789,15 +716,15 @@ import { Button } from '@bambi-astro/button';
       <div class="demo-preview-card">
         <div class="preview-col">
           <VueButton style="width:100%">Full Width Primary</VueButton>
-          <VueButton style="width:100%" variant="secondary">Full Width Secondary</VueButton>
-          <VueButton style="width:100%" variant="outline">Full Width Outline</VueButton>
+          <VueButton style="width:100%" intent="secondary">Full Width Secondary</VueButton>
+          <VueButton style="width:100%" appearance="outline">Full Width Outline</VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="vue" code={`<Button style="width: 100%">Full Width Primary</Button>
-<Button style="width: 100%" variant="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" variant="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -808,15 +735,15 @@ import { Button } from '@bambi-astro/button';
       <div class="demo-preview-card">
         <div class="preview-col">
           <AstroButton style="width:100%">Full Width Primary</AstroButton>
-          <AstroButton style="width:100%" variant="secondary">Full Width Secondary</AstroButton>
-          <AstroButton style="width:100%" variant="outline">Full Width Outline</AstroButton>
+          <AstroButton style="width:100%" intent="secondary">Full Width Secondary</AstroButton>
+          <AstroButton style="width:100%" appearance="outline">Full Width Outline</AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`<Button style="width: 100%">Full Width Primary</Button>
-<Button style="width: 100%" variant="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" variant="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -833,20 +760,20 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <ReactButton variant="primary" loading>Save</ReactButton>
-          <ReactButton variant="secondary" loading>Save</ReactButton>
-          <ReactButton variant="outline" loading>Save</ReactButton>
-          <ReactButton variant="ghost" loading>Save</ReactButton>
-          <ReactButton variant="destructive" loading>Delete</ReactButton>
-          <ReactButton variant="success" loading>Create</ReactButton>
-          <ReactButton variant="warning" loading>Caution</ReactButton>
+          <ReactButton intent="primary" loading>Save</ReactButton>
+          <ReactButton intent="secondary" loading>Save</ReactButton>
+          <ReactButton appearance="outline" loading>Save</ReactButton>
+          <ReactButton appearance="ghost" loading>Save</ReactButton>
+          <ReactButton intent="danger" loading>Delete</ReactButton>
+          <ReactButton intent="success" loading>Create</ReactButton>
+          <ReactButton intent="warning" loading>Caution</ReactButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="tsx" code={`<Button variant="primary" loading>Save</Button>
-<Button variant="secondary" loading>Save</Button>
-<Button variant="destructive" loading>Delete</Button>`} />
+          <Code lang="tsx" code={`<Button intent="primary" loading>Save</Button>
+<Button intent="secondary" loading>Save</Button>
+<Button intent="danger" loading>Delete</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -856,20 +783,20 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <SvelteButton variant="primary" loading>Save</SvelteButton>
-          <SvelteButton variant="secondary" loading>Save</SvelteButton>
-          <SvelteButton variant="outline" loading>Save</SvelteButton>
-          <SvelteButton variant="ghost" loading>Save</SvelteButton>
-          <SvelteButton variant="destructive" loading>Delete</SvelteButton>
-          <SvelteButton variant="success" loading>Create</SvelteButton>
-          <SvelteButton variant="warning" loading>Caution</SvelteButton>
+          <SvelteButton intent="primary" loading>Save</SvelteButton>
+          <SvelteButton intent="secondary" loading>Save</SvelteButton>
+          <SvelteButton appearance="outline" loading>Save</SvelteButton>
+          <SvelteButton appearance="ghost" loading>Save</SvelteButton>
+          <SvelteButton intent="danger" loading>Delete</SvelteButton>
+          <SvelteButton intent="success" loading>Create</SvelteButton>
+          <SvelteButton intent="warning" loading>Caution</SvelteButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="svelte" code={`<Button variant="primary" loading>Save</Button>
-<Button variant="secondary" loading>Save</Button>
-<Button variant="destructive" loading>Delete</Button>`} />
+          <Code lang="svelte" code={`<Button intent="primary" loading>Save</Button>
+<Button intent="secondary" loading>Save</Button>
+<Button intent="danger" loading>Delete</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -879,20 +806,20 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <VueButton variant="primary" loading={true}>Save</VueButton>
-          <VueButton variant="secondary" loading={true}>Save</VueButton>
-          <VueButton variant="outline" loading={true}>Save</VueButton>
-          <VueButton variant="ghost" loading={true}>Save</VueButton>
-          <VueButton variant="destructive" loading={true}>Delete</VueButton>
-          <VueButton variant="success" loading={true}>Create</VueButton>
-          <VueButton variant="warning" loading={true}>Caution</VueButton>
+          <VueButton intent="primary" loading={true}>Save</VueButton>
+          <VueButton intent="secondary" loading={true}>Save</VueButton>
+          <VueButton appearance="outline" loading={true}>Save</VueButton>
+          <VueButton appearance="ghost" loading={true}>Save</VueButton>
+          <VueButton intent="danger" loading={true}>Delete</VueButton>
+          <VueButton intent="success" loading={true}>Create</VueButton>
+          <VueButton intent="warning" loading={true}>Caution</VueButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
-          <Code lang="vue" code={`<Button variant="primary" loading={true}>Save</Button>
-<Button variant="secondary" loading={true}>Save</Button>
-<Button variant="destructive" loading={true}>Delete</Button>`} />
+          <Code lang="vue" code={`<Button intent="primary" loading={true}>Save</Button>
+<Button intent="secondary" loading={true}>Save</Button>
+<Button intent="danger" loading={true}>Delete</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -902,24 +829,24 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
     <div class="demo-grid">
       <div class="demo-preview-card">
         <div class="preview-row">
-          <AstroButton variant="primary" loading>Save</AstroButton>
-          <AstroButton variant="secondary" loading>Save</AstroButton>
-          <AstroButton variant="outline" loading>Save</AstroButton>
-          <AstroButton variant="ghost" loading>Save</AstroButton>
-          <AstroButton variant="destructive" loading>Delete</AstroButton>
-          <AstroButton variant="success" loading>Create</AstroButton>
-          <AstroButton variant="warning" loading>Caution</AstroButton>
+          <AstroButton intent="primary" loading>Save</AstroButton>
+          <AstroButton intent="secondary" loading>Save</AstroButton>
+          <AstroButton appearance="outline" loading>Save</AstroButton>
+          <AstroButton appearance="ghost" loading>Save</AstroButton>
+          <AstroButton intent="danger" loading>Delete</AstroButton>
+          <AstroButton intent="success" loading>Create</AstroButton>
+          <AstroButton intent="warning" loading>Caution</AstroButton>
         </div>
       </div>
       <div class="demo-code-card">
         <div class="code-body">
           <Code lang="astro" code={`---
-import { Button } from '@bambi-astro/button';
+import Button from './components/ui/Button.astro';
 ---
 
-<Button variant="primary" loading>Save</Button>
-<Button variant="secondary" loading>Save</Button>
-<Button variant="destructive" loading>Delete</Button>`} />
+<Button intent="primary" loading>Save</Button>
+<Button intent="secondary" loading>Save</Button>
+<Button intent="danger" loading>Delete</Button>`} />
         </div>
         <button class="view-code-btn">View code</button>
       </div>
@@ -933,7 +860,8 @@ All framework packages share the same prop API.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'destructive' \| 'success' \| 'warning'` | `'primary'` | Visual style |
+| `intent` | `'primary' \| 'secondary' \| 'danger' \| 'success' \| 'warning'` | `'primary'` | Semantic meaning |
+| `appearance` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | Visual treatment |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'icon'` | `'md'` | Button size |
 | `loading` | `boolean` | `false` | Shows spinner and prevents interaction |
 | `disabled` | `boolean` | `false` | Disables the button |

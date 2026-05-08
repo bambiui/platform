@@ -1,0 +1,150 @@
+.bambi-button {
+  --bambi-button-bg: var(--bambi-intent-primary-bg);
+  --bambi-button-fg: var(--bambi-intent-primary-fg);
+  --bambi-button-border: transparent;
+  --bambi-button-hover-bg: var(--bambi-intent-primary-hover-bg);
+  --bambi-button-hover-fg: var(--bambi-button-fg);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bambi-button-gap);
+  border: var(--bambi-button-border-width) solid var(--bambi-button-border);
+  border-radius: var(--bambi-button-radius);
+  background-color: var(--bambi-button-bg);
+  color: var(--bambi-button-fg);
+  font-family: var(--bambi-button-font-family);
+  font-size: var(--bambi-button-font-size-md);
+  font-weight: var(--bambi-button-font-weight);
+  line-height: var(--bambi-button-line-height);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: var(--bambi-button-transition);
+}
+
+.bambi-button[data-size="sm"] {
+  padding: var(--bambi-button-padding-sm);
+  font-size: var(--bambi-button-font-size-sm);
+}
+
+.bambi-button[data-size="md"] {
+  padding: var(--bambi-button-padding-md);
+  font-size: var(--bambi-button-font-size-md);
+}
+
+.bambi-button[data-size="lg"] {
+  padding: var(--bambi-button-padding-lg);
+  font-size: var(--bambi-button-font-size-lg);
+}
+
+.bambi-button[data-size="icon"] {
+  padding: var(--bambi-button-padding-icon);
+  aspect-ratio: 1 / 1;
+}
+
+.bambi-button[data-intent="secondary"] {
+  --bambi-button-bg: var(--bambi-intent-secondary-bg);
+  --bambi-button-fg: var(--bambi-intent-secondary-fg);
+  --bambi-button-border: var(--bambi-border);
+  --bambi-button-hover-bg: var(--bambi-intent-secondary-hover-bg);
+}
+
+.bambi-button[data-intent="danger"] {
+  --bambi-button-bg: var(--bambi-intent-danger-bg);
+  --bambi-button-fg: var(--bambi-intent-danger-fg);
+  --bambi-button-hover-bg: var(--bambi-intent-danger-hover-bg);
+}
+
+.bambi-button[data-intent="success"] {
+  --bambi-button-bg: var(--bambi-intent-success-bg);
+  --bambi-button-fg: var(--bambi-intent-success-fg);
+  --bambi-button-hover-bg: var(--bambi-intent-success-hover-bg);
+}
+
+.bambi-button[data-intent="warning"] {
+  --bambi-button-bg: var(--bambi-intent-warning-bg);
+  --bambi-button-fg: var(--bambi-intent-warning-fg);
+  --bambi-button-hover-bg: var(--bambi-intent-warning-hover-bg);
+}
+
+.bambi-button[data-appearance="outline"] {
+  --bambi-button-bg: transparent;
+  --bambi-button-fg: var(--bambi-button-hover-bg);
+  --bambi-button-border: var(--bambi-button-hover-bg);
+  --bambi-button-hover-bg: color-mix(in oklch, currentColor 10%, transparent);
+  --bambi-button-hover-fg: var(--bambi-button-fg);
+}
+
+.bambi-button[data-appearance="ghost"] {
+  --bambi-button-bg: transparent;
+  --bambi-button-fg: var(--bambi-foreground);
+  --bambi-button-border: transparent;
+  --bambi-button-hover-bg: var(--bambi-accent);
+  --bambi-button-hover-fg: var(--bambi-accent-foreground);
+}
+
+.bambi-button[data-appearance="link"] {
+  --bambi-button-bg: transparent;
+  --bambi-button-fg: var(--bambi-primary);
+  --bambi-button-border: transparent;
+  --bambi-button-hover-bg: transparent;
+  --bambi-button-hover-fg: var(--bambi-primary);
+
+  padding: 0;
+  height: auto;
+  text-underline-offset: var(--bambi-button-link-underline-offset);
+}
+
+.bambi-button:hover:not(:disabled) {
+  background-color: var(--bambi-button-hover-bg);
+  color: var(--bambi-button-hover-fg);
+  opacity: var(--bambi-state-hover-opacity);
+}
+
+.bambi-button[data-appearance="link"]:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.bambi-button-content {
+  display: contents;
+}
+
+.bambi-button[data-loading] {
+  position: relative;
+  pointer-events: none;
+}
+
+.bambi-button[data-loading] .bambi-button-content {
+  opacity: 0;
+}
+
+.bambi-button-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin: -0.5em 0 0 -0.5em;
+  border: var(--bambi-button-spinner-border-width) solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--bambi-radius-full);
+  animation: bambi-spin var(--bambi-button-spinner-duration) linear infinite;
+}
+
+@keyframes bambi-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.bambi-button:focus-visible {
+  outline: var(--bambi-button-focus-ring-width) solid var(--bambi-button-ring);
+  outline-offset: var(--bambi-button-focus-ring-offset);
+}
+
+.bambi-button:disabled {
+  opacity: var(--bambi-button-disabled-opacity);
+  pointer-events: none;
+}

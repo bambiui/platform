@@ -11,8 +11,9 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        '@bambi-ui/theme/tokens.css': resolve(root, 'packages/ui/theme/src/tokens.css'),
-        '@bambi-ui/button/index.css': resolve(root, 'packages/ui/button/src/index.css'),
+        '@bambiui/tokens/tokens.css': resolve(root, 'packages/tokens/src/tokens.css'),
+        '@bambiui/components/button.css': resolve(root, 'packages/components/button/src/button.css'),
+        '@bambiui/components/button/astro': resolve(root, 'packages/components/button/src/astro.astro'),
       },
     },
   },

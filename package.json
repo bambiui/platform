@@ -1,9 +1,9 @@
 {
-  "name": "bambiui",
+  "name": "@bambiui/workspace",
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "deploy-static": "turbo run build && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/",
+    "deploy-static": "turbo run build --filter=docs --filter=builder && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

@@ -1,8 +1,8 @@
-# BambiUI — CLAUDE.md
+# Bambi UI — AGENTS.md
 
 ## What this repo is
 
-BambiUI is a multi-framework UI component CLI built as a pnpm + Turborepo monorepo. The CLI copies React, Svelte, Vue, and Astro component source into user projects. Docs and builder consume the same source files directly through Vite aliases.
+Bambi UI is a multi-framework UI component library built as a pnpm + Turborepo monorepo. Components are available for React, Svelte, Vue, and Astro. All frameworks share the same design tokens and base CSS.
 
 ## Monorepo structure
 
@@ -11,31 +11,33 @@ apps/
   docs/                    # Starlight (Astro) documentation site
   builder/                 # Infinite-canvas design token editor (static Astro, served at /builder)
 packages/
-  cli/                    # @bambiui/cli — init + add source components
-  core/                   # @bambiui/core — shared contracts and framework-agnostic types
-  tokens/                 # @bambiui/tokens — primitive, semantic, intent, state, component tokens
-  recipes/                # @bambiui/recipes — shared recipe definitions
-  components/             # @bambiui/components — source components + CSS
-    button/
+  ui/
+    button/                # @bambi-ui/button — shared types + base CSS (built with tsup)
+    theme/                 # @bambi-ui/theme — CSS tokens + cn() utility (built with tsup)
+  react/
+    button/                # @bambi-react/button — React component (built with tsup)
+  svelte/
+    button/                # @bambi-svelte/button — Svelte 5 component (source-shipped)
+  vue/
+    button/                # @bambi-vue/button — Vue 3 component (source-shipped)
+  astro/
+    button/                # @bambi-astro/button — Astro component (source-shipped)
 ```
 
 ## Key conventions
 
-### CLI-first component delivery
-- Components are source files under `packages/components`, not per-framework packages.
-- User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
-- The initial registry is GitHub raw files; a hosted registry API can replace the base URL later without changing component packages.
-- The CLI package must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
-- Do not add per-component package.json files or build steps unless the project intentionally returns to package publishing.
+### Source-shipping vs. built packages
+- `@bambi-ui/button`, `@bambi-ui/theme`, `@bambi-react/button` are **built with tsup** — consumers get compiled JS + `.d.ts`.
+- `@bambi-svelte/button`, `@bambi-vue/button`, `@bambi-astro/button` are **source-shipped** — `.svelte`, `.vue`, `.astro` files go to consumers as-is; the consumer's bundler compiles them.
 
 ### CSS delivery
-- All button CSS lives in `packages/components/button/src/button.css` — a single source consumed by all frameworks.
-- Public user projects receive global tokens from `packages/tokens/src/tokens.css` and component CSS from `packages/components/<name>/src/<name>.css`.
+- All button CSS lives in `packages/ui/button/src/index.css` — a single source consumed by all frameworks.
+- The CSS export is `@bambi-ui/button/index.css` (declared in `package.json` exports, not the dist).
 - In the docs site, CSS is loaded via Starlight's `customCss` array in `astro.config.mjs`, **not** via PostCSS `@import` (PostCSS doesn't resolve package.json `exports` for CSS).
 - The builder resolves workspace CSS via `vite.resolve.alias` in `apps/builder/astro.config.mjs`.
 
 ### Design tokens
-- Global design tokens are CSS custom properties in `packages/tokens/src/tokens.css`.
+- All design tokens are CSS custom properties in `packages/ui/theme/src/tokens.css`.
 - Colors use OKLCH. Light defaults in `:root`, dark overrides in `.dark`.
 - Button tokens are namespaced `--bambi-button-*`. Theme tokens are `--bambi-*`.
 
@@ -47,20 +49,19 @@ packages/
 
 ### Component API conventions
 Every button component across all frameworks follows the same shape:
-- Props: `intent`, `appearance`, `size`, `loading`, `disabled`, `type` (all optional with defaults)
+- Props: `variant`, `size`, `loading`, `disabled`, `type` (all optional with defaults)
 - Default `type="button"` (prevents accidental form submission)
-- `data-intent`, `data-appearance`, `data-size` attributes drive CSS styling
+- `data-variant`, `data-size` attributes drive CSS styling
 - `data-loading` + `aria-busy="true"` for loading state
 - `opacity: 0` (not `visibility: hidden`) on `.bambi-button-content` during loading — keeps text accessible to screen readers
 - `aria-disabled` set when `loading || disabled`
 
 ### Adding a new component
-1. Add shared contracts to `packages/core/src/index.ts` when needed.
-2. Add shared recipes to `packages/recipes/src/index.ts` when needed.
-3. Add component source under `packages/components/<name>/src/`.
-4. Add component CSS beside the source component in `packages/components/<name>/src/<name>.css`.
-5. Register the component in `packages/cli/src/index.js`.
-6. Add the component to the docs under `apps/docs/src/content/docs/components/<name>.mdx`.
+1. Add shared types + CSS to a new package under `packages/ui/<name>/`
+2. Add framework implementations under `packages/react/<name>/`, `packages/svelte/<name>/`, etc.
+3. Add the component to the docs under `apps/docs/src/content/docs/components/<name>.mdx`
+4. Register new workspace packages in `pnpm-workspace.yaml` if new directories are introduced
+5. Add `noExternal` entries in `apps/docs/astro.config.mjs` for any new workspace package used in docs
 
 ## Common commands
 
@@ -68,8 +69,12 @@ Every button component across all frameworks follows the same shape:
 # Install dependencies
 pnpm install
 
-# Build docs and builder
+# Build all packages (required before running docs or builder)
 pnpm build
+
+# Build a specific package
+pnpm --filter @bambi-ui/button build
+pnpm --filter @bambi-react/button build
 
 # Run the docs dev server
 pnpm --filter docs dev
@@ -101,7 +106,7 @@ pnpm check-types
 
 ## Deployment (Cloudflare Pages)
 
-Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` (root script) builds docs and builder with Turborepo, then copies `apps/builder/dist/` into `apps/docs/dist/builder/`. The single output directory is `apps/docs/dist`.
+Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` (root script) builds everything with Turborepo, then copies `apps/builder/dist/` into `apps/docs/dist/builder/`. The single output directory is `apps/docs/dist`.
 
 | Setting | Value |
 |---|---|
@@ -112,19 +117,21 @@ Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static
 ## Dependency graph
 
 ```
-@bambiui/cli         (fetches source from registry URL)
-@bambiui/core        (shared contracts)
-@bambiui/tokens      (global CSS tokens)
-@bambiui/recipes  →  @bambiui/core
-@bambiui/components  (source files, no build)
-docs              →  @bambiui/components, @bambiui/tokens
-builder           →  @bambiui/components, @bambiui/tokens
+@bambi-ui/theme          (no internal deps)
+@bambi-ui/button         (no internal deps)
+@bambi-react/button  →   @bambi-ui/button, @bambi-ui/theme
+@bambi-svelte/button →   @bambi-ui/button
+@bambi-vue/button    →   @bambi-ui/button
+@bambi-astro/button  →   @bambi-ui/button
+docs                 →   all of the above
+builder              →   @bambi-ui/theme, @bambi-ui/button, @bambi-astro/button
 ```
 
 ## Things to watch out for
 
-- **Vite aliases**: Docs and builder resolve component source files through aliases such as `@bambiui/components/button/react`.
-- **Registry URL**: CLI defaults to GitHub raw and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or hosted registries.
-- **Component source has no build step**: User-facing files are copied by the CLI.
+- **Build order matters**: `@bambi-ui/button` and `@bambi-ui/theme` must be built before `@bambi-react/button` and before running docs or builder. Turborepo handles this via `"dependsOn": ["^build"]` in `turbo.json`.
+- **`vite.ssr.noExternal`**: All workspace packages used by docs must be listed here or Astro's SSR bundler won't process them correctly.
+- **PostCSS cannot resolve CSS from package `exports`**: Always use Starlight's `customCss` for CSS in docs; use `vite.resolve.alias` for CSS in builder.
+- **Svelte/Vue/Astro packages have no build step**: Don't add `tsup` scripts to them. Their source files are the published artifact.
 - **Builder `base: '/builder'`**: All internal asset paths in the builder are prefixed with `/builder`. Don't remove this or assets will 404 in production.
 - **`starlight-theme` localStorage key**: Both apps share this key. Never rename it in the builder without updating Starlight's config in docs, and vice versa.

@@ -1,11 +1,11 @@
 ---
-import { Button } from "@bambi-astro/button";
-import "@bambi-ui/theme/tokens.css";
+import Button from '@bambiui/components/button/astro';
+import '@bambiui/tokens/tokens.css';
 
 const colorGroups = [
   { label: "Base", tokens: ["background", "foreground", "card", "card-foreground", "border", "separator"] },
   { label: "Brand", tokens: ["primary", "primary-foreground", "secondary", "secondary-foreground", "accent", "accent-foreground", "muted", "muted-foreground"] },
-  { label: "Semantic", tokens: ["destructive", "destructive-foreground", "success", "success-foreground", "warning", "warning-foreground", "ring"] },
+  { label: "Semantic", tokens: ["danger", "danger-foreground", "success", "success-foreground", "warning", "warning-foreground", "ring"] },
   { label: "Input", tokens: ["input", "input-background", "input-foreground", "input-placeholder"] },
 ];
 
@@ -714,7 +714,7 @@ const typeWeights = [
         <div class="card" id="card-colors" style="top: 40px; left: 40px; width: 480px">
           <div class="cardHeader">
             <h3>Colors</h3>
-            <Button variant="link" data-edit-card="colors">Edit Tokens</Button>
+            <Button appearance="link" data-edit-card="colors">Edit Tokens</Button>
           </div>
           {colorGroups.map((group) => (
             <div class="color-group">
@@ -735,7 +735,7 @@ const typeWeights = [
         <div class="card" id="card-typography" style="top: 40px; left: 580px; width: 480px">
           <div class="cardHeader">
             <h3>Typography</h3>
-            <Button variant="link" data-edit-card="typography">Edit Tokens</Button>
+            <Button appearance="link" data-edit-card="typography">Edit Tokens</Button>
           </div>
 
           <div class="type-section">
@@ -746,7 +746,7 @@ const typeWeights = [
             </div>
             <div class="type-row">
               <span class="type-meta">--bambi-font-mono</span>
-              <span class="type-sample mono">const theme = "bambi-ui";</span>
+              <span class="type-sample mono">const theme = "bambiui";</span>
             </div>
           </div>
 
@@ -775,20 +775,20 @@ const typeWeights = [
         <div class="card" id="card-buttons" style="top: 40px; left: 1120px; width: 520px">
           <div class="cardHeader">
             <h3>Buttons</h3>
-            <Button variant="link" data-edit-card="buttons">Edit Tokens</Button>
+            <Button appearance="link" data-edit-card="buttons">Edit Tokens</Button>
           </div>
 
           <div class="preview-section">
             <span class="preview-section-label">Variants</span>
             <div class="row">
-              <Button variant="primary">Primary</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="link">Link</Button>
-              <Button variant="destructive">Destructive</Button>
-              <Button variant="success">Success</Button>
-              <Button variant="warning">Warning</Button>
+              <Button intent="primary">Primary</Button>
+              <Button intent="secondary">Secondary</Button>
+              <Button appearance="outline">Outline</Button>
+              <Button appearance="ghost">Ghost</Button>
+              <Button appearance="link">Link</Button>
+              <Button intent="danger">Danger</Button>
+              <Button intent="success">Success</Button>
+              <Button intent="warning">Warning</Button>
             </div>
           </div>
 
@@ -804,39 +804,39 @@ const typeWeights = [
           <div class="preview-section">
             <span class="preview-section-label">Icon</span>
             <div class="row">
-              <Button size="icon" variant="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="destructive" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-              <Button size="icon" variant="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" intent="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" intent="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" appearance="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" appearance="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" intent="danger" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" intent="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+              <Button size="icon" intent="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
             </div>
           </div>
 
           <div class="preview-section">
             <span class="preview-section-label">With Icon</span>
             <div class="row">
-              <Button variant="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-              <Button variant="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-              <Button variant="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-              <Button variant="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-              <Button variant="destructive"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</Button>
-              <Button variant="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</Button>
-              <Button variant="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</Button>
+              <Button intent="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+              <Button intent="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+              <Button appearance="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+              <Button appearance="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+              <Button intent="danger"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</Button>
+              <Button intent="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</Button>
+              <Button intent="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</Button>
             </div>
           </div>
 
           <div class="preview-section">
             <span class="preview-section-label">Rounded</span>
             <div class="row">
-              <Button variant="primary" style="--bambi-button-radius: 9999px">Primary</Button>
-              <Button variant="secondary" style="--bambi-button-radius: 9999px">Secondary</Button>
-              <Button variant="outline" style="--bambi-button-radius: 9999px">Outline</Button>
-              <Button variant="ghost" style="--bambi-button-radius: 9999px">Ghost</Button>
-              <Button variant="destructive" style="--bambi-button-radius: 9999px">Destructive</Button>
-              <Button variant="success" style="--bambi-button-radius: 9999px">Success</Button>
-              <Button variant="warning" style="--bambi-button-radius: 9999px">Warning</Button>
+              <Button intent="primary" style="--bambi-button-radius: 9999px">Primary</Button>
+              <Button intent="secondary" style="--bambi-button-radius: 9999px">Secondary</Button>
+              <Button appearance="outline" style="--bambi-button-radius: 9999px">Outline</Button>
+              <Button appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</Button>
+              <Button intent="danger" style="--bambi-button-radius: 9999px">Danger</Button>
+              <Button intent="success" style="--bambi-button-radius: 9999px">Success</Button>
+              <Button intent="warning" style="--bambi-button-radius: 9999px">Warning</Button>
             </div>
           </div>
 
@@ -844,34 +844,34 @@ const typeWeights = [
             <span class="preview-section-label">Full Width</span>
             <div class="col">
               <Button style="width: 100%">Full Width Primary</Button>
-              <Button variant="secondary" style="width: 100%">Full Width Secondary</Button>
-              <Button variant="outline" style="width: 100%">Full Width Outline</Button>
+              <Button intent="secondary" style="width: 100%">Full Width Secondary</Button>
+              <Button appearance="outline" style="width: 100%">Full Width Outline</Button>
             </div>
           </div>
 
           <div class="preview-section">
             <span class="preview-section-label">Loading</span>
             <div class="row">
-              <Button variant="primary" loading>Save</Button>
-              <Button variant="secondary" loading>Save</Button>
-              <Button variant="outline" loading>Save</Button>
-              <Button variant="ghost" loading>Save</Button>
-              <Button variant="destructive" loading>Delete</Button>
-              <Button variant="success" loading>Create</Button>
-              <Button variant="warning" loading>Caution</Button>
+              <Button intent="primary" loading>Save</Button>
+              <Button intent="secondary" loading>Save</Button>
+              <Button appearance="outline" loading>Save</Button>
+              <Button appearance="ghost" loading>Save</Button>
+              <Button intent="danger" loading>Delete</Button>
+              <Button intent="success" loading>Create</Button>
+              <Button intent="warning" loading>Caution</Button>
             </div>
           </div>
 
           <div class="preview-section">
             <span class="preview-section-label">Disabled</span>
             <div class="row">
-              <Button variant="primary" disabled>Primary</Button>
-              <Button variant="secondary" disabled>Secondary</Button>
-              <Button variant="outline" disabled>Outline</Button>
-              <Button variant="ghost" disabled>Ghost</Button>
-              <Button variant="destructive" disabled>Destructive</Button>
-              <Button variant="success" disabled>Success</Button>
-              <Button variant="warning" disabled>Warning</Button>
+              <Button intent="primary" disabled>Primary</Button>
+              <Button intent="secondary" disabled>Secondary</Button>
+              <Button appearance="outline" disabled>Outline</Button>
+              <Button appearance="ghost" disabled>Ghost</Button>
+              <Button intent="danger" disabled>Danger</Button>
+              <Button intent="success" disabled>Success</Button>
+              <Button intent="warning" disabled>Warning</Button>
             </div>
           </div>
         </div>
@@ -957,22 +957,24 @@ const typeWeights = [
           '--bambi-secondary':fmt(0.9524,gc*0.8,hue),'--bambi-secondary-foreground':'oklch(9% 0 0)',
           '--bambi-accent':fmt(0.9373,gc*0.8,hue),'--bambi-accent-foreground':'oklch(9% 0 0)',
           '--bambi-muted':fmt(0.9373,gc*0.8,hue),'--bambi-muted-foreground':fmt(0.5517,Math.min(gc*2,0.03),hue),
-          '--bambi-destructive':lDes,'--bambi-destructive-foreground':lDesFg,
+          '--bambi-danger':lDes,'--bambi-danger-foreground':lDesFg,
           '--bambi-success':lSuc,'--bambi-success-foreground':lSucFg,
           '--bambi-warning':lWar,'--bambi-warning-foreground':lWarFg,
           '--bambi-border':fmt(0.90,gc,hue),'--bambi-input':fmt(0.90,gc,hue),
           '--bambi-input-background':fmt(1.00,gc*0.5,hue),'--bambi-input-foreground':'oklch(9% 0 0)',
           '--bambi-input-placeholder':fmt(0.5517,Math.min(gc*2,0.03),hue),
           '--bambi-ring':lP,'--bambi-separator':fmt(0.92,gc,hue),
-          '--bambi-button-primary-bg':lP,'--bambi-button-primary-foreground':lPFg,
-          '--bambi-button-outline-color':lP,'--bambi-button-outline-border':lP,
-          '--bambi-button-link-color':lP,'--bambi-button-ring':lP,
-          '--bambi-button-secondary-bg':fmt(0.9524,gc*0.8,hue),'--bambi-button-secondary-foreground':'oklch(9% 0 0)',
-          '--bambi-button-secondary-border':fmt(0.90,gc,hue),
-          '--bambi-button-ghost-color':'oklch(9% 0 0)','--bambi-button-ghost-hover-bg':fmt(0.9373,gc*0.8,hue),'--bambi-button-ghost-hover-color':'oklch(9% 0 0)',
-          '--bambi-button-destructive-bg':lDes,'--bambi-button-destructive-foreground':lDesFg,
-          '--bambi-button-success-bg':lSuc,'--bambi-button-success-foreground':lSucFg,
-          '--bambi-button-warning-bg':lWar,'--bambi-button-warning-foreground':lWarFg,
+          '--bambi-intent-primary-bg':lP,'--bambi-intent-primary-fg':lPFg,
+          '--bambi-intent-primary-hover-bg':fmt(0.49,chroma,hue),
+          '--bambi-state-focus-ring':lP,
+          '--bambi-intent-secondary-bg':fmt(0.9524,gc*0.8,hue),'--bambi-intent-secondary-fg':'oklch(9% 0 0)',
+          '--bambi-intent-secondary-hover-bg':fmt(0.9373,gc*0.8,hue),
+          '--bambi-intent-danger-bg':lDes,'--bambi-intent-danger-fg':lDesFg,
+          '--bambi-intent-danger-hover-bg':fmt(0.58,0.22,dHL),
+          '--bambi-intent-success-bg':lSuc,'--bambi-intent-success-fg':lSucFg,
+          '--bambi-intent-success-hover-bg':fmt(0.64,0.18,sH),
+          '--bambi-intent-warning-bg':lWar,'--bambi-intent-warning-fg':lWarFg,
+          '--bambi-intent-warning-hover-bg':fmt(0.69,0.15,wHL),
         };
         const dark: Record<string,string> = {
           '--bambi-background':fmt(0.12,gc,hue),'--bambi-foreground':'oklch(98% 0 0)',
@@ -982,22 +984,24 @@ const typeWeights = [
           '--bambi-secondary':fmt(0.2570,gc*1.5,hue),'--bambi-secondary-foreground':'oklch(98% 0 0)',
           '--bambi-accent':fmt(0.2721,gc*1.5,hue),'--bambi-accent-foreground':'oklch(98% 0 0)',
           '--bambi-muted':fmt(0.2740,gc,hue),'--bambi-muted-foreground':fmt(0.7050,Math.min(gc*2,0.03),hue),
-          '--bambi-destructive':dDes,'--bambi-destructive-foreground':dDesFg,
+          '--bambi-danger':dDes,'--bambi-danger-foreground':dDesFg,
           '--bambi-success':dSuc,'--bambi-success-foreground':dSucFg,
           '--bambi-warning':dWar,'--bambi-warning-foreground':dWarFg,
           '--bambi-border':fmt(0.28,gc,hue),'--bambi-input':fmt(0.28,gc,hue),
           '--bambi-input-background':fmt(0.2103,gc*2,hue),'--bambi-input-foreground':'oklch(98% 0 0)',
           '--bambi-input-placeholder':fmt(0.7050,Math.min(gc*2,0.03),hue),
           '--bambi-ring':dP,'--bambi-separator':fmt(0.25,gc,hue),
-          '--bambi-button-primary-bg':dP,'--bambi-button-primary-foreground':dPFg,
-          '--bambi-button-outline-color':dP,'--bambi-button-outline-border':dP,
-          '--bambi-button-link-color':dP,'--bambi-button-ring':dP,
-          '--bambi-button-secondary-bg':fmt(0.2570,gc*1.5,hue),'--bambi-button-secondary-foreground':'oklch(98% 0 0)',
-          '--bambi-button-secondary-border':fmt(0.28,gc,hue),
-          '--bambi-button-ghost-color':'oklch(98% 0 0)','--bambi-button-ghost-hover-bg':fmt(0.2721,gc*1.5,hue),'--bambi-button-ghost-hover-color':'oklch(98% 0 0)',
-          '--bambi-button-destructive-bg':dDes,'--bambi-button-destructive-foreground':dDesFg,
-          '--bambi-button-success-bg':dSuc,'--bambi-button-success-foreground':dSucFg,
-          '--bambi-button-warning-bg':dWar,'--bambi-button-warning-foreground':dWarFg,
+          '--bambi-intent-primary-bg':dP,'--bambi-intent-primary-fg':dPFg,
+          '--bambi-intent-primary-hover-bg':fmt(0.72,0.20,hue),
+          '--bambi-state-focus-ring':dP,
+          '--bambi-intent-secondary-bg':fmt(0.2570,gc*1.5,hue),'--bambi-intent-secondary-fg':'oklch(98% 0 0)',
+          '--bambi-intent-secondary-hover-bg':fmt(0.2721,gc*1.5,hue),
+          '--bambi-intent-danger-bg':dDes,'--bambi-intent-danger-fg':dDesFg,
+          '--bambi-intent-danger-hover-bg':fmt(0.67,0.18,dHD),
+          '--bambi-intent-success-bg':dSuc,'--bambi-intent-success-fg':dSucFg,
+          '--bambi-intent-success-hover-bg':fmt(0.80,0.16,sH),
+          '--bambi-intent-warning-bg':dWar,'--bambi-intent-warning-fg':dWarFg,
+          '--bambi-intent-warning-hover-bg':fmt(0.88,0.12,wHD),
         };
         return { light, dark };
       }
@@ -1040,7 +1044,7 @@ const typeWeights = [
         colors: [
           { label: "Base",     tokens: ["--bambi-background","--bambi-foreground","--bambi-card","--bambi-card-foreground","--bambi-border","--bambi-separator"] },
           { label: "Brand",    tokens: ["--bambi-primary","--bambi-primary-foreground","--bambi-secondary","--bambi-secondary-foreground","--bambi-accent","--bambi-accent-foreground","--bambi-muted","--bambi-muted-foreground"] },
-          { label: "Semantic", tokens: ["--bambi-destructive","--bambi-destructive-foreground","--bambi-success","--bambi-success-foreground","--bambi-warning","--bambi-warning-foreground","--bambi-ring"] },
+          { label: "Semantic", tokens: ["--bambi-danger","--bambi-danger-foreground","--bambi-success","--bambi-success-foreground","--bambi-warning","--bambi-warning-foreground","--bambi-ring"] },
           { label: "Input",    tokens: ["--bambi-input","--bambi-input-background","--bambi-input-foreground","--bambi-input-placeholder"] },
         ],
         typography: [
@@ -1054,21 +1058,21 @@ const typeWeights = [
           { label: "Layout",      tokens: ["--bambi-button-gap","--bambi-button-border-width","--bambi-button-line-height"] },
           { label: "Padding",     tokens: ["--bambi-button-padding-sm","--bambi-button-padding-md","--bambi-button-padding-lg","--bambi-button-padding-icon"] },
           { label: "Typography",  tokens: ["--bambi-button-font-size-sm","--bambi-button-font-size-md","--bambi-button-font-size-lg","--bambi-button-font-weight"] },
-          { label: "Shape",       tokens: ["--bambi-button-radius","--bambi-button-hover-opacity","--bambi-button-disabled-opacity"] },
-          { label: "Focus",       tokens: ["--bambi-button-focus-ring-width","--bambi-button-focus-ring-offset","--bambi-button-ring"] },
+          { label: "Shape",       tokens: ["--bambi-button-radius","--bambi-state-hover-opacity","--bambi-button-disabled-opacity"] },
+          { label: "Focus",       tokens: ["--bambi-button-focus-ring-width","--bambi-button-focus-ring-offset","--bambi-state-focus-ring"] },
           { label: "Spinner",     tokens: ["--bambi-button-spinner-border-width","--bambi-button-spinner-duration"] },
-          { label: "Primary",     tokens: ["--bambi-button-primary-bg","--bambi-button-primary-foreground"] },
-          { label: "Secondary",   tokens: ["--bambi-button-secondary-bg","--bambi-button-secondary-foreground","--bambi-button-secondary-border"] },
-          { label: "Ghost",       tokens: ["--bambi-button-ghost-color","--bambi-button-ghost-hover-bg","--bambi-button-ghost-hover-color"] },
-          { label: "Outline",     tokens: ["--bambi-button-outline-color","--bambi-button-outline-border","--bambi-button-outline-hover-bg"] },
-          { label: "Link",        tokens: ["--bambi-button-link-color","--bambi-button-link-underline-offset"] },
-          { label: "Destructive", tokens: ["--bambi-button-destructive-bg","--bambi-button-destructive-foreground"] },
-          { label: "Success",     tokens: ["--bambi-button-success-bg","--bambi-button-success-foreground"] },
-          { label: "Warning",     tokens: ["--bambi-button-warning-bg","--bambi-button-warning-foreground"] },
+          { label: "Primary",     tokens: ["--bambi-intent-primary-bg","--bambi-intent-primary-fg"] },
+          { label: "Secondary",   tokens: ["--bambi-intent-secondary-bg","--bambi-intent-secondary-fg","--bambi-border"] },
+          { label: "Ghost",       tokens: ["--bambi-foreground","--bambi-accent","--bambi-accent-foreground"] },
+          { label: "Outline",     tokens: ["--bambi-primary","--bambi-accent"] },
+          { label: "Link",        tokens: ["--bambi-primary","--bambi-button-link-underline-offset"] },
+          { label: "Danger", tokens: ["--bambi-intent-danger-bg","--bambi-intent-danger-fg"] },
+          { label: "Success",     tokens: ["--bambi-intent-success-bg","--bambi-intent-success-fg"] },
+          { label: "Warning",     tokens: ["--bambi-intent-warning-bg","--bambi-intent-warning-fg"] },
         ],
       };
 
-      const COLOR_HINTS = ["-bg","-foreground","-color","-border","-ring","-separator","background","primary","secondary","destructive","success","warning","muted","accent","input","popover","card"];
+      const COLOR_HINTS = ["-bg","-foreground","-color","-border","-ring","-separator","background","primary","secondary","danger","success","warning","muted","accent","input","popover","card"];
 
       function isColorToken(name: string): boolean {
         return COLOR_HINTS.some(h => name.includes(h));

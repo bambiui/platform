@@ -1,0 +1,10 @@
+{
+  "name": "@bambiui/tokens",
+  "version": "0.0.1",
+  "description": "Primitive, semantic, intent, state, and component CSS tokens for BambiUI.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./src/tokens.css"
+  }
+}

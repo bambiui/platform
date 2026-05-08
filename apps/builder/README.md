@@ -23,7 +23,7 @@ Served at `/builder` under the same Cloudflare Pages project as the docs site.
 ```sh
 # from the monorepo root
 pnpm install
-pnpm build                        # build upstream packages first
+pnpm build                        # build docs and builder
 pnpm --filter builder dev         # http://localhost:4321/builder
 ```
 
@@ -45,7 +45,7 @@ The builder is merged into the docs site's output at build time. A single Cloudf
 
 ### How it works
 
-1. `turbo run build` builds all packages, the builder (`apps/builder/dist/`), and the docs (`apps/docs/dist/`).
+1. `turbo run build --filter=docs --filter=builder` builds the builder (`apps/builder/dist/`) and docs (`apps/docs/dist/`).
 2. `deploy-static` copies `apps/builder/dist/` into `apps/docs/dist/builder/`.
 3. Cloudflare Pages serves `apps/docs/dist/` — docs at `/`, builder at `/builder`.
 
@@ -79,7 +79,7 @@ All logic lives in `src/pages/index.astro`. The `<style is:global>` block styles
 
 | Group | CSS file |
 |---|---|
-| Color + Typography | `packages/ui/theme/src/tokens.css` |
-| Button | `packages/ui/button/src/index.css` |
+| Color + Typography | `packages/tokens/src/tokens.css` |
+| Button | `packages/components/button/src/button.css` |
 
 Token values are read at runtime via `getComputedStyle(document.documentElement)` and overrides are written back with `document.documentElement.style.setProperty` / `removeProperty`.

@@ -1,0 +1,19 @@
+{
+  "name": "@bambiui/cli",
+  "version": "0.0.1",
+  "description": "CLI for adding BambiUI component source files to your app.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "bambiui": "./src/index.js"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "files": [
+    "src"
+  ],
+  "devDependencies": {
+    "@types/node": "^24.12.2"
+  }
+}

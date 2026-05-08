@@ -1,8 +1,3 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "packages/react/*"
-  - "packages/ui/*"
-  - "packages/vue/*"
-  - "packages/svelte/*"
-  - "packages/astro/*"

@@ -3,7 +3,7 @@ title: Button Tokens
 description: CSS custom properties that control every aspect of the Button component.
 ---
 
-Button tokens are defined alongside the global theme in `@bambi-ui/theme/tokens.css` and consumed by `@bambi-ui/button/index.css`. All tokens are namespaced `--bambi-button-*`.
+Button tokens are defined in `@bambiui/tokens/tokens.css` and consumed by the generated button CSS. Component tokens are namespaced `--bambi-button-*`; intent and state tokens are shared across components.
 
 Override them in `:root` (global) or on a selector (scoped):
 
@@ -11,13 +11,13 @@ Override them in `:root` (global) or on a selector (scoped):
 /* global override */
 :root {
   --bambi-button-radius: 9999px;
-  --bambi-button-hover-opacity: 0.85;
+  --bambi-state-hover-opacity: 0.85;
 }
 
 /* scoped to a container */
 .my-card {
   --bambi-button-radius: 0;
-  --bambi-button-primary-bg: oklch(55% 0.2 160);
+  --bambi-intent-primary-bg: oklch(55% 0.2 160);
 }
 ```
 
@@ -65,12 +65,12 @@ All button sizes share `--bambi-button-radius`. `--bambi-button-radius-full` is 
 
 | Token | Default | Resolved value |
 |---|---|---|
-| `--bambi-button-transition` | `opacity 0.15s ease, background-color 0.15s ease` | — |
-| `--bambi-button-hover-opacity` | `0.9` | — |
+| `--bambi-button-transition` | `background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease` | — |
+| `--bambi-state-hover-opacity` | `1` | — |
 | `--bambi-button-disabled-opacity` | `0.5` | — |
 | `--bambi-button-focus-ring-width` | `2px` | — |
 | `--bambi-button-focus-ring-offset` | `2px` | — |
-| `--bambi-button-ring` | `var(--bambi-ring)` | `oklch(55% 0.22 250)` ¹ |
+| `--bambi-state-focus-ring` | `var(--bambi-ring)` | `oklch(55% 0.22 250)` ¹ |
 
 ¹ Resolves to `oklch(65% 0.22 250)` in dark mode.
 
@@ -85,7 +85,7 @@ All button sizes share `--bambi-button-radius`. `--bambi-button-radius-full` is 
 
 ---
 
-## Variant Colors
+## Intent And Appearance Colors
 
 Color tokens resolve from the global theme and change between light and dark mode. Values shown are light mode defaults.
 
@@ -93,60 +93,59 @@ Color tokens resolve from the global theme and change between light and dark mod
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-primary-bg` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
-| `--bambi-button-primary-foreground` | `var(--bambi-primary-foreground)` | `oklch(98% 0 0)` |
+| `--bambi-intent-primary-bg` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
+| `--bambi-intent-primary-fg` | `var(--bambi-primary-foreground)` | `oklch(98% 0 0)` |
 
 ### Secondary
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-secondary-bg` | `var(--bambi-secondary)` | `oklch(96% 0 0)` |
-| `--bambi-button-secondary-foreground` | `var(--bambi-secondary-foreground)` | `oklch(9% 0 0)` |
-| `--bambi-button-secondary-border` | `var(--bambi-border)` | `oklch(70% 0 0)` |
+| `--bambi-intent-secondary-bg` | `var(--bambi-secondary)` | `oklch(96% 0 0)` |
+| `--bambi-intent-secondary-fg` | `var(--bambi-secondary-foreground)` | `oklch(9% 0 0)` |
+| `--bambi-border` | `var(--bambi-border)` | `oklch(70% 0 0)` |
 
 ### Outline
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-outline-color` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
-| `--bambi-button-outline-border` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
-| `--bambi-button-outline-hover-bg` | `color-mix(in oklch, var(--bambi-button-outline-color) 10%, transparent)` | — |
+| `--bambi-primary` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
+| `--bambi-accent` | `var(--bambi-accent)` | `oklch(94% 0.008 271)` |
 
 ### Ghost
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-ghost-color` | `var(--bambi-foreground)` | `oklch(9% 0 0)` |
-| `--bambi-button-ghost-hover-bg` | `var(--bambi-accent)` | `oklch(93% 0 0)` |
-| `--bambi-button-ghost-hover-color` | `var(--bambi-accent-foreground)` | `oklch(9% 0 0)` |
+| `--bambi-foreground` | `var(--bambi-foreground)` | `oklch(9% 0 0)` |
+| `--bambi-accent` | `var(--bambi-accent)` | `oklch(93% 0 0)` |
+| `--bambi-accent-foreground` | `var(--bambi-accent-foreground)` | `oklch(9% 0 0)` |
 
 ### Link
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-link-color` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
+| `--bambi-primary` | `var(--bambi-primary)` | `oklch(55% 0.22 250)` |
 | `--bambi-button-link-underline-offset` | `4px` | — |
 
-### Destructive
+### Danger
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-destructive-bg` | `var(--bambi-destructive)` | `oklch(55% 0.22 25)` |
-| `--bambi-button-destructive-foreground` | `var(--bambi-destructive-foreground)` | `oklch(98% 0 0)` |
+| `--bambi-intent-danger-bg` | `var(--bambi-danger)` | `oklch(55% 0.22 25)` |
+| `--bambi-intent-danger-fg` | `var(--bambi-danger-foreground)` | `oklch(98% 0 0)` |
 
 ### Success
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-success-bg` | `var(--bambi-success)` | `oklch(55% 0.17 145)` |
-| `--bambi-button-success-foreground` | `var(--bambi-success-foreground)` | `oklch(98% 0 0)` |
+| `--bambi-intent-success-bg` | `var(--bambi-success)` | `oklch(55% 0.17 145)` |
+| `--bambi-intent-success-fg` | `var(--bambi-success-foreground)` | `oklch(98% 0 0)` |
 
 ### Warning
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-button-warning-bg` | `var(--bambi-warning)` | `oklch(75% 0.17 70)` |
-| `--bambi-button-warning-foreground` | `var(--bambi-warning-foreground)` | `oklch(15% 0 0)` |
+| `--bambi-intent-warning-bg` | `var(--bambi-warning)` | `oklch(75% 0.17 70)` |
+| `--bambi-intent-warning-fg` | `var(--bambi-warning-foreground)` | `oklch(15% 0 0)` |
 
 ---
 
@@ -164,8 +163,8 @@ Color tokens resolve from the global theme and change between light and dark mod
 
 ```css
 :root {
-  --bambi-button-primary-bg: oklch(55% 0.2 160);      /* green */
-  --bambi-button-primary-foreground: oklch(98% 0 0);
+  --bambi-intent-primary-bg: oklch(55% 0.2 160);      /* green */
+  --bambi-intent-primary-fg: oklch(98% 0 0);
 }
 ```
 

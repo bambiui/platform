@@ -3,10 +3,10 @@ title: Theme Tokens
 description: Global design tokens — colors, radius, typography, and shadows.
 ---
 
-All tokens are CSS custom properties defined in `@bambiui/tokens/tokens.css`. Import once at the root of your app:
+All tokens are CSS custom properties installed by the CLI into `src/styles/bambi.css`. Import once at the root of your app:
 
 ```css
-@import '@bambiui/tokens/tokens.css';
+@import './styles/bambi.css';
 ```
 
 Override any token in your own `:root` block to customise the theme globally:
@@ -17,7 +17,7 @@ Override any token in your own `:root` block to customise the theme globally:
   --bambi-radius-md: 0.5rem;
 }
 
-.dark {
+[data-theme='dark'], .dark {
   --bambi-primary: oklch(70% 0.25 30);
 }
 ```
@@ -26,50 +26,76 @@ Override any token in your own `:root` block to customise the theme globally:
 
 ## Colors
 
-Colors use the [OKLCH](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) color space. Light mode values are defined in `:root`, dark mode overrides in `.dark`.
+Colors use the [OKLCH](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch) color space. Light mode values are defined in `:root`, dark mode overrides in `[data-theme='dark'], .dark`.
 
 ### Brand
 
 | Token | Light | Dark |
 |---|---|---|
-| `--bambi-primary` | `oklch(55% 0.22 250)` | `oklch(65% 0.22 250)` |
-| `--bambi-primary-foreground` | `oklch(98% 0 0)` | `oklch(9% 0 0)` |
-| `--bambi-secondary` | `oklch(96% 0 0)` | `oklch(14% 0 0)` |
+| `--bambi-primary` | `oklch(55% 0.220 271)` | `oklch(65% 0.220 271)` |
+| `--bambi-primary-foreground` | `oklch(100% 0 0)` | `oklch(9% 0 0)` |
+| `--bambi-secondary` | `oklch(95% 0.008 271)` | `oklch(26% 0.016 271)` |
 | `--bambi-secondary-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
-| `--bambi-accent` | `oklch(93% 0 0)` | `oklch(18% 0 0)` |
+| `--bambi-accent` | `oklch(94% 0.008 271)` | `oklch(27% 0.016 271)` |
 | `--bambi-accent-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
 
 ### State
 
 | Token | Light | Dark |
 |---|---|---|
-| `--bambi-danger` | `oklch(55% 0.22 25)` | `oklch(60% 0.22 25)` |
-| `--bambi-danger-foreground` | `oklch(98% 0 0)` | `oklch(98% 0 0)` |
-| `--bambi-success` | `oklch(55% 0.17 145)` | `oklch(65% 0.17 145)` |
-| `--bambi-success-foreground` | `oklch(98% 0 0)` | `oklch(98% 0 0)` |
-| `--bambi-warning` | `oklch(75% 0.17 70)` | `oklch(80% 0.17 70)` |
-| `--bambi-warning-foreground` | `oklch(15% 0 0)` | `oklch(15% 0 0)` |
-| `--bambi-muted` | `oklch(93% 0 0)` | `oklch(14% 0 0)` |
-| `--bambi-muted-foreground` | `oklch(42% 0 0)` | `oklch(60% 0 0)` |
+| `--bambi-danger` | `oklch(65% 0.233 28)` | `oklch(59% 0.197 27)` |
+| `--bambi-danger-foreground` | `oklch(100% 0 0)` | `oklch(98% 0 0)` |
+| `--bambi-success` | `oklch(73% 0.194 153)` | `oklch(73% 0.194 153)` |
+| `--bambi-success-foreground` | `oklch(9% 0 0)` | `oklch(9% 0 0)` |
+| `--bambi-warning` | `oklch(78% 0.159 74)` | `oklch(82% 0.139 78)` |
+| `--bambi-warning-foreground` | `oklch(9% 0 0)` | `oklch(9% 0 0)` |
+| `--bambi-muted` | `oklch(94% 0.008 271)` | `oklch(27% 0.010 271)` |
+| `--bambi-muted-foreground` | `oklch(55% 0.021 271)` | `oklch(71% 0.021 271)` |
 
 ### Surface
 
 | Token | Light | Dark |
 |---|---|---|
-| `--bambi-background` | `oklch(100% 0 0)` | `oklch(9% 0 0)` |
+| `--bambi-background` | `oklch(97% 0.010 271)` | `oklch(12% 0.010 271)` |
 | `--bambi-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
-| `--bambi-card` | `oklch(100% 0 0)` | `oklch(11% 0 0)` |
+| `--bambi-card` | `oklch(100% 0 0)` | `oklch(21% 0.021 271)` |
 | `--bambi-card-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
-| `--bambi-popover` | `oklch(100% 0 0)` | `oklch(11% 0 0)` |
+| `--bambi-popover` | `oklch(100% 0 0)` | `oklch(21% 0.021 271)` |
 | `--bambi-popover-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
 
 ### Utility
 
 | Token | Light | Dark |
 |---|---|---|
-| `--bambi-border` | `oklch(70% 0 0)` | `oklch(40% 0 0)` |
-| `--bambi-input` | `oklch(70% 0 0)` | `oklch(40% 0 0)` |
-| `--bambi-ring` | `oklch(55% 0.22 250)` | `oklch(65% 0.22 250)` |
+| `--bambi-border` | `oklch(90% 0.010 271)` | `oklch(28% 0.010 271)` |
+| `--bambi-input` | `oklch(90% 0.010 271)` | `oklch(28% 0.010 271)` |
+| `--bambi-input-background` | `oklch(100% 0 0)` | `oklch(21% 0.021 271)` |
+| `--bambi-input-foreground` | `oklch(9% 0 0)` | `oklch(98% 0 0)` |
+| `--bambi-input-placeholder` | `oklch(55% 0.021 271)` | `oklch(71% 0.021 271)` |
+| `--bambi-ring` | `var(--bambi-primary)` | `var(--bambi-primary)` |
+| `--bambi-separator` | `oklch(92% 0.010 271)` | `oklch(25% 0.010 271)` |
+
+### Intent (hover backgrounds)
+
+These tokens are used internally by components. Override them to change hover colors without touching the base intent colors.
+
+| Token | Default |
+|---|---|
+| `--bambi-intent-primary-bg` | `var(--bambi-primary)` |
+| `--bambi-intent-primary-fg` | `var(--bambi-primary-foreground)` |
+| `--bambi-intent-primary-hover-bg` | `oklch(49% 0.230 271)` / `oklch(72% 0.200 271)` dark |
+| `--bambi-intent-secondary-bg` | `var(--bambi-secondary)` |
+| `--bambi-intent-secondary-fg` | `var(--bambi-secondary-foreground)` |
+| `--bambi-intent-secondary-hover-bg` | `var(--bambi-accent)` |
+| `--bambi-intent-danger-bg` | `var(--bambi-danger)` |
+| `--bambi-intent-danger-fg` | `var(--bambi-danger-foreground)` |
+| `--bambi-intent-danger-hover-bg` | `oklch(58% 0.220 28)` |
+| `--bambi-intent-success-bg` | `var(--bambi-success)` |
+| `--bambi-intent-success-fg` | `var(--bambi-success-foreground)` |
+| `--bambi-intent-success-hover-bg` | `oklch(64% 0.180 153)` |
+| `--bambi-intent-warning-bg` | `var(--bambi-warning)` |
+| `--bambi-intent-warning-fg` | `var(--bambi-warning-foreground)` |
+| `--bambi-intent-warning-hover-bg` | `oklch(69% 0.150 74)` |
 
 ---
 
@@ -77,10 +103,10 @@ Colors use the [OKLCH](https://developer.mozilla.org/en-US/docs/Web/CSS/color_va
 
 | Token | Value |
 |---|---|
-| `--bambi-radius-sm` | `0.25rem` |
-| `--bambi-radius-md` | `0.375rem` |
-| `--bambi-radius-lg` | `0.5rem` |
-| `--bambi-radius-xl` | `0.75rem` |
+| `--bambi-radius-sm` | `0.375rem` |
+| `--bambi-radius-md` | `0.5rem` |
+| `--bambi-radius-lg` | `0.75rem` |
+| `--bambi-radius-xl` | `1rem` |
 | `--bambi-radius-full` | `9999px` |
 
 ---
@@ -116,28 +142,10 @@ Colors use the [OKLCH](https://developer.mozilla.org/en-US/docs/Web/CSS/color_va
 
 ## Shadows
 
-| Token | Light value |
-|---|---|
-| `--bambi-shadow-sm` | `0 1px 2px 0 oklch(0% 0 0 / 0.05)` |
-| `--bambi-shadow-md` | `0 4px 6px -1px oklch(0% 0 0 / 0.1), 0 2px 4px -2px oklch(0% 0 0 / 0.1)` |
-| `--bambi-shadow-lg` | `0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -4px oklch(0% 0 0 / 0.1)` |
+| Token | Light | Dark |
+|---|---|---|
+| `--bambi-shadow-sm` | `0 1px 2px 0 oklch(0% 0 0 / 0.05)` | `oklch(0% 0 0 / 0.3)` |
+| `--bambi-shadow-md` | `0 4px 6px -1px oklch(0% 0 0 / 0.1), …` | `oklch(0% 0 0 / 0.4), …` |
+| `--bambi-shadow-lg` | `0 10px 15px -3px oklch(0% 0 0 / 0.1), …` | `oklch(0% 0 0 / 0.4), …` |
 
-Shadow opacities are higher in dark mode (`0.3` / `0.4` / `0.4`) to compensate for darker backgrounds.
-
----
-
-## Tailwind Integration
-
-The token file ships an `@theme inline` block that maps Bambi tokens to Tailwind v4 CSS variables. No extra config is needed — importing `tokens.css` is enough:
-
-```css
-/* globals.css */
-@import '@bambiui/tokens/tokens.css';
-```
-
-```html
-<!-- Tailwind classes resolve to Bambi tokens automatically -->
-<div class="bg-primary text-primary-foreground rounded-md shadow-md">
-  Hello
-</div>
-```
+Shadow opacity is higher in dark mode to remain visible on dark surfaces.

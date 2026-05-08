@@ -1,0 +1,92 @@
+---
+---
+<aside id="drawer-left">
+  <a href="/" class="drawer-brand">
+    <svg width="48" height="48" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          .logo-base    { fill: var(--bambi-primary); }
+          .logo-shadow  { fill: var(--bambi-background); fill-opacity: 0.7; }
+        </style>
+        <path id="outer-shape" d="
+          M224.5 681.5
+          L224.5 291.5
+          C224.5 236.5 231.5 199.5 254.5 192.5
+          C289.5 181.8 372.5 236.5 413.5 306.5
+          C443.5 302.5 477.5 300.5 512 300.5
+          C546.5 300.5 580.5 302.5 610.5 306.5
+          C651.5 236.5 734.5 181.8 769.5 192.5
+          C792.5 199.5 799.5 236.5 799.5 291.5
+          L799.5 681.5
+          C799.5 724.5 772.5 750.5 729.5 750.5
+          L294.5 750.5
+          C251.5 750.5 224.5 724.5 224.5 681.5
+          Z
+        "/>
+        <clipPath id="clip">
+          <use href="#outer-shape"/>
+        </clipPath>
+      </defs>
+      <use href="#outer-shape" class="logo-base"/>
+      <path class="logo-shadow" clip-path="url(#clip)" d="
+        M468.5 300.5
+        C488.5 299.5 516.5 299.5 536.5 300.5
+        C537.5 354.5 537.5 409.5 545.5 459.5
+        C557.5 535.5 598.5 576.5 653.5 607.5
+        C704.5 636.5 741.5 661.5 766.5 688.5
+        C780.5 704.5 782.5 728.5 761.5 750.5
+        L280.5 750.5
+        C284.5 717.5 303.5 681.5 344.5 644.5
+        C395.5 598.5 438.5 562.5 453.5 501.5
+        C467.5 445.5 466.5 372.5 468.5 300.5
+        Z
+      "/>
+      <circle class="logo-base" cx="607.5" cy="636.5" r="31.5"/>
+    </svg>
+    <span class="brand-name">Bambi</span>
+  </a>
+
+  <div class="drawer-section-label">Frames</div>
+  <nav class="drawer-nav">
+    <button class="nav-item" data-card="colors">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"></circle>
+        <circle cx="5" cy="7" r="1.5" fill="currentColor"></circle>
+        <circle cx="11" cy="7" r="1.5" fill="currentColor"></circle>
+        <circle cx="8" cy="11" r="1.5" fill="currentColor"></circle>
+      </svg>
+      Colors
+    </button>
+    <button class="nav-item" data-card="typography">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2.5 4h11M8 4v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+      </svg>
+      Typography
+    </button>
+    <button class="nav-item" data-card="buttons">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="1.75" y="5" width="12.5" height="6" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+      </svg>
+      Buttons
+    </button>
+  </nav>
+
+  <div class="drawer-footer">
+    <span class="drawer-footer-label">Theme</span>
+    <div class="theme-switcher">
+      <button class="theme-btn active" data-theme-val="light">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"></circle>
+          <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        </svg>
+        Light
+      </button>
+      <button class="theme-btn" data-theme-val="dark">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 000 11 6 6 0 008-3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+        </svg>
+        Dark
+      </button>
+    </div>
+  </div>
+</aside>

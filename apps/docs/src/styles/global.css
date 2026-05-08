@@ -1,5 +1,4 @@
-@import '@bambiui/tokens/tokens.css';
-@import '@bambiui/components/button.css';
+@import './bambi.css';
 
 /* Hide per-section tab navigation for framework tabs — selection is in the global header */
 starlight-tabs[data-sync-key='framework'] > .tablist-wrapper {

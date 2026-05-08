@@ -1,0 +1,5 @@
+{
+  "framework": "astro",
+  "componentDir": "src/components/ui",
+  "tokensFile": "src/styles/bambi.css"
+}

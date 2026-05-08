@@ -30,36 +30,24 @@ const components = {
       from: "packages/components/button/src/button.css",
       fileName: "button.css",
     },
+    shared: [
+      { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
+      { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
+    ],
     files: {
-      react: [
-        { kind: "react", from: "packages/components/button/src/react.tsx", to: "button.tsx" },
-        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
-      ],
-      svelte: [
-        { kind: "svelte", from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" },
-        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
-      ],
-      vue: [
-        { kind: "vue", from: "packages/components/button/src/vue.vue", to: "Button.vue" },
-        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
-      ],
-      astro: [
-        { kind: "astro", from: "packages/components/button/src/astro.astro", to: "Button.astro" },
-        { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-        { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
-      ],
+      react: [{ kind: "react", from: "packages/components/button/src/react.tsx", to: "button.tsx" }],
+      svelte: [{ kind: "svelte", from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" }],
+      vue: [{ kind: "vue", from: "packages/components/button/src/vue.vue", to: "Button.vue" }],
+      astro: [{ kind: "astro", from: "packages/components/button/src/astro.astro", to: "Button.astro" }],
     },
   },
 };
 
 const frameworkFiles = {
-  react: ["vite.config.ts", "vite.config.js", "next.config.js", "next.config.mjs"],
-  svelte: ["svelte.config.js", "svelte.config.ts"],
-  vue: ["vite.config.ts", "vite.config.js", "nuxt.config.ts", "nuxt.config.js"],
   astro: ["astro.config.mjs", "astro.config.ts"],
+  svelte: ["svelte.config.js", "svelte.config.ts"],
+  vue: ["nuxt.config.ts", "nuxt.config.js"],
+  react: ["next.config.js", "next.config.mjs", "next.config.ts"],
 };
 
 const frameworkOptions = ["react", "svelte", "vue", "astro"];
@@ -285,7 +273,7 @@ function printResults(results) {
 }
 
 async function addComponent(componentName, flags) {
-  const component = components[componentName];
+  const component = components[/** @type {keyof typeof components} */ (componentName)];
 
   if (!component) {
     throw new Error(`Unknown component "${componentName}". Available: ${Object.keys(components).join(", ")}`);
@@ -297,7 +285,7 @@ async function addComponent(componentName, flags) {
   const componentDir = flags.componentDir ?? config.componentDir;
   const registryUrl = getRegistryUrl(flags);
   const componentDirectory = componentName;
-  const files = component.files[framework];
+  const files = [...(component.shared ?? []), ...(component.files[/** @type {keyof typeof component.files} */ (framework)] ?? [])];
 
   if (!files) {
     throw new Error(`Unknown framework "${framework}". Use react, svelte, vue, or astro.`);
@@ -316,7 +304,7 @@ async function addComponent(componentName, flags) {
   const results = [];
 
   for (const file of files) {
-    const targetName = fileNames[file.kind] ?? file.to;
+    const targetName = fileNames[/** @type {keyof typeof fileNames} */ (file.kind)] ?? file.to;
     const transform = file.kind === "recipe"
       ? (content) => transformComponentSource(content, { types: fileNames.types })
       : file.kind === framework
@@ -372,7 +360,6 @@ async function promptForConfig(defaults, flags) {
   }
 
   const { createInterface } = await import("node:readline/promises");
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
 
   process.stdout.write(`${color("Bambi UI", "bold")} ${color("setup", "cyan")}\n`);
   process.stdout.write(`${color("Detected defaults", "green")}\n\n`);
@@ -380,22 +367,21 @@ async function promptForConfig(defaults, flags) {
   process.stdout.write(`  ${color("componentDir", "dim")} ${color(defaults.componentDir, "yellow")}\n`);
   process.stdout.write(`  ${color("tokensFile", "dim")}   ${color(defaults.tokensFile, "yellow")}\n\n`);
 
-  try {
-    const useDefaults = await rl.question(`Use these defaults? ${color("(Y/n)", "dim")} `);
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const useDefaults = await rl.question(`Use these defaults? ${color("(Y/n)", "dim")} `);
+  rl.close();
 
-    if (!useDefaults.trim() || useDefaults.trim().toLowerCase().startsWith("y")) {
-      return defaults;
-    }
-
-    rl.close();
-  } finally {
-    rl.close();
+  if (!useDefaults.trim() || useDefaults.trim().toLowerCase().startsWith("y")) {
+    return defaults;
   }
 
   process.stdout.write(`\n${color("Customize config", "green")}\n`);
   process.stdout.write(`${color("Press enter to keep the shown value.", "dim")}\n\n`);
 
+  process.stdin.resume();
   const framework = await selectFramework(defaults.framework);
+
+  process.stdin.resume();
   const customRl = createInterface({ input: process.stdin, output: process.stdout });
 
   try {

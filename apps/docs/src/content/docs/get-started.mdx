@@ -1,0 +1,202 @@
+---
+title: Get Started
+description: Install BambiUI in your project using the CLI.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+BambiUI is a source-first component library. The CLI copies component files and design tokens directly into your project — no runtime package, no version lock-in.
+
+## Prerequisites
+
+- **Node.js 18+**
+- A project using React, Svelte, Vue, or Astro
+
+## 1. Initialize
+
+Run `init` from your project root. It auto-detects your framework, creates `bambiui.config.json`, and writes the global design token file.
+
+```sh
+npx @bambiui/cli init
+```
+
+**What it creates:**
+
+| File | Purpose |
+|---|---|
+| `bambiui.config.json` | Stores your framework, component directory, and token file path |
+| `src/styles/bambi.css` | Global design tokens as CSS custom properties |
+
+You can skip the interactive prompts with `--yes` to accept detected defaults:
+
+```sh
+npx @bambiui/cli init --yes
+```
+
+Or override specific values:
+
+```sh
+npx @bambiui/cli init --framework react --component-dir src/ui --tokens-file src/styles/tokens.css
+```
+
+## 2. Import the token file
+
+Import `bambi.css` once in your app's global stylesheet or entry point. All component CSS depends on these tokens being present.
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    // src/main.tsx or src/App.tsx
+    import './styles/bambi.css';
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <!-- src/routes/+layout.svelte -->
+    <script>
+      import '../styles/bambi.css';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```ts
+    // src/main.ts
+    import './styles/bambi.css';
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    // src/layouts/Layout.astro
+    import '../styles/bambi.css';
+    ---
+    ```
+
+    Or via `customCss` in `astro.config.mjs`:
+
+    ```js
+    export default defineConfig({
+      integrations: [starlight({
+        customCss: ['./src/styles/bambi.css'],
+      })],
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+## 3. Add a component
+
+Add the Button component to your project:
+
+```sh
+npx @bambiui/cli add button
+```
+
+The CLI installs the following files into your component directory (default: `src/components/ui/button/`):
+
+| File | Purpose |
+|---|---|
+| `Button.astro` / `button.tsx` / `Button.svelte` / `Button.vue` | Component source |
+| `recipe.ts` | Style recipe — maps props to CSS data attributes |
+| `types.ts` | Shared TypeScript types |
+| `button.css` | Component-scoped CSS (imported by the component) |
+| `index.ts` | Re-exports `Button` and all types |
+
+## 4. Use the component
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    import { Button } from './components/ui/button';
+
+    export default function App() {
+      return (
+        <Button intent="primary" size="md">
+          Get started
+        </Button>
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script>
+      import { Button } from './components/ui/button';
+    </script>
+
+    <Button intent="primary" size="md">Get started</Button>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup>
+    import { Button } from './components/ui/button';
+    </script>
+
+    <template>
+      <Button intent="primary" size="md">Get started</Button>
+    </template>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    import { Button } from './components/ui/button';
+    ---
+
+    <Button intent="primary" size="md">Get started</Button>
+    ```
+  </TabItem>
+</Tabs>
+
+## Updating a component
+
+Re-run `add` with `--force` to overwrite existing files with the latest source:
+
+```sh
+npx @bambiui/cli add button --force
+```
+
+## bambiui.config.json
+
+The config file is created by `init` and read by every subsequent `add` command. You can edit it manually.
+
+```json
+{
+  "framework": "react",
+  "componentDir": "src/components/ui",
+  "tokensFile": "src/styles/bambi.css"
+}
+```
+
+| Field | Description | Default |
+|---|---|---|
+| `framework` | `react`, `svelte`, `vue`, or `astro` | Auto-detected |
+| `componentDir` | Directory where components are installed | `src/components/ui` |
+| `tokensFile` | Path for the global token CSS file | `src/styles/bambi.css` |
+
+## CLI reference
+
+```
+bambiui init
+bambiui add <component>
+
+Options:
+  --framework react|svelte|vue|astro   Override framework
+  --component-dir <path>               Override component directory
+  --tokens-file <path>                 Override token file path
+  --registry-url <url>                 Use a custom registry (default: GitHub raw)
+  --cwd <path>                         Run in a different directory
+  --force                              Overwrite existing files
+  --yes, -y                            Accept defaults without prompting
+```
+
+## Dark mode
+
+BambiUI uses the `.dark` class on `<html>` for dark mode. Toggle it based on user preference:
+
+```js
+document.documentElement.classList.toggle('dark');
+```
+
+Tokens for both modes are included in `bambi.css`. Light values are in `:root`, dark overrides in `[data-theme='dark'], .dark`.

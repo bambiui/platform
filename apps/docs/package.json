@@ -10,21 +10,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.4",
     "@astrojs/starlight": "^0.38.5",
-    "@astrojs/svelte": "^8.1.0",
-    "@astrojs/vue": "^6.0.1",
-    "@bambiui/components": "workspace:*",
-    "@bambiui/core": "workspace:*",
-    "@bambiui/tokens": "workspace:*",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
     "astro": "^6.2.2",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
     "sharp": "^0.34.5",
-    "svelte": "^5.55.5",
-    "typescript": "^5.9.3",
-    "vue": "^3.5.33"
+    "typescript": "^5.9.3"
   }
 }

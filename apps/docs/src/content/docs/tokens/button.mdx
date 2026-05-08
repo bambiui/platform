@@ -3,7 +3,7 @@ title: Button Tokens
 description: CSS custom properties that control every aspect of the Button component.
 ---
 
-Button tokens are defined in `@bambiui/tokens/tokens.css` and consumed by the generated button CSS. Component tokens are namespaced `--bambi-button-*`; intent and state tokens are shared across components.
+Button tokens are defined in `bambi.css` (installed by the CLI) and consumed by `button.css` (installed alongside the component). Component tokens are namespaced `--bambi-button-*`; intent and state tokens are shared across components.
 
 Override them in `:root` (global) or on a selector (scoped):
 
@@ -27,7 +27,7 @@ Override them in `:root` (global) or on a selector (scoped):
 
 | Token | Default | Resolved value |
 |---|---|---|
-| `--bambi-button-gap` | `0.375rem` | — |
+| `--bambi-button-gap` | `var(--bambi-space-1-5)` | `0.375rem` |
 | `--bambi-button-border-width` | `1px` | — |
 | `--bambi-button-line-height` | `1` | — |
 | `--bambi-button-font-family` | `var(--bambi-font-sans)` | `system-ui, sans-serif` |
@@ -53,11 +53,9 @@ Override them in `:root` (global) or on a selector (scoped):
 
 | Token | Default | Resolved value |
 |---|---|---|
-| `--bambi-button-radius` | `var(--bambi-radius-md)` | `0.375rem` |
-| `--bambi-button-radius-sm` | `var(--bambi-radius-sm)` | `0.25rem` |
-| `--bambi-button-radius-full` | `var(--bambi-radius-full)` | `9999px` |
+| `--bambi-button-radius` | `var(--bambi-radius-md)` | `0.5rem` |
 
-All button sizes share `--bambi-button-radius`. `--bambi-button-radius-full` is used internally by the loading spinner and is not intended to be overridden directly.
+All button sizes share `--bambi-button-radius`. The loading spinner uses `--bambi-radius-full` (`9999px`) directly.
 
 ---
 
@@ -67,12 +65,12 @@ All button sizes share `--bambi-button-radius`. `--bambi-button-radius-full` is 
 |---|---|---|
 | `--bambi-button-transition` | `background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease` | — |
 | `--bambi-state-hover-opacity` | `1` | — |
-| `--bambi-button-disabled-opacity` | `0.5` | — |
-| `--bambi-button-focus-ring-width` | `2px` | — |
-| `--bambi-button-focus-ring-offset` | `2px` | — |
-| `--bambi-state-focus-ring` | `var(--bambi-ring)` | `oklch(55% 0.22 250)` ¹ |
+| `--bambi-button-disabled-opacity` | `var(--bambi-state-disabled-opacity)` | `0.5` |
+| `--bambi-button-focus-ring-width` | `var(--bambi-state-focus-ring-width)` | `2px` |
+| `--bambi-button-focus-ring-offset` | `var(--bambi-state-focus-ring-offset)` | `2px` |
+| `--bambi-button-ring` | `var(--bambi-state-focus-ring)` | `oklch(55% 0.220 271)` ¹ |
 
-¹ Resolves to `oklch(65% 0.22 250)` in dark mode.
+¹ Resolves to `oklch(65% 0.220 271)` in dark mode.
 
 ---
 

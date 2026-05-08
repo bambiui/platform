@@ -4,177 +4,72 @@ description: Accessible, themeable button component with intent, appearance, siz
 ---
 
 import { Tabs, TabItem, Code } from '@astrojs/starlight/components';
-import { Button as ReactButton } from '@bambiui/components/button/react';
-import SvelteButton from '@bambiui/components/button/svelte';
-import VueButton from '@bambiui/components/button/vue';
-import AstroButton from '@bambiui/components/button/astro';
-
-export const PlusIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path d="M8 1v14M1 8h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
-);
+import Button from '../../../components/ui/button/Button.astro';
 
 ## Installation
 
-Add the button source and shared styles to your app:
-
 ```sh
 npx @bambiui/cli init
+npx @bambiui/cli add button
 ```
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    ```sh
-    npx @bambiui/cli add button --framework react
-    ```
-  </TabItem>
-  <TabItem label="Svelte">
-    ```sh
-    npx @bambiui/cli add button --framework svelte
-    ```
-  </TabItem>
-  <TabItem label="Vue">
-    ```sh
-    npx @bambiui/cli add button --framework vue
-    ```
-  </TabItem>
-  <TabItem label="Astro">
-    ```sh
-    npx @bambiui/cli add button --framework astro
-    ```
-  </TabItem>
-</Tabs>
-
-Import the generated token file once from your app's global stylesheet. Component CSS is installed next to the component source and imported by the component.
+Import the token file once from your global stylesheet:
 
 ```css
 @import './styles/bambi.css';
 ```
 
-## Intent And Appearance
+Then import the component:
 
 <Tabs syncKey="framework">
   <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton intent="primary">Primary</ReactButton>
-          <ReactButton intent="secondary">Secondary</ReactButton>
-          <ReactButton appearance="outline">Outline</ReactButton>
-          <ReactButton appearance="ghost">Ghost</ReactButton>
-          <ReactButton appearance="link">Link</ReactButton>
-          <ReactButton intent="danger">Danger</ReactButton>
-          <ReactButton intent="success">Success</ReactButton>
-          <ReactButton intent="warning">Warning</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="tsx" code={`import { Button } from './components/ui/button';
-
-<Button intent="primary">Primary</Button>
-<Button intent="secondary">Secondary</Button>
-<Button appearance="outline">Outline</Button>
-<Button appearance="ghost">Ghost</Button>
-<Button appearance="link">Link</Button>
-<Button intent="danger">Danger</Button>
-<Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
+    ```tsx
+    import { Button } from './components/ui/button';
+    ```
   </TabItem>
   <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton intent="primary">Primary</SvelteButton>
-          <SvelteButton intent="secondary">Secondary</SvelteButton>
-          <SvelteButton appearance="outline">Outline</SvelteButton>
-          <SvelteButton appearance="ghost">Ghost</SvelteButton>
-          <SvelteButton appearance="link">Link</SvelteButton>
-          <SvelteButton intent="danger">Danger</SvelteButton>
-          <SvelteButton intent="success">Success</SvelteButton>
-          <SvelteButton intent="warning">Warning</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="svelte" code={`<script>
-  import { Button } from './components/ui/button';
-</script>
-
-<Button intent="primary">Primary</Button>
-<Button intent="secondary">Secondary</Button>
-<Button appearance="outline">Outline</Button>
-<Button appearance="ghost">Ghost</Button>
-<Button appearance="link">Link</Button>
-<Button intent="danger">Danger</Button>
-<Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
+    ```svelte
+    <script>
+      import { Button } from './components/ui/button';
+    </script>
+    ```
   </TabItem>
   <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton intent="primary">Primary</VueButton>
-          <VueButton intent="secondary">Secondary</VueButton>
-          <VueButton appearance="outline">Outline</VueButton>
-          <VueButton appearance="ghost">Ghost</VueButton>
-          <VueButton appearance="link">Link</VueButton>
-          <VueButton intent="danger">Danger</VueButton>
-          <VueButton intent="success">Success</VueButton>
-          <VueButton intent="warning">Warning</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="vue" code={`<script setup>
-import { Button } from './components/ui/button';
-</script>
-
-<template>
-  <Button intent="primary">Primary</Button>
-  <Button intent="secondary">Secondary</Button>
-  <Button appearance="outline">Outline</Button>
-  <Button appearance="ghost">Ghost</Button>
-  <Button appearance="link">Link</Button>
-  <Button intent="danger">Danger</Button>
-  <Button intent="success">Success</Button>
-  <Button intent="warning">Warning</Button>
-</template>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
+    ```vue
+    <script setup>
+    import { Button } from './components/ui/button';
+    </script>
+    ```
   </TabItem>
   <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton intent="primary">Primary</AstroButton>
-          <AstroButton intent="secondary">Secondary</AstroButton>
-          <AstroButton appearance="outline">Outline</AstroButton>
-          <AstroButton appearance="ghost">Ghost</AstroButton>
-          <AstroButton appearance="link">Link</AstroButton>
-          <AstroButton intent="danger">Danger</AstroButton>
-          <AstroButton intent="success">Success</AstroButton>
-          <AstroButton intent="warning">Warning</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="astro" code={`---
-import { Button } from './components/ui/button';
----
+    ```astro
+    ---
+    import { Button } from './components/ui/button';
+    ---
+    ```
+  </TabItem>
+</Tabs>
 
-<Button intent="primary">Primary</Button>
+## Intent And Appearance
+
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button intent="primary">Primary</Button>
+      <Button intent="secondary">Secondary</Button>
+      <Button appearance="outline">Outline</Button>
+      <Button appearance="ghost">Ghost</Button>
+      <Button appearance="link">Link</Button>
+      <Button intent="danger">Danger</Button>
+      <Button intent="success">Success</Button>
+      <Button intent="warning">Warning</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code lang="tsx" code={`<Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
 <Button appearance="outline">Outline</Button>
 <Button appearance="ghost">Ghost</Button>
@@ -182,114 +77,100 @@ import { Button } from './components/ui/button';
 <Button intent="danger">Danger</Button>
 <Button intent="success">Success</Button>
 <Button intent="warning">Warning</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code lang="svelte" code={`<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
+        </TabItem>
+        <TabItem label="Vue">
+          <Code lang="vue" code={`<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code lang="astro" code={`<Button intent="primary">Primary</Button>
+<Button intent="secondary">Secondary</Button>
+<Button appearance="outline">Outline</Button>
+<Button appearance="ghost">Ghost</Button>
+<Button appearance="link">Link</Button>
+<Button intent="danger">Danger</Button>
+<Button intent="success">Success</Button>
+<Button intent="warning">Warning</Button>`} />
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
 ## Sizes
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton size="sm">Small</ReactButton>
-          <ReactButton size="md">Medium</ReactButton>
-          <ReactButton size="lg">Large</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button size="sm">Small</Button>
+      <Button size="md">Medium</Button>
+      <Button size="lg">Large</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
           <Code lang="tsx" code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
 <Button size="lg">Large</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton size="sm">Small</SvelteButton>
-          <SvelteButton size="md">Medium</SvelteButton>
-          <SvelteButton size="lg">Large</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
 <Button size="lg">Large</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton size="sm">Small</VueButton>
-          <VueButton size="md">Medium</VueButton>
-          <VueButton size="lg">Large</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Vue">
           <Code lang="vue" code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
 <Button size="lg">Large</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton size="sm">Small</AstroButton>
-          <AstroButton size="md">Medium</AstroButton>
-          <AstroButton size="lg">Large</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Astro">
           <Code lang="astro" code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
 <Button size="lg">Large</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
 ## Icon
 
 Icon-only buttons. Always provide `aria-label` for accessibility.
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" intent="success" aria-label="Create"><PlusIcon /></ReactButton>
-          <ReactButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button size="icon" intent="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" intent="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" appearance="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" appearance="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" intent="danger" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" intent="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" intent="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
           <Code lang="tsx" code={`<Button size="icon" intent="primary" aria-label="Add">
   <PlusIcon />
 </Button>
@@ -299,26 +180,8 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <Button size="icon" intent="danger" aria-label="Delete">
   <PlusIcon />
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" intent="success" aria-label="Create"><PlusIcon /></SvelteButton>
-          <SvelteButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
@@ -328,26 +191,8 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton size="icon" intent="primary" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" intent="secondary" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" appearance="outline" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" appearance="ghost" aria-label="Add"><PlusIcon /></VueButton>
-          <VueButton size="icon" intent="danger" aria-label="Delete"><PlusIcon /></VueButton>
-          <VueButton size="icon" intent="success" aria-label="Create"><PlusIcon /></VueButton>
-          <VueButton size="icon" intent="warning" aria-label="Caution"><PlusIcon /></VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Vue">
           <Code lang="vue" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
@@ -357,26 +202,8 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton size="icon" intent="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" intent="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" appearance="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" appearance="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" intent="danger" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" intent="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-          <AstroButton size="icon" intent="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Astro">
           <Code lang="astro" code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
@@ -386,33 +213,30 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
-## WithIcon
+## With Icon
 
-Buttons combining an icon and a text label.
-
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton intent="primary"><PlusIcon />Add</ReactButton>
-          <ReactButton intent="secondary"><PlusIcon />Add</ReactButton>
-          <ReactButton appearance="outline"><PlusIcon />Add</ReactButton>
-          <ReactButton appearance="ghost"><PlusIcon />Add</ReactButton>
-          <ReactButton intent="danger"><PlusIcon />Delete</ReactButton>
-          <ReactButton intent="success"><PlusIcon />Create</ReactButton>
-          <ReactButton intent="warning"><PlusIcon />Caution</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button intent="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+      <Button intent="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+      <Button appearance="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+      <Button appearance="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
+      <Button intent="danger"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</Button>
+      <Button intent="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</Button>
+      <Button intent="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
           <Code lang="tsx" code={`<Button intent="primary">
   <PlusIcon />
   Add
@@ -420,31 +244,9 @@ Buttons combining an icon and a text label.
 <Button intent="danger">
   <TrashIcon />
   Delete
-</Button>
-<Button intent="success">
-  <CheckIcon />
-  Create
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton intent="primary"><PlusIcon />Add</SvelteButton>
-          <SvelteButton intent="secondary"><PlusIcon />Add</SvelteButton>
-          <SvelteButton appearance="outline"><PlusIcon />Add</SvelteButton>
-          <SvelteButton appearance="ghost"><PlusIcon />Add</SvelteButton>
-          <SvelteButton intent="danger"><PlusIcon />Delete</SvelteButton>
-          <SvelteButton intent="success"><PlusIcon />Create</SvelteButton>
-          <SvelteButton intent="warning"><PlusIcon />Caution</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button intent="primary">
   <svg>...</svg>
   Add
@@ -452,31 +254,9 @@ Buttons combining an icon and a text label.
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>
-<Button intent="success">
-  <svg>...</svg>
-  Create
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton intent="primary"><PlusIcon />Add</VueButton>
-          <VueButton intent="secondary"><PlusIcon />Add</VueButton>
-          <VueButton appearance="outline"><PlusIcon />Add</VueButton>
-          <VueButton appearance="ghost"><PlusIcon />Add</VueButton>
-          <VueButton intent="danger"><PlusIcon />Delete</VueButton>
-          <VueButton intent="success"><PlusIcon />Create</VueButton>
-          <VueButton intent="warning"><PlusIcon />Caution</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Vue">
           <Code lang="vue" code={`<Button intent="primary">
   <svg>...</svg>
   Add
@@ -484,31 +264,9 @@ Buttons combining an icon and a text label.
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>
-<Button intent="success">
-  <svg>...</svg>
-  Create
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton intent="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton intent="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton appearance="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton appearance="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</AstroButton>
-          <AstroButton intent="danger"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</AstroButton>
-          <AstroButton intent="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</AstroButton>
-          <AstroButton intent="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Astro">
           <Code lang="astro" code={`<Button intent="primary">
   <svg>...</svg>
   Add
@@ -516,347 +274,199 @@ Buttons combining an icon and a text label.
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>
-<Button intent="success">
-  <svg>...</svg>
-  Create
 </Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
 ## Rounded
 
 Override `--bambi-button-radius` to get pill-shaped buttons.
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton intent="primary" style={{'--bambi-button-radius': '9999px'}}>Primary</ReactButton>
-          <ReactButton intent="secondary" style={{'--bambi-button-radius': '9999px'}}>Secondary</ReactButton>
-          <ReactButton appearance="outline" style={{'--bambi-button-radius': '9999px'}}>Outline</ReactButton>
-          <ReactButton appearance="ghost" style={{'--bambi-button-radius': '9999px'}}>Ghost</ReactButton>
-          <ReactButton intent="danger" style={{'--bambi-button-radius': '9999px'}}>Danger</ReactButton>
-          <ReactButton intent="success" style={{'--bambi-button-radius': '9999px'}}>Success</ReactButton>
-          <ReactButton intent="warning" style={{'--bambi-button-radius': '9999px'}}>Warning</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="css" title="button.css" code={`.btn-rounded {
-  --bambi-button-radius: 9999px;
-}`} />
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button intent="primary" style="--bambi-button-radius: 9999px">Primary</Button>
+      <Button intent="secondary" style="--bambi-button-radius: 9999px">Secondary</Button>
+      <Button appearance="outline" style="--bambi-button-radius: 9999px">Outline</Button>
+      <Button appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</Button>
+      <Button intent="danger" style="--bambi-button-radius: 9999px">Danger</Button>
+      <Button intent="success" style="--bambi-button-radius: 9999px">Success</Button>
+      <Button intent="warning" style="--bambi-button-radius: 9999px">Warning</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
           <Code lang="tsx" code={`import './button.css';
 
 <Button className="btn-rounded" intent="primary">Primary</Button>
 <Button className="btn-rounded" intent="secondary">Secondary</Button>
-<Button className="btn-rounded" appearance="outline">Outline</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton intent="primary" style="--bambi-button-radius: 9999px">Primary</SvelteButton>
-          <SvelteButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</SvelteButton>
-          <SvelteButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</SvelteButton>
-          <SvelteButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</SvelteButton>
-          <SvelteButton intent="danger" style="--bambi-button-radius: 9999px">Danger</SvelteButton>
-          <SvelteButton intent="success" style="--bambi-button-radius: 9999px">Success</SvelteButton>
-          <SvelteButton intent="warning" style="--bambi-button-radius: 9999px">Warning</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="svelte" code={`<script>
-  import { Button } from './components/ui/button';
-</script>
+<Button className="btn-rounded" appearance="outline">Outline</Button>
 
-<Button class="btn-rounded" intent="primary">Primary</Button>
+/* button.css */
+.btn-rounded { --bambi-button-radius: 9999px; }`} />
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code lang="svelte" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
 <Button class="btn-rounded" intent="secondary">Secondary</Button>
 <Button class="btn-rounded" appearance="outline">Outline</Button>
 
 <style>
-  .btn-rounded {
-    --bambi-button-radius: 9999px;
-  }
+  .btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton intent="primary" style="--bambi-button-radius: 9999px">Primary</VueButton>
-          <VueButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</VueButton>
-          <VueButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</VueButton>
-          <VueButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</VueButton>
-          <VueButton intent="danger" style="--bambi-button-radius: 9999px">Danger</VueButton>
-          <VueButton intent="success" style="--bambi-button-radius: 9999px">Success</VueButton>
-          <VueButton intent="warning" style="--bambi-button-radius: 9999px">Warning</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="vue" code={`<script setup>
-import { Button } from './components/ui/button';
-</script>
-
-<template>
-  <Button class="btn-rounded" intent="primary">Primary</Button>
-  <Button class="btn-rounded" intent="secondary">Secondary</Button>
-  <Button class="btn-rounded" appearance="outline">Outline</Button>
-</template>
+        </TabItem>
+        <TabItem label="Vue">
+          <Code lang="vue" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
+<Button class="btn-rounded" intent="secondary">Secondary</Button>
+<Button class="btn-rounded" appearance="outline">Outline</Button>
 
 <style scoped>
-.btn-rounded {
-  --bambi-button-radius: 9999px;
-}
+.btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton intent="primary" style="--bambi-button-radius: 9999px">Primary</AstroButton>
-          <AstroButton intent="secondary" style="--bambi-button-radius: 9999px">Secondary</AstroButton>
-          <AstroButton appearance="outline" style="--bambi-button-radius: 9999px">Outline</AstroButton>
-          <AstroButton appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</AstroButton>
-          <AstroButton intent="danger" style="--bambi-button-radius: 9999px">Danger</AstroButton>
-          <AstroButton intent="success" style="--bambi-button-radius: 9999px">Success</AstroButton>
-          <AstroButton intent="warning" style="--bambi-button-radius: 9999px">Warning</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="astro" code={`---
-import { Button } from './components/ui/button';
----
-
-<Button class="btn-rounded" intent="primary">Primary</Button>
+        </TabItem>
+        <TabItem label="Astro">
+          <Code lang="astro" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
 <Button class="btn-rounded" intent="secondary">Secondary</Button>
 <Button class="btn-rounded" appearance="outline">Outline</Button>
 
 <style>
-  .btn-rounded {
-    --bambi-button-radius: 9999px;
-  }
+  .btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
-## FullWidth
+## Full Width
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-col">
-          <ReactButton style={{width:'100%'}}>Full Width Primary</ReactButton>
-          <ReactButton style={{width:'100%'}} intent="secondary">Full Width Secondary</ReactButton>
-          <ReactButton style={{width:'100%'}} appearance="outline">Full Width Outline</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="tsx" code={`<Button style={{ width: '100%' }}>
-  Full Width Primary
-</Button>
-<Button style={{ width: '100%' }} intent="secondary">
-  Full Width Secondary
-</Button>
-<Button style={{ width: '100%' }} appearance="outline">
-  Full Width Outline
-</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-col">
+      <Button style="width:100%">Full Width Primary</Button>
+      <Button style="width:100%" intent="secondary">Full Width Secondary</Button>
+      <Button style="width:100%" appearance="outline">Full Width Outline</Button>
     </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-col">
-          <SvelteButton style="width:100%">Full Width Primary</SvelteButton>
-          <SvelteButton style="width:100%" intent="secondary">Full Width Secondary</SvelteButton>
-          <SvelteButton style="width:100%" appearance="outline">Full Width Outline</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code lang="tsx" code={`<Button style={{ width: '100%' }}>Full Width Primary</Button>
+<Button style={{ width: '100%' }} intent="secondary">Full Width Secondary</Button>
+<Button style={{ width: '100%' }} appearance="outline">Full Width Outline</Button>`} />
+        </TabItem>
+        <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
 <Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-col">
-          <VueButton style="width:100%">Full Width Primary</VueButton>
-          <VueButton style="width:100%" intent="secondary">Full Width Secondary</VueButton>
-          <VueButton style="width:100%" appearance="outline">Full Width Outline</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Vue">
           <Code lang="vue" code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
 <Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-col">
-          <AstroButton style="width:100%">Full Width Primary</AstroButton>
-          <AstroButton style="width:100%" intent="secondary">Full Width Secondary</AstroButton>
-          <AstroButton style="width:100%" appearance="outline">Full Width Outline</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Astro">
           <Code lang="astro" code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
 <Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
 ## Loading
 
 Pass `loading` to show a spinner and block interaction. The button keeps its original width and the label remains accessible to screen readers.
 
-<Tabs syncKey="framework">
-  <TabItem label="React">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <ReactButton intent="primary" loading>Save</ReactButton>
-          <ReactButton intent="secondary" loading>Save</ReactButton>
-          <ReactButton appearance="outline" loading>Save</ReactButton>
-          <ReactButton appearance="ghost" loading>Save</ReactButton>
-          <ReactButton intent="danger" loading>Delete</ReactButton>
-          <ReactButton intent="success" loading>Create</ReactButton>
-          <ReactButton intent="warning" loading>Caution</ReactButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button intent="primary" loading>Save</Button>
+      <Button intent="secondary" loading>Save</Button>
+      <Button appearance="outline" loading>Save</Button>
+      <Button appearance="ghost" loading>Save</Button>
+      <Button intent="danger" loading>Delete</Button>
+      <Button intent="success" loading>Create</Button>
+      <Button intent="warning" loading>Caution</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
           <Code lang="tsx" code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
 <Button intent="danger" loading>Delete</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Svelte">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <SvelteButton intent="primary" loading>Save</SvelteButton>
-          <SvelteButton intent="secondary" loading>Save</SvelteButton>
-          <SvelteButton appearance="outline" loading>Save</SvelteButton>
-          <SvelteButton appearance="ghost" loading>Save</SvelteButton>
-          <SvelteButton intent="danger" loading>Delete</SvelteButton>
-          <SvelteButton intent="success" loading>Create</SvelteButton>
-          <SvelteButton intent="warning" loading>Caution</SvelteButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
+        </TabItem>
+        <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
 <Button intent="danger" loading>Delete</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Vue">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <VueButton intent="primary" loading={true}>Save</VueButton>
-          <VueButton intent="secondary" loading={true}>Save</VueButton>
-          <VueButton appearance="outline" loading={true}>Save</VueButton>
-          <VueButton appearance="ghost" loading={true}>Save</VueButton>
-          <VueButton intent="danger" loading={true}>Delete</VueButton>
-          <VueButton intent="success" loading={true}>Create</VueButton>
-          <VueButton intent="warning" loading={true}>Caution</VueButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="vue" code={`<Button intent="primary" loading={true}>Save</Button>
-<Button intent="secondary" loading={true}>Save</Button>
-<Button intent="danger" loading={true}>Delete</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
-    </div>
-  </TabItem>
-  <TabItem label="Astro">
-    <div class="demo-grid">
-      <div class="demo-preview-card">
-        <div class="preview-row">
-          <AstroButton intent="primary" loading>Save</AstroButton>
-          <AstroButton intent="secondary" loading>Save</AstroButton>
-          <AstroButton appearance="outline" loading>Save</AstroButton>
-          <AstroButton appearance="ghost" loading>Save</AstroButton>
-          <AstroButton intent="danger" loading>Delete</AstroButton>
-          <AstroButton intent="success" loading>Create</AstroButton>
-          <AstroButton intent="warning" loading>Caution</AstroButton>
-        </div>
-      </div>
-      <div class="demo-code-card">
-        <div class="code-body">
-          <Code lang="astro" code={`---
-import { Button } from './components/ui/button';
----
-
-<Button intent="primary" loading>Save</Button>
+        </TabItem>
+        <TabItem label="Vue">
+          <Code lang="vue" code={`<Button intent="primary" :loading="true">Save</Button>
+<Button intent="secondary" :loading="true">Save</Button>
+<Button intent="danger" :loading="true">Delete</Button>`} />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code lang="astro" code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
 <Button intent="danger" loading>Delete</Button>`} />
-        </div>
-        <button class="view-code-btn">View code</button>
-      </div>
+        </TabItem>
+      </Tabs>
     </div>
-  </TabItem>
-</Tabs>
+  </div>
+</div>
 
-## ApiReference
+## Disabled
 
-All framework packages share the same prop API.
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <Button intent="primary" disabled>Primary</Button>
+      <Button intent="secondary" disabled>Secondary</Button>
+      <Button appearance="outline" disabled>Outline</Button>
+      <Button appearance="ghost" disabled>Ghost</Button>
+      <Button intent="danger" disabled>Danger</Button>
+      <Button intent="success" disabled>Success</Button>
+      <Button intent="warning" disabled>Warning</Button>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code lang="tsx" code={`<Button intent="primary" disabled>Primary</Button>
+<Button intent="secondary" disabled>Secondary</Button>
+<Button intent="danger" disabled>Danger</Button>`} />
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code lang="svelte" code={`<Button intent="primary" disabled>Primary</Button>
+<Button intent="secondary" disabled>Secondary</Button>
+<Button intent="danger" disabled>Danger</Button>`} />
+        </TabItem>
+        <TabItem label="Vue">
+          <Code lang="vue" code={`<Button intent="primary" disabled>Primary</Button>
+<Button intent="secondary" disabled>Secondary</Button>
+<Button intent="danger" disabled>Danger</Button>`} />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code lang="astro" code={`<Button intent="primary" disabled>Primary</Button>
+<Button intent="secondary" disabled>Secondary</Button>
+<Button intent="danger" disabled>Danger</Button>`} />
+        </TabItem>
+      </Tabs>
+    </div>
+  </div>
+</div>
+
+## API Reference
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -867,4 +477,4 @@ All framework packages share the same prop API.
 | `disabled` | `boolean` | `false` | Disables the button |
 | `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | HTML button type |
 
-All other HTML button attributes (e.g. `onClick`, `aria-*`, `style`, `class`) are forwarded to the underlying `<button>` element.
+All other HTML button attributes (`aria-*`, `style`, `class`) are forwarded to the underlying `<button>` element.

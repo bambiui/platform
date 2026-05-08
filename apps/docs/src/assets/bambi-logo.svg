@@ -2,10 +2,10 @@
   <defs>
     <style>
       .logo-base { fill: oklch(55% 0.220 271); }
-      .logo-shadow { fill: oklch(97% 0.010 271); fill-opacity: 0.4; }
+      .logo-shadow { fill: oklch(97% 0.010 271); fill-opacity: 0.7; }
       @media (prefers-color-scheme: dark) {
         .logo-base { fill: oklch(65% 0.220 271); }
-        .logo-shadow { fill: oklch(12% 0.010 271); fill-opacity: 0.4; }
+        .logo-shadow { fill: oklch(12% 0.010 271); fill-opacity: 0.7; }
       }
     </style>
     <path id="outer-shape" d="M224.5 681.5 L224.5 291.5 C224.5 236.5 231.5 199.5 254.5 192.5 C289.5 181.8 372.5 236.5 413.5 306.5 C443.5 302.5 477.5 300.5 512 300.5 C546.5 300.5 580.5 302.5 610.5 306.5 C651.5 236.5 734.5 181.8 769.5 192.5 C792.5 199.5 799.5 236.5 799.5 291.5 L799.5 681.5 C799.5 724.5 772.5 750.5 729.5 750.5 L294.5 750.5 C251.5 750.5 224.5 724.5 224.5 681.5 Z"/>

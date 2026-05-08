@@ -1,0 +1,41 @@
+---
+import { buttonRecipe } from "./recipe";
+import type { ButtonBaseProps } from "./types";
+import "./button.css";
+
+interface Props extends ButtonBaseProps {
+  class?: string;
+  disabled?: boolean;
+  id?: string;
+  type?: "button" | "submit" | "reset";
+  [key: string]: unknown;
+}
+
+const {
+  intent = buttonRecipe.defaults.intent,
+  appearance = buttonRecipe.defaults.appearance,
+  size = buttonRecipe.defaults.size,
+  loading = buttonRecipe.defaults.loading,
+  type = "button",
+  class: className,
+  disabled,
+  ...attrs
+} = Astro.props;
+
+const cls = [buttonRecipe.className, className].filter(Boolean).join(" ");
+---
+<button
+  type={type}
+  class={cls}
+  data-intent={intent}
+  data-appearance={appearance}
+  data-size={size}
+  data-loading={loading || undefined}
+  aria-busy={loading || undefined}
+  aria-disabled={(loading || disabled) || undefined}
+  disabled={disabled}
+  {...attrs}
+>
+  {loading && <span class="bambi-button-spinner" aria-hidden="true" />}
+  <span class="bambi-button-content"><slot /></span>
+</button>

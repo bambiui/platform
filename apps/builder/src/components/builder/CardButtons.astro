@@ -1,0 +1,107 @@
+---
+import { Button } from "../ui/button";
+const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>`;
+---
+<div class="card" id="card-buttons" style="top: 40px; left: 1120px; width: 520px">
+  <div class="cardHeader">
+    <h3>Buttons</h3>
+    <Button appearance="link" data-edit-card="buttons">Edit Tokens</Button>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Variants</span>
+    <div class="row">
+      <Button intent="primary">Primary</Button>
+      <Button intent="secondary">Secondary</Button>
+      <Button appearance="outline">Outline</Button>
+      <Button appearance="ghost">Ghost</Button>
+      <Button appearance="link">Link</Button>
+      <Button intent="danger">Danger</Button>
+      <Button intent="success">Success</Button>
+      <Button intent="warning">Warning</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Sizes</span>
+    <div class="row">
+      <Button size="sm">Small</Button>
+      <Button size="md">Medium</Button>
+      <Button size="lg">Large</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Icon</span>
+    <div class="row">
+      <Button size="icon" intent="primary" aria-label="Add"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" intent="secondary" aria-label="Add"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" appearance="outline" aria-label="Add"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" appearance="ghost" aria-label="Add"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" intent="danger" aria-label="Delete"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" intent="success" aria-label="Create"><Fragment set:html={plusIcon} /></Button>
+      <Button size="icon" intent="warning" aria-label="Caution"><Fragment set:html={plusIcon} /></Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">With Icon</span>
+    <div class="row">
+      <Button intent="primary"><Fragment set:html={plusIcon} />Add</Button>
+      <Button intent="secondary"><Fragment set:html={plusIcon} />Add</Button>
+      <Button appearance="outline"><Fragment set:html={plusIcon} />Add</Button>
+      <Button appearance="ghost"><Fragment set:html={plusIcon} />Add</Button>
+      <Button intent="danger"><Fragment set:html={plusIcon} />Delete</Button>
+      <Button intent="success"><Fragment set:html={plusIcon} />Create</Button>
+      <Button intent="warning"><Fragment set:html={plusIcon} />Caution</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Rounded</span>
+    <div class="row">
+      <Button intent="primary" style="--bambi-button-radius: 9999px">Primary</Button>
+      <Button intent="secondary" style="--bambi-button-radius: 9999px">Secondary</Button>
+      <Button appearance="outline" style="--bambi-button-radius: 9999px">Outline</Button>
+      <Button appearance="ghost" style="--bambi-button-radius: 9999px">Ghost</Button>
+      <Button intent="danger" style="--bambi-button-radius: 9999px">Danger</Button>
+      <Button intent="success" style="--bambi-button-radius: 9999px">Success</Button>
+      <Button intent="warning" style="--bambi-button-radius: 9999px">Warning</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Full Width</span>
+    <div class="col">
+      <Button style="width: 100%">Full Width Primary</Button>
+      <Button intent="secondary" style="width: 100%">Full Width Secondary</Button>
+      <Button appearance="outline" style="width: 100%">Full Width Outline</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Loading</span>
+    <div class="row">
+      <Button intent="primary" loading>Save</Button>
+      <Button intent="secondary" loading>Save</Button>
+      <Button appearance="outline" loading>Save</Button>
+      <Button appearance="ghost" loading>Save</Button>
+      <Button intent="danger" loading>Delete</Button>
+      <Button intent="success" loading>Create</Button>
+      <Button intent="warning" loading>Caution</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Disabled</span>
+    <div class="row">
+      <Button intent="primary" disabled>Primary</Button>
+      <Button intent="secondary" disabled>Secondary</Button>
+      <Button appearance="outline" disabled>Outline</Button>
+      <Button appearance="ghost" disabled>Ghost</Button>
+      <Button intent="danger" disabled>Danger</Button>
+      <Button intent="success" disabled>Success</Button>
+      <Button intent="warning" disabled>Warning</Button>
+    </div>
+  </div>
+</div>

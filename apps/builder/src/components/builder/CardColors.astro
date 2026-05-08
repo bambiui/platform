@@ -1,0 +1,26 @@
+---
+import { Button } from "../ui/button";
+interface Props {
+  colorGroups: { label: string; tokens: string[] }[];
+}
+const { colorGroups } = Astro.props;
+---
+<div class="card" id="card-colors" style="top: 40px; left: 40px; width: 480px">
+  <div class="cardHeader">
+    <h3>Colors</h3>
+    <Button appearance="link" data-edit-card="colors">Edit Tokens</Button>
+  </div>
+  {colorGroups.map((group) => (
+    <div class="color-group">
+      <span class="color-group-label">{group.label}</span>
+      <div class="swatches">
+        {group.tokens.map((token) => (
+          <div class="swatch">
+            <div class="swatch-color" style={`background-color: var(--bambi-${token})`} />
+            <span class="swatch-name">{token}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>

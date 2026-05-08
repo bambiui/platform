@@ -12,8 +12,6 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@bambiui/components": "workspace:*",
-    "@bambiui/tokens": "workspace:*",
     "astro": "^6.3.1"
   }
 }

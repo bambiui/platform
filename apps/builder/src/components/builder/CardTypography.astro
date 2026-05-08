@@ -1,0 +1,59 @@
+---
+import { Button } from "../ui/button";
+interface Props {
+  typeSizes: { label: string; token: string; value: string }[];
+  typeWeights: { label: string; token: string; value: string }[];
+}
+const { typeSizes, typeWeights } = Astro.props;
+---
+<div class="card" id="card-typography" style="top: 40px; left: 580px; width: 480px">
+  <div class="cardHeader">
+    <h3>Typography</h3>
+    <Button appearance="link" data-edit-card="typography">Edit Tokens</Button>
+  </div>
+
+  <div class="type-section">
+    <span class="type-section-label">Font Families</span>
+    <div class="type-row">
+      <span class="type-meta">--bambi-font-sans</span>
+      <span class="type-sample" style="font-family: var(--bambi-font-sans)">
+        The quick brown fox jumps over the lazy dog
+      </span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">--bambi-font-mono</span>
+      <span class="type-sample mono">const theme = "bambiui";</span>
+    </div>
+  </div>
+
+  <div class="type-section">
+    <span class="type-section-label">Font Sizes</span>
+    {typeSizes.map(({ token, value }) => (
+      <div class="type-row">
+        <span class="type-meta">
+          {token.replace("--bambi-", "")}<br />{value}
+        </span>
+        <span class="type-sample" style={`font-size: var(${token})`}>
+          The quick brown fox jumps over the lazy dog
+        </span>
+      </div>
+    ))}
+  </div>
+
+  <div class="type-section">
+    <span class="type-section-label">Font Weights</span>
+    {typeWeights.map(({ label, token, value }) => (
+      <div class="type-row">
+        <span class="type-meta">
+          {token.replace("--bambi-font-weight-", "")}<br />{value}
+        </span>
+        <span
+          class="type-sample"
+          style={`font-weight: var(${token}); font-size: var(--bambi-text-base)`}
+        >
+          {label} — The quick brown fox
+        </span>
+      </div>
+    ))}
+  </div>
+</div>

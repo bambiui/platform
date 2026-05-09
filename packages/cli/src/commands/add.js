@@ -5,8 +5,7 @@ import {
   getIndexContent,
 } from "../utils/framework.js";
 import {
-  moduleSpecifier,
-  transformButtonTypesSource,
+  generateTypesSource,
   transformComponentSource,
   writeProjectFile,
 } from "../utils/files.js";
@@ -18,12 +17,27 @@ import {
 } from "../utils/registry.js";
 
 /**
- * @param {string} framework
  * @param {Record<string, string>} fileNames
  */
-function getFrameworkTransform(framework, fileNames) {
+function getFileTransform(fileNames) {
   return /** @param {string} content */ (content) =>
-    transformComponentSource(content, fileNames);
+    transformComponentSource(content, {
+      modules: getModuleReplacements(fileNames),
+      style: fileNames.style,
+    });
+}
+
+/**
+ * @param {Record<string, string>} fileNames
+ */
+function getModuleReplacements(fileNames) {
+  const replacements = {};
+
+  for (const [kind, fileName] of Object.entries(fileNames)) {
+    replacements[`./${kind}`] = fileName;
+  }
+
+  return /** @type {Record<string, string>} */ (replacements);
 }
 
 /**
@@ -58,7 +72,7 @@ export async function addComponent(componentName, flags) {
   const component = getRegistryComponent(manifest, componentName);
   assertRegistryComponent(component);
 
-  const componentRecord = /** @type {{ exportName?: string, style?: { from: string, fileName: string }, shared?: Array<{ kind: string, from: string, to: string }>, files?: Record<string, Array<{ kind: string, from: string, to: string }>> }} */ (component);
+  const componentRecord = /** @type {{ exportName?: string, api?: { typeExports?: string[], types?: Parameters<typeof generateTypesSource>[0] }, style?: { from: string, fileName: string }, shared?: Array<{ kind: string, from?: string, to: string, generate?: string }>, files?: Record<string, Array<{ kind: string, from?: string, to: string, generate?: string }>> }} */ (component);
   const frameworkFiles = componentRecord.files?.[framework];
 
   if (!frameworkFiles) {
@@ -78,19 +92,35 @@ export async function addComponent(componentName, flags) {
   );
   fileNames.style = componentRecord.style.fileName;
   const exportName = componentRecord.exportName ?? componentName;
+  const typeExports = componentRecord.api?.typeExports ?? [];
   const results = [];
 
   for (const file of files) {
     const targetName = file.to;
-    const transform =
-      file.kind === "types"
-        ? transformButtonTypesSource
-        : file.kind === "recipe"
-          ? /** @param {string} content */ (content) =>
-              transformComponentSource(content, { types: fileNames.types })
-          : file.kind === framework
-            ? getFrameworkTransform(framework, fileNames)
-            : undefined;
+    const transform = getFileTransform(fileNames);
+
+    if (file.generate === "types") {
+      if (!componentRecord.api?.types) {
+        throw new Error(
+          `Component "${componentName}" is missing api.types metadata.`,
+        );
+      }
+
+      results.push(
+        await writeProjectFile(
+          path.join(targetDir, targetName),
+          generateTypesSource(componentRecord.api.types),
+          Boolean(flags.force),
+        ),
+      );
+      continue;
+    }
+
+    if (!file.from) {
+      throw new Error(
+        `Component "${componentName}" file "${file.kind}" is missing a source path.`,
+      );
+    }
 
     results.push(
       await copyRegistryFile(
@@ -115,7 +145,7 @@ export async function addComponent(componentName, flags) {
   results.push(
     await writeProjectFile(
       path.join(targetDir, "index.ts"),
-      getIndexContent(framework, exportName, fileNames),
+      getIndexContent(framework, exportName, fileNames, typeExports),
       Boolean(flags.force),
     ),
   );

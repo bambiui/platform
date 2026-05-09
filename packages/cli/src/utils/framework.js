@@ -95,15 +95,25 @@ export async function getConfig(cwd, flags = {}) {
  * @param {string} framework
  * @param {string} exportName
  * @param {Record<string, string>} fileNames
+ * @param {string[]} typeExports
  */
-export function getIndexContent(framework, exportName, fileNames) {
+export function getIndexContent(framework, exportName, fileNames, typeExports) {
+  const typeExportList = typeExports.join(", ");
+
   if (framework === "react") {
     const componentModule = moduleSpecifier(fileNames[framework]);
+    const typeLine = typeExportList
+      ? `export type { ${typeExportList} } from "${componentModule}";\n`
+      : "";
 
-    return `export { ${exportName} } from "${componentModule}";\nexport type { ButtonAppearance, ButtonBaseProps, ButtonIntent, ButtonSize } from "${componentModule}";\n`;
+    return `export { ${exportName} } from "${componentModule}";\n${typeLine}`;
   }
 
-  return `export { default as ${exportName} } from "${moduleSpecifier(fileNames[framework])}";\nexport type { ButtonAppearance, ButtonBaseProps, ButtonIntent, ButtonSize } from "${moduleSpecifier(fileNames.types)}";\n`;
+  const typeLine = typeExportList
+    ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
+    : "";
+
+  return `export { default as ${exportName} } from "${moduleSpecifier(fileNames[framework])}";\n${typeLine}`;
 }
 
 /**

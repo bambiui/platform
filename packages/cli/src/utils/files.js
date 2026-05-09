@@ -69,77 +69,56 @@ export function moduleSpecifier(fileName) {
 
 /**
  * @param {string} content
- * @param {Record<string, string>} [replacements]
+ * @param {{ modules?: Record<string, string>, style?: string }} [replacements]
  */
 export function transformComponentSource(content, replacements = {}) {
   let next = content;
 
-  if (replacements.recipe) {
-    next = next.replace(
-      /from "\.\/recipe"/g,
-      `from "${moduleSpecifier(replacements.recipe)}"`,
+  for (const [source, target] of Object.entries(replacements.modules ?? {})) {
+    next = next.replaceAll(
+      `from "${source}"`,
+      `from "${moduleSpecifier(target)}"`,
     );
   }
 
-  if (replacements.types) {
-    next = next.replace(
-      /from "\.\/types"/g,
-      `from "${moduleSpecifier(replacements.types)}"`,
-    );
-    next = next.replace(
-      /from "@bambiui\/core\/button"/g,
-      `from "${moduleSpecifier(replacements.types)}"`,
-    );
-  }
-
-  if (replacements.style) {
-    next = next.replace(
-      /import "\.\/button\.css";/g,
-      `import "./${replacements.style}";`,
-    );
-  }
+  next = next.replace(
+    /import "\.\/([^"]+\.css)";/g,
+    `import "./${replacements.style ?? "$1"}";`,
+  );
 
   return next;
 }
 
 /**
- * @param {string} content
+ * @param {{ consts?: Array<{ name: string, values: string[] }>, aliasesFromConsts?: Array<{ name: string, constName: string }>, interfaces?: Array<{ name: string, props: Array<{ name: string, type: string, optional?: boolean }> }>, requiredPicks?: Array<{ name: string, source: string, keys: string[] }> }} types
  */
-export function transformButtonTypesSource(content) {
-  if (
-    !content.includes('from "./contracts"') &&
-    !content.includes('from "@bambiui/core/button"')
-  ) {
-    return content;
+export function generateTypesSource(types) {
+  const chunks = [];
+
+  for (const item of types.consts ?? []) {
+    const values = item.values.map((value) => `  "${value}",`).join("\n");
+    chunks.push(`export const ${item.name} = [\n${values}\n] as const;`);
   }
 
-  return `export const buttonIntents = [
-  "primary",
-  "secondary",
-  "danger",
-  "success",
-  "warning",
-] as const;
+  for (const item of types.aliasesFromConsts ?? []) {
+    chunks.push(
+      `export type ${item.name} = (typeof ${item.constName})[number];`,
+    );
+  }
 
-export const buttonAppearances = ["solid", "outline", "ghost", "link"] as const;
+  for (const item of types.interfaces ?? []) {
+    const props = item.props
+      .map((prop) => `  ${prop.name}${prop.optional ? "?" : ""}: ${prop.type};`)
+      .join("\n");
+    chunks.push(`export interface ${item.name} {\n${props}\n}`);
+  }
 
-export const buttonSizes = ["sm", "md", "lg", "icon"] as const;
+  for (const item of types.requiredPicks ?? []) {
+    const keys = item.keys.map((key) => `"${key}"`).join(" | ");
+    chunks.push(
+      `export type ${item.name} = Required<\n  Pick<${item.source}, ${keys}>\n>;`,
+    );
+  }
 
-export type ButtonIntent = (typeof buttonIntents)[number];
-
-export type ButtonAppearance = (typeof buttonAppearances)[number];
-
-export type ButtonSize = (typeof buttonSizes)[number];
-
-export interface ButtonBaseProps {
-  intent?: ButtonIntent;
-  appearance?: ButtonAppearance;
-  size?: ButtonSize;
-  loading?: boolean;
-}
-
-export type ButtonDefaults = Required<
-  Pick<ButtonBaseProps, "intent" | "appearance" | "size" | "loading">
->;
-`;
+  return `${chunks.join("\n\n")}\n`;
 }

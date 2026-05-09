@@ -1,5 +1,5 @@
 {
-  "$schema": "https://bambiui.dev/registry.schema.json",
+  "$schema": "https://bambi-ui.felekoglu.dev/registry.schema.json",
   "version": 1,
   "tokens": {
     "css": "packages/tokens/src/tokens.css"
@@ -7,6 +7,78 @@
   "components": {
     "button": {
       "exportName": "Button",
+      "api": {
+        "typeExports": [
+          "ButtonAppearance",
+          "ButtonBaseProps",
+          "ButtonIntent",
+          "ButtonSize"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "buttonIntents",
+              "values": ["primary", "secondary", "danger", "success", "warning"]
+            },
+            {
+              "name": "buttonAppearances",
+              "values": ["solid", "outline", "ghost", "link"]
+            },
+            {
+              "name": "buttonSizes",
+              "values": ["sm", "md", "lg", "icon"]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "ButtonIntent",
+              "constName": "buttonIntents"
+            },
+            {
+              "name": "ButtonAppearance",
+              "constName": "buttonAppearances"
+            },
+            {
+              "name": "ButtonSize",
+              "constName": "buttonSizes"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "ButtonBaseProps",
+              "props": [
+                {
+                  "name": "intent",
+                  "type": "ButtonIntent",
+                  "optional": true
+                },
+                {
+                  "name": "appearance",
+                  "type": "ButtonAppearance",
+                  "optional": true
+                },
+                {
+                  "name": "size",
+                  "type": "ButtonSize",
+                  "optional": true
+                },
+                {
+                  "name": "loading",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "ButtonDefaults",
+              "source": "ButtonBaseProps",
+              "keys": ["intent", "appearance", "size", "loading"]
+            }
+          ]
+        }
+      },
       "style": {
         "from": "packages/components/button/src/button.css",
         "fileName": "button.css"
@@ -19,8 +91,8 @@
         },
         {
           "kind": "types",
-          "from": "packages/components/button/src/types.ts",
-          "to": "types.ts"
+          "to": "types.ts",
+          "generate": "types"
         }
       ],
       "files": {

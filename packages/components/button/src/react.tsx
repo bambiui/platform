@@ -1,6 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { buttonRecipe } from "./recipe";
-import type { ButtonBaseProps } from "@bambiui/core/button";
+import type { ButtonBaseProps } from "./types";
 import "./button.css";
 
 export type {
@@ -8,7 +8,7 @@ export type {
   ButtonBaseProps,
   ButtonIntent,
   ButtonSize,
-} from "@bambiui/core/button";
+} from "./types";
 
 function cn(...inputs: Array<string | false | null | undefined>) {
   return inputs.filter(Boolean).join(" ");

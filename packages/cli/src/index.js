@@ -38,7 +38,7 @@ const components = {
       },
       {
         kind: "types",
-        from: "packages/core/src/button.ts",
+        from: "packages/components/button/src/types.ts",
         to: "types.ts",
       },
     ],
@@ -285,9 +285,11 @@ function transformComponentSource(content, replacements = {}) {
 }
 
 function transformButtonTypesSource(content) {
-  return content.replace(
-    /import \{\n  bambiAppearances,\n  bambiIntents,\n  bambiSizes,\n  type BambiAppearance,\n  type BambiIntent,\n  type BambiSize,\n\} from "\.\/contracts";/,
-    `export const bambiIntents = [
+  if (!content.includes('from "@bambiui/core/button"')) {
+    return content;
+  }
+
+  return `export const buttonIntents = [
   "primary",
   "secondary",
   "danger",
@@ -295,16 +297,27 @@ function transformButtonTypesSource(content) {
   "warning",
 ] as const;
 
-export const bambiAppearances = ["solid", "outline", "ghost", "link"] as const;
+export const buttonAppearances = ["solid", "outline", "ghost", "link"] as const;
 
-export const bambiSizes = ["sm", "md", "lg", "icon"] as const;
+export const buttonSizes = ["sm", "md", "lg", "icon"] as const;
 
-export type BambiIntent = (typeof bambiIntents)[number];
+export type ButtonIntent = (typeof buttonIntents)[number];
 
-export type BambiAppearance = (typeof bambiAppearances)[number];
+export type ButtonAppearance = (typeof buttonAppearances)[number];
 
-export type BambiSize = (typeof bambiSizes)[number];`,
-  );
+export type ButtonSize = (typeof buttonSizes)[number];
+
+export interface ButtonBaseProps {
+  intent?: ButtonIntent;
+  appearance?: ButtonAppearance;
+  size?: ButtonSize;
+  loading?: boolean;
+}
+
+export type ButtonDefaults = Required<
+  Pick<ButtonBaseProps, "intent" | "appearance" | "size" | "loading">
+>;
+`;
 }
 
 function getFrameworkFileName(framework) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from "svelte/elements";
   import { buttonRecipe } from "./recipe";
-  import type { ButtonBaseProps } from "@bambiui/core/button";
+  import type { ButtonBaseProps } from "./types";
   import "./button.css";
 
   interface Props extends HTMLButtonAttributes, ButtonBaseProps {

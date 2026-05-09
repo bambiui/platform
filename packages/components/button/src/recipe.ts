@@ -3,7 +3,7 @@ import {
   buttonIntents,
   buttonSizes,
   type ButtonDefaults,
-} from "@bambiui/core/button";
+} from "./types";
 
 export interface ButtonRecipe {
   className: string;

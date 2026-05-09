@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from "vue";
 import { buttonRecipe } from "./recipe";
-import type { ButtonBaseProps } from "@bambiui/core/button";
+import type { ButtonBaseProps } from "./types";
 import "./button.css";
 
 defineOptions({ name: "BambiButton", inheritAttrs: false });

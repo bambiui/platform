@@ -324,6 +324,25 @@ function getIndexContent(framework) {
   return `export { default as Button } from "./${getFrameworkFileName(framework)}";\nexport type { ButtonAppearance, ButtonBaseProps, ButtonIntent, ButtonSize } from "./types";\n`;
 }
 
+function getFrameworkSupportFiles(framework) {
+  if (framework === "svelte") {
+    return [
+      {
+        fileName: "svelte.d.ts",
+        content: `declare module "*.svelte" {
+  import type { Component } from "svelte";
+
+  const component: Component<Record<string, unknown>>;
+  export default component;
+}
+`,
+      },
+    ];
+  }
+
+  return [];
+}
+
 async function copyRegistryFile(registryUrl, from, to, force, transform) {
   await mkdir(path.dirname(to), { recursive: true });
 
@@ -437,6 +456,16 @@ async function addComponent(componentName, flags) {
       flags.force,
     ),
   );
+
+  for (const supportFile of getFrameworkSupportFiles(framework)) {
+    results.push(
+      await writeGeneratedFile(
+        path.join(targetDir, supportFile.fileName),
+        supportFile.content,
+        flags.force,
+      ),
+    );
+  }
 
   return results;
 }

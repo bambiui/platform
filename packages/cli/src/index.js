@@ -14,7 +14,7 @@ Usage:
 Options:
   --framework react|svelte|vue|astro   Framework override
   --component-dir <path>               Component destination (default: src/components/ui)
-  --registry-url <url>                 Registry base URL (default: GitHub raw)
+  --registry-url <url>                 Registry base URL (default: https://bambi-ui.felekoglu.dev)
   --tokens-file <path>                 Global token CSS destination (default: src/styles/bambi.css)
   --style-file <path>                  Alias for --tokens-file
   --cwd <path>                         Target project (default: current directory)

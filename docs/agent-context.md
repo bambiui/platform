@@ -24,7 +24,7 @@ packages/
 
 - Components are source files under `packages/components`, not per-framework packages.
 - User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
-- The initial registry is GitHub raw files; a hosted registry API can replace the base URL later without changing component packages.
+- The default registry is the hosted static site at `https://bambi-ui.felekoglu.dev`; `--registry-url` and `BAMBIUI_REGISTRY_URL` can point to local or preview registries.
 - The CLI package must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
 - Do not add per-component `package.json` files or build steps unless the project intentionally returns to package publishing.
 
@@ -140,7 +140,7 @@ builder              -> source components and tokens
 ## Things To Watch Out For
 
 - Node version: use Node `>=22.12.0` across the repo.
-- Registry URL: CLI defaults to GitHub raw and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or hosted registries.
+- Registry URL: CLI defaults to `https://bambi-ui.felekoglu.dev` and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or preview registries.
 - Installed source must stay self-contained: internal packages can share contracts, but files copied into user projects should not require BambiUI runtime packages.
 - Recipes in installed components: keep component-local recipes self-contained so users do not need extra BambiUI runtime packages.
 - Component source has no build step: user-facing files are copied by the CLI.

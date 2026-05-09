@@ -47,13 +47,13 @@ npx bambiui add button --framework astro
 
 The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps the component CSS next to the component source and imports it automatically.
 
-By default the CLI fetches source from the GitHub raw registry. For local development or a future hosted registry API, override the base:
+By default the CLI fetches source from the hosted BambiUI registry. For local development or a preview registry, override the base:
 
 ```sh
-npx bambiui init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
+npx bambiui init --registry-url https://bambi-ui.felekoglu.dev
 ```
 
-The current site domain is `https://bambi-ui.felekoglu.dev`; production deploys should expose `registry.json` and `registry.schema.json` at the site root.
+The current site domain is `https://bambi-ui.felekoglu.dev`; production deploys expose `registry.json`, `registry.schema.json`, and registry source files at the site root.
 
 ### 3. Use the component
 

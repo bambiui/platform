@@ -6,26 +6,25 @@ A multi-framework UI component library CLI — React, Svelte, Vue, and Astro com
 
 ## Workspace
 
-| Package/App | Description |
-|---|---|
-| [`packages/cli`](packages/cli) | `bambiui` CLI that adds component source files to user projects |
-| [`packages/core`](packages/core) | Shared contracts and framework-agnostic types |
-| [`packages/tokens`](packages/tokens) | Primitive, semantic, intent, state, and component tokens |
-| [`packages/recipes`](packages/recipes) | Shared recipe definitions for variants, sizes, and states |
-| [`packages/components`](packages/components) | Source components for React, Svelte, Vue, and Astro |
+| Package/App                                  | Description                                                     |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| [`packages/cli`](packages/cli)               | `bambiui` CLI that adds component source files to user projects |
+| [`packages/core`](packages/core)             | Shared contracts and framework-agnostic types                   |
+| [`packages/tokens`](packages/tokens)         | Primitive, semantic, intent, state, and component tokens        |
+| [`packages/components`](packages/components) | Source components for React, Svelte, Vue, and Astro             |
 
 ## Apps
 
-| App | Description |
-|---|---|
-| [`apps/docs`](apps/docs) | Starlight documentation site |
+| App                            | Description                                               |
+| ------------------------------ | --------------------------------------------------------- |
+| [`apps/docs`](apps/docs)       | Starlight documentation site                              |
 | [`apps/builder`](apps/builder) | Infinite-canvas design token editor, served at `/builder` |
 
 ## Getting started
 
 ### 1. Initialize
 
-Run the CLI in your app:
+Run the scoped CLI package in your app. The executable it exposes is `bambiui`.
 
 ```sh
 npx @bambiui/cli init
@@ -58,8 +57,8 @@ npx @bambiui/cli init --registry-url https://raw.githubusercontent.com/bambiui/p
 
 ```tsx
 // React
-import { Button } from './components/ui/button';
-<Button intent="primary">Click me</Button>
+import { Button } from "./components/ui/button";
+<Button intent="primary">Click me</Button>;
 ```
 
 ```svelte
@@ -73,7 +72,7 @@ import { Button } from './components/ui/button';
 ```vue
 <!-- Vue -->
 <script setup>
-import { Button } from './components/ui/button';
+import { Button } from "./components/ui/button";
 </script>
 <template>
   <Button intent="primary">Click me</Button>
@@ -92,20 +91,20 @@ import { Button } from './components/ui/button';
 
 All framework implementations share the same props:
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `intent` | `string` | `"primary"` | Meaning — `primary` `secondary` `danger` `success` `warning` |
-| `appearance` | `string` | `"solid"` | Rendering style — `solid` `outline` `ghost` `link` |
-| `size` | `string` | `"md"` | Button size — `sm` `md` `lg` `icon` |
-| `loading` | `boolean` | `false` | Shows a spinner, sets `aria-busy`, disables pointer events |
-| `disabled` | `boolean` | `false` | Native disabled state |
-| `type` | `string` | `"button"` | HTML button type |
+| Prop         | Type      | Default     | Description                                                  |
+| ------------ | --------- | ----------- | ------------------------------------------------------------ |
+| `intent`     | `string`  | `"primary"` | Meaning — `primary` `secondary` `danger` `success` `warning` |
+| `appearance` | `string`  | `"solid"`   | Rendering style — `solid` `outline` `ghost` `link`           |
+| `size`       | `string`  | `"md"`      | Button size — `sm` `md` `lg` `icon`                          |
+| `loading`    | `boolean` | `false`     | Shows a spinner, sets `aria-busy`, disables pointer events   |
+| `disabled`   | `boolean` | `false`     | Native disabled state                                        |
+| `type`       | `string`  | `"button"`  | HTML button type                                             |
 
 All additional HTML `<button>` attributes are forwarded to the element.
 
 ## Development
 
-Requirements: Node ≥ 22, pnpm 9
+Requirements: Node ≥ 22.12.0, pnpm 9
 
 ```sh
 # Install dependencies

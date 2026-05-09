@@ -10,6 +10,16 @@
       "types": "./src/index.ts",
       "import": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./contracts": {
+      "types": "./src/contracts.ts",
+      "import": "./src/contracts.ts",
+      "default": "./src/contracts.ts"
+    },
+    "./button": {
+      "types": "./src/button.ts",
+      "import": "./src/button.ts",
+      "default": "./src/button.ts"
     }
   },
   "scripts": {

@@ -1,130 +1,55 @@
-# BambiUI — CLAUDE.md
+# BambiUI — Claude Quick Context
 
-## What this repo is
+BambiUI is a pnpm + Turborepo monorepo for a multi-framework UI component CLI. The CLI copies source components for React, Svelte, Vue, and Astro into user projects. Docs and builder consume the same package source through workspace dependencies.
 
-BambiUI is a multi-framework UI component CLI built as a pnpm + Turborepo monorepo. The CLI copies React, Svelte, Vue, and Astro component source into user projects. Docs and builder consume the same source files directly through Vite aliases.
+Keep this file short to reduce context usage. Load `docs/agent-context.md` only when deeper architecture, deployment, or component details are needed.
 
-## Monorepo structure
+## Structure
 
-```
-apps/
-  docs/                    # Starlight (Astro) documentation site
-  builder/                 # Infinite-canvas design token editor (static Astro, served at /builder)
-packages/
-  cli/                    # @bambiui/cli — init + add source components
-  core/                   # @bambiui/core — shared contracts and framework-agnostic types
-  tokens/                 # @bambiui/tokens — primitive, semantic, intent, state, component tokens
-  recipes/                # @bambiui/recipes — shared recipe definitions
-  components/             # @bambiui/components — source components + CSS
-    button/
+```txt
+apps/docs       # Starlight docs site
+apps/builder    # static Astro token builder served at /builder
+packages/cli    # @bambiui/cli init + add commands
+packages/core   # shared contracts and framework-agnostic types
+packages/tokens # global CSS design tokens
+packages/components/button
 ```
 
-## Key conventions
+## Core Rules
 
-### CLI-first component delivery
-- Components are source files under `packages/components`, not per-framework packages.
-- User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
-- The initial registry is GitHub raw files; a hosted registry API can replace the base URL later without changing component packages.
-- The CLI package must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
-- Do not add per-component package.json files or build steps unless the project intentionally returns to package publishing.
+- Components are source files under `packages/components`; do not add per-component packages or build steps unless explicitly requested.
+- `packages/cli` must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
+- Installed component source must stay self-contained for user projects.
+- Shared component-agnostic contracts live in `packages/core/src/contracts.ts`; component-specific contracts derive from them.
+- Global tokens live in `packages/tokens/src/tokens.css`; component CSS lives beside each component, for example `packages/components/button/src/button.css`.
+- Button CSS is shared by all frameworks and uses `data-intent`, `data-appearance`, `data-size`, and loading/disabled attributes.
+- Docs and builder share the `starlight-theme` localStorage key. Dark mode uses both `data-theme="dark"` on `<html>` and the `.dark` class.
+- Builder must keep `base: '/builder'` so production assets work under `/builder`.
 
-### CSS delivery
-- All button CSS lives in `packages/components/button/src/button.css` — a single source consumed by all frameworks.
-- Public user projects receive global tokens from `packages/tokens/src/tokens.css` and component CSS from `packages/components/<name>/src/<name>.css`.
-- In the docs site, CSS is loaded via Starlight's `customCss` array in `astro.config.mjs`, **not** via PostCSS `@import` (PostCSS doesn't resolve package.json `exports` for CSS).
-- The builder resolves workspace CSS via `vite.resolve.alias` in `apps/builder/astro.config.mjs`.
-
-### Design tokens
-- Global design tokens are CSS custom properties in `packages/tokens/src/tokens.css`.
-- Colors use OKLCH. Light defaults in `:root`, dark overrides in `.dark`.
-- Button tokens are namespaced `--bambi-button-*`. Theme tokens are `--bambi-*`.
-
-### Theme management (shared between docs and builder)
-- Both apps use the `starlight-theme` localStorage key (`"light"` or `"dark"`) as the single source of truth for the active theme.
-- Docs: Starlight reads/writes this key natively.
-- Builder: reads on page load, writes on toggle, and listens to the `storage` event so tabs stay in sync.
-- Dark mode is activated by `data-theme="dark"` on `<html>` plus the `.dark` class (dual-selector to match both Starlight and Bambi token conventions).
-
-### Component API conventions
-Every button component across all frameworks follows the same shape:
-- Props: `intent`, `appearance`, `size`, `loading`, `disabled`, `type` (all optional with defaults)
-- Default `type="button"` (prevents accidental form submission)
-- `data-intent`, `data-appearance`, `data-size` attributes drive CSS styling
-- `data-loading` + `aria-busy="true"` for loading state
-- `opacity: 0` (not `visibility: hidden`) on `.bambi-button-content` during loading — keeps text accessible to screen readers
-- `aria-disabled` set when `loading || disabled`
-
-### Adding a new component
-1. Add shared contracts to `packages/core/src/index.ts` when needed.
-2. Add shared recipes to `packages/recipes/src/index.ts` when needed.
-3. Add component source under `packages/components/<name>/src/`.
-4. Add component CSS beside the source component in `packages/components/<name>/src/<name>.css`.
-5. Register the component in `packages/cli/src/index.js`.
-6. Add the component to the docs under `apps/docs/src/content/docs/components/<name>.mdx`.
-
-## Common commands
+## Common Commands
 
 ```sh
-# Install dependencies
 pnpm install
-
-# Build docs and builder
 pnpm build
-
-# Run the docs dev server
-pnpm --filter docs dev
-
-# Run the builder dev server
-pnpm --filter builder dev
-
-# Full static deploy build (docs + builder merged, output: apps/docs/dist)
-pnpm deploy-static
-
-# Type-check all packages
 pnpm check-types
+pnpm --filter docs dev
+pnpm --filter builder dev
+pnpm deploy-static
 ```
 
-## Docs site (`apps/docs`)
-- Built with [Starlight](https://starlight.astro.build/) on top of Astro.
-- Integrations: `@astrojs/react`, `@astrojs/svelte`, `@astrojs/vue` — all four frameworks render in the same MDX page.
-- Tab groups use `<Tabs syncKey="framework">` so switching framework in one section switches all sections on the page.
-- Preview wrappers use `.preview`, `.preview-row`, `.preview-col` CSS classes from `src/styles/preview.css`.
-- Global CSS (`src/styles/global.css`) imports the token sheet and button CSS.
-- Hero page (`index.mdx`) links to: Documents (`/components/button`), Token Builder (`/builder`), GitHub.
+## Add A Component
 
-## Builder app (`apps/builder`)
-- A single-page infinite-canvas token editor. All logic lives in `src/pages/index.astro`.
-- `base: '/builder'` is set in `astro.config.mjs` so all assets resolve correctly when served under the `/builder` subpath.
-- The logo in the left drawer links back to `/` (docs root).
-- CSS from workspace packages is resolved via `vite.resolve.alias` (PostCSS can't resolve package `exports` for CSS).
-- Color token generation uses OKLCH math ported from the old `ThemeBuilder.tsx` (which has been removed from docs).
+1. Add or reuse shared contracts in `packages/core/src/contracts.ts`.
+2. Add source and CSS under `packages/components/<name>/src/`.
+3. Register it in the CLI registry map or manifest.
+4. Add docs at `apps/docs/src/content/docs/components/<name>.mdx`.
 
-## Deployment (Cloudflare Pages)
+## Need More Detail?
 
-Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` (root script) builds docs and builder with Turborepo, then copies `apps/builder/dist/` into `apps/docs/dist/builder/`. The single output directory is `apps/docs/dist`.
+Read `docs/agent-context.md` for:
 
-| Setting | Value |
-|---|---|
-| Build command | `pnpm deploy-static` |
-| Build output directory | `apps/docs/dist` |
-| Node.js version | `22` |
-
-## Dependency graph
-
-```
-@bambiui/cli         (fetches source from registry URL)
-@bambiui/core        (shared contracts)
-@bambiui/tokens      (global CSS tokens)
-@bambiui/recipes  →  @bambiui/core
-@bambiui/components  (source files, no build)
-docs              →  @bambiui/components, @bambiui/tokens
-builder           →  @bambiui/components, @bambiui/tokens
-```
-
-## Things to watch out for
-
-- **Vite aliases**: Docs and builder resolve component source files through aliases such as `@bambiui/components/button/react`.
-- **Registry URL**: CLI defaults to GitHub raw and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or hosted registries.
-- **Component source has no build step**: User-facing files are copied by the CLI.
-- **Builder `base: '/builder'`**: All internal asset paths in the builder are prefixed with `/builder`. Don't remove this or assets will 404 in production.
-- **`starlight-theme` localStorage key**: Both apps share this key. Never rename it in the builder without updating Starlight's config in docs, and vice versa.
+- full CSS/token conventions
+- full button API conventions
+- docs and builder notes
+- Cloudflare Pages deployment settings
+- dependency graph and gotchas

@@ -3,8 +3,8 @@ title: Button
 description: Accessible, themeable button component with intent, appearance, size, and state layers.
 ---
 
-import { Tabs, TabItem, Code } from '@astrojs/starlight/components';
-import Button from '../../../components/ui/button/Button.astro';
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+import Button from "@bambiui/components/button/astro";
 
 ## Installation
 
@@ -16,37 +16,27 @@ npx @bambiui/cli add button
 Import the token file once from your global stylesheet:
 
 ```css
-@import './styles/bambi.css';
+@import "./styles/bambi.css";
 ```
 
 Then import the component:
 
 <Tabs syncKey="framework">
   <TabItem label="React">
-    ```tsx
-    import { Button } from './components/ui/button';
-    ```
+    ```tsx import {Button} from './components/ui/button'; ```
   </TabItem>
   <TabItem label="Svelte">
     ```svelte
-    <script>
-      import { Button } from './components/ui/button';
-    </script>
+    <script>import {Button} from './components/ui/button';</script>
     ```
   </TabItem>
   <TabItem label="Vue">
     ```vue
-    <script setup>
-    import { Button } from './components/ui/button';
-    </script>
+    <script setup>import {Button} from './components/ui/button';</script>
     ```
   </TabItem>
   <TabItem label="Astro">
-    ```astro
-    ---
-    import { Button } from './components/ui/button';
-    ---
-    ```
+    ```astro --- import {Button} from './components/ui/button'; --- ```
   </TabItem>
 </Tabs>
 
@@ -69,44 +59,56 @@ Then import the component:
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button intent="primary">Primary</Button>
+          <Code
+            lang="tsx"
+            code={`<Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
 <Button appearance="outline">Outline</Button>
 <Button appearance="ghost">Ghost</Button>
 <Button appearance="link">Link</Button>
 <Button intent="danger">Danger</Button>
 <Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
+<Button intent="warning">Warning</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button intent="primary">Primary</Button>
+          <Code
+            lang="svelte"
+            code={`<Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
 <Button appearance="outline">Outline</Button>
 <Button appearance="ghost">Ghost</Button>
 <Button appearance="link">Link</Button>
 <Button intent="danger">Danger</Button>
 <Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
+<Button intent="warning">Warning</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button intent="primary">Primary</Button>
+          <Code
+            lang="vue"
+            code={`<Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
 <Button appearance="outline">Outline</Button>
 <Button appearance="ghost">Ghost</Button>
 <Button appearance="link">Link</Button>
 <Button intent="danger">Danger</Button>
 <Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
+<Button intent="warning">Warning</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button intent="primary">Primary</Button>
+          <Code
+            lang="astro"
+            code={`<Button intent="primary">Primary</Button>
 <Button intent="secondary">Secondary</Button>
 <Button appearance="outline">Outline</Button>
 <Button appearance="ghost">Ghost</Button>
 <Button appearance="link">Link</Button>
 <Button intent="danger">Danger</Button>
 <Button intent="success">Success</Button>
-<Button intent="warning">Warning</Button>`} />
+<Button intent="warning">Warning</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -127,24 +129,36 @@ Then import the component:
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button size="sm">Small</Button>
+          <Code
+            lang="tsx"
+            code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
-<Button size="lg">Large</Button>`} />
+<Button size="lg">Large</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button size="sm">Small</Button>
+          <Code
+            lang="svelte"
+            code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
-<Button size="lg">Large</Button>`} />
+<Button size="lg">Large</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button size="sm">Small</Button>
+          <Code
+            lang="vue"
+            code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
-<Button size="lg">Large</Button>`} />
+<Button size="lg">Large</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button size="sm">Small</Button>
+          <Code
+            lang="astro"
+            code={`<Button size="sm">Small</Button>
 <Button size="md">Medium</Button>
-<Button size="lg">Large</Button>`} />
+<Button size="lg">Large</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -158,20 +172,127 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <div class="demo-grid">
   <div class="demo-preview-card">
     <div class="preview-row">
-      <Button size="icon" intent="primary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" intent="secondary" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" appearance="outline" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" appearance="ghost" aria-label="Add"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" intent="danger" aria-label="Delete"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" intent="success" aria-label="Create"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
-      <Button size="icon" intent="warning" aria-label="Caution"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></Button>
+      <Button size="icon" intent="primary" aria-label="Add">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" intent="secondary" aria-label="Add">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" appearance="outline" aria-label="Add">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" appearance="ghost" aria-label="Add">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" intent="danger" aria-label="Delete">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" intent="success" aria-label="Create">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
+      <Button size="icon" intent="warning" aria-label="Caution">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </Button>
     </div>
   </div>
   <div class="demo-code-card">
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button size="icon" intent="primary" aria-label="Add">
+          <Code
+            lang="tsx"
+            code={`<Button size="icon" intent="primary" aria-label="Add">
   <PlusIcon />
 </Button>
 <Button size="icon" intent="secondary" aria-label="Add">
@@ -179,10 +300,13 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 </Button>
 <Button size="icon" intent="danger" aria-label="Delete">
   <PlusIcon />
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button size="icon" intent="primary" aria-label="Add">
+          <Code
+            lang="svelte"
+            code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
 <Button size="icon" intent="secondary" aria-label="Add">
@@ -190,10 +314,13 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 </Button>
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button size="icon" intent="primary" aria-label="Add">
+          <Code
+            lang="vue"
+            code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
 <Button size="icon" intent="secondary" aria-label="Add">
@@ -201,10 +328,13 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 </Button>
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button size="icon" intent="primary" aria-label="Add">
+          <Code
+            lang="astro"
+            code={`<Button size="icon" intent="primary" aria-label="Add">
   <svg>...</svg>
 </Button>
 <Button size="icon" intent="secondary" aria-label="Add">
@@ -212,7 +342,8 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 </Button>
 <Button size="icon" intent="danger" aria-label="Delete">
   <svg>...</svg>
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -224,57 +355,181 @@ Icon-only buttons. Always provide `aria-label` for accessibility.
 <div class="demo-grid">
   <div class="demo-preview-card">
     <div class="preview-row">
-      <Button intent="primary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-      <Button intent="secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-      <Button appearance="outline"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-      <Button appearance="ghost"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add</Button>
-      <Button intent="danger"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Delete</Button>
-      <Button intent="success"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Create</Button>
-      <Button intent="warning"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Caution</Button>
+      <Button intent="primary">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Add
+      </Button>
+      <Button intent="secondary">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Add
+      </Button>
+      <Button appearance="outline">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Add
+      </Button>
+      <Button appearance="ghost">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Add
+      </Button>
+      <Button intent="danger">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Delete
+      </Button>
+      <Button intent="success">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Create
+      </Button>
+      <Button intent="warning">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 1v14M1 8h14"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        Caution
+      </Button>
     </div>
   </div>
   <div class="demo-code-card">
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button intent="primary">
+          <Code
+            lang="tsx"
+            code={`<Button intent="primary">
   <PlusIcon />
   Add
 </Button>
 <Button intent="danger">
   <TrashIcon />
   Delete
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button intent="primary">
+          <Code
+            lang="svelte"
+            code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button intent="primary">
+          <Code
+            lang="vue"
+            code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button intent="primary">
+          <Code
+            lang="astro"
+            code={`<Button intent="primary">
   <svg>...</svg>
   Add
 </Button>
 <Button intent="danger">
   <svg>...</svg>
   Delete
-</Button>`} />
+</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -303,42 +558,67 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
         <TabItem label="React">
           <Code lang="tsx" code={`import './button.css';
 
-<Button className="btn-rounded" intent="primary">Primary</Button>
-<Button className="btn-rounded" intent="secondary">Secondary</Button>
-<Button className="btn-rounded" appearance="outline">Outline</Button>
+<Button className="btn-rounded" intent="primary">
+  Primary
+</Button>
+<Button className="btn-rounded" intent="secondary">
+  Secondary
+</Button>
+<Button className="btn-rounded" appearance="outline">
+  Outline
+</Button>
 
-/* button.css */
+/_ button.css _/
 .btn-rounded { --bambi-button-radius: 9999px; }`} />
         </TabItem>
         <TabItem label="Svelte">
           <Code lang="svelte" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
-<Button class="btn-rounded" intent="secondary">Secondary</Button>
-<Button class="btn-rounded" appearance="outline">Outline</Button>
+
+<Button class="btn-rounded" intent="secondary">
+  Secondary
+</Button>
+<Button class="btn-rounded" appearance="outline">
+  Outline
+</Button>
 
 <style>
   .btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
+
         </TabItem>
         <TabItem label="Vue">
           <Code lang="vue" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
-<Button class="btn-rounded" intent="secondary">Secondary</Button>
-<Button class="btn-rounded" appearance="outline">Outline</Button>
+
+<Button class="btn-rounded" intent="secondary">
+  Secondary
+</Button>
+<Button class="btn-rounded" appearance="outline">
+  Outline
+</Button>
 
 <style scoped>
 .btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
+
         </TabItem>
         <TabItem label="Astro">
           <Code lang="astro" code={`<Button class="btn-rounded" intent="primary">Primary</Button>
-<Button class="btn-rounded" intent="secondary">Secondary</Button>
-<Button class="btn-rounded" appearance="outline">Outline</Button>
+
+<Button class="btn-rounded" intent="secondary">
+  Secondary
+</Button>
+<Button class="btn-rounded" appearance="outline">
+  Outline
+</Button>
 
 <style>
   .btn-rounded { --bambi-button-radius: 9999px; }
 </style>`} />
+
         </TabItem>
       </Tabs>
     </div>
+
   </div>
 </div>
 
@@ -348,32 +628,48 @@ Override `--bambi-button-radius` to get pill-shaped buttons.
   <div class="demo-preview-card">
     <div class="preview-col">
       <Button style="width:100%">Full Width Primary</Button>
-      <Button style="width:100%" intent="secondary">Full Width Secondary</Button>
-      <Button style="width:100%" appearance="outline">Full Width Outline</Button>
+      <Button style="width:100%" intent="secondary">
+        Full Width Secondary
+      </Button>
+      <Button style="width:100%" appearance="outline">
+        Full Width Outline
+      </Button>
     </div>
   </div>
   <div class="demo-code-card">
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button style={{ width: '100%' }}>Full Width Primary</Button>
+          <Code
+            lang="tsx"
+            code={`<Button style={{ width: '100%' }}>Full Width Primary</Button>
 <Button style={{ width: '100%' }} intent="secondary">Full Width Secondary</Button>
-<Button style={{ width: '100%' }} appearance="outline">Full Width Outline</Button>`} />
+<Button style={{ width: '100%' }} appearance="outline">Full Width Outline</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button style="width: 100%">Full Width Primary</Button>
+          <Code
+            lang="svelte"
+            code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button style="width: 100%">Full Width Primary</Button>
+          <Code
+            lang="vue"
+            code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button style="width: 100%">Full Width Primary</Button>
+          <Code
+            lang="astro"
+            code={`<Button style="width: 100%">Full Width Primary</Button>
 <Button style="width: 100%" intent="secondary">Full Width Secondary</Button>
-<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`} />
+<Button style="width: 100%" appearance="outline">Full Width Outline</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -387,37 +683,63 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
 <div class="demo-grid">
   <div class="demo-preview-card">
     <div class="preview-row">
-      <Button intent="primary" loading>Save</Button>
-      <Button intent="secondary" loading>Save</Button>
-      <Button appearance="outline" loading>Save</Button>
-      <Button appearance="ghost" loading>Save</Button>
-      <Button intent="danger" loading>Delete</Button>
-      <Button intent="success" loading>Create</Button>
-      <Button intent="warning" loading>Caution</Button>
+      <Button intent="primary" loading>
+        Save
+      </Button>
+      <Button intent="secondary" loading>
+        Save
+      </Button>
+      <Button appearance="outline" loading>
+        Save
+      </Button>
+      <Button appearance="ghost" loading>
+        Save
+      </Button>
+      <Button intent="danger" loading>
+        Delete
+      </Button>
+      <Button intent="success" loading>
+        Create
+      </Button>
+      <Button intent="warning" loading>
+        Caution
+      </Button>
     </div>
   </div>
   <div class="demo-code-card">
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button intent="primary" loading>Save</Button>
+          <Code
+            lang="tsx"
+            code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
-<Button intent="danger" loading>Delete</Button>`} />
+<Button intent="danger" loading>Delete</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button intent="primary" loading>Save</Button>
+          <Code
+            lang="svelte"
+            code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
-<Button intent="danger" loading>Delete</Button>`} />
+<Button intent="danger" loading>Delete</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button intent="primary" :loading="true">Save</Button>
+          <Code
+            lang="vue"
+            code={`<Button intent="primary" :loading="true">Save</Button>
 <Button intent="secondary" :loading="true">Save</Button>
-<Button intent="danger" :loading="true">Delete</Button>`} />
+<Button intent="danger" :loading="true">Delete</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button intent="primary" loading>Save</Button>
+          <Code
+            lang="astro"
+            code={`<Button intent="primary" loading>Save</Button>
 <Button intent="secondary" loading>Save</Button>
-<Button intent="danger" loading>Delete</Button>`} />
+<Button intent="danger" loading>Delete</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -429,37 +751,63 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
 <div class="demo-grid">
   <div class="demo-preview-card">
     <div class="preview-row">
-      <Button intent="primary" disabled>Primary</Button>
-      <Button intent="secondary" disabled>Secondary</Button>
-      <Button appearance="outline" disabled>Outline</Button>
-      <Button appearance="ghost" disabled>Ghost</Button>
-      <Button intent="danger" disabled>Danger</Button>
-      <Button intent="success" disabled>Success</Button>
-      <Button intent="warning" disabled>Warning</Button>
+      <Button intent="primary" disabled>
+        Primary
+      </Button>
+      <Button intent="secondary" disabled>
+        Secondary
+      </Button>
+      <Button appearance="outline" disabled>
+        Outline
+      </Button>
+      <Button appearance="ghost" disabled>
+        Ghost
+      </Button>
+      <Button intent="danger" disabled>
+        Danger
+      </Button>
+      <Button intent="success" disabled>
+        Success
+      </Button>
+      <Button intent="warning" disabled>
+        Warning
+      </Button>
     </div>
   </div>
   <div class="demo-code-card">
     <div class="code-body">
       <Tabs syncKey="framework">
         <TabItem label="React">
-          <Code lang="tsx" code={`<Button intent="primary" disabled>Primary</Button>
+          <Code
+            lang="tsx"
+            code={`<Button intent="primary" disabled>Primary</Button>
 <Button intent="secondary" disabled>Secondary</Button>
-<Button intent="danger" disabled>Danger</Button>`} />
+<Button intent="danger" disabled>Danger</Button>`}
+          />
         </TabItem>
         <TabItem label="Svelte">
-          <Code lang="svelte" code={`<Button intent="primary" disabled>Primary</Button>
+          <Code
+            lang="svelte"
+            code={`<Button intent="primary" disabled>Primary</Button>
 <Button intent="secondary" disabled>Secondary</Button>
-<Button intent="danger" disabled>Danger</Button>`} />
+<Button intent="danger" disabled>Danger</Button>`}
+          />
         </TabItem>
         <TabItem label="Vue">
-          <Code lang="vue" code={`<Button intent="primary" disabled>Primary</Button>
+          <Code
+            lang="vue"
+            code={`<Button intent="primary" disabled>Primary</Button>
 <Button intent="secondary" disabled>Secondary</Button>
-<Button intent="danger" disabled>Danger</Button>`} />
+<Button intent="danger" disabled>Danger</Button>`}
+          />
         </TabItem>
         <TabItem label="Astro">
-          <Code lang="astro" code={`<Button intent="primary" disabled>Primary</Button>
+          <Code
+            lang="astro"
+            code={`<Button intent="primary" disabled>Primary</Button>
 <Button intent="secondary" disabled>Secondary</Button>
-<Button intent="danger" disabled>Danger</Button>`} />
+<Button intent="danger" disabled>Danger</Button>`}
+          />
         </TabItem>
       </Tabs>
     </div>
@@ -468,13 +816,13 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
 
 ## API Reference
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `intent` | `'primary' \| 'secondary' \| 'danger' \| 'success' \| 'warning'` | `'primary'` | Semantic meaning |
-| `appearance` | `'solid' \| 'outline' \| 'ghost' \| 'link'` | `'solid'` | Visual treatment |
-| `size` | `'sm' \| 'md' \| 'lg' \| 'icon'` | `'md'` | Button size |
-| `loading` | `boolean` | `false` | Shows spinner and prevents interaction |
-| `disabled` | `boolean` | `false` | Disables the button |
-| `type` | `'button' \| 'submit' \| 'reset'` | `'button'` | HTML button type |
+| Prop         | Type                                                             | Default     | Description                            |
+| ------------ | ---------------------------------------------------------------- | ----------- | -------------------------------------- |
+| `intent`     | `'primary' \| 'secondary' \| 'danger' \| 'success' \| 'warning'` | `'primary'` | Semantic meaning                       |
+| `appearance` | `'solid' \| 'outline' \| 'ghost' \| 'link'`                      | `'solid'`   | Visual treatment                       |
+| `size`       | `'sm' \| 'md' \| 'lg' \| 'icon'`                                 | `'md'`      | Button size                            |
+| `loading`    | `boolean`                                                        | `false`     | Shows spinner and prevents interaction |
+| `disabled`   | `boolean`                                                        | `false`     | Disables the button                    |
+| `type`       | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | HTML button type                       |
 
 All other HTML button attributes (`aria-*`, `style`, `class`) are forwarded to the underlying `<button>` element.

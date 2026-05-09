@@ -10,6 +10,8 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@bambiui/components": "workspace:*",
+    "@bambiui/tokens": "workspace:*",
     "@astrojs/starlight": "^0.38.5",
     "astro": "^6.2.2",
     "sharp": "^0.34.5",

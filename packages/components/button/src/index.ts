@@ -5,4 +5,4 @@ export type {
   ButtonBaseProps,
   ButtonIntent,
   ButtonSize,
-} from "./types";
+} from "@bambiui/core/button";

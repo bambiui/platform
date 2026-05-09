@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, type Ref } from "react";
 import { buttonRecipe } from "./recipe";
-import type { ButtonBaseProps } from "./types";
+import type { ButtonBaseProps } from "@bambiui/core/button";
 import "./button.css";
 
 export type {
@@ -8,15 +8,14 @@ export type {
   ButtonBaseProps,
   ButtonIntent,
   ButtonSize,
-} from "./types";
+} from "@bambiui/core/button";
 
 function cn(...inputs: Array<string | false | null | undefined>) {
   return inputs.filter(Boolean).join(" ");
 }
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    ButtonBaseProps {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonBaseProps {
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -41,7 +40,7 @@ export function Button({
       data-size={size}
       data-loading={loading || undefined}
       aria-busy={loading || undefined}
-      aria-disabled={(loading || disabled) || undefined}
+      aria-disabled={loading || disabled || undefined}
       disabled={disabled}
       className={cn(buttonRecipe.className, className)}
       {...props}

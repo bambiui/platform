@@ -53,13 +53,13 @@ The builder is merged into the docs site's output at build time. A single Cloudf
 
 ### Cloudflare Pages project settings
 
-| Setting | Value |
-|---|---|
-| Framework preset | None |
-| Root directory | `/` (monorepo root) |
-| Build command | `pnpm deploy-static` |
-| Build output directory | `apps/docs/dist` |
-| Node.js version | `22` |
+| Setting                | Value                |
+| ---------------------- | -------------------- |
+| Framework preset       | None                 |
+| Root directory         | `/` (monorepo root)  |
+| Build command          | `pnpm deploy-static` |
+| Build output directory | `apps/docs/dist`     |
+| Node.js version        | `22.12.0` or newer   |
 
 ## Architecture
 
@@ -69,17 +69,17 @@ apps/builder/
 │   └── pages/
 │       └── index.astro   # entire app — canvas, drawers, token editor, OKLCH color math
 ├── public/
-├── astro.config.mjs      # base: '/builder' + CSS alias workaround for workspace packages
+├── astro.config.mjs      # base: '/builder'
 └── package.json
 ```
 
-All logic lives in `src/pages/index.astro`. The `<style is:global>` block styles the canvas and drawers; the `<script>` block (TypeScript, processed by Vite) handles pan/zoom, drawer state, token rendering, and OKLCH color math.
+The page entry imports tokens from `@bambiui/tokens/tokens.css` and button source from `@bambiui/components`. Canvas interactions live in `src/scripts/builder.ts`.
 
 ## Token sources
 
-| Group | CSS file |
-|---|---|
-| Color + Typography | `packages/tokens/src/tokens.css` |
-| Button | `packages/components/button/src/button.css` |
+| Group              | CSS file                                    |
+| ------------------ | ------------------------------------------- |
+| Color + Typography | `packages/tokens/src/tokens.css`            |
+| Button             | `packages/components/button/src/button.css` |
 
 Token values are read at runtime via `getComputedStyle(document.documentElement)` and overrides are written back with `document.documentElement.style.setProperty` / `removeProperty`.

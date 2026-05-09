@@ -31,14 +31,46 @@ const components = {
       fileName: "button.css",
     },
     shared: [
-      { kind: "recipe", from: "packages/components/button/src/recipe.ts", to: "recipe.ts" },
-      { kind: "types", from: "packages/components/button/src/types.ts", to: "types.ts" },
+      {
+        kind: "recipe",
+        from: "packages/components/button/src/recipe.ts",
+        to: "recipe.ts",
+      },
+      {
+        kind: "types",
+        from: "packages/core/src/button.ts",
+        to: "types.ts",
+      },
     ],
     files: {
-      react: [{ kind: "react", from: "packages/components/button/src/react.tsx", to: "button.tsx" }],
-      svelte: [{ kind: "svelte", from: "packages/components/button/src/svelte.svelte", to: "Button.svelte" }],
-      vue: [{ kind: "vue", from: "packages/components/button/src/vue.vue", to: "Button.vue" }],
-      astro: [{ kind: "astro", from: "packages/components/button/src/astro.astro", to: "Button.astro" }],
+      react: [
+        {
+          kind: "react",
+          from: "packages/components/button/src/react.tsx",
+          to: "button.tsx",
+        },
+      ],
+      svelte: [
+        {
+          kind: "svelte",
+          from: "packages/components/button/src/svelte.svelte",
+          to: "Button.svelte",
+        },
+      ],
+      vue: [
+        {
+          kind: "vue",
+          from: "packages/components/button/src/vue.vue",
+          to: "Button.vue",
+        },
+      ],
+      astro: [
+        {
+          kind: "astro",
+          from: "packages/components/button/src/astro.astro",
+          to: "Button.astro",
+        },
+      ],
     },
   },
 };
@@ -56,15 +88,22 @@ function createDefaultConfig(framework, overrides = {}) {
   return {
     framework,
     componentDir: overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
-    tokensFile: overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
+    tokensFile:
+      overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
   };
 }
 
 function mergeConfig(config, defaults, flags = {}) {
   return {
     framework: flags.framework ?? config.framework ?? defaults.framework,
-    componentDir: flags.componentDir ?? config.componentDir ?? defaults.componentDir,
-    tokensFile: flags.tokensFile ?? flags.styleFile ?? config.tokensFile ?? config.styleFile ?? defaults.tokensFile,
+    componentDir:
+      flags.componentDir ?? config.componentDir ?? defaults.componentDir,
+    tokensFile:
+      flags.tokensFile ??
+      flags.styleFile ??
+      config.tokensFile ??
+      config.styleFile ??
+      defaults.tokensFile,
   };
 }
 
@@ -98,7 +137,9 @@ function parseArgs(argv) {
     }
 
     if (arg.startsWith("--")) {
-      const key = arg.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+      const key = arg
+        .slice(2)
+        .replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
       const value = rest[index + 1];
       if (!value || value.startsWith("--")) {
         throw new Error(`Missing value for ${arg}`);
@@ -140,7 +181,10 @@ async function readJson(filePath) {
 
 async function detectFramework(cwd) {
   const packageJson = await readJson(path.join(cwd, "package.json"));
-  const deps = { ...packageJson?.dependencies, ...packageJson?.devDependencies };
+  const deps = {
+    ...packageJson?.dependencies,
+    ...packageJson?.devDependencies,
+  };
 
   for (const framework of ["astro", "svelte", "vue", "react"]) {
     if (deps[framework] || deps[`@${framework}js/kit`]) {
@@ -163,7 +207,7 @@ async function readConfig(cwd) {
 }
 
 async function getConfig(cwd, flags = {}) {
-  const detectedFramework = flags.framework ?? await detectFramework(cwd);
+  const detectedFramework = flags.framework ?? (await detectFramework(cwd));
   const defaults = createDefaultConfig(detectedFramework, flags);
   const config = await readConfig(cwd);
 
@@ -193,7 +237,9 @@ async function readRegistryFile(registryUrl, registryPath) {
     const response = await fetch(fileUrl);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch ${fileUrl}: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch ${fileUrl}: ${response.status} ${response.statusText}`,
+      );
     }
 
     return response.text();
@@ -211,18 +257,54 @@ function transformComponentSource(content, replacements = {}) {
   let next = content;
 
   if (replacements.recipe) {
-    next = next.replace(/from "\.\/recipe"/g, `from "${moduleSpecifier(replacements.recipe)}"`);
+    next = next.replace(
+      /from "\.\/recipe"/g,
+      `from "${moduleSpecifier(replacements.recipe)}"`,
+    );
   }
 
   if (replacements.types) {
-    next = next.replace(/from "\.\/types"/g, `from "${moduleSpecifier(replacements.types)}"`);
+    next = next.replace(
+      /from "\.\/types"/g,
+      `from "${moduleSpecifier(replacements.types)}"`,
+    );
+    next = next.replace(
+      /from "@bambiui\/core\/button"/g,
+      `from "${moduleSpecifier(replacements.types)}"`,
+    );
   }
 
   if (replacements.style) {
-    next = next.replace(/import "\.\/button\.css";/g, `import "./${replacements.style}";`);
+    next = next.replace(
+      /import "\.\/button\.css";/g,
+      `import "./${replacements.style}";`,
+    );
   }
 
   return next;
+}
+
+function transformButtonTypesSource(content) {
+  return content.replace(
+    /import \{\n  bambiAppearances,\n  bambiIntents,\n  bambiSizes,\n  type BambiAppearance,\n  type BambiIntent,\n  type BambiSize,\n\} from "\.\/contracts";/,
+    `export const bambiIntents = [
+  "primary",
+  "secondary",
+  "danger",
+  "success",
+  "warning",
+] as const;
+
+export const bambiAppearances = ["solid", "outline", "ghost", "link"] as const;
+
+export const bambiSizes = ["sm", "md", "lg", "icon"] as const;
+
+export type BambiIntent = (typeof bambiIntents)[number];
+
+export type BambiAppearance = (typeof bambiAppearances)[number];
+
+export type BambiSize = (typeof bambiSizes)[number];`,
+  );
 }
 
 function getFrameworkFileName(framework) {
@@ -268,15 +350,20 @@ async function writeGeneratedFile(filePath, content, force) {
 function printResults(results) {
   for (const result of results) {
     const label = result.skipped ? "skipped" : "created";
-    process.stdout.write(`  ${label} ${path.relative(process.cwd(), result.path)}\n`);
+    process.stdout.write(
+      `  ${label} ${path.relative(process.cwd(), result.path)}\n`,
+    );
   }
 }
 
 async function addComponent(componentName, flags) {
-  const component = components[/** @type {keyof typeof components} */ (componentName)];
+  const component =
+    components[/** @type {keyof typeof components} */ (componentName)];
 
   if (!component) {
-    throw new Error(`Unknown component "${componentName}". Available: ${Object.keys(components).join(", ")}`);
+    throw new Error(
+      `Unknown component "${componentName}". Available: ${Object.keys(components).join(", ")}`,
+    );
   }
 
   const cwd = path.resolve(flags.cwd);
@@ -285,10 +372,17 @@ async function addComponent(componentName, flags) {
   const componentDir = flags.componentDir ?? config.componentDir;
   const registryUrl = getRegistryUrl(flags);
   const componentDirectory = componentName;
-  const files = [...(component.shared ?? []), ...(component.files[/** @type {keyof typeof component.files} */ (framework)] ?? [])];
+  const files = [
+    ...(component.shared ?? []),
+    ...(component.files[
+      /** @type {keyof typeof component.files} */ (framework)
+    ] ?? []),
+  ];
 
   if (!files) {
-    throw new Error(`Unknown framework "${framework}". Use react, svelte, vue, or astro.`);
+    throw new Error(
+      `Unknown framework "${framework}". Use react, svelte, vue, or astro.`,
+    );
   }
 
   const targetDir = path.join(cwd, componentDir, componentDirectory);
@@ -304,24 +398,45 @@ async function addComponent(componentName, flags) {
   const results = [];
 
   for (const file of files) {
-    const targetName = fileNames[/** @type {keyof typeof fileNames} */ (file.kind)] ?? file.to;
-    const transform = file.kind === "recipe"
-      ? (content) => transformComponentSource(content, { types: fileNames.types })
-      : file.kind === framework
-        ? (content) => transformComponentSource(content, fileNames)
-        : undefined;
+    const targetName =
+      fileNames[/** @type {keyof typeof fileNames} */ (file.kind)] ?? file.to;
+    const transform =
+      file.kind === "types"
+        ? transformButtonTypesSource
+        : file.kind === "recipe"
+          ? (content) =>
+              transformComponentSource(content, { types: fileNames.types })
+          : file.kind === framework
+            ? (content) => transformComponentSource(content, fileNames)
+            : undefined;
 
-    results.push(await copyRegistryFile(registryUrl, file.from, path.join(targetDir, targetName), flags.force, transform));
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        file.from,
+        path.join(targetDir, targetName),
+        flags.force,
+        transform,
+      ),
+    );
   }
 
-  results.push(await copyRegistryFile(
-    registryUrl,
-    component.style.from,
-    path.join(targetDir, fileNames.style),
-    flags.force,
-  ));
+  results.push(
+    await copyRegistryFile(
+      registryUrl,
+      component.style.from,
+      path.join(targetDir, fileNames.style),
+      flags.force,
+    ),
+  );
 
-  results.push(await writeGeneratedFile(path.join(targetDir, "index.ts"), getIndexContent(framework), flags.force));
+  results.push(
+    await writeGeneratedFile(
+      path.join(targetDir, "index.ts"),
+      getIndexContent(framework),
+      flags.force,
+    ),
+  );
 
   return results;
 }
@@ -339,7 +454,7 @@ async function writeProjectFile(filePath, content, force) {
 
 async function initProject(flags) {
   const cwd = path.resolve(flags.cwd);
-  const framework = flags.framework ?? await detectFramework(cwd);
+  const framework = flags.framework ?? (await detectFramework(cwd));
   const defaults = createDefaultConfig(framework, flags);
   const config = await promptForConfig(defaults, flags);
   const registryUrl = getRegistryUrl(flags);
@@ -350,7 +465,12 @@ async function initProject(flags) {
       `${JSON.stringify(config, null, 2)}\n`,
       flags.force,
     ),
-    await copyRegistryFile(registryUrl, "packages/tokens/src/tokens.css", path.join(cwd, config.tokensFile), flags.force),
+    await copyRegistryFile(
+      registryUrl,
+      "packages/tokens/src/tokens.css",
+      path.join(cwd, config.tokensFile),
+      flags.force,
+    ),
   ];
 }
 
@@ -361,14 +481,24 @@ async function promptForConfig(defaults, flags) {
 
   const { createInterface } = await import("node:readline/promises");
 
-  process.stdout.write(`${color("Bambi UI", "bold")} ${color("setup", "cyan")}\n`);
+  process.stdout.write(
+    `${color("Bambi UI", "bold")} ${color("setup", "cyan")}\n`,
+  );
   process.stdout.write(`${color("Detected defaults", "green")}\n\n`);
-  process.stdout.write(`  ${color("framework", "dim")}    ${color(defaults.framework, "yellow")}\n`);
-  process.stdout.write(`  ${color("componentDir", "dim")} ${color(defaults.componentDir, "yellow")}\n`);
-  process.stdout.write(`  ${color("tokensFile", "dim")}   ${color(defaults.tokensFile, "yellow")}\n\n`);
+  process.stdout.write(
+    `  ${color("framework", "dim")}    ${color(defaults.framework, "yellow")}\n`,
+  );
+  process.stdout.write(
+    `  ${color("componentDir", "dim")} ${color(defaults.componentDir, "yellow")}\n`,
+  );
+  process.stdout.write(
+    `  ${color("tokensFile", "dim")}   ${color(defaults.tokensFile, "yellow")}\n\n`,
+  );
 
   const rl = createInterface({ input: process.stdin, output: process.stdout });
-  const useDefaults = await rl.question(`Use these defaults? ${color("(Y/n)", "dim")} `);
+  const useDefaults = await rl.question(
+    `Use these defaults? ${color("(Y/n)", "dim")} `,
+  );
   rl.close();
 
   if (!useDefaults.trim() || useDefaults.trim().toLowerCase().startsWith("y")) {
@@ -376,17 +506,26 @@ async function promptForConfig(defaults, flags) {
   }
 
   process.stdout.write(`\n${color("Customize config", "green")}\n`);
-  process.stdout.write(`${color("Press enter to keep the shown value.", "dim")}\n\n`);
+  process.stdout.write(
+    `${color("Press enter to keep the shown value.", "dim")}\n\n`,
+  );
 
   process.stdin.resume();
   const framework = await selectFramework(defaults.framework);
 
   process.stdin.resume();
-  const customRl = createInterface({ input: process.stdin, output: process.stdout });
+  const customRl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
 
   try {
-    const componentDir = await customRl.question(`Component directory (${defaults.componentDir}): `);
-    const tokensFile = await customRl.question(`Tokens file (${defaults.tokensFile}): `);
+    const componentDir = await customRl.question(
+      `Component directory (${defaults.componentDir}): `,
+    );
+    const tokensFile = await customRl.question(
+      `Tokens file (${defaults.tokensFile}): `,
+    );
 
     return {
       framework,
@@ -414,12 +553,19 @@ async function selectFramework(defaultFramework) {
   function render() {
     const choices = frameworkOptions
       .map((framework, index) => {
-        const label = framework === selectedIndexFramework() ? color(framework, "yellow") : framework;
-        return index === selectedIndex ? `${color("›", "cyan")} ${label}` : `  ${color(framework, "dim")}`;
+        const label =
+          framework === selectedIndexFramework()
+            ? color(framework, "yellow")
+            : framework;
+        return index === selectedIndex
+          ? `${color("›", "cyan")} ${label}`
+          : `  ${color(framework, "dim")}`;
       })
       .join("  ");
 
-    output.write(`\rFramework ${color("(use ←/→, enter)", "dim")} ${choices}\x1b[K`);
+    output.write(
+      `\rFramework ${color("(use ←/→, enter)", "dim")} ${choices}\x1b[K`,
+    );
   }
 
   function selectedIndexFramework() {
@@ -446,7 +592,9 @@ async function selectFramework(defaultFramework) {
       }
 
       if (key?.name === "left" || key?.name === "up") {
-        selectedIndex = (selectedIndex - 1 + frameworkOptions.length) % frameworkOptions.length;
+        selectedIndex =
+          (selectedIndex - 1 + frameworkOptions.length) %
+          frameworkOptions.length;
         render();
         return;
       }
@@ -489,7 +637,9 @@ async function main() {
 
     process.stdout.write("\nBambi UI is ready.\n");
     printResults(results);
-    process.stdout.write("\nImport the token file once in your global stylesheet or app entry.\n");
+    process.stdout.write(
+      "\nImport the token file once in your global stylesheet or app entry.\n",
+    );
 
     return;
   }
@@ -505,7 +655,9 @@ async function main() {
 
   process.stdout.write(`\nAdded ${component} for ${framework}.\n`);
   printResults(results);
-  process.stdout.write(`\nUse it with:\n  ${getImportHint(config.componentDir, component)}\n`);
+  process.stdout.write(
+    `\nUse it with:\n  ${getImportHint(config.componentDir, component)}\n`,
+  );
 }
 
 main().catch(async (error) => {

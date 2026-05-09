@@ -20,6 +20,12 @@ importers:
 
   apps/builder:
     dependencies:
+      '@bambiui/components':
+        specifier: workspace:*
+        version: link:../../packages/components
+      '@bambiui/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       astro:
         specifier: ^6.3.1
         version: 6.3.1(@types/node@24.12.2)(rollup@4.60.3)
@@ -29,6 +35,12 @@ importers:
       '@astrojs/starlight':
         specifier: ^0.38.5
         version: 0.38.5(astro@6.2.2(@types/node@24.12.2)(rollup@4.60.3))
+      '@bambiui/components':
+        specifier: workspace:*
+        version: link:../../packages/components
+      '@bambiui/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
       astro:
         specifier: ^6.2.2
         version: 6.2.2(@types/node@24.12.2)(rollup@4.60.3)
@@ -47,6 +59,9 @@ importers:
 
   packages/components:
     dependencies:
+      '@bambiui/core':
+        specifier: workspace:*
+        version: link:../core
       astro:
         specifier: '>=4'
         version: 6.3.1(@types/node@24.12.2)(rollup@4.60.3)
@@ -61,12 +76,6 @@ importers:
         version: 3.5.33(typescript@5.9.3)
 
   packages/core: {}
-
-  packages/recipes:
-    dependencies:
-      '@bambiui/core':
-        specifier: workspace:*
-        version: link:../core
 
   packages/tokens: {}
 

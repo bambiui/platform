@@ -1,6 +1,6 @@
 # Bambi UI — Docs
 
-The documentation site for Bambi UI, built with [Starlight](https://starlight.astro.build/) on Astro. All four framework button components (React, Svelte, Vue, Astro) render live on the same page.
+The documentation site for Bambi UI, built with [Starlight](https://starlight.astro.build/) on Astro. It imports package source from `@bambiui/components` and tokens from `@bambiui/tokens`.
 
 ## Running locally
 
@@ -28,14 +28,14 @@ The site runs at `http://localhost:4321`.
 
 ```
 apps/docs/
-  astro.config.mjs          # Starlight config — integrations, customCss, sidebar, noExternal
+  astro.config.mjs          # Starlight config — customCss, sidebar
   src/
     content/
       docs/
         components/
           button.mdx        # Button component documentation
     styles/
-      global.css            # Imports @bambiui/tokens/tokens.css + internal button CSS
+      global.css            # Imports @bambiui/tokens/tokens.css
       preview.css           # .preview, .preview-row, .preview-col utility classes
 ```
 
@@ -46,19 +46,19 @@ apps/docs/
    ```js
    { label: 'Component Name', slug: 'components/<name>' }
    ```
-3. Import the framework components at the top of the MDX file
+3. Import component source from `@bambiui/components`
 4. Use `<Tabs syncKey="framework">` so tab selections stay in sync across sections
 
 ## Key configuration notes
 
-- **`vite.ssr.noExternal`**: Any workspace package imported in MDX must be listed here, otherwise Astro's SSR bundler won't process it.
-- **CSS imports**: The token andgenerated button CSS are loaded via Starlight's `customCss` array, not PostCSS `@import` — PostCSS cannot resolve package.json `exports` fields.
-- **Framework integrations**: `@astrojs/react`, `@astrojs/svelte`, `@astrojs/vue` are all registered, enabling all four frameworks in a single MDX file.
+- **Package source**: Docs should consume components from `@bambiui/components`, not local generated copies.
+- **CSS imports**: `global.css` imports `@bambiui/tokens/tokens.css`; component CSS is imported by the component source.
+- **Framework examples**: Use `<Tabs syncKey="framework">` to keep examples in sync.
 
 ## Preview classes
 
-| Class | Description |
-|---|---|
-| `.preview` | Bordered container wrapping a live example |
+| Class          | Description                                      |
+| -------------- | ------------------------------------------------ |
+| `.preview`     | Bordered container wrapping a live example       |
 | `.preview-row` | Flex row with `gap: 8px`, items aligned to `end` |
-| `.preview-col` | Flex column with `gap: 16px` |
+| `.preview-col` | Flex column with `gap: 16px`                     |

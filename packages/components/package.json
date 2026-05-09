@@ -11,8 +11,10 @@
     "./button/vue": "./button/src/vue.vue",
     "./button/astro": "./button/src/astro.astro",
     "./button/recipe": "./button/src/recipe.ts",
-    "./button/types": "./button/src/types.ts",
     "./button.css": "./button/src/button.css"
+  },
+  "dependencies": {
+    "@bambiui/core": "workspace:*"
   },
   "peerDependencies": {
     "astro": ">=4",
@@ -21,9 +23,17 @@
     "vue": ">=3"
   },
   "peerDependenciesMeta": {
-    "astro": { "optional": true },
-    "react": { "optional": true },
-    "svelte": { "optional": true },
-    "vue": { "optional": true }
+    "astro": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { moduleSpecifier, readJson } from "./files.js";
+import { moduleSpecifier, normalizeRelativePath, readJson } from "./files.js";
 
 export const DEFAULT_COMPONENT_DIR = "src/components/ui";
 export const DEFAULT_TOKENS_FILE = "src/styles/bambi.css";
@@ -16,14 +16,30 @@ export const frameworkOptions = ["react", "svelte", "vue", "astro"];
 
 /**
  * @param {string} framework
+ */
+export function assertSupportedFramework(framework) {
+  if (!frameworkOptions.includes(framework)) {
+    throw new Error(
+      `Unknown framework "${framework}". Use ${frameworkOptions.join(", ")}.`,
+    );
+  }
+}
+
+/**
+ * @param {string} framework
  * @param {Record<string, string | undefined>} [overrides]
  */
 export function createDefaultConfig(framework, overrides = {}) {
+  assertSupportedFramework(framework);
+
   return {
     framework,
-    componentDir: overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
-    tokensFile:
+    componentDir: normalizeRelativePath(
+      overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
+    ),
+    tokensFile: normalizeRelativePath(
       overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
+    ),
   };
 }
 
@@ -33,16 +49,21 @@ export function createDefaultConfig(framework, overrides = {}) {
  * @param {Record<string, string | undefined>} [flags]
  */
 export function mergeConfig(config, defaults, flags = {}) {
+  const framework = flags.framework ?? config.framework ?? defaults.framework;
+  assertSupportedFramework(framework);
+
   return {
-    framework: flags.framework ?? config.framework ?? defaults.framework,
-    componentDir:
+    framework,
+    componentDir: normalizeRelativePath(
       flags.componentDir ?? config.componentDir ?? defaults.componentDir,
-    tokensFile:
+    ),
+    tokensFile: normalizeRelativePath(
       flags.tokensFile ??
-      flags.styleFile ??
-      config.tokensFile ??
-      config.styleFile ??
-      defaults.tokensFile,
+        flags.styleFile ??
+        config.tokensFile ??
+        config.styleFile ??
+        defaults.tokensFile,
+    ),
   };
 }
 

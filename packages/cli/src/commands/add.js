@@ -93,6 +93,13 @@ export async function addComponent(componentName, flags) {
   fileNames.style = componentRecord.style.fileName;
   const exportName = componentRecord.exportName ?? componentName;
   const typeExports = componentRecord.api?.typeExports ?? [];
+
+  if (typeExports.length > 0 && !fileNames.types) {
+    throw new Error(
+      `Component "${componentName}" exports types but has no types file entry.`,
+    );
+  }
+
   const results = [];
 
   for (const file of files) {

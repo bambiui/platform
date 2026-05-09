@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "deploy-static": "turbo run build --filter=docs --filter=builder && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/",
+    "check": "pnpm check-types && pnpm check-registry && pnpm --filter bambiui smoke",
+    "check-registry": "node scripts/check-registry.mjs",
+    "deploy-static": "turbo run build --filter=docs --filter=builder && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/ && cp registry.json registry.schema.json apps/docs/dist/",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",

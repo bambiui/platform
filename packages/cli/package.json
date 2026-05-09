@@ -1,19 +1,46 @@
 {
-  "name": "@bambiui/cli",
-  "version": "0.0.6",
+  "name": "bambiui",
+  "version": "0.0.7",
   "description": "CLI for adding BambiUI component source files to your app.",
+  "keywords": [
+    "bambiui",
+    "ui",
+    "components",
+    "cli",
+    "design-system",
+    "react",
+    "svelte",
+    "vue",
+    "astro",
+    "source-distributed"
+  ],
+  "homepage": "https://bambi-ui.felekoglu.dev",
+  "bugs": {
+    "url": "https://github.com/bambiui/platform/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bambiui/platform.git",
+    "directory": "packages/cli"
+  },
   "license": "MIT",
   "type": "module",
   "bin": {
     "bambiui": "src/index.js"
   },
   "scripts": {
-    "check-types": "tsc --noEmit"
+    "check": "pnpm run check-types && pnpm run smoke",
+    "check-types": "tsc --noEmit",
+    "smoke": "node scripts/smoke.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   },
   "publishConfig": {
     "access": "public"
   },
   "files": [
+    "README.md",
     "src"
   ],
   "devDependencies": {

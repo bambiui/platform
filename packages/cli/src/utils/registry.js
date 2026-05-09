@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { writeProjectFile } from "./files.js";
+import { getExistingFileResult, writeProjectFile } from "./files.js";
 
 export const DEFAULT_REGISTRY_URL =
   "https://raw.githubusercontent.com/bambiui/platform/main";
@@ -39,7 +39,15 @@ export async function readRegistryFile(registryUrl, registryPath) {
   const fileUrl = getRegistryFileUrl(registryUrl, registryPath);
 
   if (typeof fileUrl === "string") {
-    const response = await fetch(fileUrl);
+    let response;
+
+    try {
+      response = await fetch(fileUrl);
+    } catch (error) {
+      throw new Error(
+        `Failed to fetch ${fileUrl}: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
 
     if (!response.ok) {
       throw new Error(
@@ -50,7 +58,13 @@ export async function readRegistryFile(registryUrl, registryPath) {
     return response.text();
   }
 
-  return readFile(fileURLToPath(fileUrl), "utf8");
+  try {
+    return await readFile(fileURLToPath(fileUrl), "utf8");
+  } catch (error) {
+    throw new Error(
+      `Failed to read ${fileURLToPath(fileUrl)}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 }
 
 /**
@@ -58,7 +72,14 @@ export async function readRegistryFile(registryUrl, registryPath) {
  */
 export async function readRegistryManifest(registryUrl) {
   const content = await readRegistryFile(registryUrl, DEFAULT_MANIFEST_PATH);
-  return JSON.parse(content);
+
+  try {
+    return JSON.parse(content);
+  } catch (error) {
+    throw new Error(
+      `Invalid registry manifest at ${DEFAULT_MANIFEST_PATH}: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
 }
 
 /**
@@ -69,6 +90,11 @@ export async function readRegistryManifest(registryUrl) {
  * @param {(content: string) => string} [transform]
  */
 export async function copyRegistryFile(registryUrl, from, to, force, transform) {
+  const existing = getExistingFileResult(to, force);
+  if (existing) {
+    return existing;
+  }
+
   const content = await readRegistryFile(registryUrl, from);
   return writeProjectFile(to, transform ? transform(content) : content, force);
 }
@@ -83,7 +109,7 @@ export function getRegistryComponent(manifest, componentName) {
   if (!component) {
     const available = Object.keys(manifest.components ?? {}).join(", ");
     throw new Error(
-      `Unknown component "${componentName}". Available: ${available}`,
+      `Unknown component "${componentName}". Available: ${available || "none"}`,
     );
   }
 

@@ -11,6 +11,7 @@ import {
   getTokensPath,
   readRegistryManifest,
 } from "../utils/registry.js";
+import { normalizeRelativePath } from "../utils/files.js";
 
 /**
  * @param {Record<string, string | boolean | undefined>} flags
@@ -102,8 +103,10 @@ async function promptForConfig(defaults, flags) {
 
     return {
       framework,
-      componentDir: componentDir.trim() || defaults.componentDir,
-      tokensFile: tokensFile.trim() || defaults.tokensFile,
+      componentDir: normalizeRelativePath(
+        componentDir.trim() || defaults.componentDir,
+      ),
+      tokensFile: normalizeRelativePath(tokensFile.trim() || defaults.tokensFile),
     };
   } finally {
     customRl.close();

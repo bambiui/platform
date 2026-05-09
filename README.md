@@ -2,7 +2,7 @@
 
 A multi-framework UI component library CLI — React, Svelte, Vue, and Astro components copied into your app as source.
 
-**[Documentation](https://bambi-ui.com)** · **[Token Builder](https://bambi-ui.com/builder)** · **[GitHub](https://github.com/bambiui/platform)**
+**[Documentation](https://bambi-ui.felekoglu.dev)** · **[Token Builder](https://bambi-ui.felekoglu.dev/builder)** · **[GitHub](https://github.com/bambiui/platform)**
 
 ## Workspace
 
@@ -24,25 +24,25 @@ A multi-framework UI component library CLI — React, Svelte, Vue, and Astro com
 
 ### 1. Initialize
 
-Run the scoped CLI package in your app. The executable it exposes is `bambiui`.
+Run the CLI package in your app.
 
 ```sh
-npx @bambiui/cli init
+npx bambiui init
 ```
 
 ### 2. Add a component
 
 ```sh
-npx @bambiui/cli add button
+npx bambiui add button
 ```
 
 Framework override is available when detection is not enough:
 
 ```sh
-npx @bambiui/cli add button --framework react
-npx @bambiui/cli add button --framework svelte
-npx @bambiui/cli add button --framework vue
-npx @bambiui/cli add button --framework astro
+npx bambiui add button --framework react
+npx bambiui add button --framework svelte
+npx bambiui add button --framework vue
+npx bambiui add button --framework astro
 ```
 
 The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps the component CSS next to the component source and imports it automatically.
@@ -50,8 +50,10 @@ The command creates the component under `src/components/ui/button/`. `init` crea
 By default the CLI fetches source from the GitHub raw registry. For local development or a future hosted registry API, override the base:
 
 ```sh
-npx @bambiui/cli init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
+npx bambiui init --registry-url https://raw.githubusercontent.com/bambiui/platform/main
 ```
+
+The current site domain is `https://bambi-ui.felekoglu.dev`; production deploys should expose `registry.json` and `registry.schema.json` at the site root.
 
 ### 3. Use the component
 
@@ -121,17 +123,22 @@ pnpm --filter builder dev
 
 # Type-check everything
 pnpm check-types
+
+# Full local verification
+pnpm check
 ```
 
 ## Deployment
 
-Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything and merge builder output into the docs dist:
+Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything, merge builder output into the docs dist, and publish the static registry files:
 
 ```sh
 pnpm deploy-static
 # output → apps/docs/dist/
 #   /          → docs site
 #   /builder   → token builder
+#   /registry.json
+#   /registry.schema.json
 ```
 
 See [`apps/builder/README.md`](apps/builder/README.md) for Cloudflare Pages project settings.

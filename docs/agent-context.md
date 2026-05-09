@@ -13,7 +13,7 @@ apps/
   docs/                    # Starlight (Astro) documentation site
   builder/                 # Infinite-canvas design token editor (static Astro, served at /builder)
 packages/
-  cli/                     # @bambiui/cli — init + add source components
+  cli/                     # bambiui CLI — init + add source components
   core/                    # @bambiui/core — shared contracts and framework-agnostic types
   tokens/                  # @bambiui/tokens — primitive, semantic, intent, state, component tokens
   components/              # @bambiui/components — source components + CSS
@@ -95,6 +95,9 @@ pnpm deploy-static
 
 # Type-check all packages
 pnpm check-types
+
+# Full local verification
+pnpm check
 ```
 
 ## Docs Site (`apps/docs`)
@@ -115,7 +118,7 @@ pnpm check-types
 
 ## Deployment (Cloudflare Pages)
 
-Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` builds docs and builder with Turborepo, then copies `apps/builder/dist/` into `apps/docs/dist/builder/`. The single output directory is `apps/docs/dist`.
+Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` builds docs and builder with Turborepo, copies `apps/builder/dist/` into `apps/docs/dist/builder/`, and copies `registry.json` plus `registry.schema.json` into `apps/docs/dist/`. The single output directory is `apps/docs/dist`.
 
 | Setting | Value |
 | --- | --- |
@@ -126,7 +129,7 @@ Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static
 ## Dependency Graph
 
 ```txt
-@bambiui/cli         (fetches source from registry URL)
+bambiui CLI         (fetches source from registry URL)
 @bambiui/core        (shared contracts)
 @bambiui/tokens      (global CSS tokens)
 @bambiui/components  -> @bambiui/core

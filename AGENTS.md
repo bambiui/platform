@@ -9,7 +9,7 @@ Keep this file short to reduce Codex context usage. Load `docs/agent-context.md`
 ```txt
 apps/docs       # Starlight docs site
 apps/builder    # static Astro token builder served at /builder
-packages/cli    # @bambiui/cli init + add commands
+packages/cli    # bambiui init + add commands
 packages/core   # shared contracts and framework-agnostic types
 packages/tokens # global CSS design tokens
 packages/components/button

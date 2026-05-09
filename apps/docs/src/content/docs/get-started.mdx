@@ -17,7 +17,7 @@ BambiUI is a source-first component library. The CLI copies component files and 
 Run the scoped CLI package from your project root. It exposes the `bambiui` executable, auto-detects your framework, creates `bambiui.config.json`, and writes the global design token file.
 
 ```sh
-npx @bambiui/cli init
+npx bambiui init
 ```
 
 **What it creates:**
@@ -30,13 +30,13 @@ npx @bambiui/cli init
 You can skip the interactive prompts with `--yes` to accept detected defaults:
 
 ```sh
-npx @bambiui/cli init --yes
+npx bambiui init --yes
 ```
 
 Or override specific values:
 
 ```sh
-npx @bambiui/cli init --framework react --component-dir src/ui --tokens-file src/styles/tokens.css
+npx bambiui init --framework react --component-dir src/ui --tokens-file src/styles/tokens.css
 ```
 
 ## 2. Import the token file
@@ -90,7 +90,7 @@ Import `bambi.css` once in your app's global stylesheet or entry point. All comp
 Add the Button component to your project:
 
 ```sh
-npx @bambiui/cli add button
+npx bambiui add button
 ```
 
 The CLI installs the following files into your component directory (default: `src/components/ui/button/`):
@@ -159,7 +159,7 @@ The CLI installs the following files into your component directory (default: `sr
 Re-run `add` with `--force` to overwrite existing files with the latest source:
 
 ```sh
-npx @bambiui/cli add button --force
+npx bambiui add button --force
 ```
 
 ## bambiui.config.json

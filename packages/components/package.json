@@ -4,6 +4,10 @@
   "description": "Source-distributed BambiUI component implementations.",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "lint": "eslint \"**/*.{astro,svelte,ts,tsx,vue}\"",
+    "check-types": "tsc --noEmit"
+  },
   "exports": {
     "./button": "./button/src/index.ts",
     "./button/react": "./button/src/react.tsx",
@@ -15,6 +19,17 @@
   },
   "dependencies": {
     "@bambiui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.7",
+    "eslint": "^9.39.1",
+    "eslint-plugin-astro": "^1.5.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-svelte": "^3.13.0",
+    "eslint-plugin-vue": "^10.6.1",
+    "typescript-eslint": "^8.46.4"
   },
   "peerDependencies": {
     "astro": ">=4",

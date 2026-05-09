@@ -23,6 +23,8 @@
   const cls = $derived(
     [buttonRecipe.className, className].filter(Boolean).join(" ")
   );
+  const isLoading = $derived(Boolean(loading));
+  const isDisabled = $derived(Boolean(disabled || isLoading));
 </script>
 
 <button
@@ -31,13 +33,13 @@
   data-intent={intent}
   data-appearance={appearance}
   data-size={size}
-  data-loading={loading || undefined}
-  aria-busy={loading || undefined}
-  aria-disabled={(loading || disabled) || undefined}
-  {disabled}
+  data-loading={isLoading || undefined}
+  aria-busy={isLoading || undefined}
+  aria-disabled={isDisabled || undefined}
+  disabled={isDisabled}
   {...attrs}
 >
-  {#if loading}
+  {#if isLoading}
     <span class="bambi-button-spinner" aria-hidden="true"></span>
   {/if}
   <span class="bambi-button-content">

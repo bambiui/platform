@@ -4,7 +4,7 @@ import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "@bambiui/core/button";
 import "./button.css";
 
-defineOptions({ inheritAttrs: false });
+defineOptions({ name: "BambiButton", inheritAttrs: false });
 
 const props = withDefaults(
   defineProps<
@@ -14,7 +14,7 @@ const props = withDefaults(
       type?: "button" | "submit" | "reset";
     }
   >(),
-  { ...buttonRecipe.defaults, type: "button" },
+  { ...buttonRecipe.defaults, class: undefined, type: "button" },
 );
 
 const attrs = useAttrs();
@@ -22,6 +22,9 @@ const attrs = useAttrs();
 const cls = computed(() =>
   [buttonRecipe.className, props.class].filter(Boolean).join(" "),
 );
+
+const isLoading = computed(() => Boolean(props.loading));
+const isDisabled = computed(() => Boolean(props.disabled || isLoading.value));
 </script>
 
 <template>
@@ -31,14 +34,14 @@ const cls = computed(() =>
     :data-intent="props.intent"
     :data-appearance="props.appearance"
     :data-size="props.size"
-    :data-loading="props.loading || undefined"
-    :aria-busy="props.loading || undefined"
-    :aria-disabled="props.loading || props.disabled || undefined"
-    :disabled="props.disabled"
+    :data-loading="isLoading || undefined"
+    :aria-busy="isLoading || undefined"
+    :aria-disabled="isDisabled || undefined"
+    :disabled="isDisabled"
     v-bind="attrs"
   >
     <span
-      v-if="props.loading"
+      v-if="isLoading"
       class="bambi-button-spinner"
       aria-hidden="true"
     />

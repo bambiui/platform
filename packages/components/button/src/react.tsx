@@ -1,4 +1,4 @@
-import { type ButtonHTMLAttributes, type Ref } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { buttonRecipe } from "./recipe";
 import type { ButtonBaseProps } from "@bambiui/core/button";
 import "./button.css";
@@ -15,38 +15,45 @@ function cn(...inputs: Array<string | false | null | undefined>) {
 }
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonBaseProps {
-  ref?: Ref<HTMLButtonElement>;
-}
+  extends ButtonHTMLAttributes<HTMLButtonElement>, ButtonBaseProps {}
 
-export function Button({
-  children,
-  className,
-  ref,
-  type = "button",
-  intent = buttonRecipe.defaults.intent,
-  appearance = buttonRecipe.defaults.appearance,
-  size = buttonRecipe.defaults.size,
-  loading = buttonRecipe.defaults.loading,
-  disabled,
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      ref={ref}
-      type={type}
-      data-intent={intent}
-      data-appearance={appearance}
-      data-size={size}
-      data-loading={loading || undefined}
-      aria-busy={loading || undefined}
-      aria-disabled={loading || disabled || undefined}
-      disabled={disabled}
-      className={cn(buttonRecipe.className, className)}
-      {...props}
-    >
-      {loading && <span className="bambi-button-spinner" aria-hidden="true" />}
-      <span className="bambi-button-content">{children}</span>
-    </button>
-  );
-}
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button(
+    {
+      children,
+      className,
+      type = "button",
+      intent = buttonRecipe.defaults.intent,
+      appearance = buttonRecipe.defaults.appearance,
+      size = buttonRecipe.defaults.size,
+      loading = buttonRecipe.defaults.loading,
+      disabled,
+      ...props
+    },
+    ref,
+  ) {
+    const isLoading = Boolean(loading);
+    const isDisabled = Boolean(disabled || isLoading);
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        data-intent={intent}
+        data-appearance={appearance}
+        data-size={size}
+        data-loading={isLoading || undefined}
+        aria-busy={isLoading || undefined}
+        aria-disabled={isDisabled || undefined}
+        disabled={isDisabled}
+        className={cn(buttonRecipe.className, className)}
+        {...props}
+      >
+        {isLoading && (
+          <span className="bambi-button-spinner" aria-hidden="true" />
+        )}
+        <span className="bambi-button-content">{children}</span>
+      </button>
+    );
+  },
+);

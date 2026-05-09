@@ -11,6 +11,8 @@ interface Props extends ButtonBaseProps {
   [key: string]: unknown;
 }
 
+const astro = Astro as unknown as { props: Props };
+
 const {
   intent = buttonRecipe.defaults.intent,
   appearance = buttonRecipe.defaults.appearance,
@@ -20,9 +22,11 @@ const {
   class: className,
   disabled,
   ...attrs
-} = Astro.props;
+} = astro.props;
 
 const cls = [buttonRecipe.className, className].filter(Boolean).join(" ");
+const isLoading = Boolean(loading);
+const isDisabled = Boolean(disabled || isLoading);
 ---
 <button
   type={type}
@@ -30,12 +34,12 @@ const cls = [buttonRecipe.className, className].filter(Boolean).join(" ");
   data-intent={intent}
   data-appearance={appearance}
   data-size={size}
-  data-loading={loading || undefined}
-  aria-busy={loading || undefined}
-  aria-disabled={(loading || disabled) || undefined}
-  disabled={disabled}
+  data-loading={isLoading || undefined}
+  aria-busy={isLoading || undefined}
+  aria-disabled={isDisabled || undefined}
+  disabled={isDisabled}
   {...attrs}
 >
-  {loading && <span class="bambi-button-spinner" aria-hidden="true" />}
+  {isLoading && <span class="bambi-button-spinner" aria-hidden="true" />}
   <span class="bambi-button-content"><slot /></span>
 </button>

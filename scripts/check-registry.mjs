@@ -86,9 +86,39 @@ function assertRegistryFilesExist(registry) {
   }
 }
 
+/**
+ * @param {{ components?: Record<string, unknown>, tokens?: { css?: string } }} registry
+ */
+function getRegistrySourceFiles(registry) {
+  const files = [registry.tokens?.css];
+
+  for (const component of Object.values(registry.components ?? {})) {
+    const entry = /** @type {{ style?: { from?: string }, shared?: Array<{ from?: string }>, files?: Record<string, Array<{ from?: string }>> }} */ (component);
+    files.push(entry.style?.from);
+
+    for (const file of entry.shared ?? []) {
+      files.push(file.from);
+    }
+
+    for (const frameworkFiles of Object.values(entry.files ?? {})) {
+      for (const file of frameworkFiles) {
+        files.push(file.from);
+      }
+    }
+  }
+
+  return files.filter(Boolean);
+}
+
 const registry = await readJson(registryPath);
 const contracts = await readFile(contractsPath, "utf8");
 assertRegistryFilesExist(registry);
+
+for (const file of getRegistrySourceFiles(registry)) {
+  if (path.isAbsolute(/** @type {string} */ (file))) {
+    throw new Error(`Registry source path must be relative: ${file}`);
+  }
+}
 
 const button = registry.components?.button;
 if (!button || typeof button !== "object") {

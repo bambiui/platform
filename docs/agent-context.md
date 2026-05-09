@@ -118,7 +118,7 @@ pnpm check
 
 ## Deployment (Cloudflare Pages)
 
-Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` builds docs and builder with Turborepo, copies `apps/builder/dist/` into `apps/docs/dist/builder/`, and copies `registry.json` plus `registry.schema.json` into `apps/docs/dist/`. The single output directory is `apps/docs/dist`.
+Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` builds docs and builder with Turborepo, copies `apps/builder/dist/` into `apps/docs/dist/builder/`, and copies `registry.json`, `registry.schema.json`, and all source files referenced by `registry.json` into `apps/docs/dist/`. The single output directory is `apps/docs/dist`.
 
 | Setting | Value |
 | --- | --- |

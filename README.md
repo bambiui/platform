@@ -130,7 +130,7 @@ pnpm check
 
 ## Deployment
 
-Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything, merge builder output into the docs dist, and publish the static registry files:
+Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything, merge builder output into the docs dist, and publish the static registry manifest plus all source files referenced by it:
 
 ```sh
 pnpm deploy-static
@@ -139,6 +139,7 @@ pnpm deploy-static
 #   /builder   → token builder
 #   /registry.json
 #   /registry.schema.json
+#   /packages/... → source files used by the CLI registry
 ```
 
 See [`apps/builder/README.md`](apps/builder/README.md) for Cloudflare Pages project settings.

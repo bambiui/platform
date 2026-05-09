@@ -47,8 +47,8 @@ The builder is merged into the docs site's output at build time. A single Cloudf
 
 1. `turbo run build --filter=docs --filter=builder` builds the builder (`apps/builder/dist/`) and docs (`apps/docs/dist/`).
 2. `deploy-static` copies `apps/builder/dist/` into `apps/docs/dist/builder/`.
-3. `deploy-static` copies `registry.json` and `registry.schema.json` into `apps/docs/dist/`.
-4. Cloudflare Pages serves `apps/docs/dist/` — docs at `/`, builder at `/builder`, registry files at the site root.
+3. `deploy-static` copies `registry.json`, `registry.schema.json`, and registry source files into `apps/docs/dist/`.
+4. Cloudflare Pages serves `apps/docs/dist/` — docs at `/`, builder at `/builder`, registry files at the site root, and source files under `/packages/...`.
 
 `base: '/builder'` in `astro.config.mjs` ensures all asset paths are correct at that subpath.
 

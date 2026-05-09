@@ -41,7 +41,7 @@ pnpm deploy-static
 
 1. Add or reuse shared contracts in `packages/core/src/contracts.ts`.
 2. Add source and CSS under `packages/components/<name>/src/`.
-3. Register it in the CLI registry map or manifest.
+3. Register it in `registry.json`.
 4. Add docs at `apps/docs/src/content/docs/components/<name>.mdx`.
 
 ## Need More Detail?

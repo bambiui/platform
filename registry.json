@@ -1,0 +1,58 @@
+{
+  "$schema": "https://bambiui.dev/registry.schema.json",
+  "version": 1,
+  "tokens": {
+    "css": "packages/tokens/src/tokens.css"
+  },
+  "components": {
+    "button": {
+      "exportName": "Button",
+      "style": {
+        "from": "packages/components/button/src/button.css",
+        "fileName": "button.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/button/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "from": "packages/components/button/src/types.ts",
+          "to": "types.ts"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/button/src/react.tsx",
+            "to": "button.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/button/src/svelte.svelte",
+            "to": "Button.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/button/src/vue.vue",
+            "to": "Button.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/button/src/astro.astro",
+            "to": "Button.astro"
+          }
+        ]
+      }
+    }
+  }
+}

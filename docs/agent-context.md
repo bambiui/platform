@@ -72,7 +72,7 @@ Every button component across all frameworks follows the same shape:
 1. Add shared component-agnostic contracts to `packages/core/src/contracts.ts` when needed, then derive component-specific contracts from them.
 2. Add component source under `packages/components/<name>/src/`.
 3. Add component CSS beside the source component in `packages/components/<name>/src/<name>.css`.
-4. Register the component in the CLI registry map or manifest.
+4. Register the component in `registry.json`.
 5. Add the component to the docs under `apps/docs/src/content/docs/components/<name>.mdx`.
 
 ## Common Commands

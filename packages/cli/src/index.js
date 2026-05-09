@@ -38,7 +38,7 @@ const components = {
       },
       {
         kind: "types",
-        from: "packages/components/button/src/types.ts",
+        from: "packages/core/src/button.ts",
         to: "types.ts",
       },
     ],
@@ -285,7 +285,10 @@ function transformComponentSource(content, replacements = {}) {
 }
 
 function transformButtonTypesSource(content) {
-  if (!content.includes('from "@bambiui/core/button"')) {
+  if (
+    !content.includes('from "./contracts"') &&
+    !content.includes('from "@bambiui/core/button"')
+  ) {
     return content;
   }
 

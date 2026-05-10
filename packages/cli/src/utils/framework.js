@@ -117,24 +117,44 @@ export async function getConfig(cwd, flags = {}) {
  * @param {string} exportName
  * @param {Record<string, string>} fileNames
  * @param {string[]} typeExports
+ * @param {string[]} valueExports
  */
-export function getIndexContent(framework, exportName, fileNames, typeExports) {
+export function getIndexContent(
+  framework,
+  exportName,
+  fileNames,
+  typeExports,
+  valueExports = [],
+) {
   const typeExportList = typeExports.join(", ");
+  const valueExportList = valueExports.join(", ");
+  const recipeConst = `${exportName.slice(0, 1).toLowerCase()}${exportName.slice(1)}Recipe`;
+  const recipeType = `${exportName}Recipe`;
+  const recipeModule = fileNames.recipe
+    ? moduleSpecifier(fileNames.recipe)
+    : undefined;
+  const recipeLine = recipeModule
+    ? `export { ${recipeConst}, type ${recipeType} } from "${recipeModule}";\n`
+    : "";
+  const valueLine =
+    valueExportList && fileNames.types
+      ? `export { ${valueExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
+      : "";
 
   if (framework === "react") {
     const componentModule = moduleSpecifier(fileNames[framework]);
     const typeLine = typeExportList
-      ? `export type { ${typeExportList} } from "${componentModule}";\n`
+      ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
       : "";
 
-    return `export { ${exportName} } from "${componentModule}";\n${typeLine}`;
+    return `export { ${exportName} } from "${componentModule}";\n${typeLine}${recipeLine}${valueLine}`;
   }
 
   const typeLine = typeExportList
     ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
     : "";
 
-  return `export { default as ${exportName} } from "${componentSpecifier(framework, fileNames[framework])}";\n${typeLine}`;
+  return `export { default as ${exportName} } from "${componentSpecifier(framework, fileNames[framework])}";\n${typeLine}${recipeLine}${valueLine}`;
 }
 
 /**

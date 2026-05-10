@@ -1,10 +1,4 @@
 .bambi-button {
-  --bambi-button-bg: var(--bambi-intent-primary-bg);
-  --bambi-button-fg: var(--bambi-intent-primary-fg);
-  --bambi-button-border: transparent;
-  --bambi-button-hover-bg: var(--bambi-intent-primary-hover-bg);
-  --bambi-button-hover-fg: var(--bambi-button-fg);
-
   display: inline-flex;
   align-items: center;
   justify-content: center;

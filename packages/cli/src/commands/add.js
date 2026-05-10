@@ -72,7 +72,10 @@ export async function addComponent(componentName, flags) {
   const component = getRegistryComponent(manifest, componentName);
   assertRegistryComponent(component);
 
-  const componentRecord = /** @type {{ exportName?: string, api?: { typeExports?: string[], types?: Parameters<typeof generateTypesSource>[0] }, style?: { from: string, fileName: string }, shared?: Array<{ kind: string, from?: string, to: string, generate?: string }>, files?: Record<string, Array<{ kind: string, from?: string, to: string, generate?: string }>> }} */ (component);
+  const componentRecord =
+    /** @type {{ exportName?: string, api?: { typeExports?: string[], types?: Parameters<typeof generateTypesSource>[0] }, style?: { from: string, fileName: string }, shared?: Array<{ kind: string, from?: string, to: string, generate?: string }>, files?: Record<string, Array<{ kind: string, from?: string, to: string, generate?: string }>> }} */ (
+      component
+    );
   const frameworkFiles = componentRecord.files?.[framework];
 
   if (!frameworkFiles) {
@@ -93,6 +96,8 @@ export async function addComponent(componentName, flags) {
   fileNames.style = componentRecord.style.fileName;
   const exportName = componentRecord.exportName ?? componentName;
   const typeExports = componentRecord.api?.typeExports ?? [];
+  const valueExports =
+    componentRecord.api?.types?.consts?.map((item) => item.name) ?? [];
 
   if (typeExports.length > 0 && !fileNames.types) {
     throw new Error(
@@ -152,7 +157,13 @@ export async function addComponent(componentName, flags) {
   results.push(
     await writeProjectFile(
       path.join(targetDir, "index.ts"),
-      getIndexContent(framework, exportName, fileNames, typeExports),
+      getIndexContent(
+        framework,
+        exportName,
+        fileNames,
+        typeExports,
+        valueExports,
+      ),
       Boolean(flags.force),
     ),
   );

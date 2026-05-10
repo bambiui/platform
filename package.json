@@ -3,8 +3,9 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "check": "pnpm check-types && pnpm check-registry && pnpm --filter bambiui smoke",
+    "check": "pnpm check-types && pnpm check-registry && pnpm check-tokens && pnpm --filter bambiui smoke",
     "check-registry": "node scripts/check-registry.mjs",
+    "check-tokens": "node scripts/check-tokens.mjs",
     "deploy-static": "turbo run build --filter=docs --filter=builder && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/ && node scripts/copy-registry-assets.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",

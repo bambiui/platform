@@ -12,15 +12,9 @@ function hexToOklch(hex: string): { hue: number; chroma: number } | null {
   const r = toLinear(parseInt(clean.slice(0, 2), 16) / 255);
   const g = toLinear(parseInt(clean.slice(2, 4), 16) / 255);
   const b = toLinear(parseInt(clean.slice(4, 6), 16) / 255);
-  const l_ = Math.cbrt(
-    0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b,
-  );
-  const m_ = Math.cbrt(
-    0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b,
-  );
-  const s_ = Math.cbrt(
-    0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b,
-  );
+  const l_ = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m_ = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s_ = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
   const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
   const bv = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
   return {
@@ -84,9 +78,7 @@ function bestFg(bgL: number, bgC: number, bgH: number): string {
     wLum = relativeLuminance(0.98, 0, 0);
   const hi = Math.max(bgLum, wLum),
     lo = Math.min(bgLum, wLum);
-  return (hi + 0.05) / (lo + 0.05) >= 4.5
-    ? "oklch(98% 0 0)"
-    : "oklch(9% 0 0)";
+  return (hi + 0.05) / (lo + 0.05) >= 4.5 ? "oklch(98% 0 0)" : "oklch(9% 0 0)";
 }
 function blendHue(primary: number, def: number): number {
   return (((def + (primary - 253.83) * 0.12) % 360) + 360) % 360;
@@ -246,9 +238,7 @@ function applyGenTokens() {
     root.getAttribute("data-theme") === "dark" ||
     root.classList.contains("dark");
   const active = isDark ? genTokens.dark : genTokens.light;
-  Object.entries(active).forEach(([k, v]) =>
-    root.style.setProperty(k, v),
-  );
+  Object.entries(active).forEach(([k, v]) => root.style.setProperty(k, v));
 }
 
 function regenerate() {
@@ -345,11 +335,7 @@ const CARD_TOKENS: Record<string, { label: string; tokens: string[] }[]> = {
     },
     {
       label: "Shadow",
-      tokens: [
-        "--bambi-shadow-sm",
-        "--bambi-shadow-md",
-        "--bambi-shadow-lg",
-      ],
+      tokens: ["--bambi-shadow-sm", "--bambi-shadow-md", "--bambi-shadow-lg"],
     },
   ],
   buttons: [
@@ -416,7 +402,11 @@ const CARD_TOKENS: Record<string, { label: string; tokens: string[] }[]> = {
     },
     {
       label: "Ghost",
-      tokens: ["--bambi-foreground", "--bambi-accent", "--bambi-accent-foreground"],
+      tokens: [
+        "--bambi-foreground",
+        "--bambi-accent",
+        "--bambi-accent-foreground",
+      ],
     },
     { label: "Outline", tokens: ["--bambi-primary", "--bambi-accent"] },
     {

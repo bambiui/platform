@@ -63,7 +63,9 @@ function assertExists(filePath) {
   }
 }
 
-for (const [framework, componentFile] of Object.entries(expectedComponentFiles)) {
+for (const [framework, componentFile] of Object.entries(
+  expectedComponentFiles,
+)) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
 
   try {
@@ -110,7 +112,9 @@ for (const [framework, componentFile] of Object.entries(expectedComponentFiles))
     ]);
 
     if (!secondAdd.stdout.includes("skipped")) {
-      throw new Error(`Expected second add to skip existing ${framework} files.`);
+      throw new Error(
+        `Expected second add to skip existing ${framework} files.`,
+      );
     }
 
     const forcedAdd = await runCli([
@@ -126,19 +130,37 @@ for (const [framework, componentFile] of Object.entries(expectedComponentFiles))
     ]);
 
     if (!forcedAdd.stdout.includes("updated")) {
-      throw new Error(`Expected forced add to update existing ${framework} files.`);
+      throw new Error(
+        `Expected forced add to update existing ${framework} files.`,
+      );
     }
 
     const types = await readFile(path.join(buttonDir, "types.ts"), "utf8");
     if (types.includes("@bambiui/")) {
       throw new Error(`Generated ${framework} types are not self-contained.`);
     }
+
+    const index = await readFile(path.join(buttonDir, "index.ts"), "utf8");
+    for (const exportName of [
+      "ButtonDefaults",
+      "buttonRecipe",
+      "ButtonRecipe",
+      "buttonIntents",
+    ]) {
+      if (!index.includes(exportName)) {
+        throw new Error(
+          `Generated ${framework} index is missing ${exportName}.`,
+        );
+      }
+    }
   } finally {
     await rm(cwd, { force: true, recursive: true });
   }
 }
 
-const invalidFrameworkDir = await mkdtemp(path.join(tmpdir(), "bambiui-invalid-"));
+const invalidFrameworkDir = await mkdtemp(
+  path.join(tmpdir(), "bambiui-invalid-"),
+);
 try {
   const result = await runCli(
     [

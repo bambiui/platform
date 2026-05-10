@@ -3,7 +3,10 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const repoRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 const registryPath = path.join(repoRoot, "registry.json");
 const contractsPath = path.join(repoRoot, "packages/core/src/contracts.ts");
 const frameworkOptions = ["react", "svelte", "vue", "astro"];
@@ -27,7 +30,9 @@ async function readJson(filePath) {
  */
 function readConstStringArray(source, exportName) {
   const match = source.match(
-    new RegExp(`export const ${exportName} = \\[(?<body>[\\s\\S]*?)\\] as const;`),
+    new RegExp(
+      `export const ${exportName} = \\[(?<body>[\\s\\S]*?)\\] as const;`,
+    ),
   );
 
   if (!match?.groups?.body) {
@@ -42,27 +47,58 @@ function readConstStringArray(source, exportName) {
  */
 function readExportedNames(source) {
   return new Set(
-    [...source.matchAll(/export\s+(?:declare\s+)?(?:const|type|interface)\s+([A-Za-z_$][A-Za-z0-9_$]*)/g)]
-      .map((match) => match[1]),
+    [
+      ...source.matchAll(
+        /export\s+(?:declare\s+)?(?:const|type|interface)\s+([A-Za-z_$][A-Za-z0-9_$]*)/g,
+      ),
+    ].map((match) => match[1]),
   );
+}
+
+/**
+ * @param {string} source
+ * @param {string} interfaceName
+ */
+function readInterfaceProps(source, interfaceName) {
+  const match = source.match(
+    new RegExp(
+      `export interface ${interfaceName}[^\\{]*\\{(?<body>[\\s\\S]*?)\\n\\}`,
+    ),
+  );
+
+  if (!match?.groups?.body) {
+    throw new Error(`Could not find exported interface "${interfaceName}".`);
+  }
+
+  return [
+    ...match.groups.body.matchAll(
+      /([A-Za-z_$][A-Za-z0-9_$]*)(\?)?:\s*([^;\n]+);/g,
+    ),
+  ].map((item) => ({
+    name: item[1],
+    optional: Boolean(item[2]),
+    type: item[3].trim(),
+  }));
 }
 
 /**
  * @param {string} source
  */
 function readRecipeDefaults(source) {
-  const match = source.match(/defaults:\s*\{(?<body>[\s\S]*?)\}\s*,\s*variants:/);
+  const match = source.match(
+    /defaults:\s*\{(?<body>[\s\S]*?)\}\s*,\s*variants:/,
+  );
 
   if (!match?.groups?.body) {
     return undefined;
   }
 
   return Object.fromEntries(
-    [...match.groups.body.matchAll(/([A-Za-z_$][A-Za-z0-9_$]*)\s*:\s*("([^"]+)"|true|false)/g)]
-      .map((item) => [
-        item[1],
-        item[3] ?? item[2] === "true",
-      ]),
+    [
+      ...match.groups.body.matchAll(
+        /([A-Za-z_$][A-Za-z0-9_$]*)\s*:\s*("([^"]+)"|true|false)/g,
+      ),
+    ].map((item) => [item[1], item[3] ?? item[2] === "true"]),
   );
 }
 
@@ -120,7 +156,9 @@ function assertRegistryPath(file, label) {
   const normalized = file.replaceAll("\\", "/");
 
   if (path.isAbsolute(normalized) || normalized.split("/").includes("..")) {
-    throw new Error(`${label} must be a relative path inside the repo: ${file}`);
+    throw new Error(
+      `${label} must be a relative path inside the repo: ${file}`,
+    );
   }
 
   const absolutePath = path.join(repoRoot, normalized);
@@ -139,7 +177,10 @@ function getRegistrySourceFiles(registry) {
   const files = [registry.tokens?.css];
 
   for (const component of Object.values(registry.components ?? {})) {
-    const entry = /** @type {{ style?: { from?: string }, shared?: Array<{ from?: string }>, files?: Record<string, Array<{ from?: string }>> }} */ (component);
+    const entry =
+      /** @type {{ style?: { from?: string }, shared?: Array<{ from?: string }>, files?: Record<string, Array<{ from?: string }>> }} */ (
+        component
+      );
     files.push(entry.style?.from);
 
     for (const file of entry.shared ?? []) {
@@ -173,17 +214,27 @@ function getGeneratedTypeExports(types) {
  */
 function assertGeneratedTypes(types, componentName) {
   const constNames = new Set((types.consts ?? []).map((item) => item.name));
-  const interfaces = new Map((types.interfaces ?? []).map((item) => [item.name, item]));
+  const interfaces = new Map(
+    (types.interfaces ?? []).map((item) => [item.name, item]),
+  );
   const exportedTypes = getGeneratedTypeExports(types);
 
-  assertUnique(types.consts?.map((item) => item.name) ?? [], `${componentName}.api.types.consts`);
+  assertUnique(
+    types.consts?.map((item) => item.name) ?? [],
+    `${componentName}.api.types.consts`,
+  );
   assertUnique([...exportedTypes], `${componentName}.api.types exports`);
 
   for (const item of types.consts ?? []) {
-    assertUnique(item.values, `${componentName}.api.types.consts.${item.name}.values`);
+    assertUnique(
+      item.values,
+      `${componentName}.api.types.consts.${item.name}.values`,
+    );
 
     if (item.values.length === 0) {
-      throw new Error(`${componentName}.api.types.consts.${item.name} must not be empty.`);
+      throw new Error(
+        `${componentName}.api.types.consts.${item.name} must not be empty.`,
+      );
     }
   }
 
@@ -241,9 +292,15 @@ function assertDefaultsMatchMetadata(defaults, types, componentName) {
     `${componentName} recipe defaults keys`,
   );
 
-  const source = (types.interfaces ?? []).find((item) => item.name === requiredPick.source);
-  const aliases = new Map((types.aliasesFromConsts ?? []).map((item) => [item.name, item.constName]));
-  const consts = new Map((types.consts ?? []).map((item) => [item.name, item.values]));
+  const source = (types.interfaces ?? []).find(
+    (item) => item.name === requiredPick.source,
+  );
+  const aliases = new Map(
+    (types.aliasesFromConsts ?? []).map((item) => [item.name, item.constName]),
+  );
+  const consts = new Map(
+    (types.consts ?? []).map((item) => [item.name, item.values]),
+  );
 
   for (const key of requiredPick.keys) {
     const prop = source?.props.find((item) => item.name === key);
@@ -269,6 +326,32 @@ function assertDefaultsMatchMetadata(defaults, types, componentName) {
 }
 
 /**
+ * @param {string} coreComponent
+ * @param {{ interfaces?: Array<{ name: string, props: Array<{ name: string, type: string, optional?: boolean }> }> }} types
+ * @param {string} componentName
+ */
+function assertCoreInterfacesMatchMetadata(
+  coreComponent,
+  types,
+  componentName,
+) {
+  for (const item of types.interfaces ?? []) {
+    const coreProps = readInterfaceProps(coreComponent, item.name);
+    const registryProps = item.props.map((prop) => ({
+      name: prop.name,
+      optional: Boolean(prop.optional),
+      type: prop.type,
+    }));
+
+    assertDeepEqual(
+      registryProps,
+      coreProps,
+      `${componentName}.api.types.interfaces.${item.name}`,
+    );
+  }
+}
+
+/**
  * @param {string} componentName
  * @param {unknown} component
  * @param {string} contracts
@@ -276,7 +359,10 @@ function assertDefaultsMatchMetadata(defaults, types, componentName) {
 async function assertComponentManifest(componentName, component, contracts) {
   assertPlainObject(component, `components.${componentName}`);
 
-  const entry = /** @type {{ exportName?: string, api?: { typeExports?: string[], types?: { consts?: Array<{ name: string, values: string[] }>, aliasesFromConsts?: Array<{ name: string, constName: string }>, interfaces?: Array<{ name: string, props: Array<{ name: string, type: string, optional?: boolean }> }>, requiredPicks?: Array<{ name: string, source: string, keys: string[] }> } }, style?: { from?: string, fileName?: string }, shared?: Array<{ kind?: string, from?: string, to?: string, generate?: string }>, files?: Record<string, Array<{ kind?: string, from?: string, to?: string, generate?: string }>> }} */ (component);
+  const entry =
+    /** @type {{ exportName?: string, api?: { typeExports?: string[], types?: { consts?: Array<{ name: string, values: string[] }>, aliasesFromConsts?: Array<{ name: string, constName: string }>, interfaces?: Array<{ name: string, props: Array<{ name: string, type: string, optional?: boolean }> }>, requiredPicks?: Array<{ name: string, source: string, keys: string[] }> } }, style?: { from?: string, fileName?: string }, shared?: Array<{ kind?: string, from?: string, to?: string, generate?: string }>, files?: Record<string, Array<{ kind?: string, from?: string, to?: string, generate?: string }>> }} */ (
+      component
+    );
   const apiTypes = entry.api?.types;
 
   if (!entry.exportName) {
@@ -289,11 +375,16 @@ async function assertComponentManifest(componentName, component, contracts) {
 
   assertUnique(entry.api.typeExports, `${componentName}.api.typeExports`);
 
-  const styleFrom = assertRegistryPath(entry.style?.from, `${componentName}.style.from`);
+  const styleFrom = assertRegistryPath(
+    entry.style?.from,
+    `${componentName}.style.from`,
+  );
   const componentSourceRoot = `packages/components/${componentName}/src/`;
 
   if (!styleFrom.startsWith(componentSourceRoot)) {
-    throw new Error(`${componentName}.style.from must live under ${componentSourceRoot}.`);
+    throw new Error(
+      `${componentName}.style.from must live under ${componentSourceRoot}.`,
+    );
   }
 
   if (!entry.style?.fileName?.endsWith(".css")) {
@@ -304,19 +395,28 @@ async function assertComponentManifest(componentName, component, contracts) {
   const generatedTypes = shared.filter((file) => file.generate === "types");
 
   if (entry.api.typeExports.length > 0 && generatedTypes.length !== 1) {
-    throw new Error(`${componentName} must have exactly one shared generated types file.`);
+    throw new Error(
+      `${componentName} must have exactly one shared generated types file.`,
+    );
   }
 
   if (generatedTypes.length > 0 && !apiTypes) {
-    throw new Error(`${componentName} generates types but is missing api.types metadata.`);
+    throw new Error(
+      `${componentName} generates types but is missing api.types metadata.`,
+    );
   }
 
   for (const file of shared) {
     if (file.from) {
-      const from = assertRegistryPath(file.from, `${componentName}.shared.${file.to}.from`);
+      const from = assertRegistryPath(
+        file.from,
+        `${componentName}.shared.${file.to}.from`,
+      );
 
       if (!from.startsWith(componentSourceRoot)) {
-        throw new Error(`${componentName}.shared.${file.to}.from must live under ${componentSourceRoot}.`);
+        throw new Error(
+          `${componentName}.shared.${file.to}.from must live under ${componentSourceRoot}.`,
+        );
       }
     }
   }
@@ -330,13 +430,20 @@ async function assertComponentManifest(componentName, component, contracts) {
 
     for (const file of files) {
       if (file.kind !== framework) {
-        throw new Error(`${componentName}.${framework}.${file.to} kind must be "${framework}".`);
+        throw new Error(
+          `${componentName}.${framework}.${file.to} kind must be "${framework}".`,
+        );
       }
 
-      const from = assertRegistryPath(file.from, `${componentName}.${framework}.${file.to}.from`);
+      const from = assertRegistryPath(
+        file.from,
+        `${componentName}.${framework}.${file.to}.from`,
+      );
 
       if (!from.startsWith(componentSourceRoot)) {
-        throw new Error(`${componentName}.${framework}.${file.to}.from must live under ${componentSourceRoot}.`);
+        throw new Error(
+          `${componentName}.${framework}.${file.to}.from must live under ${componentSourceRoot}.`,
+        );
       }
     }
   }
@@ -355,7 +462,10 @@ async function assertComponentManifest(componentName, component, contracts) {
     }
   }
 
-  const coreComponentPath = path.join(repoRoot, `packages/core/src/${componentName}.ts`);
+  const coreComponentPath = path.join(
+    repoRoot,
+    `packages/core/src/${componentName}.ts`,
+  );
 
   if (existsSync(coreComponentPath)) {
     const coreComponent = await readFile(coreComponentPath, "utf8");
@@ -367,6 +477,10 @@ async function assertComponentManifest(componentName, component, contracts) {
           `${componentName}.api.typeExports includes "${typeExport}" but packages/core/src/${componentName}.ts does not export it.`,
         );
       }
+    }
+
+    if (apiTypes) {
+      assertCoreInterfacesMatchMetadata(coreComponent, apiTypes, componentName);
     }
   }
 
@@ -395,7 +509,10 @@ async function assertComponentManifest(componentName, component, contracts) {
   const recipe = shared.find((file) => file.kind === "recipe" && file.from);
 
   if (recipe?.from && apiTypes) {
-    const recipeSource = await readFile(path.join(repoRoot, recipe.from), "utf8");
+    const recipeSource = await readFile(
+      path.join(repoRoot, recipe.from),
+      "utf8",
+    );
     const defaults = readRecipeDefaults(recipeSource);
 
     if (defaults) {

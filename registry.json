@@ -11,6 +11,7 @@
         "typeExports": [
           "ButtonAppearance",
           "ButtonBaseProps",
+          "ButtonDefaults",
           "ButtonIntent",
           "ButtonSize"
         ],

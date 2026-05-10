@@ -2,7 +2,7 @@
   "name": "@bambiui/components",
   "version": "0.0.1",
   "private": true,
-  "description": "Source-distributed BambiUI component implementations.",
+  "description": "Source-distributed bambiui component implementations.",
   "license": "MIT",
   "type": "module",
   "scripts": {

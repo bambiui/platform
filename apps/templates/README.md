@@ -1,6 +1,6 @@
-# BambiUI Templates
+# bambiui Templates
 
-These apps are local fixture projects for testing the BambiUI CLI against real framework projects.
+These apps are local fixture projects for testing the bambiui CLI against real framework projects.
 
 They are not part of the public product surface and are not distributed as starter templates yet. Keep them small, framework-specific, and useful for validating source-distributed component installs before adding or releasing components.
 
@@ -38,5 +38,5 @@ The templates use their own `package-lock.json` files, so the smoke script uses 
 ## Notes
 
 - Do not commit `node_modules`, `.next`, `.svelte-kit`, `dist`, or other generated output.
-- Generated BambiUI component files may be committed when they intentionally represent the current fixture state.
+- Generated bambiui component files may be committed when they intentionally represent the current fixture state.
 - These fixtures should stay boring: one page, one imported component, enough framework config to catch integration regressions.

@@ -8,7 +8,7 @@ starlight-tabs[data-sync-key="framework"] > .tablist-wrapper {
 .astro-4hqup6uv {
   background-color: var(--bambi-card);
 }
-/* ── Map Bambi tokens → Starlight design tokens ── */
+/* ── Map bambiui tokens → Starlight design tokens ── */
 
 /* Dark mode (Starlight default) */
 :root {

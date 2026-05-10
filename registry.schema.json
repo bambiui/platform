@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://bambi-ui.felekoglu.dev/registry.schema.json",
-  "title": "BambiUI Registry",
+  "$id": "https://bambiui.com/registry.schema.json",
+  "title": "bambiui registry",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "tokens", "components"],

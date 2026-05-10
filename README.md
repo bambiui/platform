@@ -1,8 +1,8 @@
-# BambiUI
+# bambiui
 
-A multi-framework UI component library CLI — React, Svelte, Vue, and Astro components copied into your app as source.
+A CLI-first, source-distributed UI toolkit for React, Svelte, Vue, and Astro.
 
-**[Documentation](https://bambi-ui.felekoglu.dev)** · **[Token Builder](https://bambi-ui.felekoglu.dev/builder)** · **[GitHub](https://github.com/bambiui/platform)**
+**[Documentation](https://bambiui.com)** · **[Token Builder](https://bambiui.com/builder)** · **[GitHub](https://github.com/bambiui/platform)**
 
 ## Workspace
 
@@ -47,13 +47,13 @@ npx bambiui add button --framework astro
 
 The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps the component CSS next to the component source and imports it automatically.
 
-By default the CLI fetches source from the hosted BambiUI registry. For local development or a preview registry, override the base:
+By default the CLI fetches source from the hosted bambiui registry. For local development or a preview registry, override the base:
 
 ```sh
-npx bambiui init --registry-url https://bambi-ui.felekoglu.dev
+npx bambiui init --registry-url https://bambiui.com
 ```
 
-The current site domain is `https://bambi-ui.felekoglu.dev`; production deploys expose `registry.json`, `registry.schema.json`, and registry source files at the site root.
+The current site domain is `https://bambiui.com`; production deploys expose `registry.json`, `registry.schema.json`, and registry source files at the site root.
 
 ### 3. Use the component
 

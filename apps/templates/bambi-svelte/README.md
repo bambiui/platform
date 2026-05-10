@@ -1,6 +1,6 @@
 # bambi-svelte
 
-BambiUI local SvelteKit fixture.
+bambiui local SvelteKit fixture.
 
 ## Creating a project
 

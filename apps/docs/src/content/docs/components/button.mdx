@@ -1,6 +1,6 @@
 ---
 title: Button
-description: Accessible, themeable button component with intent, appearance, size, and state layers.
+description: Add an accessible, themeable Button component to React, Svelte, Vue, or Astro with the bambiui CLI.
 ---
 
 import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
@@ -13,7 +13,9 @@ npx bambiui init
 npx bambiui add button
 ```
 
-Import the token file once from your global stylesheet:
+The CLI copies the Button source into your project. The installed files are self-contained and do not depend on a runtime bambiui component package.
+
+Import the token file once from your global stylesheet or app entry:
 
 ```css
 @import "./styles/bambi.css";
@@ -23,24 +25,34 @@ Then import the component:
 
 <Tabs syncKey="framework">
   <TabItem label="React">
-    ```tsx import {Button} from './components/ui/button'; ```
+    ```tsx
+    import { Button } from './components/ui/button';
+    ```
   </TabItem>
   <TabItem label="Svelte">
     ```svelte
-    <script>import {Button} from './components/ui/button';</script>
+    <script>
+      import { Button } from './components/ui/button';
+    </script>
     ```
   </TabItem>
   <TabItem label="Vue">
     ```vue
-    <script setup>import {Button} from './components/ui/button';</script>
+    <script setup>
+    import { Button } from './components/ui/button';
+    </script>
     ```
   </TabItem>
   <TabItem label="Astro">
-    ```astro --- import {Button} from './components/ui/button'; --- ```
+    ```astro
+    ---
+    import { Button } from './components/ui/button';
+    ---
+    ```
   </TabItem>
 </Tabs>
 
-## Intent And Appearance
+## Intent and Appearance
 
 <div class="demo-grid">
   <div class="demo-preview-card">
@@ -825,4 +837,4 @@ Pass `loading` to show a spinner and block interaction. The button keeps its ori
 | `disabled`   | `boolean`                                                        | `false`     | Disables the button                    |
 | `type`       | `'button' \| 'submit' \| 'reset'`                                | `'button'`  | HTML button type                       |
 
-All other HTML button attributes (`aria-*`, `style`, `class`) are forwarded to the underlying `<button>` element.
+All other HTML button attributes (`aria-*`, `style`, `class`) are forwarded to the underlying `<button>` element. React uses `className`; Svelte, Vue, and Astro use `class`.

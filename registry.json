@@ -1,5 +1,5 @@
 {
-  "$schema": "https://bambi-ui.felekoglu.dev/registry.schema.json",
+  "$schema": "https://bambiui.com/registry.schema.json",
   "version": 1,
   "tokens": {
     "css": "packages/tokens/src/tokens.css"

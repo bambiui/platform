@@ -1,0 +1,12 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#f7f7fb"/>
+  <rect x="64" y="64" width="1072" height="502" rx="32" fill="#ffffff" stroke="#e4e4ef"/>
+  <g transform="translate(112 132) scale(0.22)">
+    <path fill="#3d56f0" d="M224.5 681.5 L224.5 291.5 C224.5 236.5 231.5 199.5 254.5 192.5 C289.5 181.8 372.5 236.5 413.5 306.5 C443.5 302.5 477.5 300.5 512 300.5 C546.5 300.5 580.5 302.5 610.5 306.5 C651.5 236.5 734.5 181.8 769.5 192.5 C792.5 199.5 799.5 236.5 799.5 291.5 L799.5 681.5 C799.5 724.5 772.5 750.5 729.5 750.5 L294.5 750.5 C251.5 750.5 224.5 724.5 224.5 681.5 Z"/>
+    <path fill="#f7f7fb" fill-opacity="0.72" d="M468.5 300.5 C488.5 299.5 516.5 299.5 536.5 300.5 C537.5 354.5 537.5 409.5 545.5 459.5 C557.5 535.5 598.5 576.5 653.5 607.5 C704.5 636.5 741.5 661.5 766.5 688.5 C780.5 704.5 782.5 728.5 761.5 750.5 L280.5 750.5 C284.5 717.5 303.5 681.5 344.5 644.5 C395.5 598.5 438.5 562.5 453.5 501.5 C467.5 445.5 466.5 372.5 468.5 300.5 Z"/>
+    <circle fill="#3d56f0" cx="607.5" cy="636.5" r="31.5"/>
+  </g>
+  <text x="112" y="392" fill="#111827" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="96" font-weight="700">bambiui</text>
+  <text x="116" y="462" fill="#4b5563" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="34" font-weight="500">CLI-first UI components copied into your app as source.</text>
+  <text x="116" y="514" fill="#3d56f0" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="28" font-weight="600">React · Svelte · Vue · Astro</text>
+</svg>

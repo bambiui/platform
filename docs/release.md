@@ -1,6 +1,6 @@
 # Release Checklist
 
-Use this checklist when publishing a new BambiUI CLI or registry release.
+Use this checklist when publishing a new bambiui CLI or registry release.
 
 ## 1. Verify Locally
 
@@ -25,11 +25,11 @@ Deploy `apps/docs/dist` to Cloudflare Pages.
 After deploy, verify:
 
 ```sh
-curl -I https://bambi-ui.felekoglu.dev
-curl -I https://bambi-ui.felekoglu.dev/builder/
-curl -I https://bambi-ui.felekoglu.dev/registry.json
-curl -I https://bambi-ui.felekoglu.dev/registry.schema.json
-curl -I https://bambi-ui.felekoglu.dev/packages/tokens/src/tokens.css
+curl -I https://bambiui.com
+curl -I https://bambiui.com/builder/
+curl -I https://bambiui.com/registry.json
+curl -I https://bambiui.com/registry.schema.json
+curl -I https://bambiui.com/packages/tokens/src/tokens.css
 ```
 
 ## 3. Test Hosted Registry

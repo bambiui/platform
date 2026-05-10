@@ -1,0 +1,16 @@
+{
+  "name": "bambiui",
+  "short_name": "bambiui",
+  "description": "CLI-first, source-distributed UI components for React, Svelte, Vue, and Astro.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3d56f0",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    }
+  ]
+}

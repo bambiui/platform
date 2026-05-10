@@ -1,12 +1,12 @@
 ---
-title: Bambi UI
-description: Multi-framework UI component library — React, Svelte, Vue, and Astro — with a shared design token system.
+title: CLI-first UI components
+description: CLI-first UI components copied into your React, Svelte, Vue, or Astro app as editable source.
 template: splash
 hero:
-  title: Bambi UI
-  tagline: Accessible, themeable components for React, Svelte, Vue, and Astro — one design system, every framework.
+  title: bambiui
+  tagline: Source-distributed, themeable components for React, Svelte, Vue, and Astro.
   actions:
-    - text: Documents
+    - text: Button
       link: /components/button
       icon: right-arrow
       variant: primary
@@ -23,8 +23,8 @@ hero:
 import { CardGrid, Card } from '@astrojs/starlight/components';
 
 <CardGrid stagger>
-  <Card title="Multi-framework" icon="puzzle">
-    The same component API across React, Svelte, Vue, and Astro. Switch frameworks without relearning your design system.
+  <Card title="CLI-first" icon="terminal">
+    Install component source into your app with `npx bambiui add`. No runtime component package required.
   </Card>
   <Card title="Design tokens" icon="setting">
     All styles are CSS custom properties. Override any token in your own CSS — no config files, no rebuild required.

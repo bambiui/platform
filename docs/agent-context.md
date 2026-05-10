@@ -1,10 +1,10 @@
-# BambiUI — Detailed Agent Context
+# bambiui — Detailed Agent Context
 
 This is the long-form reference for Codex. Keep `AGENTS.md` short; read this file only when the current task needs deeper context.
 
 ## What This Repo Is
 
-BambiUI is a multi-framework UI component CLI built as a pnpm + Turborepo monorepo. The CLI copies React, Svelte, Vue, and Astro component source into user projects. Docs and builder consume the same package source through workspace dependencies.
+bambiui is a multi-framework UI component CLI built as a pnpm + Turborepo monorepo. The CLI copies React, Svelte, Vue, and Astro component source into user projects. Docs and builder consume the same package source through workspace dependencies.
 
 ## Monorepo Structure
 
@@ -24,7 +24,7 @@ packages/
 
 - Components are source files under `packages/components`, not per-framework packages.
 - User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
-- The default registry is the hosted static site at `https://bambi-ui.felekoglu.dev`; `--registry-url` and `BAMBIUI_REGISTRY_URL` can point to local or preview registries.
+- The default registry is the hosted static site at `https://bambiui.com`; `--registry-url` and `BAMBIUI_REGISTRY_URL` can point to local or preview registries.
 - The CLI package must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
 - Do not add per-component `package.json` files or build steps unless the project intentionally returns to package publishing.
 
@@ -53,7 +53,7 @@ packages/
 - Both apps use the `starlight-theme` localStorage key (`"light"` or `"dark"`) as the single source of truth for the active theme.
 - Docs: Starlight reads and writes this key natively.
 - Builder: reads on page load, writes on toggle, and listens to the `storage` event so tabs stay in sync.
-- Dark mode is activated by `data-theme="dark"` on `<html>` plus the `.dark` class to match both Starlight and Bambi token conventions.
+- Dark mode is activated by `data-theme="dark"` on `<html>` plus the `.dark` class to match both Starlight and bambiui token conventions.
 
 ## Button API Conventions
 
@@ -140,9 +140,9 @@ builder              -> source components and tokens
 ## Things To Watch Out For
 
 - Node version: use Node `>=22.12.0` across the repo.
-- Registry URL: CLI defaults to `https://bambi-ui.felekoglu.dev` and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or preview registries.
-- Installed source must stay self-contained: internal packages can share contracts, but files copied into user projects should not require BambiUI runtime packages.
-- Recipes in installed components: keep component-local recipes self-contained so users do not need extra BambiUI runtime packages.
+- Registry URL: CLI defaults to `https://bambiui.com` and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or preview registries.
+- Installed source must stay self-contained: internal packages can share contracts, but files copied into user projects should not require bambiui runtime packages.
+- Recipes in installed components: keep component-local recipes self-contained so users do not need extra bambiui runtime packages.
 - Component source has no build step: user-facing files are copied by the CLI.
 - Builder `base: '/builder'`: all internal asset paths in the builder are prefixed with `/builder`. Do not remove this or assets will 404 in production.
 - `starlight-theme` localStorage key: both apps share this key. Never rename it in the builder without updating Starlight's config in docs, and vice versa.

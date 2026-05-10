@@ -5,7 +5,7 @@ import { parseArgs } from "./utils/args.js";
 import { printResults } from "./utils/files.js";
 
 function help() {
-  return `BambiUI
+  return `bambiui
 
 Usage:
   bambiui init
@@ -14,7 +14,7 @@ Usage:
 Options:
   --framework react|svelte|vue|astro   Framework override
   --component-dir <path>               Component destination (default: src/components/ui)
-  --registry-url <url>                 Registry base URL (default: https://bambi-ui.felekoglu.dev)
+  --registry-url <url>                 Registry base URL (default: https://bambiui.com)
   --tokens-file <path>                 Global token CSS destination (default: src/styles/bambi.css)
   --style-file <path>                  Alias for --tokens-file
   --cwd <path>                         Target project (default: current directory)
@@ -34,7 +34,7 @@ async function main() {
   if (command === "init") {
     const results = await initProject(flags);
 
-    process.stdout.write("\nBambi UI is ready.\n");
+    process.stdout.write("\nbambiui is ready.\n");
     printResults(results);
     process.stdout.write(
       "\nImport the token file once in your global stylesheet or app entry.\n",

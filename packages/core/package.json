@@ -1,7 +1,7 @@
 {
   "name": "@bambiui/core",
   "version": "0.0.1",
-  "description": "Framework-agnostic contracts and utilities for BambiUI.",
+  "description": "Framework-agnostic contracts and utilities for bambiui.",
   "license": "MIT",
   "type": "module",
   "types": "./src/index.ts",

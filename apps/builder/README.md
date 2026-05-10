@@ -1,6 +1,6 @@
-# Bambi UI — Token Builder
+# bambiui — Token Builder
 
-An infinite-canvas design token editor for the Bambi UI design system. Inspect and live-edit every CSS custom property, generate a full color theme from a single primary hue, and switch between light and dark mode — all without a page reload.
+An infinite-canvas design token editor for the bambiui design system. Inspect and live-edit every CSS custom property, generate a full color theme from a single primary hue, and switch between light and dark mode — all without a page reload.
 
 Served at `/builder` under the same Cloudflare Pages project as the docs site.
 
@@ -15,7 +15,7 @@ Served at `/builder` under the same Cloudflare Pages project as the docs site.
 
 ## Navigation
 
-- The **Bambi** logo in the top-left links back to `/` (docs root)
+- The **bambiui** logo in the top-left links back to `/` (docs root)
 - The **light/dark switch** at the bottom of the left drawer persists to localStorage and stays in sync with the docs site
 
 ## Development

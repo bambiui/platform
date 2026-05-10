@@ -1,4 +1,4 @@
-# BambiUI CLI
+# bambiui CLI
 
 CLI-first, source-distributed UI components for React, Svelte, Vue, and Astro.
 
@@ -7,7 +7,7 @@ npx bambiui init
 npx bambiui add button
 ```
 
-BambiUI copies framework-specific component source files into your app. It does not require a runtime component package.
+bambiui copies framework-specific component source files into your app. It does not require a runtime component package.
 
 ## Commands
 
@@ -30,8 +30,8 @@ Options:
 
 ## Links
 
-- Documentation: https://bambi-ui.felekoglu.dev
-- Registry manifest: https://bambi-ui.felekoglu.dev/registry.json
+- Documentation: https://bambiui.com
+- Registry manifest: https://bambiui.com/registry.json
 - GitHub: https://github.com/bambiui/platform
 
 ## License

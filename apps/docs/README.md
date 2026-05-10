@@ -1,6 +1,6 @@
-# Bambi UI — Docs
+# bambiui — Docs
 
-The documentation site for Bambi UI, built with [Starlight](https://starlight.astro.build/) on Astro. It imports package source from `@bambiui/components` and tokens from `@bambiui/tokens`.
+The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. It imports package source from `@bambiui/components` and tokens from `@bambiui/tokens`.
 
 ## Running locally
 

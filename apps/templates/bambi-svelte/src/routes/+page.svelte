@@ -3,4 +3,4 @@
 </script>
 
 <Button intent="primary">Hello world</Button>
-<Button intent="secondary" appearance="link" onclick={() => window.open("https://bambi-ui.felekoglu.dev", "_blank")}>go to bambiui</Button>
+<Button intent="secondary" appearance="link" onclick={() => window.open("https://bambiui.com", "_blank")}>go to bambiui</Button>

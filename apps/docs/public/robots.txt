@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bambiui.com/sitemap-index.xml

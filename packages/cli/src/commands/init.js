@@ -56,7 +56,7 @@ async function promptForConfig(defaults, flags) {
   const { createInterface } = await import("node:readline/promises");
 
   process.stdout.write(
-    `${color("Bambi UI", "bold")} ${color("setup", "cyan")}\n`,
+    `${color("bambiui", "bold")} ${color("setup", "cyan")}\n`,
   );
   process.stdout.write(`${color("Detected defaults", "green")}\n\n`);
   process.stdout.write(

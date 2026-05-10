@@ -1,7 +1,7 @@
 {
   "name": "bambiui",
   "version": "0.0.8",
-  "description": "CLI for adding BambiUI component source files to your app.",
+  "description": "CLI for adding bambiui component source files to your app.",
   "keywords": [
     "bambiui",
     "ui",
@@ -14,7 +14,7 @@
     "astro",
     "source-distributed"
   ],
-  "homepage": "https://bambi-ui.felekoglu.dev",
+  "homepage": "https://bambiui.com",
   "bugs": {
     "url": "https://github.com/bambiui/platform/issues"
   },

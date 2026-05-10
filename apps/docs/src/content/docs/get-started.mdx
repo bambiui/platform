@@ -1,11 +1,11 @@
 ---
-title: Get Started
-description: Install BambiUI in your project using the CLI.
+title: Get started
+description: Install bambiui, initialize design tokens, and add source-distributed UI components to your app.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components";
 
-BambiUI is a source-first component library. The CLI copies component files and design tokens directly into your project — no runtime package, no version lock-in.
+bambiui is a CLI-first, source-distributed UI toolkit. The CLI copies framework-specific component files and design tokens directly into your project, so your app owns the source it runs.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ BambiUI is a source-first component library. The CLI copies component files and 
 
 ## 1. Initialize
 
-Run the scoped CLI package from your project root. It exposes the `bambiui` executable, auto-detects your framework, creates `bambiui.config.json`, and writes the global design token file.
+Run the CLI package from your project root. It exposes the `bambiui` executable, auto-detects your framework, creates `bambiui.config.json`, and writes the global design token file.
 
 ```sh
 npx bambiui init
@@ -93,7 +93,7 @@ Add the Button component to your project:
 npx bambiui add button
 ```
 
-The CLI installs the following files into your component directory (default: `src/components/ui/button/`):
+The CLI installs the following self-contained files into your component directory (default: `src/components/ui/button/`):
 
 | File                                                           | Purpose                                          |
 | -------------------------------------------------------------- | ------------------------------------------------ |
@@ -102,6 +102,8 @@ The CLI installs the following files into your component directory (default: `sr
 | `types.ts`                                                     | Shared TypeScript types                          |
 | `button.css`                                                   | Component-scoped CSS (imported by the component) |
 | `index.ts`                                                     | Re-exports `Button` and all types                |
+
+The installed files do not import `@bambiui/components`, `@bambiui/core`, or `@bambiui/tokens` at runtime.
 
 ## 4. Use the component
 
@@ -190,7 +192,7 @@ Options:
   --framework react|svelte|vue|astro   Override framework
   --component-dir <path>               Override component directory
   --tokens-file <path>                 Override token file path
-  --registry-url <url>                 Use a custom registry (default: https://bambi-ui.felekoglu.dev)
+  --registry-url <url>                 Use a custom registry (default: https://bambiui.com)
   --cwd <path>                         Run in a different directory
   --force                              Overwrite existing files
   --yes, -y                            Accept defaults without prompting
@@ -198,7 +200,7 @@ Options:
 
 ## Dark mode
 
-BambiUI uses the `.dark` class on `<html>` for dark mode. Toggle it based on user preference:
+bambiui uses the `.dark` class on `<html>` for dark mode. Toggle it based on user preference:
 
 ```js
 document.documentElement.classList.toggle("dark");

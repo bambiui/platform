@@ -1,6 +1,6 @@
 # bambi-vue
 
-BambiUI local Vue/Vite fixture.
+bambiui local Vue/Vite fixture.
 
 ## Recommended IDE Setup
 

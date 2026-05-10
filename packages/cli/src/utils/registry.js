@@ -4,7 +4,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { getExistingFileResult, writeProjectFile } from "./files.js";
 
 export const DEFAULT_REGISTRY_URL =
-  "https://bambi-ui.felekoglu.dev";
+  "https://bambiui.com";
 
 export const DEFAULT_MANIFEST_PATH = "registry.json";
 

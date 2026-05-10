@@ -508,7 +508,6 @@ h3 {
 
 /* ── Cards ───────────────────────────────────────── */
 .card {
-  position: absolute;
   padding: 1rem;
   border-radius: var(--bambi-radius-md);
   border: 1px solid var(--bambi-border);
@@ -517,7 +516,8 @@ h3 {
   flex-direction: column;
   align-items: start;
   background-color: var(--bambi-card);
-  min-width: 420px;
+  width: max-content;
+  min-width: 0;
 }
 
 .cardHeader {
@@ -675,6 +675,11 @@ h3 {
   position: absolute;
   top: 0;
   left: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--builder-card-columns, 2), max-content);
+  align-items: start;
+  gap: 1.5rem;
+  padding: 2.5rem;
   transform-origin: 0 0;
   will-change: transform;
 }

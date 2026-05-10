@@ -87,121 +87,115 @@ function fmt(L: number, C: number, H: number): string {
   return `oklch(${Math.round(L * 100)}% ${C.toFixed(3)} ${Math.round(H)})`;
 }
 
+const SCALE_STEPS = [
+  "50",
+  "100",
+  "200",
+  "300",
+  "400",
+  "500",
+  "600",
+  "700",
+  "800",
+  "900",
+  "950",
+];
+const NEUTRAL_SCALE = [
+  [0.97, 1],
+  [0.95, 0.8],
+  [0.9, 1],
+  [0.83, 1.2],
+  [0.68, 1.8],
+  [0.55, 2.1],
+  [0.45, 2],
+  [0.36, 1.8],
+  [0.28, 1.4],
+  [0.21, 1.2],
+  [0.09, 0],
+] as const;
+const PRIMARY_SCALE = [
+  [0.97, 0.08],
+  [0.94, 0.16],
+  [0.88, 0.33],
+  [0.78, 0.55],
+  [0.66, 0.82],
+  [0.55, 1],
+  [0.49, 1.05],
+  [0.42, 0.91],
+  [0.34, 0.73],
+  [0.27, 0.55],
+  [0.18, 0.36],
+] as const;
+const DANGER_SCALE = [
+  [0.97, 0.09],
+  [0.93, 0.19],
+  [0.86, 0.39],
+  [0.78, 0.64],
+  [0.71, 0.86],
+  [0.65, 1],
+  [0.58, 0.94],
+  [0.49, 0.82],
+  [0.4, 0.64],
+  [0.32, 0.47],
+  [0.22, 0.34],
+] as const;
+const SUCCESS_SCALE = [
+  [0.97, 0.13],
+  [0.93, 0.28],
+  [0.87, 0.49],
+  [0.8, 0.75],
+  [0.76, 0.88],
+  [0.73, 1],
+  [0.64, 0.93],
+  [0.54, 0.77],
+  [0.43, 0.62],
+  [0.33, 0.46],
+  [0.22, 0.31],
+] as const;
+const WARNING_SCALE = [
+  [0.98, 0.16],
+  [0.95, 0.35],
+  [0.9, 0.57],
+  [0.84, 0.79],
+  [0.81, 0.91],
+  [0.78, 1],
+  [0.69, 0.95],
+  [0.58, 0.82],
+  [0.46, 0.63],
+  [0.35, 0.47],
+  [0.24, 0.35],
+] as const;
+
+function addScale(
+  tokens: Record<string, string>,
+  name: string,
+  hue: number,
+  chroma: number,
+  profile: readonly (readonly [number, number])[],
+) {
+  profile.forEach(([lightness, chromaRatio], index) => {
+    tokens[`--bambi-${name}-${SCALE_STEPS[index]}`] = fmt(
+      lightness,
+      chroma * chromaRatio,
+      hue,
+    );
+  });
+}
+
 function generateColorTokens(hue: number, chroma: number, base: number) {
   const gc = 0.0015 + (base / 100) * (0.02 - 0.0015);
-  const lP = fmt(0.55, chroma, hue),
-    lPFg = bestFg(0.55, chroma, hue);
-  const dP = fmt(0.65, chroma, hue),
-    dPFg = bestFg(0.65, chroma, hue);
-  const dHL = blendHue(hue, 25.74),
-    dHD = blendHue(hue, 24.63);
+  const dHL = blendHue(hue, 25.74);
   const sH = blendHue(hue, 150.81),
-    wHL = blendHue(hue, 72.33),
-    wHD = blendHue(hue, 76.34);
-  const lDes = fmt(0.6532, 0.2328, dHL),
-    lDesFg = bestFg(0.6532, 0.2328, dHL);
-  const lSuc = fmt(0.7329, 0.1935, sH),
-    lSucFg = bestFg(0.7329, 0.1935, sH);
-  const lWar = fmt(0.7819, 0.1585, wHL),
-    lWarFg = bestFg(0.7819, 0.1585, wHL);
-  const dDes = fmt(0.594, 0.1967, dHD),
-    dDesFg = bestFg(0.594, 0.1967, dHD);
-  const dSuc = fmt(0.7329, 0.1935, sH),
-    dSucFg = bestFg(0.7329, 0.1935, sH);
-  const dWar = fmt(0.8203, 0.1388, wHD),
-    dWarFg = bestFg(0.8203, 0.1388, wHD);
+    wHL = blendHue(hue, 72.33);
+  const tokens: Record<string, string> = {};
 
-  const light: Record<string, string> = {
-    "--bambi-background": fmt(0.97, gc, hue),
-    "--bambi-foreground": "oklch(9% 0 0)",
-    "--bambi-card": fmt(1.0, gc * 0.5, hue),
-    "--bambi-card-foreground": "oklch(9% 0 0)",
-    "--bambi-popover": fmt(1.0, gc * 0.5, hue),
-    "--bambi-popover-foreground": "oklch(9% 0 0)",
-    "--bambi-primary": lP,
-    "--bambi-primary-foreground": lPFg,
-    "--bambi-secondary": fmt(0.9524, gc * 0.8, hue),
-    "--bambi-secondary-foreground": "oklch(9% 0 0)",
-    "--bambi-accent": fmt(0.9373, gc * 0.8, hue),
-    "--bambi-accent-foreground": "oklch(9% 0 0)",
-    "--bambi-muted": fmt(0.9373, gc * 0.8, hue),
-    "--bambi-muted-foreground": fmt(0.5517, Math.min(gc * 2, 0.03), hue),
-    "--bambi-danger": lDes,
-    "--bambi-danger-foreground": lDesFg,
-    "--bambi-success": lSuc,
-    "--bambi-success-foreground": lSucFg,
-    "--bambi-warning": lWar,
-    "--bambi-warning-foreground": lWarFg,
-    "--bambi-border": fmt(0.9, gc, hue),
-    "--bambi-input": fmt(0.9, gc, hue),
-    "--bambi-input-background": fmt(1.0, gc * 0.5, hue),
-    "--bambi-input-foreground": "oklch(9% 0 0)",
-    "--bambi-input-placeholder": fmt(0.5517, Math.min(gc * 2, 0.03), hue),
-    "--bambi-ring": lP,
-    "--bambi-separator": fmt(0.92, gc, hue),
-    "--bambi-intent-primary-bg": lP,
-    "--bambi-intent-primary-fg": lPFg,
-    "--bambi-intent-primary-hover-bg": fmt(0.49, chroma, hue),
-    "--bambi-state-focus-ring": lP,
-    "--bambi-intent-secondary-bg": fmt(0.9524, gc * 0.8, hue),
-    "--bambi-intent-secondary-fg": "oklch(9% 0 0)",
-    "--bambi-intent-secondary-hover-bg": fmt(0.9373, gc * 0.8, hue),
-    "--bambi-intent-danger-bg": lDes,
-    "--bambi-intent-danger-fg": lDesFg,
-    "--bambi-intent-danger-hover-bg": fmt(0.58, 0.22, dHL),
-    "--bambi-intent-success-bg": lSuc,
-    "--bambi-intent-success-fg": lSucFg,
-    "--bambi-intent-success-hover-bg": fmt(0.64, 0.18, sH),
-    "--bambi-intent-warning-bg": lWar,
-    "--bambi-intent-warning-fg": lWarFg,
-    "--bambi-intent-warning-hover-bg": fmt(0.69, 0.15, wHL),
-  };
-  const dark: Record<string, string> = {
-    "--bambi-background": fmt(0.12, gc, hue),
-    "--bambi-foreground": "oklch(98% 0 0)",
-    "--bambi-card": fmt(0.2103, gc * 2, hue),
-    "--bambi-card-foreground": "oklch(98% 0 0)",
-    "--bambi-popover": fmt(0.2103, gc * 2, hue),
-    "--bambi-popover-foreground": "oklch(98% 0 0)",
-    "--bambi-primary": dP,
-    "--bambi-primary-foreground": dPFg,
-    "--bambi-secondary": fmt(0.257, gc * 1.5, hue),
-    "--bambi-secondary-foreground": "oklch(98% 0 0)",
-    "--bambi-accent": fmt(0.2721, gc * 1.5, hue),
-    "--bambi-accent-foreground": "oklch(98% 0 0)",
-    "--bambi-muted": fmt(0.274, gc, hue),
-    "--bambi-muted-foreground": fmt(0.705, Math.min(gc * 2, 0.03), hue),
-    "--bambi-danger": dDes,
-    "--bambi-danger-foreground": dDesFg,
-    "--bambi-success": dSuc,
-    "--bambi-success-foreground": dSucFg,
-    "--bambi-warning": dWar,
-    "--bambi-warning-foreground": dWarFg,
-    "--bambi-border": fmt(0.28, gc, hue),
-    "--bambi-input": fmt(0.28, gc, hue),
-    "--bambi-input-background": fmt(0.2103, gc * 2, hue),
-    "--bambi-input-foreground": "oklch(98% 0 0)",
-    "--bambi-input-placeholder": fmt(0.705, Math.min(gc * 2, 0.03), hue),
-    "--bambi-ring": dP,
-    "--bambi-separator": fmt(0.25, gc, hue),
-    "--bambi-intent-primary-bg": dP,
-    "--bambi-intent-primary-fg": dPFg,
-    "--bambi-intent-primary-hover-bg": fmt(0.72, 0.2, hue),
-    "--bambi-state-focus-ring": dP,
-    "--bambi-intent-secondary-bg": fmt(0.257, gc * 1.5, hue),
-    "--bambi-intent-secondary-fg": "oklch(98% 0 0)",
-    "--bambi-intent-secondary-hover-bg": fmt(0.2721, gc * 1.5, hue),
-    "--bambi-intent-danger-bg": dDes,
-    "--bambi-intent-danger-fg": dDesFg,
-    "--bambi-intent-danger-hover-bg": fmt(0.67, 0.18, dHD),
-    "--bambi-intent-success-bg": dSuc,
-    "--bambi-intent-success-fg": dSucFg,
-    "--bambi-intent-success-hover-bg": fmt(0.8, 0.16, sH),
-    "--bambi-intent-warning-bg": dWar,
-    "--bambi-intent-warning-fg": dWarFg,
-    "--bambi-intent-warning-hover-bg": fmt(0.88, 0.12, wHD),
-  };
-  return { light, dark };
+  addScale(tokens, "neutral", hue, gc, NEUTRAL_SCALE);
+  addScale(tokens, "primary", hue, chroma, PRIMARY_SCALE);
+  addScale(tokens, "danger", dHL, 0.233, DANGER_SCALE);
+  addScale(tokens, "success", sH, 0.194, SUCCESS_SCALE);
+  addScale(tokens, "warning", wHL, 0.159, WARNING_SCALE);
+
+  return tokens;
 }
 
 // ── Canvas setup ─────────────────────────────────────
@@ -222,23 +216,31 @@ let isDragging = false,
 let isAnimating = false;
 let activeCard: string | null = null;
 
+function getBoardColumnCount() {
+  const cardCount = transform.querySelectorAll(".card").length;
+
+  if (cardCount <= 1) return 1;
+  if (cardCount <= 4) return 2;
+  return 3;
+}
+
+function syncBoardLayout() {
+  transform.style.setProperty(
+    "--builder-card-columns",
+    String(getBoardColumnCount()),
+  );
+}
+
 // ── Generate Theme state ─────────────────────────────
 let genHue = 271,
   genChroma = 0.22,
   genBase = 46;
-let genTokens: {
-  light: Record<string, string>;
-  dark: Record<string, string>;
-} | null = null;
+let genTokens: Record<string, string> | null = null;
 
 function applyGenTokens() {
   if (!genTokens) return;
   const root = document.documentElement;
-  const isDark =
-    root.getAttribute("data-theme") === "dark" ||
-    root.classList.contains("dark");
-  const active = isDark ? genTokens.dark : genTokens.light;
-  Object.entries(active).forEach(([k, v]) => root.style.setProperty(k, v));
+  Object.entries(genTokens).forEach(([k, v]) => root.style.setProperty(k, v));
 }
 
 function regenerate() {
@@ -252,8 +254,30 @@ const MIN_SCALE = 0.1,
 const DRAWER_LEFT_W = 220,
   DRAWER_RIGHT_W = 280;
 
-const CARD_TOKENS: Record<string, { label: string; tokens: string[] }[]> = {
+type TokenItem = string | { name: string; selector: string };
+
+const CARD_TOKENS: Record<string, { label: string; tokens: TokenItem[] }[]> = {
   colors: [
+    {
+      label: "Primary Scale",
+      tokens: SCALE_STEPS.map((step) => `--bambi-primary-${step}`),
+    },
+    {
+      label: "Neutral Scale",
+      tokens: SCALE_STEPS.map((step) => `--bambi-neutral-${step}`),
+    },
+    {
+      label: "Danger Scale",
+      tokens: SCALE_STEPS.map((step) => `--bambi-danger-${step}`),
+    },
+    {
+      label: "Success Scale",
+      tokens: SCALE_STEPS.map((step) => `--bambi-success-${step}`),
+    },
+    {
+      label: "Warning Scale",
+      tokens: SCALE_STEPS.map((step) => `--bambi-warning-${step}`),
+    },
     {
       label: "Base",
       tokens: [
@@ -340,52 +364,64 @@ const CARD_TOKENS: Record<string, { label: string; tokens: string[] }[]> = {
   ],
   buttons: [
     {
-      label: "Layout",
+      label: "Component Layout",
       tokens: [
-        "--bambi-button-gap",
-        "--bambi-button-border-width",
-        "--bambi-button-line-height",
+        { name: "--bambi-button-gap", selector: ".bambi-button" },
+        { name: "--bambi-button-border-width", selector: ".bambi-button" },
+        { name: "--bambi-button-line-height", selector: ".bambi-button" },
       ],
     },
     {
-      label: "Padding",
+      label: "Component Padding",
       tokens: [
-        "--bambi-button-padding-sm",
-        "--bambi-button-padding-md",
-        "--bambi-button-padding-lg",
-        "--bambi-button-padding-icon",
+        { name: "--bambi-button-padding-sm", selector: ".bambi-button" },
+        { name: "--bambi-button-padding-md", selector: ".bambi-button" },
+        { name: "--bambi-button-padding-lg", selector: ".bambi-button" },
+        { name: "--bambi-button-padding-icon", selector: ".bambi-button" },
       ],
     },
     {
-      label: "Typography",
+      label: "Component Typography",
       tokens: [
-        "--bambi-button-font-size-sm",
-        "--bambi-button-font-size-md",
-        "--bambi-button-font-size-lg",
-        "--bambi-button-font-weight",
+        { name: "--bambi-button-font-size-sm", selector: ".bambi-button" },
+        { name: "--bambi-button-font-size-md", selector: ".bambi-button" },
+        { name: "--bambi-button-font-size-lg", selector: ".bambi-button" },
+        { name: "--bambi-button-font-weight", selector: ".bambi-button" },
       ],
     },
     {
-      label: "Shape",
+      label: "Component Shape",
       tokens: [
-        "--bambi-button-radius",
+        { name: "--bambi-button-radius", selector: ".bambi-button" },
         "--bambi-state-hover-opacity",
-        "--bambi-button-disabled-opacity",
+        { name: "--bambi-button-disabled-opacity", selector: ".bambi-button" },
       ],
     },
     {
-      label: "Focus",
+      label: "Component Focus",
       tokens: [
-        "--bambi-button-focus-ring-width",
-        "--bambi-button-focus-ring-offset",
+        {
+          name: "--bambi-button-focus-ring-width",
+          selector: ".bambi-button",
+        },
+        {
+          name: "--bambi-button-focus-ring-offset",
+          selector: ".bambi-button",
+        },
         "--bambi-state-focus-ring",
       ],
     },
     {
-      label: "Spinner",
+      label: "Component Spinner",
       tokens: [
-        "--bambi-button-spinner-border-width",
-        "--bambi-button-spinner-duration",
+        {
+          name: "--bambi-button-spinner-border-width",
+          selector: ".bambi-button",
+        },
+        {
+          name: "--bambi-button-spinner-duration",
+          selector: ".bambi-button",
+        },
       ],
     },
     {
@@ -411,7 +447,13 @@ const CARD_TOKENS: Record<string, { label: string; tokens: string[] }[]> = {
     { label: "Outline", tokens: ["--bambi-primary", "--bambi-accent"] },
     {
       label: "Link",
-      tokens: ["--bambi-primary", "--bambi-button-link-underline-offset"],
+      tokens: [
+        "--bambi-primary",
+        {
+          name: "--bambi-button-link-underline-offset",
+          selector: ".bambi-button",
+        },
+      ],
     },
     {
       label: "Danger",
@@ -647,12 +689,62 @@ function buildGenPanel(): HTMLElement {
   return section;
 }
 
+const scopedOverrideEl = document.createElement("style");
+scopedOverrideEl.id = "bambi-builder-scoped-token-overrides";
+document.head.appendChild(scopedOverrideEl);
+
+const scopedOverrides = new Map<string, Map<string, string>>();
+
+function getTokenName(item: TokenItem): string {
+  return typeof item === "string" ? item : item.name;
+}
+
+function getTokenSelector(item: TokenItem): string | null {
+  return typeof item === "string" ? null : item.selector;
+}
+
+function getTokenTarget(item: TokenItem): Element {
+  const selector = getTokenSelector(item);
+
+  if (!selector) return document.documentElement;
+
+  return document.querySelector(selector) ?? document.documentElement;
+}
+
+function setScopedToken(selector: string, tokenName: string, value: string) {
+  const selectorOverrides = scopedOverrides.get(selector) ?? new Map();
+  selectorOverrides.set(tokenName, value);
+  scopedOverrides.set(selector, selectorOverrides);
+  syncScopedOverrides();
+}
+
+function removeScopedToken(selector: string, tokenName: string) {
+  const selectorOverrides = scopedOverrides.get(selector);
+
+  if (!selectorOverrides) return;
+
+  selectorOverrides.delete(tokenName);
+  if (selectorOverrides.size === 0) scopedOverrides.delete(selector);
+  syncScopedOverrides();
+}
+
+function syncScopedOverrides() {
+  scopedOverrideEl.textContent = [...scopedOverrides.entries()]
+    .map(([selector, tokens]) => {
+      const declarations = [...tokens.entries()]
+        .map(([name, value]) => `  ${name}: ${value};`)
+        .join("\n");
+
+      return `${selector} {\n${declarations}\n}`;
+    })
+    .join("\n\n");
+}
+
 function renderTokenList(cardId: string) {
   const groups = CARD_TOKENS[cardId];
   if (!groups) return;
   tokenListEl.innerHTML = "";
   if (cardId === "colors") tokenListEl.appendChild(buildGenPanel());
-  const rootStyle = getComputedStyle(document.documentElement);
 
   for (const group of groups) {
     const groupEl = document.createElement("div");
@@ -663,8 +755,12 @@ function renderTokenList(cardId: string) {
     labelEl.textContent = group.label;
     groupEl.appendChild(labelEl);
 
-    for (const tokenName of group.tokens) {
-      const rawValue = rootStyle.getPropertyValue(tokenName).trim();
+    for (const token of group.tokens) {
+      const tokenName = getTokenName(token);
+      const selector = getTokenSelector(token);
+      const target = getTokenTarget(token);
+      const targetStyle = getComputedStyle(target);
+      const rawValue = targetStyle.getPropertyValue(tokenName).trim();
       const varMatch = rawValue.match(/^var\((--[^)]+)\)$/);
       const isInherited = !!varMatch;
       const inheritedFrom = varMatch ? varMatch[1] : null;
@@ -691,7 +787,11 @@ function renderTokenList(cardId: string) {
       input.value = rawValue;
       input.disabled = isInherited;
       input.addEventListener("input", () => {
-        document.documentElement.style.setProperty(tokenName, input.value);
+        if (selector) {
+          setScopedToken(selector, tokenName, input.value);
+        } else {
+          document.documentElement.style.setProperty(tokenName, input.value);
+        }
       });
 
       wrap.appendChild(input);
@@ -707,16 +807,24 @@ function renderTokenList(cardId: string) {
         btn.addEventListener("click", () => {
           overriding = !overriding;
           if (overriding) {
-            const resolved = rootStyle.getPropertyValue(inheritedFrom).trim();
+            const resolved = targetStyle.getPropertyValue(inheritedFrom).trim();
             input.value = resolved || rawValue;
             input.disabled = false;
-            document.documentElement.style.setProperty(tokenName, input.value);
+            if (selector) {
+              setScopedToken(selector, tokenName, input.value);
+            } else {
+              document.documentElement.style.setProperty(tokenName, input.value);
+            }
             btn.textContent = "Reset";
             btn.classList.add("active");
             row.classList.remove("inherited");
             input.focus();
           } else {
-            document.documentElement.style.removeProperty(tokenName);
+            if (selector) {
+              removeScopedToken(selector, tokenName);
+            } else {
+              document.documentElement.style.removeProperty(tokenName);
+            }
             input.disabled = true;
             input.value = rawValue;
             btn.textContent = "Override";
@@ -840,6 +948,14 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
+window.addEventListener("resize", () => {
+  syncBoardLayout();
+
+  if (activeCard) {
+    flyToCard(activeCard, false, drawerRight.classList.contains("open"));
+  }
+});
+
 canvas.addEventListener(
   "wheel",
   (e) => {
@@ -904,4 +1020,5 @@ window.addEventListener("storage", (e) => {
   applyGenTokens();
 });
 
+syncBoardLayout();
 flyToCard("colors", false);

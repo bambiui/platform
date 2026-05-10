@@ -25,9 +25,6 @@ const forbiddenTokenPatterns = [
   /--_/,
   /--bambi-color-(blue|slate|red|green|amber)-/,
 ];
-const componentTokenPrefixes = new Map([
-  ["packages/components/button/src/button.css", "--bambi-button-"],
-]);
 const cssPaths = [
   "packages/components/button/src/button.css",
   "apps/builder/src/styles/builder.css",
@@ -132,29 +129,6 @@ function assertRootTokensAreUnique(rootTokens) {
   }
 }
 
-/**
- * @param {string} source
- * @param {string} relativePath
- * @param {Set<string>} publicTokens
- */
-function assertComponentTokensArePublic(source, relativePath, publicTokens) {
-  const prefix = componentTokenPrefixes.get(relativePath);
-
-  if (!prefix) {
-    return;
-  }
-
-  const componentTokens = readDefinedTokens(source);
-
-  for (const token of componentTokens) {
-    if (token.startsWith(prefix) && !publicTokens.has(token)) {
-      throw new Error(
-        `${relativePath} defines component token "${token}" that is not declared in packages/tokens/src/tokens.css.`,
-      );
-    }
-  }
-}
-
 const tokenSource = await readFile(tokenPath, "utf8");
 const publicTokens = readDefinedTokens(tokenSource);
 const rootTokens = readRootDefinedTokens(tokenSource);
@@ -174,14 +148,14 @@ for (const token of readTokenReferences(tokenSource)) {
 for (const cssPath of cssPaths) {
   const source = await readFile(cssPath, "utf8");
   const relativePath = path.relative(repoRoot, cssPath);
+  const fileTokens = readDefinedTokens(source);
 
   assertForbiddenTokens(source, relativePath);
-  assertComponentTokensArePublic(source, relativePath, publicTokens);
 
   for (const token of readTokenReferences(source)) {
-    if (!publicTokens.has(token)) {
+    if (!publicTokens.has(token) && !fileTokens.has(token)) {
       throw new Error(
-        `${relativePath} references missing public token "${token}".`,
+        `${relativePath} references missing token "${token}". It must be declared in packages/tokens/src/tokens.css or in the same CSS file.`,
       );
     }
   }

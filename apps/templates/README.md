@@ -27,6 +27,8 @@ node packages/cli/src/index.js add button --framework <framework> --cwd <templat
 
 Then it verifies the expected generated files and runs the template's framework check.
 
+The generated fixtures intentionally include both global token CSS (`src/styles/bambi.css`) and component-local CSS (`src/components/ui/button/button.css`). Global tokens should stay synced with `packages/tokens/src/tokens.css`; button CSS should stay synced with `packages/components/button/src/button.css`.
+
 If a template has no installed dependencies yet, install them explicitly:
 
 ```sh

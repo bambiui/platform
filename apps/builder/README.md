@@ -1,14 +1,14 @@
 # bambiui — Token Builder
 
-An infinite-canvas design token editor for the bambiui design system. Inspect and live-edit every CSS custom property, generate a full color theme from a single primary hue, and switch between light and dark mode — all without a page reload.
+A grid-based design token editor for the bambiui design system. Inspect and live-edit global CSS custom properties, edit component-local token defaults, generate OKLCH color scales from a primary hue, and switch between light and dark mode — all without a page reload.
 
 Served at `/builder` under the same Cloudflare Pages project as the docs site.
 
 ## Features
 
-- **Infinite canvas** — pan and zoom freely across all token groups; selecting a card resets zoom to 1× and flies to the card's top
-- **Live editing** — changes are applied instantly as CSS custom properties on `document.documentElement`
-- **Generate Theme** — pick a primary color (hue + chroma) and a base lightness; all semantic color tokens are derived automatically using OKLCH
+- **Grid board** — cards flow into 1, 2, or 3 columns based on card count, while pan/zoom navigation still works
+- **Live editing** — global token changes are applied instantly on `document.documentElement`; component-local tokens are applied through scoped runtime overrides
+- **Generate Theme** — pick a primary color (hue + chroma) and a base lightness; neutral, primary, danger, success, and warning scales are generated with OKLCH
 - **Inherited token override** — tokens that reference another token (e.g. `var(--bambi-ring)`) appear disabled; click **Override** to edit directly, or **Reset** to restore the reference
 - **Shared theme state** — reads and writes the `starlight-theme` localStorage key, the same key used by the docs site; switching themes in one tab updates the other
 - **Token groups**: Color Tokens · Typography Tokens · Button Tokens
@@ -74,13 +74,13 @@ apps/builder/
 └── package.json
 ```
 
-The page entry imports tokens from `@bambiui/tokens/tokens.css` and button source from `@bambiui/components`. Canvas interactions live in `src/scripts/builder.ts`.
+The page entry imports global tokens from `@bambiui/tokens/tokens.css` and button source from `@bambiui/components`. Board layout, pan/zoom, token editing, scoped component overrides, and OKLCH color scale generation live in `src/scripts/builder.ts`.
 
 ## Token sources
 
-| Group              | CSS file                                    |
-| ------------------ | ------------------------------------------- |
-| Color + Typography | `packages/tokens/src/tokens.css`            |
-| Button             | `packages/components/button/src/button.css` |
+| Group                 | CSS file                                    |
+| --------------------- | ------------------------------------------- |
+| Global tokens         | `packages/tokens/src/tokens.css`            |
+| Button-local defaults | `packages/components/button/src/button.css` |
 
-Token values are read at runtime via `getComputedStyle(document.documentElement)` and overrides are written back with `document.documentElement.style.setProperty` / `removeProperty`.
+Global token values are read from `document.documentElement` and written back with `document.documentElement.style.setProperty` / `removeProperty`. Component-local token values are read from the relevant component selector and written as scoped runtime CSS overrides.

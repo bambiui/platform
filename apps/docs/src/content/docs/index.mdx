@@ -27,10 +27,10 @@ import { CardGrid, Card } from '@astrojs/starlight/components';
     Install component source into your app with `npx bambiui add`. No runtime component package required.
   </Card>
   <Card title="Design tokens" icon="setting">
-    All styles are CSS custom properties. Override any token in your own CSS — no config files, no rebuild required.
+    Global tokens define the theme; component-local tokens live beside component CSS. Override either in your own CSS — no rebuild required.
   </Card>
   <Card title="Token Builder" icon="laptop">
-    Inspect and live-edit every token on an infinite canvas. Generate a full color palette from a single primary hue using OKLCH.
+    Inspect and live-edit global and component-local tokens on a grid board. Generate full OKLCH color scales from a single primary hue.
   </Card>
   <Card title="Accessible by default" icon="approve-check-circle">
     WCAG-compliant ARIA attributes, visible focus rings, and correct `type` defaults out of the box.

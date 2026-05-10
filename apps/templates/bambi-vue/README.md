@@ -1,42 +1,22 @@
-# bambi-vue
+# bambi-vue fixture
 
-bambiui local Vue/Vite fixture.
+Vue/Vite fixture used by the bambiui CLI smoke tests.
 
-## Recommended IDE Setup
+This project intentionally contains generated bambiui files so the CLI can be tested against a real Vue app:
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- `src/styles/bambi.css` mirrors `packages/tokens/src/tokens.css`.
+- `src/components/ui/button/button.css` mirrors `packages/components/button/src/button.css`.
+- `src/components/ui/button/index.ts` should re-export `Button`, recipe helpers, defaults, and public types.
 
-## Recommended Browser Setup
+Run from the monorepo root:
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+```sh
+pnpm smoke:templates
+```
 
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+Or run the fixture directly:
 
 ```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
 ```

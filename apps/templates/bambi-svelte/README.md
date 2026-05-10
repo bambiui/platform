@@ -1,42 +1,22 @@
-# bambi-svelte
+# bambi-svelte fixture
 
-bambiui local SvelteKit fixture.
+SvelteKit fixture used by the bambiui CLI smoke tests.
 
-## Creating a project
+This project intentionally contains generated bambiui files so the CLI can be tested against a real Svelte app:
 
-If you're seeing this, you've probably already done this step. Congrats!
+- `src/styles/bambi.css` mirrors `packages/tokens/src/tokens.css`.
+- `src/components/ui/button/button.css` mirrors `packages/components/button/src/button.css`.
+- `src/components/ui/button/index.ts` should re-export `Button`, recipe helpers, defaults, and public types.
+
+Run from the monorepo root:
 
 ```sh
-# create a new project
-npx sv create my-app
+pnpm smoke:templates
 ```
 
-To recreate this project with the same configuration:
+Or run the fixture directly:
 
 ```sh
-# recreate this project
-pnpm dlx sv@0.15.3 create --template minimal --types ts --install pnpm bambi-svelte
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

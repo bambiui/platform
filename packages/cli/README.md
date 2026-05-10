@@ -9,6 +9,8 @@ npx bambiui add button
 
 bambiui copies framework-specific component source files into your app. It does not require a runtime component package.
 
+`init` writes global tokens to `src/styles/bambi.css` by default. `add button` writes source, recipe, types, component CSS, and an `index.ts` barrel that re-exports the component, recipe helpers, defaults, and public types.
+
 ## Commands
 
 ```sh

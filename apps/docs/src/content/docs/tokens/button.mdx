@@ -3,20 +3,28 @@ title: Button Tokens
 description: Customize Button styling with bambiui CSS custom properties for size, radius, states, intents, and appearances.
 ---
 
-Button tokens are defined in `bambi.css` (installed by the CLI) and consumed by `button.css` (installed alongside the component). Component tokens are namespaced `--bambi-button-*`; intent and state tokens are shared across components.
+Button tokens are public component-local CSS custom properties defined on `.bambi-button` in `button.css` (installed alongside the component). Global intent and state tokens still come from `bambi.css` and are shared across components.
 
-Override them in `:root` (global) or on a selector (scoped):
+Because `--bambi-button-*` defaults are declared on `.bambi-button`, override them on `.bambi-button`, a more specific button selector, or inline style. Override shared intent/state tokens in `:root` when you want multiple components to inherit the same theme behavior.
 
 ```css
-/* global override */
-:root {
+/* all buttons */
+.bambi-button {
   --bambi-button-radius: 9999px;
+}
+
+/* shared state token */
+:root {
   --bambi-state-hover-opacity: 0.85;
 }
 
 /* scoped to a container */
-.my-card {
+.my-card .bambi-button {
   --bambi-button-radius: 0;
+}
+
+/* shared intent token scoped to a container */
+.my-card {
   --bambi-intent-primary-bg: oklch(55% 0.2 160);
 }
 ```
@@ -69,8 +77,9 @@ All button sizes share `--bambi-button-radius`. The loading spinner uses `--bamb
 | `--bambi-button-focus-ring-width` | `var(--bambi-state-focus-ring-width)` | `2px` |
 | `--bambi-button-focus-ring-offset` | `var(--bambi-state-focus-ring-offset)` | `2px` |
 | `--bambi-button-ring` | `var(--bambi-state-focus-ring)` | `oklch(55% 0.220 271)` ¹ |
+| `--bambi-button-outline-color` | `var(--bambi-intent-primary-hover-bg)` | `oklch(49% 0.230 271)` |
 
-¹ Resolves to `oklch(65% 0.220 271)` in dark mode.
+¹ Resolves through `--bambi-primary`, which maps to `--bambi-primary-400` in dark mode.
 
 ---
 
@@ -106,8 +115,9 @@ Color tokens resolve from the global theme and change between light and dark mod
 
 | Token | Default | Light value |
 |---|---|---|
-| `--bambi-primary` | `var(--bambi-primary)` | `oklch(55% 0.220 271)` |
-| `--bambi-accent` | `var(--bambi-accent)` | `oklch(94% 0.008 271)` |
+| `--bambi-button-outline-color` | `var(--bambi-intent-primary-hover-bg)` | `oklch(49% 0.230 271)` |
+| `--bambi-button-hover-bg` | `color-mix(in oklch, var(--bambi-button-outline-color) 10%, transparent)` | — |
+| `--bambi-button-hover-fg` | `var(--bambi-button-outline-color)` | `oklch(49% 0.230 271)` |
 
 ### Ghost
 
@@ -152,7 +162,7 @@ Color tokens resolve from the global theme and change between light and dark mod
 ### Pill buttons globally
 
 ```css
-:root {
+.bambi-button {
   --bambi-button-radius: 9999px;
 }
 ```
@@ -169,7 +179,7 @@ Color tokens resolve from the global theme and change between light and dark mod
 ### Slower hover transition
 
 ```css
-:root {
+.bambi-button {
   --bambi-button-transition: opacity 0.3s ease, background-color 0.3s ease;
 }
 ```
@@ -177,7 +187,7 @@ Color tokens resolve from the global theme and change between light and dark mod
 ### Compact padding
 
 ```css
-:root {
+.bambi-button {
   --bambi-button-padding-md: 0.375rem 0.75rem;
   --bambi-button-padding-lg: 0.5rem 1rem;
 }

@@ -1,6 +1,6 @@
 # bambiui — Docs
 
-The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. It imports package source from `@bambiui/components` and tokens from `@bambiui/tokens`.
+The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. Starlight provides the docs shell, routing, sidebar, and search; page previews should dogfood bambiui source components from `@bambiui/components` and global tokens from `@bambiui/tokens`.
 
 ## Running locally
 
@@ -54,6 +54,7 @@ apps/docs/
 - **Package source**: Docs should consume components from `@bambiui/components`, not local generated copies.
 - **CSS imports**: `global.css` imports `@bambiui/tokens/tokens.css`; component CSS is imported by the component source.
 - **Framework examples**: Use `<Tabs syncKey="framework">` to keep examples in sync.
+- **Dogfooding**: Prefer bambiui components for previews and interactive docs UI. Keep Starlight for docs infrastructure, but avoid letting Starlight component styling become the product surface.
 
 ## Preview classes
 

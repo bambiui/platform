@@ -11,11 +11,11 @@ bambiui is a multi-framework UI component CLI built as a pnpm + Turborepo monore
 ```txt
 apps/
   docs/                    # Starlight (Astro) documentation site
-  builder/                 # Infinite-canvas design token editor (static Astro, served at /builder)
+  builder/                 # Grid-based design token editor (static Astro, served at /builder)
 packages/
   cli/                     # bambiui CLI — init + add source components
   core/                    # @bambiui/core — shared contracts and framework-agnostic types
-  tokens/                  # @bambiui/tokens — primitive, semantic, intent, state, component tokens
+  tokens/                  # @bambiui/tokens — global primitive, semantic, intent, and state tokens
   components/              # @bambiui/components — source components + CSS
     button/
 ```
@@ -38,15 +38,16 @@ packages/
 
 - All button CSS lives in `packages/components/button/src/button.css`; it is the single source consumed by all frameworks.
 - Public user projects receive global tokens from `packages/tokens/src/tokens.css` and component CSS from `packages/components/<name>/src/<name>.css`.
+- Component-specific token defaults live in component CSS, not in global `tokens.css`. For example, `--bambi-button-*` defaults are scoped on `.bambi-button` inside `packages/components/button/src/button.css`.
 - In the docs site, app-level CSS is loaded via Starlight's `customCss` array in `astro.config.mjs`; token CSS is imported from `@bambiui/tokens/tokens.css` inside `src/styles/global.css`.
 - The builder imports `@bambiui/tokens/tokens.css` from its page entry and imports component source from `@bambiui/components`.
 
 ## Design Tokens
 
 - Global design tokens are CSS custom properties in `packages/tokens/src/tokens.css`.
-- Colors use OKLCH. Light defaults live in `:root`, dark overrides in `.dark`.
-- Button tokens are namespaced `--bambi-button-*`. Theme tokens are `--bambi-*`.
-- Token layering is primitive -> semantic -> intent/state -> component.
+- Colors use OKLCH scale tokens (`--bambi-primary-50` through `--bambi-primary-950`, plus neutral/danger/success/warning scales). Light semantic defaults live in `:root`, dark semantic overrides live in `[data-theme="dark"], .dark`.
+- Global token layering is primitive scale -> semantic -> intent/state.
+- Component token layering happens in component CSS. Public component tokens are still namespaced, for example `--bambi-button-*`, but their defaults are component-local.
 
 ## Theme Management
 
@@ -111,10 +112,11 @@ pnpm check
 
 ## Builder App (`apps/builder`)
 
-- A single-page infinite-canvas token editor.
+- A single-page grid-based token editor with pan/zoom navigation.
 - `base: '/builder'` is set in `astro.config.mjs` so all assets resolve correctly when served under the `/builder` subpath.
 - The logo in the left drawer links back to `/` (docs root).
-- Color token generation uses OKLCH math ported from the old theme builder.
+- Color token generation uses OKLCH math to generate scale tokens for neutral, primary, danger, success, and warning. Semantic and intent tokens stay linked to those scales.
+- Global token edits apply to `document.documentElement`. Component-local token edits, such as button tokens, are written as scoped runtime overrides for `.bambi-button`.
 
 ## Deployment (Cloudflare Pages)
 

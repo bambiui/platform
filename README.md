@@ -10,7 +10,7 @@ A CLI-first, source-distributed UI toolkit for React, Svelte, Vue, and Astro.
 | -------------------------------------------- | --------------------------------------------------------------- |
 | [`packages/cli`](packages/cli)               | `bambiui` CLI that adds component source files to user projects |
 | [`packages/core`](packages/core)             | Shared contracts and framework-agnostic types                   |
-| [`packages/tokens`](packages/tokens)         | Primitive, semantic, intent, state, and component tokens        |
+| [`packages/tokens`](packages/tokens)         | Global primitive, semantic, intent, and state design tokens     |
 | [`packages/components`](packages/components) | Source components for React, Svelte, Vue, and Astro             |
 
 ## Apps
@@ -18,7 +18,7 @@ A CLI-first, source-distributed UI toolkit for React, Svelte, Vue, and Astro.
 | App                            | Description                                               |
 | ------------------------------ | --------------------------------------------------------- |
 | [`apps/docs`](apps/docs)       | Starlight documentation site                              |
-| [`apps/builder`](apps/builder) | Infinite-canvas design token editor, served at `/builder` |
+| [`apps/builder`](apps/builder) | Grid-based design token editor, served at `/builder`      |
 
 ## Getting started
 
@@ -45,7 +45,7 @@ npx bambiui add button --framework vue
 npx bambiui add button --framework astro
 ```
 
-The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps the component CSS next to the component source and imports it automatically.
+The command creates the component under `src/components/ui/button/`. `init` creates global tokens at `src/styles/bambi.css`; `add button` keeps component CSS and component-local token defaults next to the component source and imports it automatically.
 
 By default the CLI fetches source from the hosted bambiui registry. For local development or a preview registry, override the base:
 

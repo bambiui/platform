@@ -1,7 +1,7 @@
 {
   "name": "@bambiui/tokens",
   "version": "0.0.1",
-  "description": "Primitive, semantic, intent, state, and component CSS tokens for bambiui.",
+  "description": "Global primitive, semantic, intent, and state CSS tokens for bambiui.",
   "license": "MIT",
   "type": "module",
   "exports": {

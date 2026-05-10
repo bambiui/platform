@@ -100,8 +100,8 @@ The CLI installs the following self-contained files into your component director
 | `Button.astro` / `button.tsx` / `Button.svelte` / `Button.vue` | Component source                                 |
 | `recipe.ts`                                                    | Style recipe — maps props to CSS data attributes |
 | `types.ts`                                                     | Shared TypeScript types                          |
-| `button.css`                                                   | Component-scoped CSS (imported by the component) |
-| `index.ts`                                                     | Re-exports `Button` and all types                |
+| `button.css`                                                   | Component CSS and component-local token defaults |
+| `index.ts`                                                     | Re-exports `Button`, recipe helpers, defaults, and types |
 
 The installed files do not import `@bambiui/components`, `@bambiui/core`, or `@bambiui/tokens` at runtime.
 
@@ -200,10 +200,11 @@ Options:
 
 ## Dark mode
 
-bambiui uses the `.dark` class on `<html>` for dark mode. Toggle it based on user preference:
+bambiui supports both `[data-theme='dark']` and the `.dark` class on `<html>` for dark mode. Toggle both when you want the same behavior as the docs and builder:
 
 ```js
-document.documentElement.classList.toggle("dark");
+document.documentElement.setAttribute("data-theme", "dark");
+document.documentElement.classList.add("dark");
 ```
 
-Tokens for both modes are included in `bambi.css`. Light values are in `:root`, dark overrides in `[data-theme='dark'], .dark`.
+Tokens for both modes are included in `bambi.css`. Light semantic values are in `:root`, dark semantic overrides are in `[data-theme='dark'], .dark`. Color scales such as `--bambi-primary-50` through `--bambi-primary-950` stay global; dark mode changes semantic aliases like `--bambi-primary`, not the scale itself.

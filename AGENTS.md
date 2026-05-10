@@ -21,8 +21,9 @@ packages/components/button
 - `packages/cli` must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
 - Installed component source must stay self-contained for user projects.
 - Shared component-agnostic contracts live in `packages/core/src/contracts.ts`; component-specific contracts derive from them.
-- Global tokens live in `packages/tokens/src/tokens.css`; component CSS lives beside each component, for example `packages/components/button/src/button.css`.
+- Global primitive, semantic, intent, and state tokens live in `packages/tokens/src/tokens.css`. Component-specific token defaults live beside each component in component CSS, for example `packages/components/button/src/button.css`.
 - Button CSS is shared by all frameworks and uses `data-intent`, `data-appearance`, `data-size`, and loading/disabled attributes.
+- Do not put component-specific tokens such as `--bambi-button-*` in global `tokens.css`; keep them component-local and public for scoped user overrides.
 - Docs and builder share the `starlight-theme` localStorage key. Dark mode uses both `data-theme="dark"` on `<html>` and the `.dark` class.
 - Builder must keep `base: '/builder'` so production assets work under `/builder`.
 

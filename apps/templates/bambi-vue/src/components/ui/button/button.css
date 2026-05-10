@@ -20,6 +20,7 @@
   --bambi-button-border: transparent;
   --bambi-button-hover-bg: var(--bambi-intent-primary-hover-bg);
   --bambi-button-hover-fg: var(--bambi-button-fg);
+  --bambi-button-outline-color: var(--bambi-intent-primary-hover-bg);
   --bambi-button-disabled-opacity: var(--bambi-state-disabled-opacity);
   --bambi-button-focus-ring-width: var(--bambi-state-focus-ring-width);
   --bambi-button-focus-ring-offset: var(--bambi-state-focus-ring-offset);
@@ -72,32 +73,40 @@
   --bambi-button-fg: var(--bambi-intent-secondary-fg);
   --bambi-button-border: var(--bambi-border);
   --bambi-button-hover-bg: var(--bambi-intent-secondary-hover-bg);
+  --bambi-button-outline-color: var(--bambi-intent-secondary-hover-bg);
 }
 
 .bambi-button[data-intent="danger"] {
   --bambi-button-bg: var(--bambi-intent-danger-bg);
   --bambi-button-fg: var(--bambi-intent-danger-fg);
   --bambi-button-hover-bg: var(--bambi-intent-danger-hover-bg);
+  --bambi-button-outline-color: var(--bambi-intent-danger-hover-bg);
 }
 
 .bambi-button[data-intent="success"] {
   --bambi-button-bg: var(--bambi-intent-success-bg);
   --bambi-button-fg: var(--bambi-intent-success-fg);
   --bambi-button-hover-bg: var(--bambi-intent-success-hover-bg);
+  --bambi-button-outline-color: var(--bambi-intent-success-hover-bg);
 }
 
 .bambi-button[data-intent="warning"] {
   --bambi-button-bg: var(--bambi-intent-warning-bg);
   --bambi-button-fg: var(--bambi-intent-warning-fg);
   --bambi-button-hover-bg: var(--bambi-intent-warning-hover-bg);
+  --bambi-button-outline-color: var(--bambi-intent-warning-hover-bg);
 }
 
 .bambi-button[data-appearance="outline"] {
   --bambi-button-bg: transparent;
-  --bambi-button-fg: var(--bambi-button-hover-bg);
-  --bambi-button-border: var(--bambi-button-hover-bg);
-  --bambi-button-hover-bg: color-mix(in oklch, currentColor 10%, transparent);
-  --bambi-button-hover-fg: var(--bambi-button-fg);
+  --bambi-button-fg: var(--bambi-button-outline-color);
+  --bambi-button-border: var(--bambi-button-outline-color);
+  --bambi-button-hover-bg: color-mix(
+    in oklch,
+    var(--bambi-button-outline-color) 10%,
+    transparent
+  );
+  --bambi-button-hover-fg: var(--bambi-button-outline-color);
 }
 
 .bambi-button[data-appearance="ghost"] {

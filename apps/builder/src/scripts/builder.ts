@@ -444,7 +444,17 @@ const CARD_TOKENS: Record<string, { label: string; tokens: TokenItem[] }[]> = {
         "--bambi-accent-foreground",
       ],
     },
-    { label: "Outline", tokens: ["--bambi-primary", "--bambi-accent"] },
+    {
+      label: "Outline",
+      tokens: [
+        {
+          name: "--bambi-button-outline-color",
+          selector: ".bambi-button",
+        },
+        "--bambi-primary",
+        "--bambi-accent",
+      ],
+    },
     {
       label: "Link",
       tokens: [

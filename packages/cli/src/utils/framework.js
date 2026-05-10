@@ -134,7 +134,19 @@ export function getIndexContent(framework, exportName, fileNames, typeExports) {
     ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
     : "";
 
-  return `export { default as ${exportName} } from "${moduleSpecifier(fileNames[framework])}";\n${typeLine}`;
+  return `export { default as ${exportName} } from "${componentSpecifier(framework, fileNames[framework])}";\n${typeLine}`;
+}
+
+/**
+ * @param {string} framework
+ * @param {string} fileName
+ */
+function componentSpecifier(framework, fileName) {
+  if (["astro", "svelte", "vue"].includes(framework)) {
+    return `./${fileName}`;
+  }
+
+  return moduleSpecifier(fileName);
 }
 
 /**

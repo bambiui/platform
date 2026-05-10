@@ -8,6 +8,7 @@
     "deploy-static": "turbo run build --filter=docs --filter=builder && mkdir -p apps/docs/dist/builder && cp -r apps/builder/dist/. apps/docs/dist/builder/ && node scripts/copy-registry-assets.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "smoke:templates": "node scripts/smoke-templates.mjs",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },

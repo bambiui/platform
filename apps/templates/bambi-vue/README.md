@@ -1,6 +1,6 @@
-# vue-bambi-template
+# bambi-vue
 
-This template should help get you started developing with Vue 3 in Vite.
+BambiUI local Vue/Vite fixture.
 
 ## Recommended IDE Setup
 

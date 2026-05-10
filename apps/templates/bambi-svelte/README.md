@@ -1,6 +1,6 @@
-# sv
+# bambi-svelte
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+BambiUI local SvelteKit fixture.
 
 ## Creating a project
 
@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-pnpm dlx sv@0.15.3 create --template minimal --types ts --install pnpm svelte-bambi-template
+pnpm dlx sv@0.15.3 create --template minimal --types ts --install pnpm bambi-svelte
 ```
 
 ## Developing

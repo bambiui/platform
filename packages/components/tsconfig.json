@@ -15,10 +15,10 @@
   },
   "include": [
     "src-env.d.ts",
-    "button/src/**/*.astro",
-    "button/src/**/*.svelte",
-    "button/src/**/*.ts",
-    "button/src/**/*.tsx",
-    "button/src/**/*.vue"
+    "*/src/**/*.astro",
+    "*/src/**/*.svelte",
+    "*/src/**/*.ts",
+    "*/src/**/*.tsx",
+    "*/src/**/*.vue"
   ]
 }

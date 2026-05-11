@@ -11,10 +11,20 @@ const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 
 const expectedComponentFiles = {
-  astro: "Button.astro",
-  react: "button.tsx",
-  svelte: "Button.svelte",
-  vue: "Button.vue",
+  button: {
+    astro: "Button.astro",
+    css: "button.css",
+    react: "button.tsx",
+    svelte: "Button.svelte",
+    vue: "Button.vue",
+  },
+  buttongroup: {
+    astro: "ButtonGroup.astro",
+    css: "buttongroup.css",
+    react: "buttongroup.tsx",
+    svelte: "ButtonGroup.svelte",
+    vue: "ButtonGroup.vue",
+  },
 };
 
 /**
@@ -63,8 +73,8 @@ function assertExists(filePath) {
   }
 }
 
-for (const [framework, componentFile] of Object.entries(
-  expectedComponentFiles,
+for (const [framework] of Object.entries(expectedComponentFiles.button).filter(
+  ([key]) => key !== "css",
 )) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
 
@@ -80,25 +90,30 @@ for (const [framework, componentFile] of Object.entries(
       repoRoot,
     ]);
 
-    await runCli([
-      "add",
-      "button",
-      "--framework",
-      framework,
-      "--cwd",
-      cwd,
-      "--registry-url",
-      repoRoot,
-    ]);
-
-    const buttonDir = path.join(cwd, "src/components/ui/button");
     assertExists(path.join(cwd, "bambiui.config.json"));
     assertExists(path.join(cwd, "src/styles/bambi.css"));
-    assertExists(path.join(buttonDir, componentFile));
-    assertExists(path.join(buttonDir, "button.css"));
-    assertExists(path.join(buttonDir, "index.ts"));
-    assertExists(path.join(buttonDir, "recipe.ts"));
-    assertExists(path.join(buttonDir, "types.ts"));
+
+    for (const [componentName, files] of Object.entries(
+      expectedComponentFiles,
+    )) {
+      await runCli([
+        "add",
+        componentName,
+        "--framework",
+        framework,
+        "--cwd",
+        cwd,
+        "--registry-url",
+        repoRoot,
+      ]);
+
+      const componentDir = path.join(cwd, "src/components/ui", componentName);
+      assertExists(path.join(componentDir, files[framework]));
+      assertExists(path.join(componentDir, files.css));
+      assertExists(path.join(componentDir, "index.ts"));
+      assertExists(path.join(componentDir, "recipe.ts"));
+      assertExists(path.join(componentDir, "types.ts"));
+    }
 
     const secondAdd = await runCli([
       "add",
@@ -135,6 +150,7 @@ for (const [framework, componentFile] of Object.entries(
       );
     }
 
+    const buttonDir = path.join(cwd, "src/components/ui/button");
     const types = await readFile(path.join(buttonDir, "types.ts"), "utf8");
     if (types.includes("@bambiui/")) {
       throw new Error(`Generated ${framework} types are not self-contained.`);

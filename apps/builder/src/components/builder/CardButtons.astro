@@ -1,5 +1,6 @@
 ---
 import Button from "@bambiui/components/button/astro";
+import ButtonGroup from "@bambiui/components/buttongroup/astro";
 const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>`;
 ---
 <div class="card" id="card-buttons">
@@ -102,6 +103,32 @@ const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ar
       <Button intent="danger" disabled>Danger</Button>
       <Button intent="success" disabled>Success</Button>
       <Button intent="warning" disabled>Warning</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Button Group</span>
+    <div class="row">
+      <ButtonGroup aria-label="Text alignment">
+        <Button appearance="outline">Left</Button>
+        <Button appearance="outline">Center</Button>
+        <Button appearance="outline">Right</Button>
+      </ButtonGroup>
+      <ButtonGroup attached={false} aria-label="Dialog actions">
+        <Button appearance="ghost">Cancel</Button>
+        <Button>Save</Button>
+      </ButtonGroup>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Vertical Group</span>
+    <div class="row">
+      <ButtonGroup orientation="vertical" aria-label="Export format">
+        <Button appearance="outline">PDF</Button>
+        <Button appearance="outline">CSV</Button>
+        <Button appearance="outline">JSON</Button>
+      </ButtonGroup>
     </div>
   </div>
 </div>

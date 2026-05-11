@@ -16,7 +16,14 @@
     "./button/vue": "./button/src/vue.vue",
     "./button/astro": "./button/src/astro.astro",
     "./button/recipe": "./button/src/recipe.ts",
-    "./button.css": "./button/src/button.css"
+    "./button.css": "./button/src/button.css",
+    "./buttongroup": "./buttongroup/src/index.ts",
+    "./buttongroup/react": "./buttongroup/src/react.tsx",
+    "./buttongroup/svelte": "./buttongroup/src/svelte.svelte",
+    "./buttongroup/vue": "./buttongroup/src/vue.vue",
+    "./buttongroup/astro": "./buttongroup/src/astro.astro",
+    "./buttongroup/recipe": "./buttongroup/src/recipe.ts",
+    "./buttongroup.css": "./buttongroup/src/buttongroup.css"
   },
   "dependencies": {
     "@bambiui/core": "workspace:*"

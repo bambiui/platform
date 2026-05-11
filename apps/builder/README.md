@@ -11,7 +11,7 @@ Served at `/builder` under the same Cloudflare Pages project as the docs site.
 - **Generate Theme** — pick a primary color (hue + chroma) and a base lightness; neutral, primary, danger, success, and warning scales are generated with OKLCH
 - **Inherited token override** — tokens that reference another token (e.g. `var(--bambi-ring)`) appear disabled; click **Override** to edit directly, or **Reset** to restore the reference
 - **Shared theme state** — reads and writes the `starlight-theme` localStorage key, the same key used by the docs site; switching themes in one tab updates the other
-- **Token groups**: Color Tokens · Typography Tokens · Button Tokens
+- **Token groups**: Color Tokens · Typography Tokens · Button and ButtonGroup Tokens
 
 ## Navigation
 
@@ -74,13 +74,14 @@ apps/builder/
 └── package.json
 ```
 
-The page entry imports global tokens from `@bambiui/tokens/tokens.css` and button source from `@bambiui/components`. Board layout, pan/zoom, token editing, scoped component overrides, and OKLCH color scale generation live in `src/scripts/builder.ts`.
+The page entry imports global tokens from `@bambiui/tokens/tokens.css` and component source from `@bambiui/components`. Board layout, pan/zoom, token editing, scoped component overrides, and OKLCH color scale generation live in `src/scripts/builder.ts`.
 
 ## Token sources
 
-| Group                 | CSS file                                    |
-| --------------------- | ------------------------------------------- |
-| Global tokens         | `packages/tokens/src/tokens.css`            |
-| Button-local defaults | `packages/components/button/src/button.css` |
+| Group                      | CSS file                                              |
+| -------------------------- | ----------------------------------------------------- |
+| Global tokens              | `packages/tokens/src/tokens.css`                      |
+| Button-local defaults      | `packages/components/button/src/button.css`           |
+| ButtonGroup-local defaults | `packages/components/buttongroup/src/buttongroup.css` |
 
 Global token values are read from `document.documentElement` and written back with `document.documentElement.style.setProperty` / `removeProperty`. Component-local token values are read from the relevant component selector and written as scoped runtime CSS overrides.

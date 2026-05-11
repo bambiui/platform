@@ -126,6 +126,100 @@
           }
         ]
       }
+    },
+    "buttongroup": {
+      "exportName": "ButtonGroup",
+      "api": {
+        "typeExports": [
+          "ButtonGroupBaseProps",
+          "ButtonGroupDefaults",
+          "ButtonGroupOrientation"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "buttonGroupOrientations",
+              "values": ["horizontal", "vertical"]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "ButtonGroupOrientation",
+              "constName": "buttonGroupOrientations"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "ButtonGroupBaseProps",
+              "props": [
+                {
+                  "name": "orientation",
+                  "type": "ButtonGroupOrientation",
+                  "optional": true
+                },
+                {
+                  "name": "attached",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "ButtonGroupDefaults",
+              "source": "ButtonGroupBaseProps",
+              "keys": ["orientation", "attached"]
+            }
+          ]
+        }
+      },
+      "style": {
+        "from": "packages/components/buttongroup/src/buttongroup.css",
+        "fileName": "buttongroup.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/buttongroup/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "to": "types.ts",
+          "generate": "types"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/buttongroup/src/react.tsx",
+            "to": "buttongroup.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/buttongroup/src/svelte.svelte",
+            "to": "ButtonGroup.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/buttongroup/src/vue.vue",
+            "to": "ButtonGroup.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/buttongroup/src/astro.astro",
+            "to": "ButtonGroup.astro"
+          }
+        ]
+      }
     }
   }
 }

@@ -19,6 +19,28 @@
   align-items: end;
 }
 
+/*
+  Starlight adds vertical rhythm to arbitrary markdown siblings. Component demos
+  manage their own spacing with flex/grid gaps, so reset that margin locally.
+*/
+.sl-markdown-content
+  :where(
+    .demo-grid,
+    .demo-preview-card,
+    .preview-row,
+    .preview-col,
+    .bambi-button-group,
+    .tb-root,
+    .tb-controls,
+    .tb-control-row,
+    .tb-btn-group,
+    .tb-preview
+  )
+  > *
+  + * {
+  margin-top: 0 !important;
+}
+
 /* ── Demo grid: preview card + code card ── */
 
 .demo-grid {

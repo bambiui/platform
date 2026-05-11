@@ -1,0 +1,244 @@
+---
+title: ButtonGroup
+description: Group related buttons as attached segments or spaced controls in React, Svelte, Vue, or Astro.
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+import Button from "@bambiui/components/button/astro";
+import ButtonGroup from "@bambiui/components/buttongroup/astro";
+
+## Installation
+
+```sh
+npx bambiui init
+npx bambiui add button
+npx bambiui add buttongroup
+```
+
+ButtonGroup copies a small wrapper component and local CSS into your project. It does not depend on a runtime bambiui package.
+
+Then import the components:
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`import { Button } from './components/ui/button';
+import { ButtonGroup } from './components/ui/buttongroup';`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<script>
+  import { Button } from './components/ui/button';
+  import { ButtonGroup } from './components/ui/buttongroup';
+</script>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<script setup>
+import { Button } from './components/ui/button';
+import { ButtonGroup } from './components/ui/buttongroup';
+</script>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`---
+import { Button } from './components/ui/button';
+import { ButtonGroup } from './components/ui/buttongroup';
+---`}
+    />
+  </TabItem>
+</Tabs>
+
+## Attached
+
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <ButtonGroup aria-label="Text alignment">
+        <Button appearance="outline">Left</Button>
+        <Button appearance="outline">Center</Button>
+        <Button appearance="outline">Right</Button>
+      </ButtonGroup>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code
+            lang="tsx"
+            code={`<ButtonGroup aria-label="Text alignment">
+  <Button appearance="outline">Left</Button>
+  <Button appearance="outline">Center</Button>
+  <Button appearance="outline">Right</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code
+            lang="svelte"
+            code={`<ButtonGroup aria-label="Text alignment">
+  <Button appearance="outline">Left</Button>
+  <Button appearance="outline">Center</Button>
+  <Button appearance="outline">Right</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Vue">
+          <Code
+            lang="vue"
+            code={`<ButtonGroup aria-label="Text alignment">
+  <Button appearance="outline">Left</Button>
+  <Button appearance="outline">Center</Button>
+  <Button appearance="outline">Right</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code
+            lang="astro"
+            code={`<ButtonGroup aria-label="Text alignment">
+  <Button appearance="outline">Left</Button>
+  <Button appearance="outline">Center</Button>
+  <Button appearance="outline">Right</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+      </Tabs>
+    </div>
+  </div>
+</div>
+
+## Vertical
+
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <ButtonGroup orientation="vertical" aria-label="Export format">
+        <Button appearance="outline">PDF</Button>
+        <Button appearance="outline">CSV</Button>
+        <Button appearance="outline">JSON</Button>
+      </ButtonGroup>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code
+            lang="tsx"
+            code={`<ButtonGroup orientation="vertical" aria-label="Export format">
+  <Button appearance="outline">PDF</Button>
+  <Button appearance="outline">CSV</Button>
+  <Button appearance="outline">JSON</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code
+            lang="svelte"
+            code={`<ButtonGroup orientation="vertical" aria-label="Export format">
+  <Button appearance="outline">PDF</Button>
+  <Button appearance="outline">CSV</Button>
+  <Button appearance="outline">JSON</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Vue">
+          <Code
+            lang="vue"
+            code={`<ButtonGroup orientation="vertical" aria-label="Export format">
+  <Button appearance="outline">PDF</Button>
+  <Button appearance="outline">CSV</Button>
+  <Button appearance="outline">JSON</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code
+            lang="astro"
+            code={`<ButtonGroup orientation="vertical" aria-label="Export format">
+  <Button appearance="outline">PDF</Button>
+  <Button appearance="outline">CSV</Button>
+  <Button appearance="outline">JSON</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+      </Tabs>
+    </div>
+  </div>
+</div>
+
+## Spaced
+
+Set `attached={false}` to keep related actions grouped semantically while preserving space between buttons.
+
+<div class="demo-grid">
+  <div class="demo-preview-card">
+    <div class="preview-row">
+      <ButtonGroup attached={false} aria-label="Dialog actions">
+        <Button appearance="ghost">Cancel</Button>
+        <Button>Save</Button>
+      </ButtonGroup>
+    </div>
+  </div>
+  <div class="demo-code-card">
+    <div class="code-body">
+      <Tabs syncKey="framework">
+        <TabItem label="React">
+          <Code
+            lang="tsx"
+            code={`<ButtonGroup attached={false} aria-label="Dialog actions">
+  <Button appearance="ghost">Cancel</Button>
+  <Button>Save</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Svelte">
+          <Code
+            lang="svelte"
+            code={`<ButtonGroup attached={false} aria-label="Dialog actions">
+  <Button appearance="ghost">Cancel</Button>
+  <Button>Save</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Vue">
+          <Code
+            lang="vue"
+            code={`<ButtonGroup :attached="false" aria-label="Dialog actions">
+  <Button appearance="ghost">Cancel</Button>
+  <Button>Save</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+        <TabItem label="Astro">
+          <Code
+            lang="astro"
+            code={`<ButtonGroup attached={false} aria-label="Dialog actions">
+  <Button appearance="ghost">Cancel</Button>
+  <Button>Save</Button>
+</ButtonGroup>`}
+          />
+        </TabItem>
+      </Tabs>
+    </div>
+  </div>
+</div>
+
+## API Reference
+
+| Prop          | Type                         | Default        | Description                            |
+| ------------- | ---------------------------- | -------------- | -------------------------------------- |
+| `orientation` | `'horizontal' \| 'vertical'` | `'horizontal'` | Direction of the grouped controls      |
+| `attached`    | `boolean`                    | `true`         | Removes gaps and merges button borders |
+| `role`        | `string`                     | `'group'`      | ARIA grouping role                     |
+
+All other HTML div attributes (`aria-*`, `style`, `class`) are forwarded to the wrapper. React uses `className`; Svelte, Vue, and Astro use `class`.

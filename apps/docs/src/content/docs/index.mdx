@@ -6,8 +6,8 @@ hero:
   title: bambiui
   tagline: Source-distributed, themeable components for React, Svelte, Vue, and Astro.
   actions:
-    - text: Button
-      link: /components/button
+    - text: Get Started
+      link: /get-started
       icon: right-arrow
       variant: primary
     - text: Token Builder
@@ -20,19 +20,23 @@ hero:
       variant: minimal
 ---
 
-import { CardGrid, Card } from '@astrojs/starlight/components';
+import { CardGrid, Card } from "@astrojs/starlight/components";
 
 <CardGrid stagger>
   <Card title="CLI-first" icon="terminal">
-    Install component source into your app with `npx bambiui add`. No runtime component package required.
+    Install component source into your app with `npx bambiui add`. No runtime
+    component package required.
   </Card>
   <Card title="Design tokens" icon="setting">
-    Global tokens define the theme; component-local tokens live beside component CSS. Override either in your own CSS — no rebuild required.
+    Global tokens define the theme; component-local tokens live beside component
+    CSS. Override either in your own CSS — no rebuild required.
   </Card>
   <Card title="Token Builder" icon="laptop">
-    Inspect and live-edit global and component-local tokens on a grid board. Generate full OKLCH color scales from a single primary hue.
+    Inspect and live-edit global and component-local tokens on a grid board.
+    Generate full OKLCH color scales from a single primary hue.
   </Card>
   <Card title="Accessible by default" icon="approve-check-circle">
-    WCAG-compliant ARIA attributes, visible focus rings, and correct `type` defaults out of the box.
+    WCAG-compliant ARIA attributes, visible focus rings, and correct `type`
+    defaults out of the box.
   </Card>
 </CardGrid>

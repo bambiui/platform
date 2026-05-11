@@ -1,0 +1,67 @@
+---
+title: ButtonGroup Tokens
+description: Customize ButtonGroup spacing, radius, and attached border overlap with bambiui CSS custom properties.
+---
+
+ButtonGroup tokens are public component-local CSS custom properties defined on `.bambi-button-group` in `buttongroup.css` (installed alongside the component). They control how grouped buttons sit together; the individual button visuals still come from Button tokens.
+
+Because `--bambi-button-group-*` defaults are declared on `.bambi-button-group`, override them on `.bambi-button-group`, a more specific group selector, or inline style.
+
+```css
+/* all button groups */
+.bambi-button-group {
+  --bambi-button-group-gap: 0.75rem;
+}
+
+/* scoped to a toolbar */
+.toolbar .bambi-button-group {
+  --bambi-button-group-radius: 9999px;
+  --bambi-button-group-overlap: 2px;
+}
+```
+
+---
+
+## Layout
+
+| Token                          | Default                                              | Resolved value |
+| ------------------------------ | ---------------------------------------------------- | -------------- |
+| `--bambi-button-group-gap`     | `var(--bambi-space-2)`                               | `0.5rem`       |
+| `--bambi-button-group-radius`  | `var(--bambi-button-radius, var(--bambi-radius-md))` | `0.5rem`       |
+| `--bambi-button-group-overlap` | `var(--bambi-button-border-width, 1px)`              | `1px`          |
+
+`--bambi-button-group-gap` is used when `attached={false}`. Attached groups set their gap to `0` and use `--bambi-button-group-overlap` to collapse adjacent button borders.
+
+`--bambi-button-group-radius` defaults to the current Button radius, so grouped buttons keep matching corners when `--bambi-button-radius` changes.
+
+---
+
+## Examples
+
+### Roomier spaced groups
+
+```css
+.bambi-button-group {
+  --bambi-button-group-gap: 0.75rem;
+}
+```
+
+### Pill-shaped attached groups
+
+```css
+.bambi-button-group {
+  --bambi-button-group-radius: 9999px;
+}
+```
+
+### Match a thicker button border
+
+```css
+.bambi-button {
+  --bambi-button-border-width: 2px;
+}
+
+.bambi-button-group {
+  --bambi-button-group-overlap: 2px;
+}
+```

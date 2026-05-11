@@ -425,6 +425,23 @@ const CARD_TOKENS: Record<string, { label: string; tokens: TokenItem[] }[]> = {
       ],
     },
     {
+      label: "Button Group",
+      tokens: [
+        {
+          name: "--bambi-button-group-gap",
+          selector: ".bambi-button-group",
+        },
+        {
+          name: "--bambi-button-group-radius",
+          selector: ".bambi-button-group",
+        },
+        {
+          name: "--bambi-button-group-overlap",
+          selector: ".bambi-button-group",
+        },
+      ],
+    },
+    {
       label: "Primary",
       tokens: ["--bambi-intent-primary-bg", "--bambi-intent-primary-fg"],
     },
@@ -823,7 +840,10 @@ function renderTokenList(cardId: string) {
             if (selector) {
               setScopedToken(selector, tokenName, input.value);
             } else {
-              document.documentElement.style.setProperty(tokenName, input.value);
+              document.documentElement.style.setProperty(
+                tokenName,
+                input.value,
+              );
             }
             btn.textContent = "Reset";
             btn.classList.add("active");

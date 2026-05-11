@@ -20,6 +20,11 @@
       "types": "./src/button.ts",
       "import": "./src/button.ts",
       "default": "./src/button.ts"
+    },
+    "./buttongroup": {
+      "types": "./src/buttongroup.ts",
+      "import": "./src/buttongroup.ts",
+      "default": "./src/buttongroup.ts"
     }
   },
   "scripts": {

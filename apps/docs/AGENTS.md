@@ -2,15 +2,17 @@
 
 ## Responsibility
 
-- Owns Starlight docs content, examples, previews, navigation, and public docs assets.
-- Docs dogfood source components and tokens through workspace packages.
+- Owns Starlight docs content, examples, navigation, and public docs assets.
+- Docs pages are explanatory reference pages only. Do not add live component previews or import `@bambiui/components` into docs content; rich previews belong in Studio.
 
 ## Boundaries
 
-- Import product components from `@bambiui/components`, not generated template copies.
 - Import global tokens through docs global CSS.
 - Keep docs and builder theme behavior aligned through the shared `starlight-theme` key.
 - Keep docs examples consistent with CLI-installed output.
+- For complex components, document props-driven root usage first for common layouts and compound/composed usage second for advanced control. Avoid documenting `*Simple` component names unless the component source has a strong reason for one.
+- Make clear that props-driven APIs render the same semantic structure as compound APIs and must preserve accessibility, keyboard behavior, focus management, and semantic HTML.
+- Keep React examples idiomatic with `ReactNode` props where useful; use props and slots for Svelte, Vue, and Astro where those are cleaner.
 
 ## Forbidden
 
@@ -23,7 +25,6 @@
 
 - Docs shell/config: `astro.config.mjs`.
 - Global CSS and token import: `src/styles/global.css`.
-- Preview utilities: `src/styles/preview.css`.
 - Component docs pattern: `src/content/docs/components/button.mdx`.
 - Install flow docs: `src/content/docs/get-started.mdx`.
 

@@ -57,7 +57,7 @@ export default defineConfig({
           href: "https://github.com/bambiui/platform",
         },
       ],
-      customCss: ["./src/styles/global.css", "./src/styles/preview.css"],
+      customCss: ["./src/styles/global.css"],
       components: {
         ThemeSelect: "./src/overrides/ThemeSelect.astro",
       },
@@ -68,6 +68,9 @@ export default defineConfig({
           items: [
             { label: "Button", slug: "components/button" },
             { label: "ButtonGroup", slug: "components/buttongroup" },
+            { label: "Card", slug: "components/card" },
+            { label: "Drawer", slug: "components/drawer" },
+            { label: "Sidebar", slug: "components/sidebar" },
           ],
         },
         {
@@ -76,6 +79,9 @@ export default defineConfig({
             { label: "Theme", slug: "tokens/theme" },
             { label: "Button", slug: "tokens/button" },
             { label: "ButtonGroup", slug: "tokens/buttongroup" },
+            { label: "Card", slug: "tokens/card" },
+            { label: "Drawer", slug: "tokens/drawer" },
+            { label: "Sidebar", slug: "tokens/sidebar" },
           ],
         },
       ],

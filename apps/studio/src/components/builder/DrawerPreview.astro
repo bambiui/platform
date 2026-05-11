@@ -4,9 +4,9 @@ import Card from "@bambiui/components/card/astro";
 import Drawer from "@bambiui/components/drawer/astro";
 
 const usage = `<button data-drawer-open="settings-drawer">Open drawer</button>
-<Drawer id="settings-drawer" side="right" size="md">
-  <div class="bambi-drawer-header">...</div>
-  <div class="bambi-drawer-body">...</div>
+<Drawer id="settings-drawer" title="Settings" side="right" size="md">
+  ...
+  <button slot="footer" data-drawer-close="settings-drawer">Save</button>
 </Drawer>`;
 ---
 <Card class="card component-preview-card" id="card-drawer-preview">
@@ -63,17 +63,18 @@ const usage = `<button data-drawer-open="settings-drawer">Open drawer</button>
   <pre class="usage-snippet"><code>{usage}</code></pre>
 </Card>
 
-<Drawer id="drawer-live-preview" side="right" size="md" class="preview-drawer">
-  <div class="bambi-drawer-header">
-    <h2 class="bambi-drawer-title" id="drawer-live-preview-title">Project settings</h2>
-    <p class="bambi-drawer-description" id="drawer-live-preview-desc">Adjust release preferences and notification behavior.</p>
-  </div>
-  <div class="bambi-drawer-body">
+<Drawer
+  id="drawer-live-preview"
+  side="right"
+  size="md"
+  class="preview-drawer"
+  title="Project settings"
+  description="Adjust release preferences and notification behavior."
+>
     <label class="form-row">Release name <input value="Bambi UI Studio" /></label>
     <label class="form-row">Channel <select><option>Stable</option><option>Beta</option></select></label>
     <label class="check-control"><input type="checkbox" checked /> Notify maintainers</label>
-  </div>
-  <div class="bambi-drawer-footer">
+  <div slot="footer">
     <Button appearance="ghost" data-drawer-close="drawer-live-preview">Cancel</Button>
     <Button data-drawer-close="drawer-live-preview">Save</Button>
   </div>

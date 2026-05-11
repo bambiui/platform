@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onDestroy, type Snippet } from "svelte";
+  /* global HTMLDivElement, HTMLElement, HTMLButtonElement, KeyboardEvent, document, window, setTimeout */
+  import type { Snippet } from "svelte";
   import type { HTMLAttributes } from "svelte/elements";
   import { drawerRecipe } from "./recipe";
   import type { DrawerBaseProps } from "./types";
@@ -9,12 +10,18 @@
     class?: string;
     trigger?: Snippet;
     children?: Snippet;
+    footer?: Snippet;
+    title?: string;
+    description?: string;
     onOpenChange?: (open: boolean) => void;
   }
 
   let {
     trigger,
     children,
+    footer,
+    title,
+    description,
     side = drawerRecipe.defaults.side,
     size = drawerRecipe.defaults.size,
     defaultOpen = drawerRecipe.defaults.defaultOpen,
@@ -29,6 +36,7 @@
   const isControlled = $derived(controlledOpen !== undefined);
   const open = $derived(isControlled ? (controlledOpen ?? false) : internalOpen);
   const state = $derived(open ? "open" : "closed");
+  const hasConvenienceContent = $derived(Boolean(title || description || footer));
 
   let triggerEl: HTMLElement | null = $state(null);
   let contentEl: HTMLElement | null = $state(null);
@@ -117,7 +125,7 @@
 <svelte:window onkeydown={open ? handleKeyDown : undefined} />
 
 {#if trigger}
-  <span bind:this={triggerEl}>
+  <span bind:this={triggerEl} onclick={() => setOpen(true)}>
     {@render trigger()}
   </span>
 {/if}
@@ -153,5 +161,18 @@
       <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
     </svg>
   </button>
-  {@render children?.()}
+  {#if title || description}
+    <div class="bambi-drawer-header">
+      {#if title}<h2 id={titleId} class="bambi-drawer-title">{title}</h2>{/if}
+      {#if description}<p id={descId} class="bambi-drawer-description">{description}</p>{/if}
+    </div>
+  {/if}
+  {#if hasConvenienceContent}
+    <div class="bambi-drawer-body">{@render children?.()}</div>
+  {:else}
+    {@render children?.()}
+  {/if}
+  {#if footer}
+    <div class="bambi-drawer-footer">{@render footer()}</div>
+  {/if}
 </div>

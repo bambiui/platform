@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/* global HTMLDivElement, HTMLElement, KeyboardEvent, document, window, setTimeout */
 import { computed, onBeforeUnmount, ref, useAttrs, watch } from "vue";
 import { drawerRecipe } from "./recipe";
 import type { DrawerBaseProps } from "./types";
@@ -10,6 +11,8 @@ const props = withDefaults(
   defineProps<
     DrawerBaseProps & {
       class?: string;
+      title?: string;
+      description?: string;
       onOpenChange?: (open: boolean) => void;
     }
   >(),
@@ -22,6 +25,11 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{ openChange: [open: boolean] }>();
+const slots = defineSlots<{
+  default?: () => unknown;
+  trigger?: () => unknown;
+  footer?: () => unknown;
+}>();
 
 const attrs = useAttrs();
 const titleId = `bambi-drawer-title-${Math.random().toString(36).slice(2, 7)}`;
@@ -32,6 +40,9 @@ const isControlled = computed(() => props.open !== undefined);
 const open = computed(() => (isControlled.value ? props.open! : internalOpen.value));
 const state = computed(() => (open.value ? "open" : "closed"));
 const contentEl = ref<HTMLDivElement | null>(null);
+const hasConvenienceContent = computed(() =>
+  Boolean(props.title || props.description || slots.footer),
+);
 
 function setOpen(next: boolean) {
   if (!isControlled.value) internalOpen.value = next;
@@ -125,6 +136,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <span v-if="slots.trigger" @click="setOpen(true)">
+    <slot name="trigger" />
+  </span>
   <Teleport to="body">
     <div
       class="bambi-drawer-overlay"
@@ -155,7 +169,21 @@ onBeforeUnmount(() => {
           />
         </svg>
       </button>
-      <slot />
+      <div v-if="props.title || props.description" class="bambi-drawer-header">
+        <h2 v-if="props.title" :id="titleId" class="bambi-drawer-title">
+          {{ props.title }}
+        </h2>
+        <p v-if="props.description" :id="descId" class="bambi-drawer-description">
+          {{ props.description }}
+        </p>
+      </div>
+      <div v-if="hasConvenienceContent" class="bambi-drawer-body">
+        <slot />
+      </div>
+      <slot v-else />
+      <div v-if="slots.footer" class="bambi-drawer-footer">
+        <slot name="footer" />
+      </div>
     </div>
   </Teleport>
 </template>

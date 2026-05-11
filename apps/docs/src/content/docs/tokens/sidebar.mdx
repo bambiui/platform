@@ -1,0 +1,61 @@
+---
+title: Sidebar Tokens
+description: Customize Sidebar width, collapsed width, surfaces, borders, transitions, and focus rings.
+---
+
+Sidebar tokens are component-local CSS custom properties defined on `.bambi-sidebar` in `sidebar.css`. Override them globally for every sidebar or scope them to one navigation area.
+
+```css
+.bambi-sidebar {
+  --bambi-sidebar-width: 18rem;
+  --bambi-sidebar-collapsed-width: 4rem;
+}
+
+.settings-layout .bambi-sidebar {
+  --bambi-sidebar-bg: var(--bambi-background);
+}
+```
+
+## Layout
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-sidebar-width` | `16rem` | Expanded sidebar width |
+| `--bambi-sidebar-collapsed-width` | `3.5rem` | Icon-collapse width |
+| `--bambi-sidebar-transition` | `width 0.25s ease, transform 0.25s ease` | Collapse/offcanvas animation |
+
+`collapsible="icon"` uses `--bambi-sidebar-collapsed-width` when closed. `collapsible="offcanvas"` translates the full sidebar off-screen.
+
+## Surface
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-sidebar-bg` | `var(--bambi-card)` | Sidebar background |
+| `--bambi-sidebar-fg` | `var(--bambi-card-foreground)` | Text and icon color |
+| `--bambi-sidebar-border` | `var(--bambi-border)` | Side, section, and rail borders |
+
+Header, footer, group separators, and rail use `--bambi-sidebar-border`.
+
+## Focus
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-sidebar-focus-ring` | `var(--bambi-state-focus-ring)` | Menu and rail focus outline color |
+| `--bambi-sidebar-focus-ring-width` | `var(--bambi-state-focus-ring-width)` | Focus outline width |
+| `--bambi-sidebar-focus-ring-offset` | `var(--bambi-state-focus-ring-offset)` | Focus outline offset |
+
+## Related Global Tokens
+
+Sidebar also reads global tokens for spacing, typography, state opacity, and accent colors:
+
+| Token | Used for |
+| --- | --- |
+| `--bambi-space-*` | Header, footer, group, and item spacing |
+| `--bambi-text-xs` / `--bambi-text-sm` | Group label and item text |
+| `--bambi-font-weight-*` | Group label and active item weight |
+| `--bambi-accent` / `--bambi-accent-foreground` | Hover and active item colors |
+| `--bambi-state-disabled-opacity` | Disabled item opacity |
+
+## Structure
+
+The props/config-driven Sidebar API renders the same classes as compound markup: `bambi-sidebar-header`, `bambi-sidebar-content`, `bambi-sidebar-group`, `bambi-sidebar-menu`, `bambi-sidebar-menu-button`, `bambi-sidebar-footer`, and `bambi-sidebar-rail`.

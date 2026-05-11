@@ -1,6 +1,6 @@
 # bambiui — Docs
 
-The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. Starlight provides the docs shell, routing, sidebar, and search; page previews should dogfood bambiui source components from `@bambiui/components` and global tokens from `@bambiui/tokens`.
+The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. Starlight provides the docs shell, routing, sidebar, and search. Docs pages are explanatory reference pages; rich live previews belong in Studio.
 
 ## Running locally
 
@@ -34,9 +34,10 @@ apps/docs/
       docs/
         components/
           button.mdx        # Button component documentation
+        tokens/
+          theme.mdx         # Global token documentation
     styles/
       global.css            # Imports @bambiui/tokens/tokens.css
-      preview.css           # .preview, .preview-row, .preview-col utility classes
 ```
 
 ## Adding a new component page
@@ -46,20 +47,12 @@ apps/docs/
    ```js
    { label: 'Component Name', slug: 'components/<name>' }
    ```
-3. Import component source from `@bambiui/components`
+3. Use code examples and reference tables instead of live previews
 4. Use `<Tabs syncKey="framework">` so tab selections stay in sync across sections
 
 ## Key configuration notes
 
-- **Package source**: Docs should consume components from `@bambiui/components`, not local generated copies.
+- **No live previews**: Do not import `@bambiui/components` into docs content. Keep interactive/rich previews in Studio.
 - **CSS imports**: `global.css` imports `@bambiui/tokens/tokens.css`; component CSS is imported by the component source.
 - **Framework examples**: Use `<Tabs syncKey="framework">` to keep examples in sync.
-- **Dogfooding**: Prefer bambiui components for previews and interactive docs UI. Keep Starlight for docs infrastructure, but avoid letting Starlight component styling become the product surface.
-
-## Preview classes
-
-| Class          | Description                                      |
-| -------------- | ------------------------------------------------ |
-| `.preview`     | Bordered container wrapping a live example       |
-| `.preview-row` | Flex row with `gap: 8px`, items aligned to `end` |
-| `.preview-col` | Flex column with `gap: 16px`                     |
+- **Complex component APIs**: Show props-driven root usage first for common/simple layouts, then compound/composed usage for advanced control. Avoid `*Simple` names; the root component remains the main entry point.

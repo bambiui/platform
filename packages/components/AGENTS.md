@@ -12,6 +12,10 @@
 - Keep component-local recipes component-local unless at least two components need the same helper.
 - Public component APIs should map to shared contracts from `packages/core`.
 - For a11y behavior, use each framework's own hooks, bindings, directives, event model, and lint/compiler feedback.
+- Complex components with meaningful internal structure should expose compound primitives and, when common usage is obvious, props-driven convenience on the same root component. Do not introduce `*Simple` names without a strong reason.
+- Props-driven convenience must render the same semantic classes and structure as the compound API and preserve accessibility, keyboard behavior, focus management, and semantic HTML.
+- Keep the API concepts equivalent across React, Svelte, Vue, and Astro while using idiomatic framework features: React may use `ReactNode` props; Svelte, Vue, and Astro should prefer props and slots where that maps better.
+- Existing public exports should not be removed.
 
 ## Forbidden
 

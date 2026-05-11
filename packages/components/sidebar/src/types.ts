@@ -2,6 +2,8 @@ export type {
   SidebarBaseProps,
   SidebarCollapsible,
   SidebarDefaults,
+  SidebarGroup,
+  SidebarItem,
   SidebarSide,
 } from "@bambiui/core/sidebar";
 

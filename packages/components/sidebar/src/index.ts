@@ -4,6 +4,8 @@ export type {
   SidebarBaseProps,
   SidebarCollapsible,
   SidebarDefaults,
+  SidebarGroup,
+  SidebarItem,
   SidebarSide,
 } from "./types";
 

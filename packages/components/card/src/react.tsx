@@ -1,4 +1,9 @@
-import { forwardRef, type AnchorHTMLAttributes, type HTMLAttributes } from "react";
+import {
+  forwardRef,
+  type AnchorHTMLAttributes,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
 import { cardRecipe } from "./recipe";
 import type { CardBaseProps } from "./types";
 import "./card.css";
@@ -11,7 +16,15 @@ function cn(...inputs: Array<string | false | null | undefined>) {
 
 // ── Card root ──────────────────────────────────────────────────────────────
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement>, CardBaseProps {}
+export interface CardProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, "title">,
+    Omit<CardBaseProps, "title" | "description" | "header" | "footer" | "actions"> {
+  title?: ReactNode;
+  description?: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
+  actions?: ReactNode;
+}
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   {
@@ -20,10 +33,18 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
     variant = cardRecipe.defaults.variant,
     size = cardRecipe.defaults.size,
     interactive = cardRecipe.defaults.interactive,
+    title,
+    description,
+    header,
+    footer,
+    actions,
     ...props
   },
   ref,
 ) {
+  const hasHeader = header !== undefined || title !== undefined || description !== undefined;
+  const hasFooter = footer !== undefined || actions !== undefined;
+
   return (
     <div
       ref={ref}
@@ -33,7 +54,20 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
       className={cn(cardRecipe.className, className)}
       {...props}
     >
-      {children}
+      {hasHeader && (
+        <CardHeader>
+          {header ?? (
+            <>
+              {title !== undefined && <CardTitle>{title}</CardTitle>}
+              {description !== undefined && (
+                <CardDescription>{description}</CardDescription>
+              )}
+            </>
+          )}
+        </CardHeader>
+      )}
+      {hasHeader || hasFooter ? <CardContent>{children}</CardContent> : children}
+      {hasFooter && <CardFooter>{footer ?? actions}</CardFooter>}
     </div>
   );
 });
@@ -42,7 +76,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
 
 export interface CardLinkProps
   extends AnchorHTMLAttributes<HTMLAnchorElement>,
-    Omit<CardBaseProps, "interactive"> {}
+    Omit<CardBaseProps, "interactive" | "title" | "description" | "header" | "footer" | "actions"> {}
 
 export const CardLink = forwardRef<HTMLAnchorElement, CardLinkProps>(function CardLink(
   {
@@ -70,7 +104,7 @@ export const CardLink = forwardRef<HTMLAnchorElement, CardLinkProps>(function Ca
 
 // ── CardHeader ─────────────────────────────────────────────────────────────
 
-export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type CardHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
   { children, className, ...props },
@@ -102,7 +136,7 @@ export const CardTitle = forwardRef<HTMLHeadingElement, CardTitleProps>(function
 
 // ── CardDescription ────────────────────────────────────────────────────────
 
-export interface CardDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+export type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
 export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionProps>(
   function CardDescription({ children, className, ...props }, ref) {
@@ -116,7 +150,7 @@ export const CardDescription = forwardRef<HTMLParagraphElement, CardDescriptionP
 
 // ── CardContent ────────────────────────────────────────────────────────────
 
-export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+export type CardContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(function CardContent(
   { children, className, ...props },
@@ -131,7 +165,7 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(function
 
 // ── CardFooter ─────────────────────────────────────────────────────────────
 
-export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type CardFooterProps = HTMLAttributes<HTMLDivElement>;
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(function CardFooter(
   { children, className, ...props },

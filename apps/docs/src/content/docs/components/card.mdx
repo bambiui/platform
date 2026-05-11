@@ -50,7 +50,72 @@ Then import the component:
   </TabItem>
 </Tabs>
 
-## Basic Usage
+## API Styles
+
+Use props-driven `Card` props for common layouts. Use the compound API when you need custom structure or full control. Both styles render the same `bambi-card-*` structure.
+
+## Props-driven Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`<Card
+  title="Account settings"
+  description="Manage your account preferences."
+  footer={<Button>Save</Button>}
+>
+  Your content goes here.
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`{#snippet footer()}
+  <button>Save</button>
+{/snippet}
+
+<Card
+  title="Account settings"
+  description="Manage your account preferences."
+  {footer}
+>
+  Your content goes here.
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Card
+  title="Account settings"
+  description="Manage your account preferences."
+>
+  Your content goes here.
+  <template #footer>
+    <button>Save</button>
+  </template>
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<Card
+  title="Account settings"
+  description="Manage your account preferences."
+>
+  Your content goes here.
+  <button slot="footer">Save</button>
+</Card>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Compound Usage
+
+Use compound pieces for advanced layouts, custom headings, or non-standard section order.
 
 <Tabs syncKey="framework">
   <TabItem label="React">
@@ -71,55 +136,34 @@ Then import the component:
     />
   </TabItem>
   <TabItem label="Svelte">
-    <Code
-      lang="svelte"
-      code={`<Card>
+    <Code lang="svelte" code={`<Card>
   <div class="bambi-card-header">
     <h3 class="bambi-card-title">Account settings</h3>
     <p class="bambi-card-description">Manage your account preferences.</p>
   </div>
-  <div class="bambi-card-content">
-    <p>Your content goes here.</p>
-  </div>
-  <div class="bambi-card-footer">
-    <button>Save</button>
-  </div>
-</Card>`}
-    />
+  <div class="bambi-card-content">Your content goes here.</div>
+  <div class="bambi-card-footer"><button>Save</button></div>
+</Card>`} />
   </TabItem>
   <TabItem label="Vue">
-    <Code
-      lang="vue"
-      code={`<Card>
+    <Code lang="vue" code={`<Card>
   <div class="bambi-card-header">
     <h3 class="bambi-card-title">Account settings</h3>
     <p class="bambi-card-description">Manage your account preferences.</p>
   </div>
-  <div class="bambi-card-content">
-    <p>Your content goes here.</p>
-  </div>
-  <div class="bambi-card-footer">
-    <button>Save</button>
-  </div>
-</Card>`}
-    />
+  <div class="bambi-card-content">Your content goes here.</div>
+  <div class="bambi-card-footer"><button>Save</button></div>
+</Card>`} />
   </TabItem>
   <TabItem label="Astro">
-    <Code
-      lang="astro"
-      code={`<Card>
+    <Code lang="astro" code={`<Card>
   <div class="bambi-card-header">
     <h3 class="bambi-card-title">Account settings</h3>
     <p class="bambi-card-description">Manage your account preferences.</p>
   </div>
-  <div class="bambi-card-content">
-    <p>Your content goes here.</p>
-  </div>
-  <div class="bambi-card-footer">
-    <button>Save</button>
-  </div>
-</Card>`}
-    />
+  <div class="bambi-card-content">Your content goes here.</div>
+  <div class="bambi-card-footer"><button>Save</button></div>
+</Card>`} />
   </TabItem>
 </Tabs>
 
@@ -258,6 +302,25 @@ The following CSS classes are available for structuring card content in any fram
 | `bambi-card-description` | Description text |
 | `bambi-card-content` | Main content area |
 | `bambi-card-footer` | Footer action area |
+
+## API Reference
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'default' \| 'outline' \| 'ghost' \| 'elevated'` | `'default'` | Visual card style |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Section padding density |
+| `interactive` | `boolean` | `false` | Adds interactive card affordances |
+| `title` | framework text/node prop | — | Convenience title rendered as `bambi-card-title` |
+| `description` | framework text/node prop | — | Convenience description rendered as `bambi-card-description` |
+| `header` | React node / Svelte snippet / Vue or Astro slot | — | Custom convenience header content |
+| `footer` | React node / Svelte snippet / Vue or Astro slot | — | Footer content rendered as `bambi-card-footer` |
+| `actions` | React node / Svelte snippet / Vue or Astro slot | — | Alternate footer/action content |
+
+## Accessibility
+
+- Use `CardLink` or a real anchor/button for navigable or actionable cards.
+- Props-driven sections render the same semantic classes as the compound API.
+- Choose the heading level in compound React usage with `CardTitle as="h2"` when the page hierarchy requires it.
 
 ## API Reference
 

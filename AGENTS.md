@@ -97,6 +97,18 @@ pnpm deploy-static
 - Keep the public API equivalent, but write idiomatic framework source.
 - Use `data-*` attributes for visual variants and states.
 
+## Component API Convention
+
+- New complex components should provide a compound API when the component has meaningful internal structure.
+- When common usage is obvious, the same root component should also support a props-driven convenience API.
+- Avoid `*Simple` component names unless there is a very strong reason.
+- Compound subcomponents remain the source of truth for advanced layouts and custom composition.
+- Props-driven APIs must internally render the same semantic structure as the compound API.
+- Props-driven APIs must not weaken accessibility, keyboard behavior, focus management, or semantic HTML.
+- Keep API concepts equivalent across React, Svelte, Vue, and Astro, but implement them idiomatically per framework.
+- React can use `ReactNode` props such as `header`, `footer`, and `actions`; Svelte, Vue, and Astro should use idiomatic props and slots where those props do not map cleanly.
+- Existing exports should not be removed.
+
 ## Registry Pattern
 
 - `exportName`: public component export.

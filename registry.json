@@ -175,6 +175,31 @@
                   "name": "interactive",
                   "type": "boolean",
                   "optional": true
+                },
+                {
+                  "name": "title",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "description",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "header",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "footer",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "actions",
+                  "type": "unknown",
+                  "optional": true
                 }
               ]
             }
@@ -242,6 +267,8 @@
           "SidebarBaseProps",
           "SidebarCollapsible",
           "SidebarDefaults",
+          "SidebarGroup",
+          "SidebarItem",
           "SidebarSide"
         ],
         "types": {
@@ -288,6 +315,54 @@
                   "name": "open",
                   "type": "boolean",
                   "optional": true
+                }
+              ]
+            },
+            {
+              "name": "SidebarItem",
+              "props": [
+                {
+                  "name": "label",
+                  "type": "string"
+                },
+                {
+                  "name": "href",
+                  "type": "string",
+                  "optional": true
+                },
+                {
+                  "name": "active",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "disabled",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "icon",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "onClick",
+                  "type": "unknown",
+                  "optional": true
+                }
+              ]
+            },
+            {
+              "name": "SidebarGroup",
+              "props": [
+                {
+                  "name": "label",
+                  "type": "string",
+                  "optional": true
+                },
+                {
+                  "name": "items",
+                  "type": "SidebarItem[]"
                 }
               ]
             }
@@ -405,6 +480,26 @@
                 {
                   "name": "closeOnOverlayClick",
                   "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "trigger",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "title",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "description",
+                  "type": "unknown",
+                  "optional": true
+                },
+                {
+                  "name": "footer",
+                  "type": "unknown",
                   "optional": true
                 }
               ]

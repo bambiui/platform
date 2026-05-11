@@ -6,6 +6,23 @@ import "./sidebar.css";
 interface Props extends SidebarBaseProps {
   class?: string;
   id?: string;
+  groups?: Array<{
+    label?: string;
+    items: Array<{
+      label: string;
+      href?: string;
+      active?: boolean;
+      disabled?: boolean;
+      icon?: string;
+    }>;
+  }>;
+  items?: Array<{
+    label: string;
+    href?: string;
+    active?: boolean;
+    disabled?: boolean;
+    icon?: string;
+  }>;
   [key: string]: unknown;
 }
 
@@ -15,6 +32,8 @@ const {
   side = sidebarRecipe.defaults.side,
   collapsible = sidebarRecipe.defaults.collapsible,
   defaultOpen = sidebarRecipe.defaults.defaultOpen,
+  groups,
+  items,
   class: className,
   id,
   ...attrs
@@ -24,6 +43,11 @@ const sidebarId = id ?? `bambi-sidebar-${Math.random().toString(36).slice(2, 7)}
 const overlayId = `${sidebarId}-overlay`;
 const cls = [sidebarRecipe.className, className].filter(Boolean).join(" ");
 const initialState = defaultOpen ? "open" : "closed";
+const normalizedGroups = groups ?? (items ? [{ items }] : []);
+const hasConvenienceContent =
+  Astro.slots.has("header") ||
+  Astro.slots.has("footer") ||
+  normalizedGroups.length > 0;
 ---
 
 {collapsible === "offcanvas" && (
@@ -44,7 +68,55 @@ const initialState = defaultOpen ? "open" : "closed";
   data-collapsible={collapsible}
   aria-label="Sidebar navigation"
 >
-  <slot />
+  {hasConvenienceContent ? (
+    <>
+      {Astro.slots.has("header") && (
+        <div class="bambi-sidebar-header"><slot name="header" /></div>
+      )}
+      <div class="bambi-sidebar-content">
+        {normalizedGroups.map((group) => (
+          <div class="bambi-sidebar-group">
+            {group.label && <span class="bambi-sidebar-group-label">{group.label}</span>}
+            <ul class="bambi-sidebar-menu">
+              {group.items.map((item) => (
+                <li class="bambi-sidebar-menu-item">
+                  {item.href && !item.disabled ? (
+                    <a
+                      class="bambi-sidebar-menu-button"
+                      href={item.href}
+                      data-active={item.active || undefined}
+                      aria-current={item.active ? "page" : undefined}
+                    >
+                      {item.icon && <span aria-hidden="true">{item.icon}</span>}
+                      <span>{item.label}</span>
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      class="bambi-sidebar-menu-button"
+                      data-active={item.active || undefined}
+                      data-disabled={item.disabled || undefined}
+                      aria-current={item.active ? "page" : undefined}
+                      aria-disabled={item.disabled || undefined}
+                      disabled={item.disabled}
+                    >
+                      {item.icon && <span aria-hidden="true">{item.icon}</span>}
+                      <span>{item.label}</span>
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {Astro.slots.has("footer") && (
+        <div class="bambi-sidebar-footer"><slot name="footer" /></div>
+      )}
+    </>
+  ) : (
+    <slot />
+  )}
   <div class="bambi-sidebar-rail">
     <button
       type="button"

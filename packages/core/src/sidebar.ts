@@ -12,4 +12,18 @@ export interface SidebarBaseProps {
   open?: boolean;
 }
 
+export interface SidebarItem {
+  label: string;
+  href?: string;
+  active?: boolean;
+  disabled?: boolean;
+  icon?: unknown;
+  onClick?: unknown;
+}
+
+export interface SidebarGroup {
+  label?: string;
+  items: SidebarItem[];
+}
+
 export type SidebarDefaults = Required<Pick<SidebarBaseProps, "side" | "collapsible" | "defaultOpen">>;

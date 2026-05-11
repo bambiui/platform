@@ -1026,9 +1026,10 @@ function syncSidebarPreview() {
   if (side) sidebarLivePreview.dataset.side = side;
   if (collapsible) sidebarLivePreview.dataset.collapsible = collapsible;
   sidebarLivePreview
-    .querySelectorAll<HTMLElement>("[data-preview-item]")
+    .querySelectorAll<HTMLElement>(".bambi-sidebar-menu-button")
     .forEach((item) => {
-      const isActive = item.dataset.previewItem === active;
+      const label = item.querySelector("span:last-child")?.textContent?.trim().toLowerCase();
+      const isActive = label === active;
       item.toggleAttribute("data-active", isActive);
       if (isActive) item.setAttribute("aria-current", "page");
       else item.removeAttribute("aria-current");

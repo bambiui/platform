@@ -52,7 +52,94 @@ Then import the component:
   </TabItem>
 </Tabs>
 
-## Basic Usage
+## API Styles
+
+Use props-driven root props for common drawers. Use the compound API for advanced layouts, custom structure, or full control. Both styles preserve the same dialog, overlay, close, header, body, and footer structure.
+
+## Props-driven Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`const [open, setOpen] = useState(false);
+
+<DrawerRoot
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button>Open Drawer</Button>}
+  title="Edit profile"
+  description="Make changes to your profile here."
+  footer={<Button onClick={() => setOpen(false)}>Save</Button>}
+  side="right"
+  size="md"
+>
+  Your content goes here.
+</DrawerRoot>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`{#snippet trigger()}
+  <button type="button">Open Drawer</button>
+{/snippet}
+
+{#snippet footer()}
+  <button type="button">Save</button>
+{/snippet}
+
+<Drawer
+  {trigger}
+  {footer}
+  title="Edit profile"
+  description="Make changes to your profile here."
+  side="right"
+  size="md"
+>
+  Your content goes here.
+</Drawer>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Drawer
+  title="Edit profile"
+  description="Make changes to your profile here."
+  side="right"
+  size="md"
+>
+  <template #trigger>
+    <button type="button">Open Drawer</button>
+  </template>
+  Your content goes here.
+  <template #footer>
+    <button type="button">Save</button>
+  </template>
+</Drawer>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<button type="button" data-drawer-open="profile-drawer">Open Drawer</button>
+
+<Drawer
+  id="profile-drawer"
+  title="Edit profile"
+  description="Make changes to your profile here."
+  side="right"
+  size="md"
+>
+  Your content goes here.
+  <button slot="footer" type="button" data-drawer-close="profile-drawer">Save</button>
+</Drawer>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Compound Usage
 
 <Tabs syncKey="framework">
   <TabItem label="React">
@@ -212,6 +299,10 @@ const open = ref(false);
 | `open` | `boolean` | — | Controlled open state |
 | `closeOnOverlayClick` | `boolean` | `true` | Close when clicking the overlay |
 | `onOpenChange` | `(open: boolean) => void` | — | Called when open state changes |
+| `trigger` | framework node/snippet/slot | — | Convenience trigger content where supported |
+| `title` | framework text/node prop | — | Convenience dialog title |
+| `description` | framework text/node prop | — | Convenience dialog description |
+| `footer` | framework node/snippet/slot | — | Convenience footer content |
 
 ### Astro data attributes (triggers)
 

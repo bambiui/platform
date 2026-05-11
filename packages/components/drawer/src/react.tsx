@@ -1,6 +1,8 @@
 import {
+  cloneElement,
   createContext,
   forwardRef,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
@@ -9,6 +11,8 @@ import {
   useState,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { drawerRecipe } from "./recipe";
@@ -87,20 +91,24 @@ function useScrollLock(active: boolean) {
 
 interface DrawerContextValue {
   open: boolean;
+  setOpen: (open: boolean) => void;
   close: () => void;
   titleId: string;
   descriptionId: string;
   side: DrawerSide;
   size: DrawerSize;
+  closeOnOverlayClick: boolean;
 }
 
 const DrawerContext = createContext<DrawerContextValue>({
   open: false,
+  setOpen: () => undefined,
   close: () => undefined,
   titleId: "",
   descriptionId: "",
   side: "right",
   size: "md",
+  closeOnOverlayClick: true,
 });
 
 export function useDrawer() {
@@ -110,7 +118,11 @@ export function useDrawer() {
 // ── DrawerRoot ─────────────────────────────────────────────────────────────
 
 export interface DrawerRootProps extends DrawerBaseProps {
-  children: React.ReactNode;
+  children?: ReactNode;
+  trigger?: ReactNode;
+  title?: ReactNode;
+  description?: ReactNode;
+  footer?: ReactNode;
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -122,6 +134,10 @@ export function DrawerRoot({
   open: controlledOpen,
   closeOnOverlayClick = drawerRecipe.defaults.closeOnOverlayClick,
   onOpenChange,
+  trigger,
+  title,
+  description,
+  footer,
 }: DrawerRootProps) {
   const isControlled = controlledOpen !== undefined;
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -140,32 +156,76 @@ export function DrawerRoot({
   const baseId = useId();
   const titleId = `${baseId}-title`;
   const descriptionId = `${baseId}-desc`;
+  const context = { open, setOpen, close, titleId, descriptionId, side, size, closeOnOverlayClick };
+  const hasConvenienceContent =
+    trigger !== undefined ||
+    title !== undefined ||
+    description !== undefined ||
+    footer !== undefined;
 
   return (
-    <DrawerContext.Provider
-      value={{ open, close, titleId, descriptionId, side, size }}
-    >
-      {typeof children === "function"
-        ? (children as (ctx: DrawerContextValue) => React.ReactNode)({
-            open,
-            close,
-            titleId,
-            descriptionId,
-            side,
-            size,
-          })
-        : children}
+    <DrawerContext.Provider value={context}>
+      {hasConvenienceContent ? (
+        <>
+          {trigger !== undefined && <DrawerConvenienceTrigger>{trigger}</DrawerConvenienceTrigger>}
+          <DrawerPortal>
+            <DrawerOverlay />
+            <DrawerContent>
+              <DrawerClose />
+              {(title !== undefined || description !== undefined) && (
+                <DrawerHeader>
+                  {title !== undefined && <DrawerTitle>{title}</DrawerTitle>}
+                  {description !== undefined && (
+                    <DrawerDescription>{description}</DrawerDescription>
+                  )}
+                </DrawerHeader>
+              )}
+              <DrawerBody>{children}</DrawerBody>
+              {footer !== undefined && <DrawerFooter>{footer}</DrawerFooter>}
+            </DrawerContent>
+          </DrawerPortal>
+        </>
+      ) : typeof children === "function" ? (
+        (children as (ctx: DrawerContextValue) => React.ReactNode)(context)
+      ) : (
+        children
+      )}
     </DrawerContext.Provider>
+  );
+}
+
+function DrawerConvenienceTrigger({ children }: { children: ReactNode }) {
+  const { open, setOpen } = useDrawer();
+
+  if (isValidElement(children)) {
+    const trigger = children as ReactElement<{
+      onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+      "aria-expanded"?: boolean;
+    }>;
+
+    return cloneElement(trigger, {
+      "aria-expanded": open,
+      onClick: (event: React.MouseEvent<HTMLElement>) => {
+        trigger.props.onClick?.(event);
+        if (!event.defaultPrevented) setOpen(true);
+      },
+    });
+  }
+
+  return (
+    <button type="button" aria-expanded={open} onClick={() => setOpen(true)}>
+      {children}
+    </button>
   );
 }
 
 // ── DrawerTrigger ──────────────────────────────────────────────────────────
 
-export interface DrawerTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
+export type DrawerTriggerProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const DrawerTrigger = forwardRef<HTMLButtonElement, DrawerTriggerProps>(
   function DrawerTrigger({ children, onClick, ...props }, ref) {
-    const { open, close } = useDrawer();
+    const { open, setOpen } = useDrawer();
     const triggerRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
@@ -174,6 +234,7 @@ export const DrawerTrigger = forwardRef<HTMLButtonElement, DrawerTriggerProps>(
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       onClick?.(e);
+      if (!e.defaultPrevented) setOpen(true);
     };
 
     return (
@@ -209,11 +270,11 @@ export function DrawerPortal({ children, container }: DrawerPortalProps) {
 
 // ── DrawerOverlay ──────────────────────────────────────────────────────────
 
-export interface DrawerOverlayProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerOverlayProps = HTMLAttributes<HTMLDivElement>;
 
 export const DrawerOverlay = forwardRef<HTMLDivElement, DrawerOverlayProps>(
   function DrawerOverlay({ className, onClick, ...props }, ref) {
-    const { open, close, side, size } = useDrawer();
+    const { open, close, side, size, closeOnOverlayClick } = useDrawer();
     const state = open ? "open" : "closed";
     return (
       <div
@@ -225,7 +286,7 @@ export const DrawerOverlay = forwardRef<HTMLDivElement, DrawerOverlayProps>(
         aria-hidden="true"
         onClick={(e) => {
           onClick?.(e);
-          close();
+          if (closeOnOverlayClick && !e.defaultPrevented) close();
         }}
         {...props}
       />
@@ -235,7 +296,7 @@ export const DrawerOverlay = forwardRef<HTMLDivElement, DrawerOverlayProps>(
 
 // ── DrawerContent ──────────────────────────────────────────────────────────
 
-export interface DrawerContentProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(
   function DrawerContent({ children, className, ...props }, ref) {
@@ -297,7 +358,7 @@ export const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(
 
 // ── DrawerHeader ───────────────────────────────────────────────────────────
 
-export interface DrawerHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
   function DrawerHeader({ children, className, ...props }, ref) {
@@ -311,7 +372,7 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
 
 // ── DrawerTitle ────────────────────────────────────────────────────────────
 
-export interface DrawerTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
+export type DrawerTitleProps = HTMLAttributes<HTMLHeadingElement>;
 
 export const DrawerTitle = forwardRef<HTMLHeadingElement, DrawerTitleProps>(
   function DrawerTitle({ children, className, ...props }, ref) {
@@ -326,7 +387,7 @@ export const DrawerTitle = forwardRef<HTMLHeadingElement, DrawerTitleProps>(
 
 // ── DrawerDescription ──────────────────────────────────────────────────────
 
-export interface DrawerDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+export type DrawerDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
 export const DrawerDescription = forwardRef<HTMLParagraphElement, DrawerDescriptionProps>(
   function DrawerDescription({ children, className, ...props }, ref) {
@@ -346,7 +407,7 @@ export const DrawerDescription = forwardRef<HTMLParagraphElement, DrawerDescript
 
 // ── DrawerBody ─────────────────────────────────────────────────────────────
 
-export interface DrawerBodyProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerBodyProps = HTMLAttributes<HTMLDivElement>;
 
 export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(
   function DrawerBody({ children, className, ...props }, ref) {
@@ -360,7 +421,7 @@ export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(
 
 // ── DrawerFooter ───────────────────────────────────────────────────────────
 
-export interface DrawerFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerFooterProps = HTMLAttributes<HTMLDivElement>;
 
 export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(
   function DrawerFooter({ children, className, ...props }, ref) {
@@ -374,7 +435,7 @@ export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(
 
 // ── DrawerClose ────────────────────────────────────────────────────────────
 
-export interface DrawerCloseProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
+export type DrawerCloseProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 export const DrawerClose = forwardRef<HTMLButtonElement, DrawerCloseProps>(
   function DrawerClose({ children, className, onClick, ...props }, ref) {

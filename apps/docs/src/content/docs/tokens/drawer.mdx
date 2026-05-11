@@ -1,0 +1,60 @@
+---
+title: Drawer Tokens
+description: Customize Drawer overlay, panel size, padding, borders, shadows, and focus rings.
+---
+
+Drawer tokens are component-local CSS custom properties defined by `drawer.css`. Override overlay tokens on `.bambi-drawer-overlay` and panel tokens on `.bambi-drawer-content`.
+
+```css
+.bambi-drawer-overlay {
+  --bambi-drawer-overlay-bg: oklch(0% 0 0 / 0.65);
+}
+
+.bambi-drawer-content {
+  --bambi-drawer-size-md: 32rem;
+  --bambi-drawer-padding: 1.25rem;
+}
+```
+
+## Overlay
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-drawer-overlay-bg` | `oklch(0% 0 0 / 0.5)` | Backdrop color |
+| `--bambi-drawer-transition` | `transform 0.3s ease` | Panel transition |
+
+The overlay opacity transition is defined directly in CSS. The panel transition uses `--bambi-drawer-transition`.
+
+## Panel Surface
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-drawer-bg` | `var(--bambi-card)` | Panel background |
+| `--bambi-drawer-fg` | `var(--bambi-card-foreground)` | Panel foreground |
+| `--bambi-drawer-border` | `var(--bambi-border)` | Side border color |
+| `--bambi-drawer-radius` | `var(--bambi-radius-lg)` | Visible panel corner radius |
+| `--bambi-drawer-shadow` | `var(--bambi-shadow-lg)` | Panel shadow |
+| `--bambi-drawer-padding` | `var(--bambi-space-4)` | Header/body/footer padding |
+
+## Sizes
+
+| Token | Default | Used by |
+| --- | --- | --- |
+| `--bambi-drawer-size-sm` | `20rem` | `size="sm"` |
+| `--bambi-drawer-size-md` | `28rem` | `size="md"` |
+| `--bambi-drawer-size-lg` | `36rem` | `size="lg"` |
+| `--bambi-drawer-size-xl` | `48rem` | `size="xl"` |
+
+Horizontal drawers use these tokens as width. Vertical drawers use them as height. `size="full"` uses `100vw` or `100dvh`.
+
+## Focus
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-drawer-focus-ring` | `var(--bambi-state-focus-ring)` | Close button focus outline color |
+| `--bambi-drawer-focus-ring-width` | `var(--bambi-state-focus-ring-width)` | Focus outline width |
+| `--bambi-drawer-focus-ring-offset` | `var(--bambi-state-focus-ring-offset)` | Focus outline offset |
+
+## Structure
+
+The same tokens apply whether you use the props-driven root API or compound structure. Header and footer borders resolve through `--bambi-drawer-border`; all main sections use `--bambi-drawer-padding`.

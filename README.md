@@ -105,6 +105,10 @@ All framework implementations share the same props:
 
 All additional HTML `<button>` attributes are forwarded to the element.
 
+## Component API convention
+
+Complex components expose composition-first compound primitives, with props-driven convenience on the same root component when common usage is obvious. Avoid separate `*Simple` names; the compound API stays the source of truth for advanced layouts, and convenience props must render the same semantic structure without weakening accessibility. React may use `ReactNode` props such as `header` and `footer`; Svelte, Vue, and Astro should use idiomatic props and slots.
+
 ## Development
 
 Requirements: Node ≥ 22.12.0, pnpm 9

@@ -12,6 +12,7 @@ Served at `/studio` under the same Cloudflare Pages project as the marketing and
 - **Inherited token override** — tokens that reference another token (e.g. `var(--bambi-ring)`) appear disabled; click **Override** to edit directly, or **Reset** to restore the reference
 - **Shared theme state** — reads and writes the `starlight-theme` localStorage key; switching themes in one tab updates the other
 - **Token groups**: Color Tokens · Typography Tokens · Button and ButtonGroup Tokens
+- **API previews** — complex component previews should show props-driven root usage for common layouts and compound/composed usage for advanced control.
 
 ## Development
 

@@ -52,7 +52,89 @@ Then import the component:
   </TabItem>
 </Tabs>
 
-## Basic Usage
+## API Styles
+
+Use props/config-driven `Sidebar` props for common navigation. Use compound markup for advanced layouts, custom structure, or full control. Both styles render the same sidebar sections, groups, menus, items, and rail.
+
+## Props-driven Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`<Sidebar
+  header={<span>My App</span>}
+  footer={<button type="button">Log out</button>}
+  groups={[
+    {
+      label: "Navigation",
+      items: [
+        { label: "Home", href: "/", active: true },
+        { label: "Settings", href: "/settings" },
+      ],
+    },
+  ]}
+/>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`{#snippet header()}My App{/snippet}
+{#snippet footer()}<button type="button">Log out</button>{/snippet}
+
+<Sidebar
+  {header}
+  {footer}
+  groups={[
+    {
+      label: "Navigation",
+      items: [
+        { label: "Home", href: "/", active: true },
+        { label: "Settings", href: "/settings" },
+      ],
+    },
+  ]}
+/>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Sidebar
+  :groups="[{
+    label: 'Navigation',
+    items: [
+      { label: 'Home', href: '/', active: true },
+      { label: 'Settings', href: '/settings' },
+    ],
+  }]"
+>
+  <template #header>My App</template>
+  <template #footer><button type="button">Log out</button></template>
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<Sidebar
+  groups={[{
+    label: "Navigation",
+    items: [
+      { label: "Home", href: "/", active: true },
+      { label: "Settings", href: "/settings" },
+    ],
+  }]}
+>
+  <span slot="header">My App</span>
+  <button slot="footer" type="button">Log out</button>
+</Sidebar>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Compound Usage
 
 <Tabs syncKey="framework">
   <TabItem label="React">
@@ -237,6 +319,12 @@ Sub-part classes usable in any framework:
 | `defaultOpen` | `boolean` | `true` | Initial open state (uncontrolled) |
 | `open` | `boolean` | — | Controlled open state |
 | `onOpenChange` | `(open: boolean) => void` | — | React/Svelte/Vue open state callback |
+| `header` | React node / Svelte snippet / Vue or Astro slot | — | Convenience header section |
+| `footer` | React node / Svelte snippet / Vue or Astro slot | — | Convenience footer section |
+| `groups` | `Array<{ label?: string; items: SidebarItem[] }>` | — | Config-driven grouped navigation |
+| `items` | `SidebarItem[]` | — | Config-driven ungrouped navigation |
+
+`SidebarItem` supports `label`, `href`, `active`, `disabled`, optional React `icon`, and button-style `onClick` where the framework supports function props.
 
 ### React-only sub-components
 

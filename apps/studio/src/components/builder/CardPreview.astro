@@ -4,12 +4,13 @@ import Card from "@bambiui/components/card/astro";
 
 const variants = ["default", "outline", "ghost", "elevated"] as const;
 const sizes = ["sm", "md", "lg"] as const;
-const usage = `<Card variant="outline" size="md">
-  <div class="bambi-card-header">
-    <h3 class="bambi-card-title">Workspace</h3>
-    <p class="bambi-card-description">Project activity and actions.</p>
-  </div>
-  <div class="bambi-card-content">...</div>
+const usage = `<Card
+  title="Workspace"
+  description="Project activity and actions."
+  variant="outline"
+  size="md"
+>
+  ...
 </Card>`;
 ---
 <Card class="card component-preview-card" id="card-card-preview">
@@ -49,16 +50,17 @@ const usage = `<Card variant="outline" size="md">
 
   <div class="preview-section">
     <span class="preview-section-label">Live preview</span>
-    <Card class="sample-card" id="card-live-preview" variant="default" size="md">
-      <div class="bambi-card-header">
-        <h4 class="bambi-card-title">Release health</h4>
-        <p class="bambi-card-description">Track component readiness across frameworks.</p>
-      </div>
-      <div class="bambi-card-content">
+    <Card
+      class="sample-card"
+      id="card-live-preview"
+      variant="default"
+      size="md"
+      title="Release health"
+      description="Track component readiness across frameworks."
+    >
         <div class="metric-row"><strong>94%</strong><span>coverage</span></div>
         <div class="metric-row"><strong>4</strong><span>frameworks</span></div>
-      </div>
-      <div class="bambi-card-footer" data-card-footer>
+      <div slot="footer" data-card-footer>
         <Button size="sm">Open report</Button>
         <Button size="sm" appearance="ghost">Export</Button>
       </div>
@@ -81,11 +83,8 @@ const usage = `<Card variant="outline" size="md">
     <span class="preview-section-label">Padding</span>
     <div class="preview-grid">
       {sizes.map((size) => (
-        <Card class="mini-card" size={size} variant="outline">
-          <div class="bambi-card-header">
-            <strong>{size}</strong>
-          </div>
-          <div class="bambi-card-content">Compact, default, or relaxed density.</div>
+        <Card class="mini-card" size={size} variant="outline" title={size}>
+          Compact, default, or relaxed density.
         </Card>
       ))}
     </div>

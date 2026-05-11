@@ -9,15 +9,24 @@ import {
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type LiHTMLAttributes,
+  type ReactNode,
 } from "react";
 import { sidebarRecipe } from "./recipe";
-import type { SidebarBaseProps, SidebarCollapsible, SidebarSide } from "./types";
+import type {
+  SidebarBaseProps,
+  SidebarCollapsible,
+  SidebarGroup as SidebarGroupConfig,
+  SidebarItem as SidebarItemConfig,
+  SidebarSide,
+} from "./types";
 import "./sidebar.css";
 
 export type {
   SidebarBaseProps,
   SidebarCollapsible,
   SidebarDefaults,
+  SidebarGroup as SidebarGroupConfig,
+  SidebarItem as SidebarItemConfig,
   SidebarSide,
 } from "./types";
 
@@ -54,7 +63,11 @@ export function useSidebar() {
 export interface SidebarProps
   extends Omit<HTMLAttributes<HTMLElement>, "children">,
     SidebarBaseProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
+  groups?: SidebarGroupConfig[];
+  items?: SidebarItemConfig[];
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -67,6 +80,10 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
     defaultOpen = sidebarRecipe.defaults.defaultOpen,
     open: controlledOpen,
     onOpenChange,
+    header,
+    footer,
+    groups,
+    items,
     ...props
   },
   ref,
@@ -87,6 +104,11 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
   const overlayId = useId();
 
   const state = open ? "open" : "closed";
+  const hasConvenienceContent =
+    children === undefined &&
+    (header !== undefined || footer !== undefined || groups !== undefined || items !== undefined);
+  const normalizedGroups =
+    groups ?? (items ? [{ items }] satisfies SidebarGroupConfig[] : []);
 
   return (
     <SidebarContext.Provider value={{ open, setOpen, toggleOpen, side, collapsible, overlayId }}>
@@ -108,15 +130,64 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
         className={cn(sidebarRecipe.className, className)}
         {...props}
       >
-        {children}
+        {hasConvenienceContent ? (
+          <>
+            {header !== undefined && <SidebarHeader>{header}</SidebarHeader>}
+            <SidebarContent>
+              {normalizedGroups.map((group, groupIndex) => (
+                <SidebarGroup key={`${group.label ?? "group"}-${groupIndex}`}>
+                  {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
+                  <SidebarMenu>
+                    {group.items.map((item, itemIndex) => (
+                      <SidebarMenuItem key={`${item.label}-${itemIndex}`}>
+                        <SidebarConfigItem item={item} />
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroup>
+              ))}
+            </SidebarContent>
+            {footer !== undefined && <SidebarFooter>{footer}</SidebarFooter>}
+            <SidebarRail />
+          </>
+        ) : (
+          children
+        )}
       </nav>
     </SidebarContext.Provider>
   );
 });
 
+function SidebarConfigItem({ item }: { item: SidebarItemConfig }) {
+  const content = (
+    <>
+      {item.icon !== undefined && <span aria-hidden="true">{item.icon as ReactNode}</span>}
+      <span>{item.label}</span>
+    </>
+  );
+
+  if (item.href && !item.disabled) {
+    return (
+      <SidebarMenuLink href={item.href} active={item.active}>
+        {content}
+      </SidebarMenuLink>
+    );
+  }
+
+  return (
+    <SidebarMenuButton
+      active={item.active}
+      disabled={item.disabled}
+      onClick={item.onClick as ButtonHTMLAttributes<HTMLButtonElement>["onClick"]}
+    >
+      {content}
+    </SidebarMenuButton>
+  );
+}
+
 // ── SidebarHeader ──────────────────────────────────────────────────────────
 
-export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarHeaderProps = HTMLAttributes<HTMLDivElement>;
 
 export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
   function SidebarHeader({ children, className, ...props }, ref) {
@@ -130,7 +201,7 @@ export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
 
 // ── SidebarContent ─────────────────────────────────────────────────────────
 
-export interface SidebarContentProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarContentProps = HTMLAttributes<HTMLDivElement>;
 
 export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
   function SidebarContent({ children, className, ...props }, ref) {
@@ -144,7 +215,7 @@ export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
 
 // ── SidebarFooter ──────────────────────────────────────────────────────────
 
-export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarFooterProps = HTMLAttributes<HTMLDivElement>;
 
 export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
   function SidebarFooter({ children, className, ...props }, ref) {
@@ -158,7 +229,7 @@ export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
 
 // ── SidebarGroup ───────────────────────────────────────────────────────────
 
-export interface SidebarGroupProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarGroupProps = HTMLAttributes<HTMLDivElement>;
 
 export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
   function SidebarGroup({ children, className, ...props }, ref) {
@@ -172,7 +243,7 @@ export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
 
 // ── SidebarGroupLabel ──────────────────────────────────────────────────────
 
-export interface SidebarGroupLabelProps extends HTMLAttributes<HTMLSpanElement> {}
+export type SidebarGroupLabelProps = HTMLAttributes<HTMLSpanElement>;
 
 export const SidebarGroupLabel = forwardRef<HTMLSpanElement, SidebarGroupLabelProps>(
   function SidebarGroupLabel({ children, className, ...props }, ref) {
@@ -186,7 +257,7 @@ export const SidebarGroupLabel = forwardRef<HTMLSpanElement, SidebarGroupLabelPr
 
 // ── SidebarMenu ────────────────────────────────────────────────────────────
 
-export interface SidebarMenuProps extends HTMLAttributes<HTMLUListElement> {}
+export type SidebarMenuProps = HTMLAttributes<HTMLUListElement>;
 
 export const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
   function SidebarMenu({ children, className, ...props }, ref) {
@@ -200,7 +271,7 @@ export const SidebarMenu = forwardRef<HTMLUListElement, SidebarMenuProps>(
 
 // ── SidebarMenuItem ────────────────────────────────────────────────────────
 
-export interface SidebarMenuItemProps extends LiHTMLAttributes<HTMLLIElement> {}
+export type SidebarMenuItemProps = LiHTMLAttributes<HTMLLIElement>;
 
 export const SidebarMenuItem = forwardRef<HTMLLIElement, SidebarMenuItemProps>(
   function SidebarMenuItem({ children, className, ...props }, ref) {
@@ -263,7 +334,7 @@ export const SidebarMenuLink = forwardRef<HTMLAnchorElement, SidebarMenuLinkProp
 
 // ── SidebarRail ────────────────────────────────────────────────────────────
 
-export interface SidebarRailProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarRailProps = HTMLAttributes<HTMLDivElement>;
 
 export const SidebarRail = forwardRef<HTMLDivElement, SidebarRailProps>(
   function SidebarRail({ className, ...props }, ref) {

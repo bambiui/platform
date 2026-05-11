@@ -13,6 +13,7 @@
 - Component token overrides apply to scoped selectors such as `.bambi-button`.
 - Import tokens from `@bambiui/tokens/tokens.css` and source components from `@bambiui/components`.
 - Keep dark mode aligned with docs through the `starlight-theme` localStorage key plus `data-theme` and `.dark`.
+- Complex component previews should demonstrate the same root component supporting props-driven common usage and compound/composed advanced usage where useful. Do not add `*Simple` preview components.
 
 ## Forbidden
 

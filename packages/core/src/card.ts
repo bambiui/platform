@@ -9,6 +9,11 @@ export interface CardBaseProps {
   variant?: CardVariant;
   size?: CardSize;
   interactive?: boolean;
+  title?: unknown;
+  description?: unknown;
+  header?: unknown;
+  footer?: unknown;
+  actions?: unknown;
 }
 
 export type CardDefaults = Required<Pick<CardBaseProps, "variant" | "size" | "interactive">>;

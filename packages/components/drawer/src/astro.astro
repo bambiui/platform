@@ -6,6 +6,8 @@ import "./drawer.css";
 interface Props extends DrawerBaseProps {
   class?: string;
   id?: string;
+  title?: string;
+  description?: string;
   [key: string]: unknown;
 }
 
@@ -16,6 +18,8 @@ const {
   size = drawerRecipe.defaults.size,
   defaultOpen = drawerRecipe.defaults.defaultOpen,
   closeOnOverlayClick = drawerRecipe.defaults.closeOnOverlayClick,
+  title,
+  description,
   class: className,
   id,
   ...attrs
@@ -25,6 +29,7 @@ const drawerId = id ?? `bambi-drawer-${Math.random().toString(36).slice(2, 7)}`;
 const titleId = `${drawerId}-title`;
 const descId = `${drawerId}-desc`;
 const initialState = defaultOpen ? "open" : "closed";
+const hasConvenienceContent = Boolean(title || description) || Astro.slots.has("footer");
 ---
 
 <div
@@ -66,7 +71,20 @@ const initialState = defaultOpen ? "open" : "closed";
         />
       </svg>
     </button>
-    <slot />
+    {(title || description) && (
+      <div class="bambi-drawer-header">
+        {title && <h2 id={titleId} class="bambi-drawer-title">{title}</h2>}
+        {description && <p id={descId} class="bambi-drawer-description">{description}</p>}
+      </div>
+    )}
+    {hasConvenienceContent ? (
+      <div class="bambi-drawer-body"><slot /></div>
+    ) : (
+      <slot />
+    )}
+    {Astro.slots.has("footer") && (
+      <div class="bambi-drawer-footer"><slot name="footer" /></div>
+    )}
   </div>
 </div>
 
@@ -133,7 +151,6 @@ const initialState = defaultOpen ? "open" : "closed";
   // Wire close buttons
   document.querySelectorAll<HTMLElement>("[data-drawer-close]").forEach((btn) => {
     const drawerId = btn.dataset.drawerClose!;
-    const root = document.getElementById(drawerId);
     const trigger = document.querySelector<HTMLElement>(`[data-drawer-open="${drawerId}"]`);
     btn.addEventListener("click", () => closeDrawer(drawerId, trigger));
   });

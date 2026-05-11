@@ -6,6 +6,8 @@ import "./card.css";
 interface Props extends CardBaseProps {
   class?: string;
   id?: string;
+  title?: string;
+  description?: string;
   [key: string]: unknown;
 }
 
@@ -15,11 +17,15 @@ const {
   variant = cardRecipe.defaults.variant,
   size = cardRecipe.defaults.size,
   interactive = cardRecipe.defaults.interactive,
+  title,
+  description,
   class: className,
   ...attrs
 } = astro.props;
 
 const cls = [cardRecipe.className, className].filter(Boolean).join(" ");
+const hasHeader = Astro.slots.has("header") || Boolean(title || description);
+const hasFooter = Astro.slots.has("footer") || Astro.slots.has("actions");
 ---
 <div
   {...attrs}
@@ -28,5 +34,26 @@ const cls = [cardRecipe.className, className].filter(Boolean).join(" ");
   data-size={size}
   data-interactive={interactive || undefined}
 >
-  <slot />
+  {hasHeader && (
+    <div class="bambi-card-header">
+      {Astro.slots.has("header") ? (
+        <slot name="header" />
+      ) : (
+        <>
+          {title && <h3 class="bambi-card-title">{title}</h3>}
+          {description && <p class="bambi-card-description">{description}</p>}
+        </>
+      )}
+    </div>
+  )}
+  {hasHeader || hasFooter ? (
+    <div class="bambi-card-content"><slot /></div>
+  ) : (
+    <slot />
+  )}
+  {hasFooter && (
+    <div class="bambi-card-footer">
+      {Astro.slots.has("footer") ? <slot name="footer" /> : <slot name="actions" />}
+    </div>
+  )}
 </div>

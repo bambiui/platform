@@ -11,6 +11,10 @@ export interface DrawerBaseProps {
   defaultOpen?: boolean;
   open?: boolean;
   closeOnOverlayClick?: boolean;
+  trigger?: unknown;
+  title?: unknown;
+  description?: unknown;
+  footer?: unknown;
 }
 
 export type DrawerDefaults = Required<Pick<DrawerBaseProps, "side" | "size" | "defaultOpen" | "closeOnOverlayClick">>;

@@ -3,10 +3,27 @@ import Button from "@bambiui/components/button/astro";
 import Card from "@bambiui/components/card/astro";
 import Sidebar from "@bambiui/components/sidebar/astro";
 
-const usage = `<Sidebar side="left" collapsible="icon">
-  <div class="bambi-sidebar-header">...</div>
-  <div class="bambi-sidebar-content">...</div>
+const usage = `<Sidebar
+  collapsible="icon"
+  groups={[{ label: "Workspace", items: [{ label: "Overview", href: "/" }] }]}
+>
+  <span slot="header">Studio</span>
 </Sidebar>`;
+const groups = [
+  {
+    label: "Workspace",
+    items: [
+      { label: "Overview", href: "#card-sidebar-preview", active: true, icon: "OV" },
+      { label: "Tokens", href: "#card-sidebar-preview", icon: "TK" },
+      { label: "Components", href: "#card-sidebar-preview", icon: "CP" },
+      { label: "Archive", disabled: true, icon: "AR" },
+    ],
+  },
+  {
+    label: "Views",
+    items: [{ label: "Dashboard", href: "#card-sidebar-preview", icon: "DB" }],
+  },
+];
 ---
 <Card class="card component-preview-card" id="card-sidebar-preview">
   <div class="cardHeader">
@@ -42,29 +59,12 @@ const usage = `<Sidebar side="left" collapsible="icon">
   <div class="preview-section">
     <span class="preview-section-label">Live preview</span>
     <div class="sidebar-stage">
-      <Sidebar id="sidebar-live-preview" collapsible="icon" defaultOpen={true}>
-        <div class="bambi-sidebar-header">
+      <Sidebar id="sidebar-live-preview" collapsible="icon" defaultOpen={true} groups={groups}>
+        <div slot="header">
           <span class="brand-logo" aria-hidden="true"></span>
           <strong class="bambi-sidebar-label">Studio</strong>
         </div>
-        <div class="bambi-sidebar-content">
-          <div class="bambi-sidebar-group">
-            <span class="bambi-sidebar-group-label">Workspace</span>
-            <ul class="bambi-sidebar-menu">
-              <li class="bambi-sidebar-menu-item"><a class="bambi-sidebar-menu-button" href="#card-sidebar-preview" data-preview-item="overview" data-active aria-current="page"><span>OV</span><span>Overview</span></a></li>
-              <li class="bambi-sidebar-menu-item"><a class="bambi-sidebar-menu-button" href="#card-sidebar-preview" data-preview-item="tokens"><span>TK</span><span>Tokens</span></a></li>
-              <li class="bambi-sidebar-menu-item"><a class="bambi-sidebar-menu-button" href="#card-sidebar-preview" data-preview-item="components"><span>CP</span><span>Components</span></a></li>
-              <li class="bambi-sidebar-menu-item"><button class="bambi-sidebar-menu-button" type="button" data-disabled disabled><span>AR</span><span>Archive</span></button></li>
-            </ul>
-          </div>
-          <div class="bambi-sidebar-group">
-            <span class="bambi-sidebar-group-label">Views</span>
-            <ul class="bambi-sidebar-menu">
-              <li class="bambi-sidebar-menu-item"><a class="bambi-sidebar-menu-button" href="#card-sidebar-preview"><span>DB</span><span>Dashboard</span></a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="bambi-sidebar-footer">
+        <div slot="footer">
           <span class="brand-logo" aria-hidden="true"></span>
           <span class="bambi-sidebar-label">Theme ready</span>
         </div>

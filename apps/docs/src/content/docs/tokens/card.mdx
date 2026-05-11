@@ -1,0 +1,61 @@
+---
+title: Card Tokens
+description: Customize Card surfaces, spacing, shadows, focus rings, and section padding.
+---
+
+Card tokens are component-local CSS custom properties defined on `.bambi-card` in `card.css`. Override them on `.bambi-card`, a more specific selector, or a scoped wrapper.
+
+```css
+.bambi-card {
+  --bambi-card-radius: 1rem;
+  --bambi-card-shadow: var(--bambi-shadow-md);
+}
+
+.billing-panel .bambi-card {
+  --bambi-card-header-padding: 1.25rem;
+}
+```
+
+## Surface
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-card-bg` | `var(--bambi-card)` | Root background |
+| `--bambi-card-fg` | `var(--bambi-card-foreground)` | Root foreground |
+| `--bambi-card-border-color` | `var(--bambi-border)` | Border color |
+| `--bambi-card-border-width` | `1px` | Border width |
+| `--bambi-card-radius` | `var(--bambi-radius-lg)` | Root radius |
+| `--bambi-card-shadow` | `none` | Root shadow |
+
+## Spacing
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-card-padding-sm` | `var(--bambi-space-3)` | Small section padding |
+| `--bambi-card-padding-md` | `var(--bambi-space-4)` | Default section padding |
+| `--bambi-card-padding-lg` | `var(--bambi-space-5)` | Large section padding |
+| `--bambi-card-header-padding` | `var(--bambi-card-padding-md)` | Header padding |
+| `--bambi-card-content-padding` | `var(--bambi-card-padding-md)` | Content padding |
+| `--bambi-card-footer-padding` | `var(--bambi-card-padding-md)` | Footer padding |
+
+`data-size="sm"` and `data-size="lg"` remap section padding to the small or large values.
+
+## Interaction
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--bambi-card-transition` | `box-shadow 0.15s ease, border-color 0.15s ease` | Hover/focus transition |
+| `--bambi-card-focus-ring-width` | `var(--bambi-state-focus-ring-width)` | Focus outline width |
+| `--bambi-card-focus-ring-offset` | `var(--bambi-state-focus-ring-offset)` | Focus outline offset |
+| `--bambi-card-ring` | `var(--bambi-state-focus-ring)` | Focus outline color |
+
+Interactive cards use `data-interactive`; prefer `CardLink` or real link/button semantics when the whole card is actionable.
+
+## Variants
+
+| Variant | Token changes |
+| --- | --- |
+| `default` | Uses default background, border, and no shadow |
+| `outline` | Sets background transparent |
+| `ghost` | Sets background and border transparent |
+| `elevated` | Removes border color and uses `var(--bambi-shadow-md)` |

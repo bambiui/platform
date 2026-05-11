@@ -1,12 +1,8 @@
 # bambiui — Detailed Agent Context
 
-This is the long-form reference for Codex. Keep `AGENTS.md` short; read this file only when the current task needs deeper context.
+This is the long-form reference for Codex. `AGENTS.md` is the quick source of truth for commands, verification, no-go rules, component standards, registry entry shape, and commit rules. Read this file only when the current task needs deeper architecture, deployment, or component details.
 
-## What This Repo Is
-
-bambiui is a multi-framework UI component CLI built as a pnpm + Turborepo monorepo. The CLI copies React, Svelte, Vue, and Astro component source into user projects. Docs and builder consume the same package source through workspace dependencies.
-
-## Monorepo Structure
+## Additional Structure Detail
 
 ```txt
 apps/
@@ -22,11 +18,8 @@ packages/
 
 ## CLI-First Component Delivery
 
-- Components are source files under `packages/components`, not per-framework packages.
 - User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
 - The default registry is the hosted static site at `https://bambiui.com`; `--registry-url` and `BAMBIUI_REGISTRY_URL` can point to local or preview registries.
-- The CLI package must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
-- Do not add per-component `package.json` files or build steps unless the project intentionally returns to package publishing.
 
 ## Source Of Truth
 
@@ -47,7 +40,7 @@ packages/
 - Global design tokens are CSS custom properties in `packages/tokens/src/tokens.css`.
 - Colors use OKLCH scale tokens (`--bambi-primary-50` through `--bambi-primary-950`, plus neutral/danger/success/warning scales). Light semantic defaults live in `:root`, dark semantic overrides live in `[data-theme="dark"], .dark`.
 - Global token layering is primitive scale -> semantic -> intent/state.
-- Component token layering happens in component CSS. Public component tokens are still namespaced, for example `--bambi-button-*`, but their defaults are component-local.
+- Component token layering happens in component CSS so scoped user overrides can target the component without changing global theme values.
 
 ## Theme Management
 
@@ -67,39 +60,6 @@ Every button component across all frameworks follows the same shape:
 - Use `opacity: 0`, not `visibility: hidden`, on `.bambi-button-content` during loading so text stays accessible to screen readers.
 - Set `aria-disabled` when `loading || disabled`.
 - Icon-only buttons must have an accessible name, usually `aria-label`.
-
-## Adding A New Component
-
-1. Add shared component-agnostic contracts to `packages/core/src/contracts.ts` when needed, then derive component-specific contracts from them.
-2. Add component source under `packages/components/<name>/src/`.
-3. Add component CSS beside the source component in `packages/components/<name>/src/<name>.css`.
-4. Register the component in `registry.json`.
-5. Add the component to the docs under `apps/docs/src/content/docs/components/<name>.mdx`.
-
-## Common Commands
-
-```sh
-# Install dependencies
-pnpm install
-
-# Build docs and builder
-pnpm build
-
-# Run the docs dev server
-pnpm --filter docs dev
-
-# Run the builder dev server
-pnpm --filter builder dev
-
-# Full static deploy build (docs + builder merged, output: apps/docs/dist)
-pnpm deploy-static
-
-# Type-check all packages
-pnpm check-types
-
-# Full local verification
-pnpm check
-```
 
 ## Docs Site (`apps/docs`)
 
@@ -122,11 +82,11 @@ pnpm check
 
 Both apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static` builds docs and builder with Turborepo, copies `apps/builder/dist/` into `apps/docs/dist/builder/`, and copies `registry.json`, `registry.schema.json`, and all source files referenced by `registry.json` into `apps/docs/dist/`. The single output directory is `apps/docs/dist`.
 
-| Setting | Value |
-| --- | --- |
-| Build command | `pnpm deploy-static` |
-| Build output directory | `apps/docs/dist` |
-| Node.js version | `22.12.0` or newer |
+| Setting                | Value                |
+| ---------------------- | -------------------- |
+| Build command          | `pnpm deploy-static` |
+| Build output directory | `apps/docs/dist`     |
+| Node.js version        | `22.12.0` or newer   |
 
 ## Dependency Graph
 
@@ -143,8 +103,6 @@ builder              -> source components and tokens
 
 - Node version: use Node `>=22.12.0` across the repo.
 - Registry URL: CLI defaults to `https://bambiui.com` and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or preview registries.
-- Installed source must stay self-contained: internal packages can share contracts, but files copied into user projects should not require bambiui runtime packages.
-- Recipes in installed components: keep component-local recipes self-contained so users do not need extra bambiui runtime packages.
-- Component source has no build step: user-facing files are copied by the CLI.
-- Builder `base: '/builder'`: all internal asset paths in the builder are prefixed with `/builder`. Do not remove this or assets will 404 in production.
+- Recipes in installed components: keep component-local recipes self-contained so users do not need extra bambiui runtime packages. Only create a shared recipe or helper after at least two components need it, and only if the generated installed output remains self-contained.
+- Builder `base: '/builder'`: all internal asset paths in the builder are prefixed with `/builder`, which is why production assets resolve under the merged docs output.
 - `starlight-theme` localStorage key: both apps share this key. Never rename it in the builder without updating Starlight's config in docs, and vice versa.

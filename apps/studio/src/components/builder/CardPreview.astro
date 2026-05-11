@@ -1,0 +1,114 @@
+---
+import Button from "@bambiui/components/button/astro";
+import Card from "@bambiui/components/card/astro";
+
+const variants = ["default", "outline", "ghost", "elevated"] as const;
+const sizes = ["sm", "md", "lg"] as const;
+const usage = `<Card variant="outline" size="md">
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Workspace</h3>
+    <p class="bambi-card-description">Project activity and actions.</p>
+  </div>
+  <div class="bambi-card-content">...</div>
+</Card>`;
+---
+<Card class="card component-preview-card" id="card-card-preview">
+  <div class="cardHeader">
+    <div>
+      <h3>Card</h3>
+      <p class="component-description">A flexible surface for grouped content, actions, and dashboard summaries.</p>
+    </div>
+    <Button appearance="link" data-edit-card="card-preview">Edit Tokens</Button>
+  </div>
+
+  <div class="control-grid" aria-label="Card preview controls">
+    <label>Variant
+      <select data-card-control="variant">
+        <option value="default">Default</option>
+        <option value="outline">Outline</option>
+        <option value="ghost">Ghost</option>
+        <option value="elevated">Elevated</option>
+      </select>
+    </label>
+    <label>Size
+      <select data-card-control="size">
+        <option value="sm">Small</option>
+        <option value="md" selected>Medium</option>
+        <option value="lg">Large</option>
+      </select>
+    </label>
+    <label class="check-control">
+      <input type="checkbox" data-card-control="interactive" />
+      Interactive
+    </label>
+    <label class="check-control">
+      <input type="checkbox" data-card-control="footer" checked />
+      Footer
+    </label>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Live preview</span>
+    <Card class="sample-card" id="card-live-preview" variant="default" size="md">
+      <div class="bambi-card-header">
+        <h4 class="bambi-card-title">Release health</h4>
+        <p class="bambi-card-description">Track component readiness across frameworks.</p>
+      </div>
+      <div class="bambi-card-content">
+        <div class="metric-row"><strong>94%</strong><span>coverage</span></div>
+        <div class="metric-row"><strong>4</strong><span>frameworks</span></div>
+      </div>
+      <div class="bambi-card-footer" data-card-footer>
+        <Button size="sm">Open report</Button>
+        <Button size="sm" appearance="ghost">Export</Button>
+      </div>
+    </Card>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Variants</span>
+    <div class="preview-grid">
+      {variants.map((variant) => (
+        <Card class="mini-card" variant={variant}>
+          <strong>{variant}</strong>
+          <span>Token-aware surface</span>
+        </Card>
+      ))}
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Padding</span>
+    <div class="preview-grid">
+      {sizes.map((size) => (
+        <Card class="mini-card" size={size} variant="outline">
+          <div class="bambi-card-header">
+            <strong>{size}</strong>
+          </div>
+          <div class="bambi-card-content">Compact, default, or relaxed density.</div>
+        </Card>
+      ))}
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Interactive link</span>
+    <a class="bambi-card link-card" href="/docs/components/card" data-variant="outline" data-size="md" data-interactive>
+      <div class="bambi-card-header">
+        <h4 class="bambi-card-title">Card docs</h4>
+        <p class="bambi-card-description">A real anchor with visible focus and hover states.</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Dashboard grid</span>
+    <div class="dashboard-grid">
+      <Card class="mini-card" variant="elevated"><strong>12</strong><span>Components</span></Card>
+      <Card class="mini-card" variant="outline"><strong>3</strong><span>Previews</span></Card>
+      <Card class="mini-card" variant="ghost"><strong>100%</strong><span>Static</span></Card>
+    </div>
+  </div>
+
+  <pre class="usage-snippet"><code>{usage}</code></pre>
+</Card>

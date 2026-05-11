@@ -1,9 +1,10 @@
 ---
 import Button from "@bambiui/components/button/astro";
 import ButtonGroup from "@bambiui/components/buttongroup/astro";
+import Card from "@bambiui/components/card/astro";
 const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>`;
 ---
-<div class="card" id="card-buttons">
+<Card class="card" id="card-buttons">
   <div class="cardHeader">
     <h3>Buttons</h3>
     <Button appearance="link" data-edit-card="buttons">Edit Tokens</Button>
@@ -131,4 +132,4 @@ const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ar
       </ButtonGroup>
     </div>
   </div>
-</div>
+</Card>

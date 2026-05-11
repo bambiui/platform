@@ -1,5 +1,6 @@
 ---
 // bambiui marketing landing page
+import Card from "@bambiui/components/card/astro";
 ---
 
 <!doctype html>
@@ -31,6 +32,15 @@
         --color-accent-hover: #2c43d6;
         --color-border: #e2e8f0;
         --color-code-bg: #f8fafc;
+        --bambi-card: var(--color-code-bg);
+        --bambi-card-foreground: var(--color-fg);
+        --bambi-border: var(--color-border);
+        --bambi-radius-lg: 0.75rem;
+        --bambi-shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+        --bambi-shadow-lg: 0 20px 45px rgba(15, 23, 42, 0.12);
+        --bambi-state-focus-ring: var(--color-accent);
+        --bambi-state-focus-ring-width: 2px;
+        --bambi-state-focus-ring-offset: 2px;
         font-family: system-ui, -apple-system, sans-serif;
         font-size: 16px;
         line-height: 1.6;
@@ -159,9 +169,6 @@
 
       .feature {
         padding: 1.5rem;
-        border: 1px solid var(--color-border);
-        border-radius: 0.75rem;
-        background: var(--color-code-bg);
       }
 
       .feature h3 {
@@ -215,30 +222,30 @@
       </section>
 
       <section class="features">
-        <div class="feature">
+        <Card class="feature" variant="outline">
           <h3>Source-distributed</h3>
           <p>Components are copied into your project. No runtime library dependency, no version lock-in. Customize freely.</p>
-        </div>
-        <div class="feature">
+        </Card>
+        <Card class="feature" variant="outline">
           <h3>Multi-framework</h3>
           <p>One CLI, four frameworks. React, Svelte, Vue, and Astro all get idiomatic, framework-native component source.</p>
-        </div>
-        <div class="feature">
+        </Card>
+        <Card class="feature" variant="outline">
           <h3>Design tokens</h3>
           <p>Global CSS custom properties with a layered token system — primitives, semantics, intent, and state. Edit live in Studio.</p>
-        </div>
-        <div class="feature">
+        </Card>
+        <Card class="feature" variant="outline">
           <h3>Accessible by default</h3>
           <p>Semantic HTML first, ARIA only when native semantics are not enough. Keyboard navigation, focus, and loading states included.</p>
-        </div>
-        <div class="feature">
+        </Card>
+        <Card class="feature" variant="outline">
           <h3>CLI-first workflow</h3>
           <p>Run <code>npx bambiui add button</code> and the component source lands in your project, ready to edit.</p>
-        </div>
-        <div class="feature">
+        </Card>
+        <Card class="feature" variant="outline">
           <h3>Open source</h3>
           <p>MIT licensed. All source on GitHub. No telemetry, no accounts, no paywalls.</p>
-        </div>
+        </Card>
       </section>
     </main>
 

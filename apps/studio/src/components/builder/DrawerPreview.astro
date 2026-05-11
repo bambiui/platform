@@ -1,0 +1,96 @@
+---
+import Button from "@bambiui/components/button/astro";
+import Card from "@bambiui/components/card/astro";
+import Drawer from "@bambiui/components/drawer/astro";
+
+const usage = `<button data-drawer-open="settings-drawer">Open drawer</button>
+<Drawer id="settings-drawer" side="right" size="md">
+  <div class="bambi-drawer-header">...</div>
+  <div class="bambi-drawer-body">...</div>
+</Drawer>`;
+---
+<Card class="card component-preview-card" id="card-drawer-preview">
+  <div class="cardHeader">
+    <div>
+      <h3>Drawer</h3>
+      <p class="component-description">Modal panels for settings, forms, and focused workflows.</p>
+    </div>
+    <Button appearance="link" data-edit-card="drawer-preview">Edit Tokens</Button>
+  </div>
+
+  <div class="control-grid" aria-label="Drawer preview controls">
+    <label>Side
+      <select data-drawer-preview-control="side">
+        <option value="right">Right</option>
+        <option value="left">Left</option>
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+      </select>
+    </label>
+    <label>Size
+      <select data-drawer-preview-control="size">
+        <option value="sm">Small</option>
+        <option value="md" selected>Medium</option>
+        <option value="lg">Large</option>
+        <option value="xl">XL</option>
+        <option value="full">Full</option>
+      </select>
+    </label>
+    <label class="check-control">
+      <input type="checkbox" data-drawer-preview-control="overlay" checked />
+      Overlay click closes
+    </label>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Live preview</span>
+    <div class="row">
+      <Button data-drawer-open="drawer-live-preview">Open drawer</Button>
+      <Button appearance="outline" data-drawer-open="drawer-left-example">Open left</Button>
+      <Button appearance="outline" data-drawer-open="drawer-bottom-example">Open bottom</Button>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">States</span>
+    <div class="preview-grid">
+      <Card class="mini-card" variant="outline"><strong>Focus trap</strong><span>Tab stays inside while open.</span></Card>
+      <Card class="mini-card" variant="outline"><strong>Escape</strong><span>Escape closes and returns focus.</span></Card>
+      <Card class="mini-card" variant="outline"><strong>Labelled</strong><span>Title and description are wired to the dialog.</span></Card>
+    </div>
+  </div>
+
+  <pre class="usage-snippet"><code>{usage}</code></pre>
+</Card>
+
+<Drawer id="drawer-live-preview" side="right" size="md" class="preview-drawer">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title" id="drawer-live-preview-title">Project settings</h2>
+    <p class="bambi-drawer-description" id="drawer-live-preview-desc">Adjust release preferences and notification behavior.</p>
+  </div>
+  <div class="bambi-drawer-body">
+    <label class="form-row">Release name <input value="Bambi UI Studio" /></label>
+    <label class="form-row">Channel <select><option>Stable</option><option>Beta</option></select></label>
+    <label class="check-control"><input type="checkbox" checked /> Notify maintainers</label>
+  </div>
+  <div class="bambi-drawer-footer">
+    <Button appearance="ghost" data-drawer-close="drawer-live-preview">Cancel</Button>
+    <Button data-drawer-close="drawer-live-preview">Save</Button>
+  </div>
+</Drawer>
+
+<Drawer id="drawer-left-example" side="left" size="sm" class="preview-drawer">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title" id="drawer-left-example-title">Left drawer</h2>
+    <p class="bambi-drawer-description" id="drawer-left-example-desc">A compact navigation panel.</p>
+  </div>
+  <div class="bambi-drawer-body"><Button data-drawer-close="drawer-left-example">Close</Button></div>
+</Drawer>
+
+<Drawer id="drawer-bottom-example" side="bottom" size="sm" class="preview-drawer">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title" id="drawer-bottom-example-title">Bottom drawer</h2>
+    <p class="bambi-drawer-description" id="drawer-bottom-example-desc">Useful for mobile action sheets.</p>
+  </div>
+  <div class="bambi-drawer-body"><Button data-drawer-close="drawer-bottom-example">Close</Button></div>
+</Drawer>

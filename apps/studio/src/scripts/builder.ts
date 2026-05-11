@@ -203,7 +203,9 @@ function generateColorTokens(hue: number, chroma: number, base: number) {
 const canvas = document.getElementById("canvas") as HTMLElement;
 const transform = document.getElementById("canvas-transform") as HTMLElement;
 const drawerRight = document.getElementById("drawer-right") as HTMLElement;
-const drawerTitle = document.getElementById("drawer-title") as HTMLElement;
+const drawerTitle = document.getElementById(
+  "drawer-right-title",
+) as HTMLElement;
 const tokenListEl = document.getElementById("token-list") as HTMLElement;
 
 let offsetX = 0,
@@ -493,6 +495,40 @@ const CARD_TOKENS: Record<string, { label: string; tokens: TokenItem[] }[]> = {
     {
       label: "Warning",
       tokens: ["--bambi-intent-warning-bg", "--bambi-intent-warning-fg"],
+    },
+  ],
+  "card-preview": [
+    {
+      label: "Card Tokens",
+      tokens: [
+        { name: "--bambi-card-bg", selector: ".bambi-card" },
+        { name: "--bambi-card-fg", selector: ".bambi-card" },
+        { name: "--bambi-card-border-color", selector: ".bambi-card" },
+        { name: "--bambi-card-radius", selector: ".bambi-card" },
+        { name: "--bambi-card-shadow", selector: ".bambi-card" },
+      ],
+    },
+  ],
+  "sidebar-preview": [
+    {
+      label: "Sidebar Tokens",
+      tokens: [
+        { name: "--bambi-sidebar-width", selector: ".bambi-sidebar" },
+        { name: "--bambi-sidebar-collapsed-width", selector: ".bambi-sidebar" },
+        { name: "--bambi-sidebar-bg", selector: ".bambi-sidebar" },
+        { name: "--bambi-sidebar-border", selector: ".bambi-sidebar" },
+      ],
+    },
+  ],
+  "drawer-preview": [
+    {
+      label: "Drawer Tokens",
+      tokens: [
+        { name: "--bambi-drawer-bg", selector: ".bambi-drawer-content" },
+        { name: "--bambi-drawer-border", selector: ".bambi-drawer-content" },
+        { name: "--bambi-drawer-radius", selector: ".bambi-drawer-content" },
+        { name: "--bambi-drawer-shadow", selector: ".bambi-drawer-content" },
+      ],
     },
   ],
 };
@@ -878,10 +914,19 @@ function openTokenEditor(cardId: string) {
     colors: "Color Tokens",
     typography: "Typography Tokens",
     buttons: "Button Tokens",
+    "card-preview": "Card Tokens",
+    "sidebar-preview": "Sidebar Tokens",
+    "drawer-preview": "Drawer Tokens",
   };
   drawerTitle.textContent = titles[cardId] ?? "Tokens";
   renderTokenList(cardId);
-  drawerRight.classList.add("open");
+  drawerRight
+    .querySelectorAll<HTMLElement>(
+      "[data-drawer-overlay], [data-drawer-content]",
+    )
+    .forEach((el) => {
+      el.dataset.state = "open";
+    });
 }
 
 function selectCard(cardId: string) {
@@ -915,13 +960,139 @@ document.querySelectorAll<HTMLElement>("[data-edit-card]").forEach((btn) => {
   });
 });
 
-document.getElementById("drawer-close")!.addEventListener("click", () => {
-  drawerRight.classList.remove("open");
-  activeCard = null;
-  document
-    .querySelectorAll<HTMLElement>(".nav-item")
-    .forEach((el) => el.classList.remove("active"));
-});
+document
+  .querySelector<HTMLElement>('[data-drawer-close="drawer-right"]')!
+  .addEventListener("click", () => {
+    drawerRight
+      .querySelectorAll<HTMLElement>(
+        "[data-drawer-overlay], [data-drawer-content]",
+      )
+      .forEach((el) => {
+        el.dataset.state = "closed";
+      });
+    activeCard = null;
+    document
+      .querySelectorAll<HTMLElement>(".nav-item")
+      .forEach((el) => el.classList.remove("active"));
+  });
+
+// ── Component preview controls ─────────────────────
+
+const cardLivePreview = document.getElementById("card-live-preview");
+const cardFooter = document.querySelector<HTMLElement>("[data-card-footer]");
+
+function syncCardPreview() {
+  if (!cardLivePreview) return;
+  const variant = document.querySelector<HTMLSelectElement>(
+    '[data-card-control="variant"]',
+  )?.value;
+  const size = document.querySelector<HTMLSelectElement>(
+    '[data-card-control="size"]',
+  )?.value;
+  const interactive = document.querySelector<HTMLInputElement>(
+    '[data-card-control="interactive"]',
+  )?.checked;
+  const showFooter = document.querySelector<HTMLInputElement>(
+    '[data-card-control="footer"]',
+  )?.checked;
+
+  if (variant) cardLivePreview.dataset.variant = variant;
+  if (size) cardLivePreview.dataset.size = size;
+  cardLivePreview.toggleAttribute("data-interactive", Boolean(interactive));
+  if (cardFooter) cardFooter.hidden = !showFooter;
+}
+
+document
+  .querySelectorAll<HTMLElement>("[data-card-control]")
+  .forEach((control) => {
+    control.addEventListener("change", syncCardPreview);
+  });
+syncCardPreview();
+
+const sidebarLivePreview = document.getElementById("sidebar-live-preview");
+
+function syncSidebarPreview() {
+  if (!sidebarLivePreview) return;
+  const side = document.querySelector<HTMLSelectElement>(
+    '[data-sidebar-control="side"]',
+  )?.value;
+  const collapsible = document.querySelector<HTMLSelectElement>(
+    '[data-sidebar-control="collapsible"]',
+  )?.value;
+  const active = document.querySelector<HTMLSelectElement>(
+    '[data-sidebar-control="active"]',
+  )?.value;
+
+  if (side) sidebarLivePreview.dataset.side = side;
+  if (collapsible) sidebarLivePreview.dataset.collapsible = collapsible;
+  sidebarLivePreview
+    .querySelectorAll<HTMLElement>("[data-preview-item]")
+    .forEach((item) => {
+      const isActive = item.dataset.previewItem === active;
+      item.toggleAttribute("data-active", isActive);
+      if (isActive) item.setAttribute("aria-current", "page");
+      else item.removeAttribute("aria-current");
+    });
+}
+
+document
+  .querySelectorAll<HTMLElement>("[data-sidebar-control]")
+  .forEach((control) => {
+    control.addEventListener("change", syncSidebarPreview);
+  });
+syncSidebarPreview();
+
+const drawerPreviewRoot = document.getElementById("drawer-live-preview");
+
+function syncDrawerPreview() {
+  if (!drawerPreviewRoot) return;
+  const side = document.querySelector<HTMLSelectElement>(
+    '[data-drawer-preview-control="side"]',
+  )?.value;
+  const size = document.querySelector<HTMLSelectElement>(
+    '[data-drawer-preview-control="size"]',
+  )?.value;
+  const overlay = document.querySelector<HTMLInputElement>(
+    '[data-drawer-preview-control="overlay"]',
+  )?.checked;
+  const content = drawerPreviewRoot.querySelector<HTMLElement>(
+    "[data-drawer-content]",
+  );
+  if (side && content) content.dataset.side = side;
+  if (size && content) content.dataset.size = size;
+  drawerPreviewRoot.dataset.closeOnOverlayClick = String(overlay);
+}
+
+document
+  .querySelectorAll<HTMLElement>("[data-drawer-preview-control]")
+  .forEach((control) => {
+    control.addEventListener("change", syncDrawerPreview);
+  });
+
+drawerPreviewRoot
+  ?.querySelector<HTMLElement>("[data-drawer-overlay]")
+  ?.addEventListener(
+    "click",
+    (event) => {
+      if (drawerPreviewRoot.dataset.closeOnOverlayClick === "false") {
+        event.stopImmediatePropagation();
+      }
+    },
+    true,
+  );
+
+document
+  .querySelectorAll<HTMLElement>("[data-drawer-open]")
+  .forEach((trigger) => {
+    trigger.addEventListener(
+      "click",
+      () => {
+        window.setTimeout(() => canvas.removeAttribute("inert"), 0);
+      },
+      true,
+    );
+  });
+syncDrawerPreview();
 
 // ── Pan ─────────────────────────────────────────────
 

@@ -1,13 +1,10 @@
 ---
+import Drawer from "@bambiui/components/drawer/astro";
 ---
-<aside id="drawer-right">
-  <div class="drawer-header">
-    <span id="drawer-title">Tokens</span>
-    <button class="drawer-close-btn" id="drawer-close" aria-label="Close">
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-        <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-      </svg>
-    </button>
+<Drawer id="drawer-right" side="right" size="sm" closeOnOverlayClick={false} class="token-drawer-content">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title" id="drawer-right-title">Tokens</h2>
+    <p class="bambi-drawer-description" id="drawer-right-desc">Edit the selected preview tokens.</p>
   </div>
-  <div id="token-list"></div>
-</aside>
+  <div class="bambi-drawer-body" id="token-list"></div>
+</Drawer>

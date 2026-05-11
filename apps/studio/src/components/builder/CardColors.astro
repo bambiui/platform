@@ -1,11 +1,12 @@
 ---
 import Button from "@bambiui/components/button/astro";
+import Card from "@bambiui/components/card/astro";
 interface Props {
   colorGroups: { label: string; tokens: string[] }[];
 }
 const { colorGroups } = Astro.props;
 ---
-<div class="card" id="card-colors">
+<Card class="card" id="card-colors">
   <div class="cardHeader">
     <h3>Colors</h3>
     <Button appearance="link" data-edit-card="colors">Edit Tokens</Button>
@@ -23,4 +24,4 @@ const { colorGroups } = Astro.props;
       </div>
     </div>
   ))}
-</div>
+</Card>

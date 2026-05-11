@@ -56,6 +56,9 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.4
         version: 0.9.9(prettier@3.7.4)(typescript@5.9.3)
+      '@bambiui/components':
+        specifier: workspace:*
+        version: link:../../packages/components
       astro:
         specifier: ^6.3.1
         version: 6.3.1(@types/node@24.12.2)(rollup@4.60.3)(yaml@2.9.0)

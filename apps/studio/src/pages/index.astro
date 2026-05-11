@@ -7,6 +7,9 @@ import DrawerRight from "../components/builder/DrawerRight.astro";
 import CardColors from "../components/builder/CardColors.astro";
 import CardTypography from "../components/builder/CardTypography.astro";
 import CardButtons from "../components/builder/CardButtons.astro";
+import CardPreview from "../components/builder/CardPreview.astro";
+import SidebarPreview from "../components/builder/SidebarPreview.astro";
+import DrawerPreview from "../components/builder/DrawerPreview.astro";
 ---
 
 <html lang="en">
@@ -14,8 +17,8 @@ import CardButtons from "../components/builder/CardButtons.astro";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" href="/builder/favicon.svg" type="image/svg+xml" />
-    <title>Builder</title>
+    <link rel="icon" href="/studio/favicon.svg" type="image/svg+xml" />
+    <title>Studio</title>
     <script is:inline>
       (function () {
         var s = localStorage.getItem("starlight-theme");
@@ -33,6 +36,9 @@ import CardButtons from "../components/builder/CardButtons.astro";
         <CardColors colorGroups={colorGroups} />
         <CardTypography typeSizes={typeSizes} typeWeights={typeWeights} />
         <CardButtons />
+        <CardPreview />
+        <SidebarPreview />
+        <DrawerPreview />
       </div>
     </div>
     <script src="../scripts/builder.ts"></script>

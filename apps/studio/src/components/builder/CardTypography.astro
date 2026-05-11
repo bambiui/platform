@@ -1,12 +1,13 @@
 ---
 import Button from "@bambiui/components/button/astro";
+import Card from "@bambiui/components/card/astro";
 interface Props {
   typeSizes: { label: string; token: string; value: string }[];
   typeWeights: { label: string; token: string; value: string }[];
 }
 const { typeSizes, typeWeights } = Astro.props;
 ---
-<div class="card" id="card-typography">
+<Card class="card" id="card-typography">
   <div class="cardHeader">
     <h3>Typography</h3>
     <Button appearance="link" data-edit-card="typography">Edit Tokens</Button>
@@ -56,4 +57,4 @@ const { typeSizes, typeWeights } = Astro.props;
       </div>
     ))}
   </div>
-</div>
+</Card>

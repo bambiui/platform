@@ -140,7 +140,10 @@
 }
 
 .bambi-button-content {
-  display: contents;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
 }
 
 .bambi-button[data-loading] {

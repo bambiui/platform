@@ -29,6 +29,7 @@ const isLoading = Boolean(loading);
 const isDisabled = Boolean(disabled || isLoading);
 ---
 <button
+  {...attrs}
   type={type}
   class={cls}
   data-intent={intent}
@@ -38,7 +39,6 @@ const isDisabled = Boolean(disabled || isLoading);
   aria-busy={isLoading || undefined}
   aria-disabled={isDisabled || undefined}
   disabled={isDisabled}
-  {...attrs}
 >
   {isLoading && <span class="bambi-button-spinner" aria-hidden="true" />}
   <span class="bambi-button-content"><slot /></span>

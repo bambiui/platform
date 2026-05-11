@@ -467,8 +467,10 @@ async function assertComponentManifest(componentName, component, contracts) {
     `packages/core/src/${componentName}.ts`,
   );
 
+  let coreComponent = "";
+
   if (existsSync(coreComponentPath)) {
-    const coreComponent = await readFile(coreComponentPath, "utf8");
+    coreComponent = await readFile(coreComponentPath, "utf8");
     const coreExports = readExportedNames(coreComponent);
 
     for (const typeExport of entry.api.typeExports) {
@@ -501,7 +503,7 @@ async function assertComponentManifest(componentName, component, contracts) {
     );
     assertDeepEqual(
       buttonConsts.buttonSizes,
-      readConstStringArray(contracts, "bambiSizes"),
+      readConstStringArray(coreComponent, "buttonSizes"),
       "buttonSizes",
     );
   }

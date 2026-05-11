@@ -19,15 +19,31 @@
           "consts": [
             {
               "name": "buttonIntents",
-              "values": ["primary", "secondary", "danger", "success", "warning"]
+              "values": [
+                "primary",
+                "secondary",
+                "danger",
+                "success",
+                "warning"
+              ]
             },
             {
               "name": "buttonAppearances",
-              "values": ["solid", "outline", "ghost", "link"]
+              "values": [
+                "solid",
+                "outline",
+                "ghost",
+                "link"
+              ]
             },
             {
               "name": "buttonSizes",
-              "values": ["sm", "md", "lg", "icon"]
+              "values": [
+                "sm",
+                "md",
+                "lg",
+                "icon"
+              ]
             }
           ],
           "aliasesFromConsts": [
@@ -75,7 +91,12 @@
             {
               "name": "ButtonDefaults",
               "source": "ButtonBaseProps",
-              "keys": ["intent", "appearance", "size", "loading"]
+              "keys": [
+                "intent",
+                "appearance",
+                "size",
+                "loading"
+              ]
             }
           ]
         }
@@ -140,11 +161,20 @@
           "consts": [
             {
               "name": "cardVariants",
-              "values": ["default", "outline", "ghost", "elevated"]
+              "values": [
+                "default",
+                "outline",
+                "ghost",
+                "elevated"
+              ]
             },
             {
               "name": "cardSizes",
-              "values": ["sm", "md", "lg"]
+              "values": [
+                "sm",
+                "md",
+                "lg"
+              ]
             }
           ],
           "aliasesFromConsts": [
@@ -208,7 +238,11 @@
             {
               "name": "CardDefaults",
               "source": "CardBaseProps",
-              "keys": ["variant", "size", "interactive"]
+              "keys": [
+                "variant",
+                "size",
+                "interactive"
+              ]
             }
           ]
         }
@@ -275,11 +309,18 @@
           "consts": [
             {
               "name": "sidebarSides",
-              "values": ["left", "right"]
+              "values": [
+                "left",
+                "right"
+              ]
             },
             {
               "name": "sidebarCollapsibles",
-              "values": ["icon", "offcanvas", "none"]
+              "values": [
+                "icon",
+                "offcanvas",
+                "none"
+              ]
             }
           ],
           "aliasesFromConsts": [
@@ -371,7 +412,11 @@
             {
               "name": "SidebarDefaults",
               "source": "SidebarBaseProps",
-              "keys": ["side", "collapsible", "defaultOpen"]
+              "keys": [
+                "side",
+                "collapsible",
+                "defaultOpen"
+              ]
             }
           ]
         }
@@ -436,11 +481,22 @@
           "consts": [
             {
               "name": "drawerSides",
-              "values": ["top", "right", "bottom", "left"]
+              "values": [
+                "top",
+                "right",
+                "bottom",
+                "left"
+              ]
             },
             {
               "name": "drawerSizes",
-              "values": ["sm", "md", "lg", "xl", "full"]
+              "values": [
+                "sm",
+                "md",
+                "lg",
+                "xl",
+                "full"
+              ]
             }
           ],
           "aliasesFromConsts": [
@@ -509,7 +565,12 @@
             {
               "name": "DrawerDefaults",
               "source": "DrawerBaseProps",
-              "keys": ["side", "size", "defaultOpen", "closeOnOverlayClick"]
+              "keys": [
+                "side",
+                "size",
+                "defaultOpen",
+                "closeOnOverlayClick"
+              ]
             }
           ]
         }
@@ -573,7 +634,10 @@
           "consts": [
             {
               "name": "buttonGroupOrientations",
-              "values": ["horizontal", "vertical"]
+              "values": [
+                "horizontal",
+                "vertical"
+              ]
             }
           ],
           "aliasesFromConsts": [
@@ -603,7 +667,10 @@
             {
               "name": "ButtonGroupDefaults",
               "source": "ButtonGroupBaseProps",
-              "keys": ["orientation", "attached"]
+              "keys": [
+                "orientation",
+                "attached"
+              ]
             }
           ]
         }
@@ -651,6 +718,257 @@
             "kind": "astro",
             "from": "packages/components/buttongroup/src/astro.astro",
             "to": "ButtonGroup.astro"
+          }
+        ]
+      }
+    },
+    "input": {
+      "exportName": "Input",
+      "api": {
+        "typeExports": [
+          "InputBaseProps",
+          "InputFieldBaseProps",
+          "InputDefaults",
+          "InputFieldDefaults",
+          "InputVariant",
+          "InputSize",
+          "InputTone",
+          "InputLabelMode"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "inputVariants",
+              "values": [
+                "outline",
+                "filled",
+                "flushed",
+                "unstyled"
+              ]
+            },
+            {
+              "name": "inputSizes",
+              "values": [
+                "sm",
+                "md",
+                "lg"
+              ]
+            },
+            {
+              "name": "inputTones",
+              "values": [
+                "default",
+                "danger",
+                "success",
+                "warning"
+              ]
+            },
+            {
+              "name": "inputLabelModes",
+              "values": [
+                "normal",
+                "floating"
+              ]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "InputVariant",
+              "constName": "inputVariants"
+            },
+            {
+              "name": "InputSize",
+              "constName": "inputSizes"
+            },
+            {
+              "name": "InputTone",
+              "constName": "inputTones"
+            },
+            {
+              "name": "InputLabelMode",
+              "constName": "inputLabelModes"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "InputBaseProps",
+              "props": [
+                {
+                  "name": "variant",
+                  "type": "InputVariant",
+                  "optional": true
+                },
+                {
+                  "name": "size",
+                  "type": "InputSize",
+                  "optional": true
+                },
+                {
+                  "name": "tone",
+                  "type": "InputTone",
+                  "optional": true
+                },
+                {
+                  "name": "invalid",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "fullWidth",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            },
+            {
+              "name": "InputFieldBaseProps",
+              "props": [
+                {
+                  "name": "variant",
+                  "type": "InputVariant",
+                  "optional": true
+                },
+                {
+                  "name": "size",
+                  "type": "InputSize",
+                  "optional": true
+                },
+                {
+                  "name": "tone",
+                  "type": "InputTone",
+                  "optional": true
+                },
+                {
+                  "name": "invalid",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "fullWidth",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "label",
+                  "type": "string",
+                  "optional": true
+                },
+                {
+                  "name": "labelMode",
+                  "type": "InputLabelMode",
+                  "optional": true
+                },
+                {
+                  "name": "description",
+                  "type": "string",
+                  "optional": true
+                },
+                {
+                  "name": "error",
+                  "type": "string",
+                  "optional": true
+                },
+                {
+                  "name": "required",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "disabled",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "readOnly",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "InputFieldDefaults",
+              "source": "InputFieldBaseProps",
+              "keys": [
+                "variant",
+                "size",
+                "tone",
+                "fullWidth",
+                "labelMode"
+              ]
+            },
+            {
+              "name": "InputDefaults",
+              "source": "InputBaseProps",
+              "keys": [
+                "variant",
+                "size",
+                "tone",
+                "fullWidth"
+              ]
+            }
+          ]
+        }
+      },
+      "style": {
+        "from": "packages/components/input/src/input.css",
+        "fileName": "input.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/input/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "to": "types.ts",
+          "generate": "types"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/input/src/react.tsx",
+            "to": "input.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/input/src/input.svelte",
+            "to": "Input.svelte"
+          },
+          {
+            "kind": "svelte",
+            "from": "packages/components/input/src/inputfield.svelte",
+            "to": "InputField.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/input/src/input.vue",
+            "to": "Input.vue"
+          },
+          {
+            "kind": "vue",
+            "from": "packages/components/input/src/inputfield.vue",
+            "to": "InputField.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/input/src/input.astro",
+            "to": "Input.astro"
+          },
+          {
+            "kind": "astro",
+            "from": "packages/components/input/src/inputfield.astro",
+            "to": "InputField.astro"
           }
         ]
       }

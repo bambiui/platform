@@ -40,6 +40,11 @@
       "types": "./src/drawer.ts",
       "import": "./src/drawer.ts",
       "default": "./src/drawer.ts"
+    },
+    "./input": {
+      "types": "./src/input.ts",
+      "import": "./src/input.ts",
+      "default": "./src/input.ts"
     }
   },
   "scripts": {

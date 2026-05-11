@@ -27,6 +27,7 @@ const forbiddenTokenPatterns = [
 ];
 const cssPaths = [
   "packages/components/button/src/button.css",
+  "packages/components/input/src/input.css",
   "apps/studio/src/styles/builder.css",
   "apps/docs/src/styles/global.css",
   "apps/docs/src/styles/preview.css",

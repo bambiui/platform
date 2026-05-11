@@ -70,6 +70,7 @@ export default defineConfig({
             { label: "ButtonGroup", slug: "components/buttongroup" },
             { label: "Card", slug: "components/card" },
             { label: "Drawer", slug: "components/drawer" },
+            { label: "Input", slug: "components/input" },
             { label: "Sidebar", slug: "components/sidebar" },
           ],
         },

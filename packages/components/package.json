@@ -44,7 +44,17 @@
     "./drawer/vue": "./drawer/src/vue.vue",
     "./drawer/astro": "./drawer/src/astro.astro",
     "./drawer/recipe": "./drawer/src/recipe.ts",
-    "./drawer.css": "./drawer/src/drawer.css"
+    "./drawer.css": "./drawer/src/drawer.css",
+    "./input": "./input/src/index.ts",
+    "./input/react": "./input/src/react.tsx",
+    "./input/svelte": "./input/src/input.svelte",
+    "./input/svelte/field": "./input/src/inputfield.svelte",
+    "./input/vue": "./input/src/input.vue",
+    "./input/vue/field": "./input/src/inputfield.vue",
+    "./input/astro": "./input/src/input.astro",
+    "./input/astro/field": "./input/src/inputfield.astro",
+    "./input/recipe": "./input/src/recipe.ts",
+    "./input.css": "./input/src/input.css"
   },
   "dependencies": {
     "@bambiui/core": "workspace:*"

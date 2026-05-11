@@ -1,0 +1,173 @@
+---
+import { inputRecipe } from "./recipe";
+import type { InputFieldBaseProps } from "./types";
+import "./input.css";
+
+interface Props extends InputFieldBaseProps {
+  class?: string;
+  id?: string;
+  value?: string | number;
+  [key: string]: unknown;
+}
+
+const astro = Astro as unknown as {
+  props: Props;
+  slots: { has: (name: string) => boolean };
+};
+
+const {
+  class: className,
+  variant = inputRecipe.defaults.variant,
+  size = inputRecipe.defaults.size,
+  tone = inputRecipe.defaults.tone,
+  invalid,
+  fullWidth = inputRecipe.defaults.fullWidth,
+  label,
+  labelMode = inputRecipe.defaults.labelMode,
+  description,
+  error,
+  required,
+  disabled,
+  readOnly,
+  id: userInputId,
+  value,
+  type: inputTypeProp,
+  ...restInputProps
+} = astro.props;
+
+// Cast type to satisfy Astro's HTMLInputTypeAttribute constraint.
+// The underlying HTML attribute accepts any string; Astro narrows it for DX.
+type HTMLInputTypeAttribute =
+  | "button" | "checkbox" | "color" | "date" | "datetime-local" | "email"
+  | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio"
+  | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time"
+  | "url" | "week";
+
+const inputType = inputTypeProp as HTMLInputTypeAttribute | undefined;
+
+const isCompound = astro.slots.has("default");
+
+// Random suffix — safe for SSG since Astro components are not hydrated.
+const fieldKey = Math.random().toString(36).slice(2, 8);
+const inputId = userInputId ?? `bambi-input-${fieldKey}`;
+const descriptionId = `bambi-input-${fieldKey}-desc`;
+const errorId = `bambi-input-${fieldKey}-err`;
+
+// data-filled reflects the server-rendered value.
+// Client-side changes are handled by the inline init script below.
+const isFilled = Boolean(value);
+
+const resolvedTone = error ? "danger" : tone;
+const isInvalid = Boolean(invalid || error);
+const hasStart = astro.slots.has("start");
+const hasEnd = astro.slots.has("end");
+
+const describedBy =
+  [description && descriptionId, (error || isInvalid) && errorId]
+    .filter(Boolean)
+    .join(" ") || undefined;
+
+const cls = [inputRecipe.fieldClassName, className].filter(Boolean).join(" ");
+---
+
+<div
+  class={cls}
+  data-variant={variant}
+  data-size={size}
+  data-tone={resolvedTone}
+  data-label-mode={labelMode}
+  data-invalid={isInvalid || undefined}
+  data-disabled={disabled || undefined}
+  data-readonly={readOnly || undefined}
+  data-required={required || undefined}
+  data-full-width={fullWidth || undefined}
+  data-filled={isFilled || undefined}
+>
+  {isCompound ? (
+    <slot />
+  ) : (
+    <>
+      {label && labelMode === "normal" && (
+        <label class={inputRecipe.labelClassName} for={inputId}>
+          {label}
+          {required && <span aria-hidden="true" style="color:var(--bambi-danger)"> *</span>}
+        </label>
+      )}
+
+      <div
+        class={inputRecipe.controlClassName}
+        data-has-start={hasStart || undefined}
+        data-has-end={hasEnd || undefined}
+      >
+        {label && labelMode === "floating" && (
+          <label class={inputRecipe.labelClassName} for={inputId}>
+            {label}
+            {required && <span aria-hidden="true" style="color:var(--bambi-danger)"> *</span>}
+          </label>
+        )}
+
+        {hasStart && (
+          <div class={inputRecipe.startClassName}>
+            <slot name="start" />
+          </div>
+        )}
+
+        <input
+          {...restInputProps}
+          id={inputId}
+          type={inputType}
+          value={value}
+          disabled={disabled}
+          readonly={readOnly}
+          required={required}
+          aria-invalid={isInvalid || undefined}
+          aria-describedby={describedBy}
+          class={inputRecipe.elementClassName}
+        />
+
+        {hasEnd && (
+          <div class={inputRecipe.endClassName}>
+            <slot name="end" />
+          </div>
+        )}
+      </div>
+
+      {description && (
+        <p class={inputRecipe.descriptionClassName} id={descriptionId}>
+          {description}
+        </p>
+      )}
+
+      {error && (
+        <p class={inputRecipe.errorClassName} id={errorId} role="alert">
+          {error}
+        </p>
+      )}
+    </>
+  )}
+</div>
+
+{/*
+  Progressive enhancement for floating label: wire up data-filled on the
+  parent field whenever the input value changes. Uses a guard attribute
+  (data-bambi-init) so the handler is only attached once per field even if
+  this script tag runs multiple times on the same page.
+*/}
+{labelMode === "floating" && (
+  <script is:inline>
+    (function () {
+      document
+        .querySelectorAll(
+          '.bambi-input-field[data-label-mode="floating"]:not([data-bambi-init])'
+        )
+        .forEach(function (field) {
+          field.setAttribute("data-bambi-init", "");
+          const input = field.querySelector(".bambi-input-element");
+          if (!input) return;
+          input.addEventListener("input", function () {
+            field.toggleAttribute("data-filled", Boolean(input.value));
+          });
+        });
+    })();
+  </script>
+)}

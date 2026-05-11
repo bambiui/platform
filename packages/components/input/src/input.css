@@ -1,0 +1,431 @@
+/* ─── Component tokens ───────────────────────────────────────────────────────
+   These live here and must not be moved to packages/tokens/src/tokens.css.
+   ─────────────────────────────────────────────────────────────────────────── */
+.bambi-input-field {
+  --bambi-input-height-sm: 2rem;
+  --bambi-input-height-md: 2.5rem;
+  --bambi-input-height-lg: 3rem;
+  --bambi-input-padding-x: var(--bambi-space-3);
+  --bambi-input-radius: var(--bambi-radius-md);
+  --bambi-input-border-width: 1px;
+  --bambi-input-bg: var(--bambi-input-background);
+  --bambi-input-fg: var(--bambi-input-foreground);
+  --bambi-input-border: var(--bambi-input);
+  --bambi-input-placeholder-color: var(--bambi-input-placeholder);
+  --bambi-input-ring: var(--bambi-state-focus-ring);
+  --bambi-input-ring-width: var(--bambi-state-focus-ring-width);
+  --bambi-input-ring-offset: var(--bambi-state-focus-ring-offset);
+  --bambi-input-disabled-opacity: var(--bambi-state-disabled-opacity);
+  --bambi-input-error-color: var(--bambi-danger);
+  --bambi-input-description-color: var(--bambi-muted-foreground);
+  --bambi-input-label-color: var(--bambi-foreground);
+  --bambi-input-addon-color: var(--bambi-muted-foreground);
+  --bambi-input-floating-label-bg: var(--bambi-input-background);
+  --bambi-input-floating-label-scale: 0.75;
+  --bambi-input-floating-label-offset-x: var(--bambi-input-padding-x);
+  --bambi-input-floating-label-offset-y: 0px;
+  --bambi-input-transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--bambi-space-1-5);
+}
+
+.bambi-input-field[data-full-width] {
+  width: 100%;
+}
+
+/* ─── Control wrapper (input + optional adornments) ────────────────────────── */
+
+.bambi-input-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--bambi-input-height-md);
+  border-radius: var(--bambi-input-radius);
+  border: var(--bambi-input-border-width) solid var(--bambi-input-border);
+  background-color: var(--bambi-input-bg);
+  transition: var(--bambi-input-transition);
+  overflow: hidden;
+}
+
+.bambi-input-control:focus-within {
+  border-color: var(--bambi-input-ring);
+  box-shadow: 0 0 0 var(--bambi-input-ring-width)
+    color-mix(in oklch, var(--bambi-input-ring) 30%, transparent);
+  overflow: visible;
+}
+
+/* ─── Native input element ──────────────────────────────────────────────────── */
+
+.bambi-input-element {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding-inline: var(--bambi-input-padding-x);
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--bambi-input-fg);
+  font-family: var(--bambi-font-sans);
+  font-size: var(--bambi-text-sm);
+  line-height: 1;
+}
+
+.bambi-input-element::placeholder {
+  color: var(--bambi-input-placeholder-color);
+}
+
+/* ─── Label ─────────────────────────────────────────────────────────────────── */
+
+.bambi-input-label {
+  display: block;
+  font-size: var(--bambi-text-sm);
+  font-weight: var(--bambi-font-weight-medium);
+  color: var(--bambi-input-label-color);
+  line-height: 1.25;
+}
+
+/* ─── Description and Error ─────────────────────────────────────────────────── */
+
+.bambi-input-description {
+  font-size: var(--bambi-text-xs);
+  color: var(--bambi-input-description-color);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.bambi-input-error {
+  font-size: var(--bambi-text-xs);
+  color: var(--bambi-input-error-color);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ─── Start / End adornments ────────────────────────────────────────────────── */
+
+.bambi-input-start,
+.bambi-input-end {
+  display: flex;
+  align-items: center;
+  padding-inline: var(--bambi-space-2);
+  color: var(--bambi-input-addon-color);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: var(--bambi-text-sm);
+  height: 100%;
+  user-select: none;
+}
+
+.bambi-input-control[data-has-start] .bambi-input-element {
+  padding-left: 0;
+}
+
+.bambi-input-control[data-has-end] .bambi-input-element {
+  padding-right: 0;
+}
+
+/* ─── Sizes ──────────────────────────────────────────────────────────────────── */
+
+.bambi-input-field[data-size="sm"] .bambi-input-control {
+  height: var(--bambi-input-height-sm);
+}
+
+.bambi-input-field[data-size="sm"] .bambi-input-element {
+  font-size: var(--bambi-text-xs);
+}
+
+.bambi-input-field[data-size="sm"] .bambi-input-start,
+.bambi-input-field[data-size="sm"] .bambi-input-end {
+  font-size: var(--bambi-text-xs);
+}
+
+.bambi-input-field[data-size="lg"] .bambi-input-control {
+  height: var(--bambi-input-height-lg);
+}
+
+.bambi-input-field[data-size="lg"] .bambi-input-element {
+  font-size: var(--bambi-text-base);
+}
+
+.bambi-input-field[data-size="lg"] .bambi-input-start,
+.bambi-input-field[data-size="lg"] .bambi-input-end {
+  font-size: var(--bambi-text-base);
+}
+
+/* ─── Variants ───────────────────────────────────────────────────────────────── */
+
+/* filled */
+.bambi-input-field[data-variant="filled"] .bambi-input-control {
+  background-color: var(--bambi-muted);
+  border-color: transparent;
+}
+
+.bambi-input-field[data-variant="filled"] .bambi-input-control:focus-within {
+  background-color: var(--bambi-input-bg);
+  border-color: var(--bambi-input-ring);
+}
+
+/* flushed */
+.bambi-input-field[data-variant="flushed"] .bambi-input-control {
+  border-radius: 0;
+  border: none;
+  border-bottom: var(--bambi-input-border-width) solid var(--bambi-input-border);
+  background-color: transparent;
+  overflow: visible;
+}
+
+.bambi-input-field[data-variant="flushed"] .bambi-input-element {
+  padding-inline: 0;
+}
+
+.bambi-input-field[data-variant="flushed"] .bambi-input-control:focus-within {
+  border-bottom-color: var(--bambi-input-ring);
+  box-shadow: 0 1px 0 var(--bambi-input-ring);
+}
+
+/* unstyled */
+.bambi-input-field[data-variant="unstyled"] .bambi-input-control {
+  border: none;
+  background-color: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.bambi-input-field[data-variant="unstyled"] .bambi-input-control:focus-within {
+  box-shadow: none;
+}
+
+/* ─── Tones ──────────────────────────────────────────────────────────────────── */
+
+.bambi-input-field[data-tone="danger"] .bambi-input-control {
+  border-color: var(--bambi-danger);
+}
+
+.bambi-input-field[data-tone="danger"] .bambi-input-control:focus-within {
+  border-color: var(--bambi-danger);
+  box-shadow: 0 0 0 var(--bambi-input-ring-width)
+    color-mix(in oklch, var(--bambi-danger) 30%, transparent);
+}
+
+.bambi-input-field[data-tone="success"] .bambi-input-control {
+  border-color: var(--bambi-success);
+}
+
+.bambi-input-field[data-tone="success"] .bambi-input-control:focus-within {
+  border-color: var(--bambi-success);
+  box-shadow: 0 0 0 var(--bambi-input-ring-width)
+    color-mix(in oklch, var(--bambi-success) 30%, transparent);
+}
+
+.bambi-input-field[data-tone="warning"] .bambi-input-control {
+  border-color: var(--bambi-warning);
+}
+
+.bambi-input-field[data-tone="warning"] .bambi-input-control:focus-within {
+  border-color: var(--bambi-warning);
+  box-shadow: 0 0 0 var(--bambi-input-ring-width)
+    color-mix(in oklch, var(--bambi-warning) 30%, transparent);
+}
+
+/* ─── Invalid state ──────────────────────────────────────────────────────────── */
+
+.bambi-input-field[data-invalid] .bambi-input-control {
+  border-color: var(--bambi-danger);
+}
+
+.bambi-input-field[data-invalid] .bambi-input-control:focus-within {
+  border-color: var(--bambi-danger);
+  box-shadow: 0 0 0 var(--bambi-input-ring-width)
+    color-mix(in oklch, var(--bambi-danger) 30%, transparent);
+}
+
+.bambi-input-field[data-invalid] .bambi-input-label {
+  color: var(--bambi-input-error-color);
+}
+
+/* ─── Disabled state ─────────────────────────────────────────────────────────── */
+
+.bambi-input-field[data-disabled] .bambi-input-control {
+  opacity: var(--bambi-input-disabled-opacity);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.bambi-input-field[data-disabled] .bambi-input-label {
+  opacity: var(--bambi-input-disabled-opacity);
+}
+
+/* ─── Readonly state ─────────────────────────────────────────────────────────── */
+
+.bambi-input-field[data-readonly] .bambi-input-control {
+  background-color: var(--bambi-muted);
+  cursor: default;
+}
+
+.bambi-input-field[data-readonly] .bambi-input-element {
+  cursor: default;
+}
+
+/* ─── Hover state ────────────────────────────────────────────────────────────── */
+
+.bambi-input-control:hover:not(:focus-within) {
+  border-color: color-mix(in oklch, var(--bambi-input-border) 70%, var(--bambi-foreground));
+}
+
+.bambi-input-field[data-disabled] .bambi-input-control:hover {
+  border-color: var(--bambi-input-border);
+}
+
+/* ─── Floating label ─────────────────────────────────────────────────────────── */
+/*
+  In floating mode the label is placed inside .bambi-input-control and
+  positioned absolutely. :focus-within on the control fires when the
+  native input is focused — no JS needed for the focus signal.
+  data-filled on the field wrapper provides the value signal.
+*/
+
+.bambi-input-field[data-label-mode="floating"] .bambi-input-control {
+  /* Extra height to fit floated label + typed text without overlap */
+  height: calc(var(--bambi-input-height-md) + 0.75rem);
+  align-items: flex-end;
+}
+
+.bambi-input-field[data-label-mode="floating"][data-size="sm"] .bambi-input-control {
+  height: calc(var(--bambi-input-height-sm) + 0.75rem);
+}
+
+.bambi-input-field[data-label-mode="floating"][data-size="lg"] .bambi-input-control {
+  height: calc(var(--bambi-input-height-lg) + 0.75rem);
+}
+
+.bambi-input-field[data-label-mode="floating"] .bambi-input-element {
+  padding-bottom: var(--bambi-space-2);
+  padding-top: var(--bambi-space-3);
+  height: auto;
+  align-self: flex-end;
+}
+
+.bambi-input-field[data-label-mode="floating"] .bambi-input-label {
+  position: absolute;
+  left: var(--bambi-input-floating-label-offset-x);
+  /* start centered in the control */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: transform 0.15s ease, top 0.15s ease, font-size 0.15s ease,
+    color 0.15s ease;
+  transform-origin: left center;
+  /* background hides the border line when label overlaps it (outline variant) */
+  background-color: var(--bambi-input-floating-label-bg);
+  padding-inline: 0.125rem;
+  z-index: 1;
+  font-weight: var(--bambi-font-weight-normal);
+  font-size: var(--bambi-text-sm);
+  color: var(--bambi-input-placeholder-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - var(--bambi-input-padding-x) * 2);
+}
+
+/* Label floats when the control is focused or the field has a value */
+.bambi-input-field[data-label-mode="floating"] .bambi-input-control:focus-within
+  .bambi-input-label,
+.bambi-input-field[data-label-mode="floating"][data-filled] .bambi-input-label {
+  top: 0.5rem;
+  transform: translateY(-50%) scale(var(--bambi-input-floating-label-scale));
+  font-weight: var(--bambi-font-weight-medium);
+  color: var(--bambi-input-label-color);
+}
+
+/* Active focus color for floating label */
+.bambi-input-field[data-label-mode="floating"] .bambi-input-control:focus-within
+  .bambi-input-label {
+  color: var(--bambi-input-ring);
+}
+
+/* Shift start adornment label offset so it doesn't overlap the start slot */
+.bambi-input-field[data-label-mode="floating"]
+  .bambi-input-control[data-has-start]
+  .bambi-input-label {
+  left: calc(var(--bambi-input-floating-label-offset-x) + 2.25rem);
+}
+
+/* filled variant: no border to cut through so no background needed */
+.bambi-input-field[data-label-mode="floating"][data-variant="filled"]
+  .bambi-input-label {
+  background-color: transparent;
+}
+
+/* flushed variant: transparent background is fine */
+.bambi-input-field[data-label-mode="floating"][data-variant="flushed"]
+  .bambi-input-label {
+  background-color: transparent;
+}
+
+/* unstyled variant */
+.bambi-input-field[data-label-mode="floating"][data-variant="unstyled"]
+  .bambi-input-label {
+  background-color: transparent;
+}
+
+/* Invalid floating label color when floated */
+.bambi-input-field[data-label-mode="floating"][data-invalid]
+  .bambi-input-control:focus-within
+  .bambi-input-label,
+.bambi-input-field[data-label-mode="floating"][data-invalid][data-filled]
+  .bambi-input-label {
+  color: var(--bambi-input-error-color);
+}
+
+/* Disabled floating label */
+.bambi-input-field[data-label-mode="floating"][data-disabled]
+  .bambi-input-label {
+  pointer-events: none;
+}
+
+/* ─── Standalone input element (used without a field wrapper) ────────────────── */
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element) {
+  display: block;
+  width: 100%;
+  height: var(--bambi-input-height-md);
+  padding-inline: var(--bambi-input-padding-x);
+  border-radius: var(--bambi-radius-md);
+  border: 1px solid var(--bambi-input);
+  background-color: var(--bambi-input-background);
+  color: var(--bambi-input-foreground);
+  font-family: var(--bambi-font-sans);
+  font-size: var(--bambi-text-sm);
+  line-height: 1;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element)::placeholder {
+  color: var(--bambi-input-placeholder);
+}
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element):focus-visible {
+  border-color: var(--bambi-state-focus-ring);
+  box-shadow: 0 0 0 var(--bambi-state-focus-ring-width)
+    color-mix(in oklch, var(--bambi-state-focus-ring) 30%, transparent);
+}
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element):disabled {
+  opacity: var(--bambi-state-disabled-opacity);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element)[aria-invalid="true"] {
+  border-color: var(--bambi-danger);
+}
+
+.bambi-input-element:not(.bambi-input-control .bambi-input-element)[aria-invalid="true"]:focus-visible {
+  border-color: var(--bambi-danger);
+  box-shadow: 0 0 0 var(--bambi-state-focus-ring-width)
+    color-mix(in oklch, var(--bambi-danger) 30%, transparent);
+}

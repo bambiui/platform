@@ -1,0 +1,446 @@
+---
+title: Input
+description: Accessible, themeable text input system for React, Svelte, Vue, and Astro with normal and floating label modes.
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+
+## Installation
+
+```sh
+npx bambiui init
+npx bambiui add input
+```
+
+The CLI copies self-contained Input source into your project. The installed output includes framework source, `recipe.ts`, `types.ts`, and `input.css`.
+
+Import global tokens once:
+
+```css
+@import "./styles/bambi.css";
+```
+
+## Imports
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    import { Input, InputField, InputControl, InputLabel,
+             InputDescription, InputError, InputStart, InputEnd }
+      from './components/ui/input';
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script>
+      import Input from './components/ui/Input.svelte';
+      import InputField from './components/ui/InputField.svelte';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup>
+    import Input from './components/ui/Input.vue';
+    import InputField from './components/ui/InputField.vue';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    import Input from './components/ui/Input.astro';
+    import InputField from './components/ui/InputField.astro';
+    ---
+    ```
+  </TabItem>
+</Tabs>
+
+## Control-only Usage
+
+Use `Input` alone when you supply your own accessible name via `aria-label` or a separate `<label>`.
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code lang="tsx" code={`<Input type="email" aria-label="Email address" placeholder="you@example.com" />`} />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code lang="svelte" code={`<Input type="email" aria-label="Email address" placeholder="you@example.com" />`} />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code lang="vue" code={`<Input type="email" aria-label="Email address" placeholder="you@example.com" />`} />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code lang="astro" code={`<Input type="email" aria-label="Email address" placeholder="you@example.com" />`} />
+  </TabItem>
+</Tabs>
+
+## Props-driven Field
+
+`InputField` renders a complete, labelled form field in a single component. Pass input attributes directly — they are forwarded to the native `<input>`.
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    <InputField
+      label="Email address"
+      description="We will never share your email."
+      error={formErrors.email}
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <InputField
+      label="Email address"
+      description="We will never share your email."
+      error={formErrors.email}
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <InputField
+      label="Email address"
+      description="We will never share your email."
+      :error="formErrors.email"
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    <InputField
+      label="Email address"
+      description="We will never share your email."
+      type="email"
+      name="email"
+      placeholder="you@example.com"
+      required
+    />
+    ```
+  </TabItem>
+</Tabs>
+
+## Label Modes
+
+### Normal (default)
+
+`labelMode="normal"` renders the label above the input. This is the default.
+
+```tsx
+<InputField label="Full name" labelMode="normal" type="text" />
+```
+
+### Floating
+
+`labelMode="floating"` renders the label inside the input area. The label floats above when the field is focused or has a value. The label is still a real `<label>` element — it is never replaced by a placeholder.
+
+```tsx
+<InputField label="Full name" labelMode="floating" type="text" />
+```
+
+**Requirements for floating labels:**
+
+- A `label` prop must be provided; the label element remains the accessible name.
+- Never use `placeholder` as the accessible label.
+- If `placeholder` is also set, it appears after the label has floated.
+- The `data-filled` attribute on the field wrapper tracks value state. React, Svelte, and Vue track this reactively. Astro uses a progressive-enhancement inline script.
+
+## Variants
+
+| Variant | Description |
+| --- | --- |
+| `outline` | Bordered input, default |
+| `filled` | Filled background, no border |
+| `flushed` | Bottom border only |
+| `unstyled` | No default styling |
+
+```tsx
+<InputField label="Outline" variant="outline" type="text" />
+<InputField label="Filled" variant="filled" type="text" />
+<InputField label="Flushed" variant="flushed" type="text" />
+<InputField label="Unstyled" variant="unstyled" type="text" />
+```
+
+## Sizes
+
+| Size | Use case |
+| --- | --- |
+| `sm` | Dense forms |
+| `md` | Default |
+| `lg` | Prominent fields |
+
+```tsx
+<InputField label="Small" size="sm" type="text" />
+<InputField label="Medium" size="md" type="text" />
+<InputField label="Large" size="lg" type="text" />
+```
+
+## Tones
+
+Use `tone` to communicate semantic feedback state.
+
+| Tone | Meaning |
+| --- | --- |
+| `default` | Neutral (default) |
+| `danger` | Error or invalid |
+| `success` | Valid |
+| `warning` | Caution |
+
+```tsx
+<InputField label="Username" tone="success" type="text" />
+<InputField label="Password" tone="danger" error="Too short" type="password" />
+<InputField label="Recovery email" tone="warning" type="email" />
+```
+
+When `error` is set, `tone` is automatically overridden to `danger` and `aria-invalid="true"` is applied to the input.
+
+## Start and End Adornments
+
+Provide prefix and suffix content with `start` and `end` props (React) or slots (Svelte, Vue, Astro).
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    <InputField
+      label="Website"
+      start="https://"
+      end=".com"
+      type="url"
+    />
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <InputField label="Website" type="url">
+      {#snippet start()}https://{/snippet}
+      {#snippet end()}.com{/snippet}
+    </InputField>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <InputField label="Website" type="url">
+      <template #start>https://</template>
+      <template #end>.com</template>
+    </InputField>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    <InputField label="Website" type="url">
+      <Fragment slot="start">https://</Fragment>
+      <Fragment slot="end">.com</Fragment>
+    </InputField>
+    ```
+  </TabItem>
+</Tabs>
+
+Decorative icons in adornments should be `aria-hidden="true"`. If an adornment is interactive (e.g., a reveal button), it must have an accessible name and be keyboard reachable.
+
+## Compound Usage
+
+For advanced layouts, use the compound primitives directly. `InputField` provides context in React so `InputLabel`, `InputDescription`, and `InputError` receive their IDs automatically.
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    <InputField variant="filled" size="lg">
+      <InputLabel>Website</InputLabel>
+      <InputControl hasStart hasEnd>
+        <InputStart>https://</InputStart>
+        <Input type="url" />
+        <InputEnd>.com</InputEnd>
+      </InputControl>
+      <InputDescription>Enter your site without the protocol.</InputDescription>
+      <InputError>Please enter a valid URL.</InputError>
+    </InputField>
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <!-- In Svelte, use InputField with children snippet for compound layout -->
+    <InputField variant="filled" size="lg">
+      {#snippet children()}
+        <!-- manually compose structure here with HTML classes -->
+        <label class="bambi-input-label" for="site">Website</label>
+        <div class="bambi-input-control" data-has-start data-has-end>
+          <div class="bambi-input-start">https://</div>
+          <input id="site" type="url" class="bambi-input-element" />
+          <div class="bambi-input-end">.com</div>
+        </div>
+        <p class="bambi-input-description">Enter your site without the protocol.</p>
+      {/snippet}
+    </InputField>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <!-- In Vue, use InputField default slot for compound layout -->
+    <InputField variant="filled" size="lg">
+      <label class="bambi-input-label" for="site">Website</label>
+      <div class="bambi-input-control" data-has-start data-has-end>
+        <div class="bambi-input-start">https://</div>
+        <input id="site" type="url" class="bambi-input-element" />
+        <div class="bambi-input-end">.com</div>
+      </div>
+      <p class="bambi-input-description">Enter your site without the protocol.</p>
+    </InputField>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    <InputField variant="filled" size="lg">
+      <label class="bambi-input-label" for="site">Website</label>
+      <div class="bambi-input-control" data-has-start data-has-end>
+        <div class="bambi-input-start">https://</div>
+        <input id="site" type="url" class="bambi-input-element" />
+        <div class="bambi-input-end">.com</div>
+      </div>
+      <p class="bambi-input-description">Enter your site without the protocol.</p>
+    </InputField>
+    ```
+  </TabItem>
+</Tabs>
+
+## States
+
+### Disabled
+
+```tsx
+<InputField label="Username" type="text" disabled />
+```
+
+### Readonly
+
+```tsx
+<InputField label="Account ID" type="text" value="acc_12345" readOnly />
+```
+
+### Required
+
+```tsx
+<InputField label="Email" type="email" required />
+```
+
+Required inputs receive the native `required` attribute. A visual `*` indicator is rendered after the label (aria-hidden). Native browser validation and AT communicate `required` semantics through the native attribute.
+
+### Invalid / Error
+
+```tsx
+<InputField
+  label="Password"
+  type="password"
+  error="Password must be at least 8 characters"
+/>
+```
+
+`error` sets `tone="danger"`, `aria-invalid="true"` on the input, and renders the error message with `role="alert"` and an `aria-describedby` connection to the input.
+
+## API Reference
+
+### InputField Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | — | Visible label text |
+| `labelMode` | `'normal' \| 'floating'` | `'normal'` | Label placement behaviour |
+| `description` | `string` | — | Helper text below the input |
+| `error` | `string` | — | Error message; sets `aria-invalid` and `tone="danger"` |
+| `variant` | `'outline' \| 'filled' \| 'flushed' \| 'unstyled'` | `'outline'` | Visual style |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Input height and font size |
+| `tone` | `'default' \| 'danger' \| 'success' \| 'warning'` | `'default'` | Semantic colour state |
+| `invalid` | `boolean` | — | Marks input invalid without an error message |
+| `fullWidth` | `boolean` | `false` | Stretches field to container width |
+| `required` | `boolean` | — | Native required attribute + visual indicator |
+| `disabled` | `boolean` | — | Native disabled attribute |
+| `readOnly` | `boolean` | — | Native readonly attribute |
+| `start` | `ReactNode` (React) / slot (others) | — | Start adornment |
+| `end` | `ReactNode` (React) / slot (others) | — | End adornment |
+
+All native `<input>` attributes (`type`, `name`, `value`, `placeholder`, `autoComplete`, `onChange`, etc.) are forwarded to the native element.
+
+### Input Props
+
+`Input` accepts all native `<input>` attributes plus `variant`, `size`, `tone`, `invalid`, and `fullWidth` from `InputBaseProps`.
+
+## Data Attributes
+
+Input styling is driven by stable data attributes on the field wrapper:
+
+| Attribute | Source |
+| --- | --- |
+| `data-variant` | `variant` |
+| `data-size` | `size` |
+| `data-tone` | computed tone (error overrides) |
+| `data-label-mode` | `labelMode` |
+| `data-invalid` | `invalid` or `error` |
+| `data-disabled` | `disabled` |
+| `data-readonly` | `readOnly` |
+| `data-required` | `required` |
+| `data-full-width` | `fullWidth` |
+| `data-filled` | input has a value |
+| `data-has-start` | start adornment present (on control) |
+| `data-has-end` | end adornment present (on control) |
+
+## Accessibility
+
+### Labels
+
+Every input must have an accessible name. Use `InputField` with a `label` prop, or use `Input` with `aria-label` / an external `<label>`.
+
+```tsx
+<!-- Preferred: visible label via InputField -->
+<InputField label="Email" type="email" />
+
+<!-- Acceptable: standalone Input with aria-label -->
+<Input type="search" aria-label="Search" />
+```
+
+### Floating Labels
+
+Floating labels are real `<label>` elements associated with the input via `for`/`id`. They must never be replaced by `placeholder`. Placeholder text is supplementary — it disappears when the user types and is not accessible to all AT. A floating label that has floated above the input is still the accessible name.
+
+### Descriptions and Errors
+
+Description and error text are connected to the input via `aria-describedby`. When both exist, both IDs are included.
+
+```tsx
+<InputField
+  label="Email"
+  description="We will never share your email."
+  error="Please enter a valid email address."
+  type="email"
+/>
+<!-- renders: aria-describedby="[desc-id] [err-id]" on the input -->
+```
+
+### aria-invalid
+
+When `error` is provided or `invalid` is `true`, `aria-invalid="true"` is set on the native input. Assistive technology announces this to users.
+
+### Required
+
+Native `required` is set on the input. The visual asterisk is `aria-hidden="true"` to avoid double-announcement.
+
+### Disabled and Readonly
+
+- `disabled` uses the native `disabled` attribute.
+- `readOnly` uses the native `readonly`/`readOnly` attribute.
+- Focus remains possible on readonly inputs so users can still read and copy the value.
+
+### Placeholder is Not a Label
+
+Never use `placeholder` as the only accessible name for an input. The placeholder disappears once typing begins and has low colour contrast by design. Always provide a real `<label>`.

@@ -1,0 +1,220 @@
+---
+import Button from "@bambiui/components/button/astro";
+import Card from "@bambiui/components/card/astro";
+import InputField from "@bambiui/components/input/astro/field";
+
+const variants = ["outline", "filled", "flushed", "unstyled"] as const;
+const sizes = ["sm", "md", "lg"] as const;
+const tones = ["default", "success", "warning", "danger"] as const;
+---
+
+<Card class="card component-preview-card" id="input-card-preview">
+  <div class="cardHeader">
+    <div>
+      <h3>Input</h3>
+      <p class="component-description">
+        Accessible form input with normal and floating label modes, variants, tones, and adornments.
+      </p>
+    </div>
+    <Button appearance="link" href="/docs/components/input">Docs</Button>
+  </div>
+
+  <!-- Variants -->
+  <div class="preview-section">
+    <span class="preview-section-label">Variants</span>
+    <div class="input-preview-grid">
+      {variants.map((variant) => (
+        <InputField
+          label={variant.charAt(0).toUpperCase() + variant.slice(1)}
+          variant={variant}
+          type="text"
+          placeholder="Placeholder"
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- Sizes -->
+  <div class="preview-section">
+    <span class="preview-section-label">Sizes</span>
+    <div class="input-preview-grid">
+      {sizes.map((size) => (
+        <InputField
+          label={`Size ${size}`}
+          size={size}
+          type="text"
+          placeholder={`Size ${size}`}
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- Tones -->
+  <div class="preview-section">
+    <span class="preview-section-label">Tones</span>
+    <div class="input-preview-grid">
+      {tones.map((tone) => (
+        <InputField
+          label={`Tone ${tone}`}
+          tone={tone}
+          type="text"
+          placeholder="Value"
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- Normal label mode -->
+  <div class="preview-section">
+    <span class="preview-section-label">Normal label</span>
+    <div class="input-preview-grid">
+      <InputField
+        label="Email address"
+        labelMode="normal"
+        type="email"
+        placeholder="you@example.com"
+        description="We will never share your email."
+      />
+      <InputField
+        label="Full name"
+        labelMode="normal"
+        type="text"
+        required
+      />
+    </div>
+  </div>
+
+  <!-- Floating label mode -->
+  <div class="preview-section">
+    <span class="preview-section-label">Floating label</span>
+    <div class="input-preview-grid">
+      <InputField
+        label="Email address"
+        labelMode="floating"
+        type="email"
+        description="Label floats on focus or value."
+      />
+      <InputField
+        label="Website"
+        labelMode="floating"
+        type="url"
+        variant="filled"
+      />
+    </div>
+  </div>
+
+  <!-- States -->
+  <div class="preview-section">
+    <span class="preview-section-label">States</span>
+    <div class="input-preview-grid">
+      <InputField
+        label="Disabled"
+        type="text"
+        value="Cannot edit"
+        disabled
+      />
+      <InputField
+        label="Readonly"
+        type="text"
+        value="Read only value"
+        readOnly
+      />
+      <InputField
+        label="Invalid"
+        type="email"
+        value="not-an-email"
+        invalid
+        error="Please enter a valid email address."
+      />
+      <InputField
+        label="Required"
+        type="text"
+        required
+      />
+    </div>
+  </div>
+
+  <!-- Success and Warning -->
+  <div class="preview-section">
+    <span class="preview-section-label">Feedback tones</span>
+    <div class="input-preview-grid">
+      <InputField
+        label="Username"
+        type="text"
+        value="bambi_user"
+        tone="success"
+        description="Username is available."
+      />
+      <InputField
+        label="Recovery email"
+        type="email"
+        tone="warning"
+        description="This email may already be in use."
+      />
+    </div>
+  </div>
+
+  <!-- With adornments -->
+  <div class="preview-section">
+    <span class="preview-section-label">Start / End adornments</span>
+    <div class="input-preview-grid">
+      <InputField label="Website" type="url" variant="outline">
+        <Fragment slot="start">https://</Fragment>
+        <Fragment slot="end">.com</Fragment>
+      </InputField>
+      <InputField label="Amount" type="number" size="lg" variant="filled">
+        <Fragment slot="start">$</Fragment>
+        <Fragment slot="end">USD</Fragment>
+      </InputField>
+    </div>
+  </div>
+
+  <!-- Floating label with adornments -->
+  <div class="preview-section">
+    <span class="preview-section-label">Floating label + adornments</span>
+    <div class="input-preview-grid">
+      <InputField label="Domain" type="text" labelMode="floating" variant="outline">
+        <Fragment slot="start">https://</Fragment>
+        <Fragment slot="end">.com</Fragment>
+      </InputField>
+    </div>
+  </div>
+
+  <!-- Full width -->
+  <div class="preview-section">
+    <span class="preview-section-label">Full width</span>
+    <InputField
+      label="Full width field"
+      type="text"
+      fullWidth
+      description="Stretches to container width."
+    />
+  </div>
+
+  <!-- Compound layout (props-driven mode with error) -->
+  <div class="preview-section">
+    <span class="preview-section-label">Props-driven with error</span>
+    <div class="input-preview-grid">
+      <InputField
+        label="Password"
+        type="password"
+        error="Password must be at least 8 characters."
+        required
+      />
+      <InputField
+        label="Confirm password"
+        type="password"
+        description="Enter the same password again."
+        tone="success"
+      />
+    </div>
+  </div>
+</Card>
+
+<style>
+  .input-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--bambi-space-4);
+  }
+</style>

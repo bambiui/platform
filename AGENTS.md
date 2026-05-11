@@ -9,8 +9,9 @@ packages/cli        bambiui init/add; fetches registry assets and writes user fi
 packages/core       framework-agnostic contracts and shared type source of truth
 packages/tokens     global CSS tokens only
 packages/components source component implementations; button is canonical
-apps/docs           Starlight docs; dogfoods source components
-apps/builder        static token builder; served at /builder
+apps/www            custom Astro marketing/landing site; served at /
+apps/docs           Starlight documentation only; served at /docs
+apps/studio         token builder, previews, playground; served at /studio
 registry.json       manifest copied to the static site and consumed by CLI
 ```
 
@@ -20,16 +21,17 @@ Nested rules:
 - `packages/core/AGENTS.md`
 - `packages/components/AGENTS.md`
 - `apps/docs/AGENTS.md`
-- `apps/builder/AGENTS.md`
+- `apps/studio/AGENTS.md`
 
 ## Architecture Principles
 
-- Dependency direction: `cli -> registry/static files`; `components -> core`; `docs/builder -> components + tokens`.
+- Dependency direction: `cli -> registry/static files`; `components -> core`; `docs/studio -> components + tokens`.
 - `packages/cli` must not depend on `@bambiui/components` or `@bambiui/tokens` at runtime.
 - Installed component files must be self-contained after the CLI copies them.
 - Shared contracts live in `packages/core/src/contracts.ts`; component-specific contracts derive from them.
 - Global tokens live in `packages/tokens/src/tokens.css`; component token defaults live beside the component CSS.
 - Component CSS should be shared across frameworks and driven by stable `data-*` attributes.
+- Production output is `apps/www/dist`; docs and studio are merged in at `/docs` and `/studio`.
 
 ## Forbidden
 
@@ -37,9 +39,13 @@ Nested rules:
 - Do not import bambiui runtime packages from installed component output.
 - Do not move component tokens such as `--bambi-button-*` into global `tokens.css`.
 - Do not duplicate recipes across frameworks; use one component-local recipe when needed.
-- Do not change builder `base: '/builder'` unless deployment changes too.
+- Do not change studio `base: '/studio'` unless deployment changes too.
 - Do not redesign registry, package layout, or runtime boundaries.
 - Do not edit generated/template fixture files without checking their source.
+- Do not reintroduce `/builder` paths or `apps/builder`.
+- Do not treat `apps/docs` as the product landing page or add marketing sections to it.
+- Do not add Starlight UI elements to `apps/www`.
+- Do not add heavy live previews or playgrounds to `apps/docs`; put them in `apps/studio`.
 
 ## Golden References
 
@@ -56,22 +62,24 @@ pnpm install
 pnpm check
 pnpm build
 pnpm check-types
+pnpm --filter www dev
 pnpm --filter docs dev
-pnpm --filter builder dev
+pnpm --filter studio dev
 pnpm deploy-static
 ```
 
 ## Verification Matrix
 
-| Change                                             | Run                                 |
-| -------------------------------------------------- | ----------------------------------- |
-| component source/CSS/contracts/CLI/registry/tokens | `pnpm check`                        |
-| CLI only                                           | `pnpm --filter bambiui check`       |
-| registry only                                      | `pnpm check-registry`               |
-| token only                                         | `pnpm check-tokens`                 |
-| docs only                                          | `pnpm --filter docs check-types`    |
-| builder only                                       | `pnpm --filter builder check-types` |
-| templates                                          | `pnpm smoke:templates`              |
+| Change                                             | Run                                  |
+| -------------------------------------------------- | ------------------------------------ |
+| component source/CSS/contracts/CLI/registry/tokens | `pnpm check`                         |
+| CLI only                                           | `pnpm --filter bambiui check`        |
+| registry only                                      | `pnpm check-registry`                |
+| token only                                         | `pnpm check-tokens`                  |
+| docs only                                          | `pnpm --filter docs check-types`     |
+| studio only                                        | `pnpm --filter studio check-types`   |
+| www only                                           | `pnpm --filter www check-types`      |
+| templates                                          | `pnpm smoke:templates`               |
 
 ## Add A Component
 

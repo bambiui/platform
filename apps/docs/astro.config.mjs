@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 
 export default defineConfig({
   site: "https://bambiui.com",
+  base: "/docs",
   integrations: [
     starlight({
       title: "bambiui",

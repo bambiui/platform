@@ -1,5 +1,5 @@
 {
-  "name": "builder",
+  "name": "www",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -8,13 +8,13 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "check-types": "astro build",
+    "check-types": "astro check",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@bambiui/components": "workspace:*",
-    "@bambiui/tokens": "workspace:*",
-    "astro": "^6.3.1"
+    "@astrojs/check": "^0.9.4",
+    "astro": "^6.3.1",
+    "typescript": "^5.9.3"
   }
 }

@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const distRoot = path.join(repoRoot, "apps/docs/dist");
+const distRoot = path.join(repoRoot, "apps/www/dist");
 const registryPath = path.join(repoRoot, "registry.json");
 const schemaPath = path.join(repoRoot, "registry.schema.json");
 const registry = JSON.parse(await readFile(registryPath, "utf8"));
@@ -43,4 +43,4 @@ for (const file of files.filter(Boolean)) {
   await copyIntoDist(/** @type {string} */ (file));
 }
 
-process.stdout.write("Registry assets copied into apps/docs/dist.\n");
+process.stdout.write("Registry assets copied into apps/www/dist.\n");

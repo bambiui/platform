@@ -2,7 +2,7 @@
 
 A CLI-first, source-distributed UI toolkit for React, Svelte, Vue, and Astro.
 
-**[Documentation](https://bambiui.com)** · **[Token Builder](https://bambiui.com/builder)** · **[GitHub](https://github.com/bambiui/platform)**
+**[Documentation](https://bambiui.com/docs)** · **[Studio](https://bambiui.com/studio)** · **[GitHub](https://github.com/bambiui/platform)**
 
 ## Workspace
 
@@ -15,10 +15,11 @@ A CLI-first, source-distributed UI toolkit for React, Svelte, Vue, and Astro.
 
 ## Apps
 
-| App                            | Description                                               |
-| ------------------------------ | --------------------------------------------------------- |
-| [`apps/docs`](apps/docs)       | Starlight documentation site                              |
-| [`apps/builder`](apps/builder) | Grid-based design token editor, served at `/builder`      |
+| App                          | Description                                                        |
+| ---------------------------- | ------------------------------------------------------------------ |
+| [`apps/www`](apps/www)       | Custom Astro marketing/landing site, served at `/`                 |
+| [`apps/docs`](apps/docs)     | Starlight documentation site, served at `/docs`                    |
+| [`apps/studio`](apps/studio) | Grid-based token editor and component playground, served at `/studio` |
 
 ## Getting started
 
@@ -112,14 +113,14 @@ Requirements: Node ≥ 22.12.0, pnpm 9
 # Install dependencies
 pnpm install
 
-# Build docs and builder
-pnpm build
+# Start the marketing site
+pnpm --filter www dev
 
 # Start the docs site
 pnpm --filter docs dev
 
-# Start the token builder
-pnpm --filter builder dev
+# Start the studio
+pnpm --filter studio dev
 
 # Type-check everything
 pnpm check-types
@@ -130,19 +131,20 @@ pnpm check
 
 ## Deployment
 
-Both `docs` and `builder` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build everything, merge builder output into the docs dist, and publish the static registry manifest plus all source files referenced by it:
+`www`, `docs`, and `studio` deploy as a single Cloudflare Pages project. Run `pnpm deploy-static` to build all three, merge outputs into `apps/www/dist`, and publish the static registry manifest plus all source files referenced by it:
 
 ```sh
 pnpm deploy-static
-# output → apps/docs/dist/
-#   /          → docs site
-#   /builder   → token builder
+# output → apps/www/dist/
+#   /          → marketing site
+#   /docs      → documentation
+#   /studio    → token editor and playground
 #   /registry.json
 #   /registry.schema.json
 #   /packages/... → source files used by the CLI registry
 ```
 
-See [`apps/builder/README.md`](apps/builder/README.md) for Cloudflare Pages project settings.
+See [`apps/studio/README.md`](apps/studio/README.md) for Cloudflare Pages project settings.
 
 ## License
 

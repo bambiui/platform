@@ -28,6 +28,7 @@
 </script>
 
 <button
+  {...attrs}
   {type}
   class={cls}
   data-intent={intent}
@@ -37,7 +38,6 @@
   aria-busy={isLoading || undefined}
   aria-disabled={isDisabled || undefined}
   disabled={isDisabled}
-  {...attrs}
 >
   {#if isLoading}
     <span class="bambi-button-spinner" aria-hidden="true"></span>

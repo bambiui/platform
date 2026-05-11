@@ -1,23 +1,21 @@
 import {
   bambiAppearances,
   bambiIntents,
-  bambiSizes,
   type BambiAppearance,
   type BambiIntent,
-  type BambiSize,
 } from "./contracts";
 
 export const buttonIntents = bambiIntents;
 
 export const buttonAppearances = bambiAppearances;
 
-export const buttonSizes = bambiSizes;
+export const buttonSizes = ["sm", "md", "lg", "icon"] as const;
 
 export type ButtonIntent = BambiIntent;
 
 export type ButtonAppearance = BambiAppearance;
 
-export type ButtonSize = BambiSize;
+export type ButtonSize = (typeof buttonSizes)[number];
 
 export interface ButtonBaseProps {
   intent?: ButtonIntent;

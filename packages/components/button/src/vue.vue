@@ -29,6 +29,7 @@ const isDisabled = computed(() => Boolean(props.disabled || isLoading.value));
 
 <template>
   <button
+    v-bind="attrs"
     :type="props.type"
     :class="cls"
     :data-intent="props.intent"
@@ -38,13 +39,8 @@ const isDisabled = computed(() => Boolean(props.disabled || isLoading.value));
     :aria-busy="isLoading || undefined"
     :aria-disabled="isDisabled || undefined"
     :disabled="isDisabled"
-    v-bind="attrs"
   >
-    <span
-      v-if="isLoading"
-      class="bambi-button-spinner"
-      aria-hidden="true"
-    />
+    <span v-if="isLoading" class="bambi-button-spinner" aria-hidden="true" />
     <span class="bambi-button-content"><slot /></span>
   </button>
 </template>

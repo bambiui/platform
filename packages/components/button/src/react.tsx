@@ -37,6 +37,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
+        {...props}
         ref={ref}
         type={type}
         data-intent={intent}
@@ -47,7 +48,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-disabled={isDisabled || undefined}
         disabled={isDisabled}
         className={cn(buttonRecipe.className, className)}
-        {...props}
       >
         {isLoading && (
           <span className="bambi-button-spinner" aria-hidden="true" />

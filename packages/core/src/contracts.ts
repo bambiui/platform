@@ -8,7 +8,7 @@ export const bambiIntents = [
 
 export const bambiAppearances = ["solid", "outline", "ghost", "link"] as const;
 
-export const bambiSizes = ["sm", "md", "lg", "icon"] as const;
+export const bambiSizes = ["sm", "md", "lg"] as const;
 
 export type BambiIntent = (typeof bambiIntents)[number];
 

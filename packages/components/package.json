@@ -23,7 +23,28 @@
     "./buttongroup/vue": "./buttongroup/src/vue.vue",
     "./buttongroup/astro": "./buttongroup/src/astro.astro",
     "./buttongroup/recipe": "./buttongroup/src/recipe.ts",
-    "./buttongroup.css": "./buttongroup/src/buttongroup.css"
+    "./buttongroup.css": "./buttongroup/src/buttongroup.css",
+    "./card": "./card/src/index.ts",
+    "./card/react": "./card/src/react.tsx",
+    "./card/svelte": "./card/src/svelte.svelte",
+    "./card/vue": "./card/src/vue.vue",
+    "./card/astro": "./card/src/astro.astro",
+    "./card/recipe": "./card/src/recipe.ts",
+    "./card.css": "./card/src/card.css",
+    "./sidebar": "./sidebar/src/index.ts",
+    "./sidebar/react": "./sidebar/src/react.tsx",
+    "./sidebar/svelte": "./sidebar/src/svelte.svelte",
+    "./sidebar/vue": "./sidebar/src/vue.vue",
+    "./sidebar/astro": "./sidebar/src/astro.astro",
+    "./sidebar/recipe": "./sidebar/src/recipe.ts",
+    "./sidebar.css": "./sidebar/src/sidebar.css",
+    "./drawer": "./drawer/src/index.ts",
+    "./drawer/react": "./drawer/src/react.tsx",
+    "./drawer/svelte": "./drawer/src/svelte.svelte",
+    "./drawer/vue": "./drawer/src/vue.vue",
+    "./drawer/astro": "./drawer/src/astro.astro",
+    "./drawer/recipe": "./drawer/src/recipe.ts",
+    "./drawer.css": "./drawer/src/drawer.css"
   },
   "dependencies": {
     "@bambiui/core": "workspace:*"
@@ -31,6 +52,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-astro": "^1.5.0",
     "eslint-plugin-react": "^7.37.5",
@@ -42,6 +64,7 @@
   "peerDependencies": {
     "astro": ">=4",
     "react": ">=18",
+    "react-dom": ">=18",
     "svelte": ">=4",
     "vue": ">=3"
   },
@@ -50,6 +73,9 @@
       "optional": true
     },
     "react": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     },
     "svelte": {

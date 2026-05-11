@@ -1,0 +1,97 @@
+---
+import { sidebarRecipe } from "./recipe";
+import type { SidebarBaseProps } from "./types";
+import "./sidebar.css";
+
+interface Props extends SidebarBaseProps {
+  class?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
+const astro = Astro as unknown as { props: Props };
+
+const {
+  side = sidebarRecipe.defaults.side,
+  collapsible = sidebarRecipe.defaults.collapsible,
+  defaultOpen = sidebarRecipe.defaults.defaultOpen,
+  class: className,
+  id,
+  ...attrs
+} = astro.props;
+
+const sidebarId = id ?? `bambi-sidebar-${Math.random().toString(36).slice(2, 7)}`;
+const overlayId = `${sidebarId}-overlay`;
+const cls = [sidebarRecipe.className, className].filter(Boolean).join(" ");
+const initialState = defaultOpen ? "open" : "closed";
+---
+
+{collapsible === "offcanvas" && (
+  <div
+    id={overlayId}
+    class="bambi-sidebar-overlay"
+    data-state={initialState}
+    aria-hidden="true"
+  ></div>
+)}
+
+<nav
+  {...attrs}
+  id={sidebarId}
+  class={cls}
+  data-state={initialState}
+  data-side={side}
+  data-collapsible={collapsible}
+  aria-label="Sidebar navigation"
+>
+  <slot />
+  <div class="bambi-sidebar-rail">
+    <button
+      type="button"
+      class="bambi-sidebar-rail-trigger"
+      aria-label={defaultOpen ? "Collapse sidebar" : "Expand sidebar"}
+      aria-expanded={defaultOpen}
+      data-sidebar-toggle={sidebarId}
+    >
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+        <path
+          d={defaultOpen ? "M7 2L4 5l3 3" : "M3 2l3 3-3 3"}
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("[data-sidebar-toggle]").forEach((btn) => {
+    const targetId = btn.dataset.sidebarToggle;
+    if (!targetId) return;
+    const sidebar = document.getElementById(targetId);
+    if (!sidebar) return;
+
+    const overlayId = `${targetId}-overlay`;
+    const overlay = document.getElementById(overlayId);
+
+    btn.addEventListener("click", () => {
+      const isOpen = sidebar.dataset.state === "open";
+      const next = isOpen ? "closed" : "open";
+      sidebar.dataset.state = next;
+      if (overlay) overlay.dataset.state = next;
+      btn.setAttribute("aria-expanded", String(!isOpen));
+      btn.setAttribute("aria-label", !isOpen ? "Collapse sidebar" : "Expand sidebar");
+    });
+
+    if (overlay) {
+      overlay.addEventListener("click", () => {
+        sidebar.dataset.state = "closed";
+        overlay.dataset.state = "closed";
+        btn.setAttribute("aria-expanded", "false");
+        btn.setAttribute("aria-label", "Expand sidebar");
+      });
+    }
+  });
+</script>

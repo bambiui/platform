@@ -1,0 +1,279 @@
+---
+title: Card
+description: A flexible layout primitive for grouping related content. Supports variants, sizes, and optional interactive (link) behavior.
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+
+## Installation
+
+```sh
+npx bambiui add card
+```
+
+The CLI copies the Card source into your project. Installed files are self-contained.
+
+Import the token file once from your global stylesheet:
+
+```css
+@import "./styles/bambi.css";
+```
+
+Then import the component:
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './components/ui/card';
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script>
+      import Card from './components/ui/Card.svelte';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup>
+    import Card from './components/ui/Card.vue';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    import Card from './components/ui/Card.astro';
+    ---
+    ```
+  </TabItem>
+</Tabs>
+
+## Basic Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`<Card>
+  <CardHeader>
+    <CardTitle>Account settings</CardTitle>
+    <CardDescription>Manage your account preferences.</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Your content goes here.</p>
+  </CardContent>
+  <CardFooter>
+    <Button>Save</Button>
+  </CardFooter>
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<Card>
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Account settings</h3>
+    <p class="bambi-card-description">Manage your account preferences.</p>
+  </div>
+  <div class="bambi-card-content">
+    <p>Your content goes here.</p>
+  </div>
+  <div class="bambi-card-footer">
+    <button>Save</button>
+  </div>
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Card>
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Account settings</h3>
+    <p class="bambi-card-description">Manage your account preferences.</p>
+  </div>
+  <div class="bambi-card-content">
+    <p>Your content goes here.</p>
+  </div>
+  <div class="bambi-card-footer">
+    <button>Save</button>
+  </div>
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<Card>
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Account settings</h3>
+    <p class="bambi-card-description">Manage your account preferences.</p>
+  </div>
+  <div class="bambi-card-content">
+    <p>Your content goes here.</p>
+  </div>
+  <div class="bambi-card-footer">
+    <button>Save</button>
+  </div>
+</Card>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Variants
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`<Card variant="default">Default</Card>
+<Card variant="outline">Outline</Card>
+<Card variant="ghost">Ghost</Card>
+<Card variant="elevated">Elevated</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<Card variant="default">Default</Card>
+<Card variant="outline">Outline</Card>
+<Card variant="ghost">Ghost</Card>
+<Card variant="elevated">Elevated</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Card variant="default">Default</Card>
+<Card variant="outline">Outline</Card>
+<Card variant="ghost">Ghost</Card>
+<Card variant="elevated">Elevated</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<Card variant="default">Default</Card>
+<Card variant="outline">Outline</Card>
+<Card variant="ghost">Ghost</Card>
+<Card variant="elevated">Elevated</Card>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Sizes
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code lang="tsx" code={`<Card size="sm">Small padding</Card>
+<Card size="md">Medium padding (default)</Card>
+<Card size="lg">Large padding</Card>`} />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code lang="svelte" code={`<Card size="sm">Small</Card>
+<Card size="md">Medium</Card>
+<Card size="lg">Large</Card>`} />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code lang="vue" code={`<Card size="sm">Small</Card>
+<Card size="md">Medium</Card>
+<Card size="lg">Large</Card>`} />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code lang="astro" code={`<Card size="sm">Small</Card>
+<Card size="md">Medium</Card>
+<Card size="lg">Large</Card>`} />
+  </TabItem>
+</Tabs>
+
+## Interactive Card
+
+Use `interactive` (or `CardLink` in React) for clickable cards. Always prefer real link or button semantics.
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`{/* Renders as <a> with full keyboard and focus support */}
+<CardLink href="/projects/1">
+  <CardHeader>
+    <CardTitle>Project Alpha</CardTitle>
+    <CardDescription>View project details</CardDescription>
+  </CardHeader>
+</CardLink>
+
+{/* Renders as <div data-interactive> */}
+<Card interactive onClick={() => navigate('/projects/1')}>
+  <CardContent>Clickable card</CardContent>
+</Card>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<a class="bambi-card" data-variant="default" data-size="md" data-interactive href="/projects/1">
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Project Alpha</h3>
+    <p class="bambi-card-description">View project details</p>
+  </div>
+</a>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<a class="bambi-card" data-variant="default" data-size="md" data-interactive href="/projects/1">
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Project Alpha</h3>
+    <p class="bambi-card-description">View project details</p>
+  </div>
+</a>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<a class="bambi-card" data-variant="default" data-size="md" data-interactive href="/projects/1">
+  <div class="bambi-card-header">
+    <h3 class="bambi-card-title">Project Alpha</h3>
+    <p class="bambi-card-description">View project details</p>
+  </div>
+</a>`}
+    />
+  </TabItem>
+</Tabs>
+
+## CSS Classes
+
+The following CSS classes are available for structuring card content in any framework:
+
+| Class | Element |
+| --- | --- |
+| `bambi-card` | Root card container |
+| `bambi-card-header` | Header section |
+| `bambi-card-title` | Title text |
+| `bambi-card-description` | Description text |
+| `bambi-card-content` | Main content area |
+| `bambi-card-footer` | Footer action area |
+
+## API Reference
+
+### Card / `<Card>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'default' \| 'outline' \| 'ghost' \| 'elevated'` | `'default'` | Visual style |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Padding density |
+| `interactive` | `boolean` | `false` | Adds hover/focus styles; use real `<a>` for navigation |
+
+React also exports `CardLink` (renders `<a>`), `CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, and `CardFooter` as helper components. All forward HTML attributes.
+
+## Accessibility
+
+- Plain layout cards use no ARIA roles — they are correctly treated as generic containers.
+- When the card is interactive, use `CardLink` (React) or an `<a>` element for navigation, or a `<button>` for actions. This ensures keyboard access and correct screen-reader announcements.
+- `CardTitle` renders as `<h3>` by default in React; pass `as="h2"` etc. to match document outline. In Svelte/Vue/Astro use the appropriate heading element directly.
+- Visible focus ring is applied via `:focus-visible` on interactive cards.

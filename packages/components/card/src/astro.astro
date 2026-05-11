@@ -1,0 +1,32 @@
+---
+import { cardRecipe } from "./recipe";
+import type { CardBaseProps } from "./types";
+import "./card.css";
+
+interface Props extends CardBaseProps {
+  class?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
+const astro = Astro as unknown as { props: Props };
+
+const {
+  variant = cardRecipe.defaults.variant,
+  size = cardRecipe.defaults.size,
+  interactive = cardRecipe.defaults.interactive,
+  class: className,
+  ...attrs
+} = astro.props;
+
+const cls = [cardRecipe.className, className].filter(Boolean).join(" ");
+---
+<div
+  {...attrs}
+  class={cls}
+  data-variant={variant}
+  data-size={size}
+  data-interactive={interactive || undefined}
+>
+  <slot />
+</div>

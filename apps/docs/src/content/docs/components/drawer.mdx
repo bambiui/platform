@@ -1,0 +1,234 @@
+---
+title: Drawer
+description: Fully accessible modal drawer / sheet / slide-over component with focus trapping, scroll lock, Escape key support, and sides top/right/bottom/left.
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+
+## Installation
+
+```sh
+npx bambiui add drawer
+```
+
+Import the token file once from your global stylesheet:
+
+```css
+@import "./styles/bambi.css";
+```
+
+Then import the component:
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    import {
+      DrawerRoot, DrawerTrigger, DrawerPortal, DrawerOverlay,
+      DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription,
+      DrawerBody, DrawerFooter, DrawerClose,
+    } from './components/ui/drawer';
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script>
+      import Drawer from './components/ui/Drawer.svelte';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup>
+    import Drawer from './components/ui/Drawer.vue';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    import Drawer from './components/ui/Drawer.astro';
+    ---
+    ```
+  </TabItem>
+</Tabs>
+
+## Basic Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`const [open, setOpen] = useState(false);
+
+<DrawerRoot open={open} onOpenChange={setOpen} side="right" size="md">
+  <DrawerTrigger onClick={() => setOpen(true)}>Open Drawer</DrawerTrigger>
+  <DrawerPortal>
+    <DrawerOverlay />
+    <DrawerContent>
+      <DrawerClose />
+      <DrawerHeader>
+        <DrawerTitle>Edit profile</DrawerTitle>
+        <DrawerDescription>Make changes to your profile here.</DrawerDescription>
+      </DrawerHeader>
+      <DrawerBody>
+        <p>Your content goes here.</p>
+      </DrawerBody>
+      <DrawerFooter>
+        <Button onClick={() => setOpen(false)}>Save</Button>
+      </DrawerFooter>
+    </DrawerContent>
+  </DrawerPortal>
+</DrawerRoot>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<script>
+  let open = $state(false);
+</script>
+
+<button type="button" onclick={() => (open = true)}>Open Drawer</button>
+
+<Drawer bind:open={open} side="right" size="md">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title">Edit profile</h2>
+    <p class="bambi-drawer-description">Make changes to your profile here.</p>
+  </div>
+  <div class="bambi-drawer-body">
+    <p>Your content goes here.</p>
+  </div>
+  <div class="bambi-drawer-footer">
+    <button type="button" onclick={() => (open = false)}>Save</button>
+  </div>
+</Drawer>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<script setup>
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open Drawer</button>
+
+  <Drawer :open="open" @open-change="(v) => (open = v)" side="right" size="md">
+    <div class="bambi-drawer-header">
+      <h2 class="bambi-drawer-title">Edit profile</h2>
+      <p class="bambi-drawer-description">Make changes here.</p>
+    </div>
+    <div class="bambi-drawer-body">
+      <p>Your content goes here.</p>
+    </div>
+    <div class="bambi-drawer-footer">
+      <button type="button" @click="open = false">Save</button>
+    </div>
+  </Drawer>
+</template>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<button type="button" data-drawer-open="my-drawer">Open Drawer</button>
+
+<Drawer id="my-drawer" side="right" size="md">
+  <div class="bambi-drawer-header">
+    <h2 class="bambi-drawer-title">Edit profile</h2>
+    <p class="bambi-drawer-description">Make changes here.</p>
+  </div>
+  <div class="bambi-drawer-body">
+    <p>Your content goes here.</p>
+  </div>
+  <div class="bambi-drawer-footer">
+    <button type="button" data-drawer-close="my-drawer">Save</button>
+  </div>
+</Drawer>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Sides
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code lang="tsx" code={`<DrawerRoot side="right">...</DrawerRoot>
+<DrawerRoot side="left">...</DrawerRoot>
+<DrawerRoot side="top">...</DrawerRoot>
+<DrawerRoot side="bottom">...</DrawerRoot>`} />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code lang="svelte" code={`<Drawer side="right">...</Drawer>
+<Drawer side="left">...</Drawer>
+<Drawer side="top">...</Drawer>
+<Drawer side="bottom">...</Drawer>`} />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code lang="vue" code={`<Drawer side="right">...</Drawer>
+<Drawer side="left">...</Drawer>
+<Drawer side="top">...</Drawer>
+<Drawer side="bottom">...</Drawer>`} />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code lang="astro" code={`<Drawer side="right">...</Drawer>
+<Drawer side="bottom">...</Drawer>`} />
+  </TabItem>
+</Tabs>
+
+## Sizes
+
+| Value | Width / Height |
+| --- | --- |
+| `sm` | 20rem |
+| `md` | 28rem (default) |
+| `lg` | 36rem |
+| `xl` | 48rem |
+| `full` | 100vw / 100dvh |
+
+## CSS Classes
+
+| Class | Element |
+| --- | --- |
+| `bambi-drawer-overlay` | Background dimmer |
+| `bambi-drawer-content` | The drawer panel |
+| `bambi-drawer-header` | Header section |
+| `bambi-drawer-title` | Title `<h2>` |
+| `bambi-drawer-description` | Description text |
+| `bambi-drawer-body` | Scrollable content area |
+| `bambi-drawer-footer` | Footer action area |
+| `bambi-drawer-close` | Close `×` button |
+
+## API Reference
+
+### DrawerRoot / `<Drawer>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `side` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'right'` | Which edge the drawer slides from |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'` | Panel width or height |
+| `defaultOpen` | `boolean` | `false` | Initial open state (uncontrolled) |
+| `open` | `boolean` | — | Controlled open state |
+| `closeOnOverlayClick` | `boolean` | `true` | Close when clicking the overlay |
+| `onOpenChange` | `(open: boolean) => void` | — | Called when open state changes |
+
+### Astro data attributes (triggers)
+
+In Astro, open/close is wired via data attributes on any element in the page:
+
+| Attribute | Value | Effect |
+| --- | --- | --- |
+| `data-drawer-open` | drawer `id` | Opens the drawer on click |
+| `data-drawer-close` | drawer `id` | Closes the drawer on click |
+
+## Accessibility
+
+- The drawer content uses `role="dialog"` and `aria-modal="true"`.
+- `DrawerTitle` is automatically linked to the dialog via `aria-labelledby`.
+- `DrawerDescription` is linked via `aria-describedby`.
+- Focus is trapped inside the drawer while open (Tab / Shift+Tab cycle within the panel).
+- Pressing Escape closes the drawer.
+- Focus is restored to the trigger element when the drawer closes.
+- While open, background content has the `inert` attribute set, making it unreachable by keyboard and screen readers.
+- All interactive elements must be keyboard-accessible; mouse-only interactions are not required.

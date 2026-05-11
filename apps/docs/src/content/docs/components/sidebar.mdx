@@ -1,0 +1,258 @@
+---
+title: Sidebar
+description: Accessible app navigation sidebar with collapsible/offcanvas modes, controlled and uncontrolled state, and a built-in rail toggle.
+---
+
+import { Tabs, TabItem, Code } from "@astrojs/starlight/components";
+
+## Installation
+
+```sh
+npx bambiui add sidebar
+```
+
+Import the token file once from your global stylesheet:
+
+```css
+@import "./styles/bambi.css";
+```
+
+Then import the component:
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    ```tsx
+    import {
+      Sidebar, SidebarHeader, SidebarContent, SidebarFooter,
+      SidebarGroup, SidebarGroupLabel, SidebarMenu,
+      SidebarMenuItem, SidebarMenuButton, SidebarMenuLink, SidebarRail,
+    } from './components/ui/sidebar';
+    ```
+  </TabItem>
+  <TabItem label="Svelte">
+    ```svelte
+    <script>
+      import Sidebar from './components/ui/Sidebar.svelte';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Vue">
+    ```vue
+    <script setup>
+    import Sidebar from './components/ui/Sidebar.vue';
+    </script>
+    ```
+  </TabItem>
+  <TabItem label="Astro">
+    ```astro
+    ---
+    import Sidebar from './components/ui/Sidebar.astro';
+    ---
+    ```
+  </TabItem>
+</Tabs>
+
+## Basic Usage
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`<Sidebar side="left" collapsible="offcanvas">
+  <SidebarHeader>
+    <span>My App</span>
+  </SidebarHeader>
+  <SidebarContent>
+    <SidebarGroup>
+      <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuLink href="/" active>Home</SidebarMenuLink>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuLink href="/settings">Settings</SidebarMenuLink>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGroup>
+  </SidebarContent>
+  <SidebarFooter>
+    <SidebarMenuButton>Log out</SidebarMenuButton>
+  </SidebarFooter>
+  <SidebarRail />
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<Sidebar side="left" collapsible="offcanvas">
+  <div class="bambi-sidebar-header">My App</div>
+  <div class="bambi-sidebar-content">
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Navigation</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/" data-active aria-current="page">Home</a>
+        </li>
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/settings">Settings</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="bambi-sidebar-footer">
+    <button class="bambi-sidebar-menu-button" type="button">Log out</button>
+  </div>
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<Sidebar side="left" collapsible="offcanvas">
+  <div class="bambi-sidebar-header">My App</div>
+  <div class="bambi-sidebar-content">
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Navigation</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/" data-active aria-current="page">Home</a>
+        </li>
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/settings">Settings</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="bambi-sidebar-footer">
+    <button class="bambi-sidebar-menu-button" type="button">Log out</button>
+  </div>
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code
+      lang="astro"
+      code={`<Sidebar side="left" collapsible="offcanvas">
+  <div class="bambi-sidebar-header">My App</div>
+  <div class="bambi-sidebar-content">
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Navigation</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/" data-active aria-current="page">Home</a>
+        </li>
+        <li class="bambi-sidebar-menu-item">
+          <a class="bambi-sidebar-menu-button" href="/settings">Settings</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="bambi-sidebar-footer">
+    <button class="bambi-sidebar-menu-button" type="button">Log out</button>
+  </div>
+</Sidebar>`}
+    />
+  </TabItem>
+</Tabs>
+
+## Collapsible Modes
+
+| Mode | Behavior |
+| --- | --- |
+| `offcanvas` | Slides off-screen; shows a backdrop overlay on mobile |
+| `icon` | Shrinks to icon-only width; text labels are hidden |
+| `none` | Always visible; no collapse behavior |
+
+## Controlled State
+
+<Tabs syncKey="framework">
+  <TabItem label="React">
+    <Code
+      lang="tsx"
+      code={`const [open, setOpen] = useState(true);
+
+<Sidebar open={open} onOpenChange={setOpen}>
+  ...
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Svelte">
+    <Code
+      lang="svelte"
+      code={`<script>
+  let open = $state(true);
+</script>
+
+<Sidebar bind:open onOpenChange={(v) => (open = v)}>
+  ...
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Vue">
+    <Code
+      lang="vue"
+      code={`<script setup>
+const open = ref(true);
+</script>
+
+<Sidebar :open="open" @open-change="(v) => (open = v)">
+  ...
+</Sidebar>`}
+    />
+  </TabItem>
+  <TabItem label="Astro">
+    <Code lang="astro" code={`<Sidebar default-open={false} collapsible="offcanvas">
+  ...
+</Sidebar>`} />
+  </TabItem>
+</Tabs>
+
+## CSS Classes
+
+Sub-part classes usable in any framework:
+
+| Class | Element |
+| --- | --- |
+| `bambi-sidebar` | Root nav element |
+| `bambi-sidebar-header` | Top header section |
+| `bambi-sidebar-content` | Scrollable main area |
+| `bambi-sidebar-footer` | Bottom footer section |
+| `bambi-sidebar-group` | Nav item group |
+| `bambi-sidebar-group-label` | Group heading text |
+| `bambi-sidebar-menu` | `<ul>` nav list |
+| `bambi-sidebar-menu-item` | `<li>` item wrapper |
+| `bambi-sidebar-menu-button` | Button/link nav item |
+| `bambi-sidebar-overlay` | Offcanvas backdrop |
+| `bambi-sidebar-rail` | Collapse toggle strip |
+
+## API Reference
+
+### Sidebar / `<Sidebar>`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `side` | `'left' \| 'right'` | `'left'` | Which side the sidebar is on |
+| `collapsible` | `'icon' \| 'offcanvas' \| 'none'` | `'offcanvas'` | Collapse behavior |
+| `defaultOpen` | `boolean` | `true` | Initial open state (uncontrolled) |
+| `open` | `boolean` | — | Controlled open state |
+| `onOpenChange` | `(open: boolean) => void` | — | React/Svelte/Vue open state callback |
+
+### React-only sub-components
+
+`SidebarHeader`, `SidebarContent`, `SidebarFooter`, `SidebarGroup`, `SidebarGroupLabel`, `SidebarMenu`, `SidebarMenuItem` all forward `HTMLAttributes` of their respective elements.
+
+`SidebarMenuButton` adds `active?: boolean` and `disabled?: boolean`.
+
+`SidebarMenuLink` (renders `<a>`) adds `active?: boolean`.
+
+`SidebarRail` renders the collapse toggle button; reads open state from context.
+
+## Accessibility
+
+- The root element is `<nav aria-label="Sidebar navigation">` — provides a landmark for screen readers.
+- The rail toggle button has `aria-label`, `aria-expanded`, and is a real `<button>` element.
+- Active items should use `aria-current="page"` (handled automatically by `SidebarMenuLink`/`SidebarMenuButton` when `active` is set).
+- Disabled items use `data-disabled` and `aria-disabled`; `pointer-events: none` prevents interaction.
+- Tab order flows naturally through the sidebar; focus is not trapped in persistent mode.
+- In offcanvas mode, the overlay dismisses the sidebar on click and when it is open the sidebar receives focus.

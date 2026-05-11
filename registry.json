@@ -127,6 +127,345 @@
         ]
       }
     },
+    "card": {
+      "exportName": "Card",
+      "api": {
+        "typeExports": [
+          "CardBaseProps",
+          "CardDefaults",
+          "CardSize",
+          "CardVariant"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "cardVariants",
+              "values": ["default", "outline", "ghost", "elevated"]
+            },
+            {
+              "name": "cardSizes",
+              "values": ["sm", "md", "lg"]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "CardVariant",
+              "constName": "cardVariants"
+            },
+            {
+              "name": "CardSize",
+              "constName": "cardSizes"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "CardBaseProps",
+              "props": [
+                {
+                  "name": "variant",
+                  "type": "CardVariant",
+                  "optional": true
+                },
+                {
+                  "name": "size",
+                  "type": "CardSize",
+                  "optional": true
+                },
+                {
+                  "name": "interactive",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "CardDefaults",
+              "source": "CardBaseProps",
+              "keys": ["variant", "size", "interactive"]
+            }
+          ]
+        }
+      },
+      "style": {
+        "from": "packages/components/card/src/card.css",
+        "fileName": "card.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/card/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "to": "types.ts",
+          "generate": "types"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/card/src/react.tsx",
+            "to": "card.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/card/src/svelte.svelte",
+            "to": "Card.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/card/src/vue.vue",
+            "to": "Card.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/card/src/astro.astro",
+            "to": "Card.astro"
+          }
+        ]
+      }
+    },
+    "sidebar": {
+      "exportName": "Sidebar",
+      "api": {
+        "typeExports": [
+          "SidebarBaseProps",
+          "SidebarCollapsible",
+          "SidebarDefaults",
+          "SidebarSide"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "sidebarSides",
+              "values": ["left", "right"]
+            },
+            {
+              "name": "sidebarCollapsibles",
+              "values": ["icon", "offcanvas", "none"]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "SidebarSide",
+              "constName": "sidebarSides"
+            },
+            {
+              "name": "SidebarCollapsible",
+              "constName": "sidebarCollapsibles"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "SidebarBaseProps",
+              "props": [
+                {
+                  "name": "side",
+                  "type": "SidebarSide",
+                  "optional": true
+                },
+                {
+                  "name": "collapsible",
+                  "type": "SidebarCollapsible",
+                  "optional": true
+                },
+                {
+                  "name": "defaultOpen",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "open",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "SidebarDefaults",
+              "source": "SidebarBaseProps",
+              "keys": ["side", "collapsible", "defaultOpen"]
+            }
+          ]
+        }
+      },
+      "style": {
+        "from": "packages/components/sidebar/src/sidebar.css",
+        "fileName": "sidebar.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/sidebar/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "to": "types.ts",
+          "generate": "types"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/sidebar/src/react.tsx",
+            "to": "sidebar.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/sidebar/src/svelte.svelte",
+            "to": "Sidebar.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/sidebar/src/vue.vue",
+            "to": "Sidebar.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/sidebar/src/astro.astro",
+            "to": "Sidebar.astro"
+          }
+        ]
+      }
+    },
+    "drawer": {
+      "exportName": "DrawerRoot",
+      "api": {
+        "typeExports": [
+          "DrawerBaseProps",
+          "DrawerDefaults",
+          "DrawerSide",
+          "DrawerSize"
+        ],
+        "types": {
+          "consts": [
+            {
+              "name": "drawerSides",
+              "values": ["top", "right", "bottom", "left"]
+            },
+            {
+              "name": "drawerSizes",
+              "values": ["sm", "md", "lg", "xl", "full"]
+            }
+          ],
+          "aliasesFromConsts": [
+            {
+              "name": "DrawerSide",
+              "constName": "drawerSides"
+            },
+            {
+              "name": "DrawerSize",
+              "constName": "drawerSizes"
+            }
+          ],
+          "interfaces": [
+            {
+              "name": "DrawerBaseProps",
+              "props": [
+                {
+                  "name": "side",
+                  "type": "DrawerSide",
+                  "optional": true
+                },
+                {
+                  "name": "size",
+                  "type": "DrawerSize",
+                  "optional": true
+                },
+                {
+                  "name": "defaultOpen",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "open",
+                  "type": "boolean",
+                  "optional": true
+                },
+                {
+                  "name": "closeOnOverlayClick",
+                  "type": "boolean",
+                  "optional": true
+                }
+              ]
+            }
+          ],
+          "requiredPicks": [
+            {
+              "name": "DrawerDefaults",
+              "source": "DrawerBaseProps",
+              "keys": ["side", "size", "defaultOpen", "closeOnOverlayClick"]
+            }
+          ]
+        }
+      },
+      "style": {
+        "from": "packages/components/drawer/src/drawer.css",
+        "fileName": "drawer.css"
+      },
+      "shared": [
+        {
+          "kind": "recipe",
+          "from": "packages/components/drawer/src/recipe.ts",
+          "to": "recipe.ts"
+        },
+        {
+          "kind": "types",
+          "to": "types.ts",
+          "generate": "types"
+        }
+      ],
+      "files": {
+        "react": [
+          {
+            "kind": "react",
+            "from": "packages/components/drawer/src/react.tsx",
+            "to": "drawer.tsx"
+          }
+        ],
+        "svelte": [
+          {
+            "kind": "svelte",
+            "from": "packages/components/drawer/src/svelte.svelte",
+            "to": "Drawer.svelte"
+          }
+        ],
+        "vue": [
+          {
+            "kind": "vue",
+            "from": "packages/components/drawer/src/vue.vue",
+            "to": "Drawer.vue"
+          }
+        ],
+        "astro": [
+          {
+            "kind": "astro",
+            "from": "packages/components/drawer/src/astro.astro",
+            "to": "Drawer.astro"
+          }
+        ]
+      }
+    },
     "buttongroup": {
       "exportName": "ButtonGroup",
       "api": {

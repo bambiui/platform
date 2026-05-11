@@ -25,6 +25,21 @@
       "types": "./src/buttongroup.ts",
       "import": "./src/buttongroup.ts",
       "default": "./src/buttongroup.ts"
+    },
+    "./card": {
+      "types": "./src/card.ts",
+      "import": "./src/card.ts",
+      "default": "./src/card.ts"
+    },
+    "./sidebar": {
+      "types": "./src/sidebar.ts",
+      "import": "./src/sidebar.ts",
+      "default": "./src/sidebar.ts"
+    },
+    "./drawer": {
+      "types": "./src/drawer.ts",
+      "import": "./src/drawer.ts",
+      "default": "./src/drawer.ts"
     }
   },
   "scripts": {

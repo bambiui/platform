@@ -15,44 +15,116 @@ import Sidebar from "@bambiui/components/sidebar/astro";
 
   <div class="bambi-sidebar-content">
     <div class="bambi-sidebar-group">
-      <span class="bambi-sidebar-group-label">Frames</span>
+      <span class="bambi-sidebar-group-label">Studio</span>
       <ul class="bambi-sidebar-menu">
         <li class="bambi-sidebar-menu-item">
-    <button class="nav-item" data-card="colors">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"></circle>
-        <circle cx="5" cy="7" r="1.5" fill="currentColor"></circle>
-        <circle cx="11" cy="7" r="1.5" fill="currentColor"></circle>
-        <circle cx="8" cy="11" r="1.5" fill="currentColor"></circle>
-      </svg>
-      Colors
-    </button>
-        </li>
-        <li class="bambi-sidebar-menu-item">
-    <button class="nav-item" data-card="typography">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M2.5 4h11M8 4v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
-      </svg>
-      Typography
-    </button>
-        </li>
-        <li class="bambi-sidebar-menu-item">
-    <button class="nav-item" data-card="buttons">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <rect x="1.75" y="5" width="12.5" height="6" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
-      </svg>
-      Buttons
-    </button>
+          <button class="nav-item" data-card="hero">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="1.75" width="12.5" height="12.5" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4.5 8h7M4.5 5.5h7M4.5 10.5h4" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/>
+            </svg>
+            Overview
+          </button>
         </li>
       </ul>
     </div>
 
     <div class="bambi-sidebar-group">
-      <span class="bambi-sidebar-group-label">Components</span>
+      <span class="bambi-sidebar-group-label">Foundations</span>
       <ul class="bambi-sidebar-menu">
-        <li class="bambi-sidebar-menu-item"><button class="nav-item" data-card="card-preview">Card</button></li>
-        <li class="bambi-sidebar-menu-item"><button class="nav-item" data-card="sidebar-preview">Sidebar</button></li>
-        <li class="bambi-sidebar-menu-item"><button class="nav-item" data-card="drawer-preview">Drawer</button></li>
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="colors">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"></circle>
+              <circle cx="5" cy="7" r="1.5" fill="currentColor"></circle>
+              <circle cx="11" cy="7" r="1.5" fill="currentColor"></circle>
+              <circle cx="8" cy="11" r="1.5" fill="currentColor"></circle>
+            </svg>
+            Colors
+          </button>
+        </li>
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="typography">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M2.5 4h11M8 4v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+            Typography
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Actions</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="buttons">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="5" width="12.5" height="6" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+            </svg>
+            Button &amp; Group
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Inputs</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="input-preview">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="4.75" width="12.5" height="6.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M4.5 8h.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Input
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Layout</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="card-preview">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M1.75 6h12.5" stroke="currentColor" stroke-width="1.25"/>
+            </svg>
+            Card
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Navigation</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="sidebar-preview">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 2.75v10.5" stroke="currentColor" stroke-width="1.25"/>
+            </svg>
+            Sidebar
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <div class="bambi-sidebar-group">
+      <span class="bambi-sidebar-group-label">Overlays</span>
+      <ul class="bambi-sidebar-menu">
+        <li class="bambi-sidebar-menu-item">
+          <button class="nav-item" data-card="drawer-preview">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10.5 2.75v10.5" stroke="currentColor" stroke-width="1.25"/>
+            </svg>
+            Drawer
+          </button>
+        </li>
       </ul>
     </div>
   </div>

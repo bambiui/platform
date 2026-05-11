@@ -1,0 +1,81 @@
+---
+import Card from "@bambiui/components/card/astro";
+---
+<Card class="card studio-hero-card" id="card-hero">
+  <div class="studio-hero-brand">
+    <svg width="30" height="30" viewBox="0 0 576 560" fill="none" aria-hidden="true" focusable="false">
+      <path d="M0 490V100C0 45 7 8 30 1C65-9 148 45 189 115C219 111 253 109 288 109C322 109 356 111 386 115C427 45 510-9 545 1C568 8 575 45 575 100V490C575 533 548 559 505 559H70C27 559 0 533 0 490Z" fill="var(--bambi-primary)"/>
+      <path d="M246 138C263 119 290 117 311 138C340 168 357 229 395 267C433 305 575 382 575 411C575 426 576 453 575 490C574 548 533 559 503 559L70 559C13 558 0 519 0 490C0 462 0 356 0 356C4 323 111 372 169 389C220 398 245 396 260 335C274 279 199 208 246 138Z" fill="white" fill-opacity="0.75"/>
+      <circle cx="393" cy="406" r="20" fill="var(--bambi-primary)"/>
+    </svg>
+    <div class="studio-hero-brand-text">
+      <span class="studio-hero-product">bambiui</span>
+      <span class="studio-hero-wordmark">Studio</span>
+    </div>
+  </div>
+
+  <p class="studio-hero-desc">
+    Design system explorer. Browse components, edit tokens, and compare variants across frameworks.
+  </p>
+
+  <div class="studio-hero-stats">
+    <div class="hero-stat">
+      <span class="hero-stat-num">6</span>
+      <span class="hero-stat-label">Components</span>
+    </div>
+    <div class="hero-stat-sep" aria-hidden="true"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">4</span>
+      <span class="hero-stat-label">Frameworks</span>
+    </div>
+    <div class="hero-stat-sep" aria-hidden="true"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">OKLCH</span>
+      <span class="hero-stat-label">Color model</span>
+    </div>
+    <div class="hero-stat-sep" aria-hidden="true"></div>
+    <div class="hero-stat">
+      <span class="hero-stat-num">100%</span>
+      <span class="hero-stat-label">Static</span>
+    </div>
+  </div>
+
+  <div class="studio-hero-divider" role="separator"></div>
+
+  <span class="studio-hero-section-label">Component categories</span>
+
+  <div class="studio-hero-categories" role="group" aria-label="Jump to component category">
+    <button class="hero-category-btn" data-fly-to="colors">
+      <span class="hero-category-label">Foundations</span>
+      <span class="hero-category-items">Colors · Typography</span>
+    </button>
+    <button class="hero-category-btn" data-fly-to="buttons">
+      <span class="hero-category-label">Actions</span>
+      <span class="hero-category-items">Button · ButtonGroup</span>
+    </button>
+    <button class="hero-category-btn" data-fly-to="input-preview">
+      <span class="hero-category-label">Inputs</span>
+      <span class="hero-category-items">Input</span>
+    </button>
+    <button class="hero-category-btn" data-fly-to="card-preview">
+      <span class="hero-category-label">Layout</span>
+      <span class="hero-category-items">Card</span>
+    </button>
+    <button class="hero-category-btn" data-fly-to="sidebar-preview">
+      <span class="hero-category-label">Navigation</span>
+      <span class="hero-category-items">Sidebar</span>
+    </button>
+    <button class="hero-category-btn" data-fly-to="drawer-preview">
+      <span class="hero-category-label">Overlays</span>
+      <span class="hero-category-items">Drawer</span>
+    </button>
+  </div>
+
+  <div class="studio-hero-divider" role="separator"></div>
+
+  <div class="studio-hero-tips" aria-label="Keyboard shortcuts">
+    <span class="hero-tip"><kbd>Space</kbd> + drag to pan</span>
+    <span class="hero-tip"><kbd>Ctrl</kbd> + scroll to zoom</span>
+    <span class="hero-tip"><kbd>Ctrl+0</kbd> to reset view</span>
+  </div>
+</Card>

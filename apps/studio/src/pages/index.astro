@@ -4,6 +4,7 @@ import "../styles/builder.css";
 import { colorGroups, typeSizes, typeWeights } from "../data/builderData";
 import DrawerLeft from "../components/builder/DrawerLeft.astro";
 import DrawerRight from "../components/builder/DrawerRight.astro";
+import StudioHero from "../components/builder/StudioHero.astro";
 import CardColors from "../components/builder/CardColors.astro";
 import CardTypography from "../components/builder/CardTypography.astro";
 import CardButtons from "../components/builder/CardButtons.astro";
@@ -34,6 +35,7 @@ import InputPreview from "../components/builder/InputPreview.astro";
     <DrawerRight />
     <div id="canvas">
       <div id="canvas-transform">
+        <StudioHero />
         <CardColors colorGroups={colorGroups} />
         <CardTypography typeSizes={typeSizes} typeWeights={typeWeights} />
         <CardButtons />

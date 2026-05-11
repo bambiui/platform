@@ -132,4 +132,27 @@ const plusIcon = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" ar
       </ButtonGroup>
     </div>
   </div>
+
+  <div class="preview-section">
+    <span class="preview-section-label">Usage</span>
+    <pre class="usage-snippet"><code>{`<!-- Button -->
+<Button intent="primary" size="md">Save</Button>
+<Button intent="danger" loading>Deleting…</Button>
+<Button size="icon" appearance="ghost" aria-label="Add">
+  <PlusIcon />
+</Button>
+
+<!-- ButtonGroup (attached) -->
+<ButtonGroup aria-label="Text alignment">
+  <Button appearance="outline">Left</Button>
+  <Button appearance="outline">Center</Button>
+  <Button appearance="outline">Right</Button>
+</ButtonGroup>
+
+<!-- ButtonGroup (detached) -->
+<ButtonGroup :attached="false" aria-label="Dialog actions">
+  <Button appearance="ghost">Cancel</Button>
+  <Button>Save</Button>
+</ButtonGroup>`}</code></pre>
+  </div>
 </Card>

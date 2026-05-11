@@ -259,6 +259,58 @@ const DRAWER_LEFT_W = 220,
 type TokenItem = string | { name: string; selector: string };
 
 const CARD_TOKENS: Record<string, { label: string; tokens: TokenItem[] }[]> = {
+  hero: [],
+  "input-preview": [
+    {
+      label: "Size",
+      tokens: [
+        { name: "--bambi-input-height-sm", selector: ".bambi-input-field" },
+        { name: "--bambi-input-height-md", selector: ".bambi-input-field" },
+        { name: "--bambi-input-height-lg", selector: ".bambi-input-field" },
+        { name: "--bambi-input-padding-x", selector: ".bambi-input-field" },
+      ],
+    },
+    {
+      label: "Shape",
+      tokens: [
+        { name: "--bambi-input-radius", selector: ".bambi-input-field" },
+        { name: "--bambi-input-border-width", selector: ".bambi-input-field" },
+      ],
+    },
+    {
+      label: "Color",
+      tokens: [
+        { name: "--bambi-input-bg", selector: ".bambi-input-field" },
+        { name: "--bambi-input-fg", selector: ".bambi-input-field" },
+        { name: "--bambi-input-border", selector: ".bambi-input-field" },
+        { name: "--bambi-input-placeholder-color", selector: ".bambi-input-field" },
+      ],
+    },
+    {
+      label: "Label",
+      tokens: [
+        { name: "--bambi-input-label-color", selector: ".bambi-input-field" },
+        { name: "--bambi-input-floating-label-scale", selector: ".bambi-input-field" },
+        { name: "--bambi-input-floating-label-bg", selector: ".bambi-input-field" },
+      ],
+    },
+    {
+      label: "Focus",
+      tokens: [
+        { name: "--bambi-input-ring", selector: ".bambi-input-field" },
+        { name: "--bambi-input-ring-width", selector: ".bambi-input-field" },
+        { name: "--bambi-input-ring-offset", selector: ".bambi-input-field" },
+      ],
+    },
+    {
+      label: "States",
+      tokens: [
+        { name: "--bambi-input-error-color", selector: ".bambi-input-field" },
+        { name: "--bambi-input-description-color", selector: ".bambi-input-field" },
+        { name: "--bambi-input-disabled-opacity", selector: ".bambi-input-field" },
+      ],
+    },
+  ],
   colors: [
     {
       label: "Primary Scale",
@@ -807,7 +859,7 @@ function renderTokenList(cardId: string) {
   const groups = CARD_TOKENS[cardId];
   if (!groups) return;
   tokenListEl.innerHTML = "";
-  if (cardId === "colors") tokenListEl.appendChild(buildGenPanel());
+  if (cardId === "hero" || cardId === "colors") tokenListEl.appendChild(buildGenPanel());
 
   for (const group of groups) {
     const groupEl = document.createElement("div");
@@ -911,9 +963,11 @@ function renderTokenList(cardId: string) {
 
 function openTokenEditor(cardId: string) {
   const titles: Record<string, string> = {
+    hero: "Generate Theme",
     colors: "Color Tokens",
     typography: "Typography Tokens",
     buttons: "Button Tokens",
+    "input-preview": "Input Tokens",
     "card-preview": "Card Tokens",
     "sidebar-preview": "Sidebar Tokens",
     "drawer-preview": "Drawer Tokens",
@@ -944,6 +998,13 @@ document.querySelectorAll<HTMLElement>(".nav-item").forEach((btn) => {
   btn.addEventListener("click", () => {
     const cardId = btn.dataset.card;
     if (cardId) selectCard(cardId);
+  });
+});
+
+document.querySelectorAll<HTMLElement>("[data-fly-to]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const cardId = btn.dataset.flyTo;
+    if (cardId) flyToCard(cardId, true, false);
   });
 });
 
@@ -1223,4 +1284,4 @@ window.addEventListener("storage", (e) => {
 });
 
 syncBoardLayout();
-flyToCard("colors", false);
+flyToCard("hero", false);

@@ -1,4 +1,4 @@
-import { DEFAULT_COMPONENT_DIR, DEFAULT_TOKENS_FILE } from "./framework.js";
+import { DEFAULT_COMPONENT_DIR, DEFAULT_STYLE_FILE } from "./framework.js";
 
 /**
  * @param {string[]} argv
@@ -15,7 +15,7 @@ export function parseArgs(argv) {
     framework: undefined,
     yes: false,
     registryUrl: process.env.BAMBIUI_REGISTRY_URL,
-    styleFile: DEFAULT_TOKENS_FILE,
+    styleFile: DEFAULT_STYLE_FILE,
     tokensFile: undefined,
   };
 
@@ -40,7 +40,7 @@ export function parseArgs(argv) {
       if (!value || value.startsWith("--")) {
         throw new Error(`Missing value for ${arg}`);
       }
-      flags[key] = value;
+      /** @type {Record<string, unknown>} */ (flags)[key] = value;
       index += 1;
     }
   }

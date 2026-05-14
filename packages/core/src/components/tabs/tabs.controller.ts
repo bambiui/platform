@@ -32,10 +32,8 @@ export class TabsController implements BambiController {
       this.options.controlled ?? getBoolAttr(this.root, TABS_CONTROLLED);
 
     const value =
-      this.options.value ??
-      getAttr(this.root, TABS_VALUE, "") ||
-      this.options.defaultValue ??
-      getAttr(this.root, TABS_DEFAULT_VALUE, "") ||
+      (this.options.value ?? getAttr(this.root, TABS_VALUE, "")) ||
+      (this.options.defaultValue ?? getAttr(this.root, TABS_DEFAULT_VALUE, "")) ||
       this.firstTriggerValue();
 
     const orientation = (

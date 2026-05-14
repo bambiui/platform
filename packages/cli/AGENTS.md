@@ -2,30 +2,53 @@
 
 ## Responsibility
 
-- Owns the `bambiui` executable, `init`, `add`, registry fetching, file copying, generated installed files, and CLI smoke tests.
-- Treat `registry.json` and static registry files as external input to the CLI.
+- Owns the `bambiui` executable, `init`, `add`, registry fetching, file copying, and CLI smoke tests.
+- Treats `registry.json` and static registry files as external input.
+
+## What `add` Does (v2 model)
+
+For `bambiui add <component> --framework <fw>`:
+1. Reads `bambiui.config.json`
+2. Reads `registry.json` (must be version 2)
+3. Copies: `contract`, `controller`, `style`, and `files[framework][]` into `componentDir/<name>/`
+4. Writes generated `index.ts` barrel via `getIndexContent(framework, componentName)`
+
+No type generation. No recipe.ts. No module path transformation.
+
+## Frameworks
+
+Supported: `react`, `svelte`, `vue`, `solid`, `html`  
+Not supported: `astro` (use `html` output instead; Astro support planned separately)
+
+## Config Shape (bambiui.config.json)
+
+```json
+{ "framework": "react", "componentDir": "src/components/ui", "styleFile": "src/styles/bambi.css" }
+```
+
+Note: `tokensFile` is the old key name. CLI reads both for backwards compat via `mergeConfig`.
 
 ## Boundaries
 
-- CLI runtime must not import `@bambiui/components` or `@bambiui/tokens`.
-- CLI-installed component output must be self-contained in user projects.
-- Preserve `--registry-url` and `BAMBIUI_REGISTRY_URL` flows.
-- Keep generated `types.ts` driven by registry metadata, not by package runtime imports.
+- CLI runtime must NOT import `@bambiui/core` or `@bambiui/registry`.
+- Installed output must be self-contained (no `@bambiui/*` runtime imports).
+- Registry version check: reject manifests where `version !== 2`.
+- Preserve `--registry-url` flow for local development.
 
 ## Forbidden
 
 - Do not add component package dependencies to `packages/cli/package.json`.
 - Do not hardcode local workspace paths into installed output.
-- Do not make `add` require docs, builder, or component package runtime code.
-- Do not change registry semantics without updating `scripts/check-registry.mjs` and docs.
+- Do not generate `types.ts` or `recipe.ts` — the new model has no generated files.
+- Do not add Astro as a supported framework without a plan.
+- Do not change registry semantics without updating `scripts/check-registry.mjs`.
 
 ## Golden References
 
-- Registry fetch/copy: `src/utils/registry.js`.
-- Installed file naming/barrel generation: `src/utils/framework.js`.
-- Generated types source: `src/utils/files.js`.
-- Command behavior: `src/commands/init.js`, `src/commands/add.js`.
-- Smoke coverage: `scripts/smoke.js`.
+- Registry fetch/copy: `src/utils/registry.js`
+- Framework options / barrel generation: `src/utils/framework.js`
+- Command behavior: `src/commands/init.js`, `src/commands/add.js`
+- Smoke coverage: `scripts/smoke.js`
 
 ## Verify
 
@@ -33,6 +56,5 @@
 pnpm --filter bambiui check-types
 pnpm --filter bambiui smoke
 pnpm --filter bambiui check
+pnpm check-registry   # after registry.json changes
 ```
-
-Registry-affecting CLI changes should also run `pnpm check-registry`.

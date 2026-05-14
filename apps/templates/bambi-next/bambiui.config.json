@@ -1,5 +1,5 @@
 {
   "framework": "react",
   "componentDir": "src/components/ui",
-  "tokensFile": "src/styles/bambi.css"
+  "styleFile": "src/styles/bambi.css"
 }

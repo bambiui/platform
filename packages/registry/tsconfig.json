@@ -5,9 +5,10 @@
     "moduleResolution": "bundler",
     "strict": true,
     "noEmit": true,
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "react"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**/*.solid.tsx"]
 }

@@ -20,7 +20,7 @@ export function Tabs({
   disabled,
   onValueChange,
 }: TabsProps) {
-  if (process.env.NODE_ENV !== "production" && value !== undefined && defaultValue !== undefined) {
+  if (value !== undefined && defaultValue !== undefined) {
     console.warn(
       "[bambiui/tabs] Tabs received both `value` and `defaultValue`. " +
         "Use `value` for controlled mode or `defaultValue` for uncontrolled mode, not both.",

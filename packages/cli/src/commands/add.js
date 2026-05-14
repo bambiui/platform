@@ -41,11 +41,27 @@ export async function addComponent(componentName, flags) {
     );
   }
 
+  // Implementation files go into componentDir/<name>/
   const targetDir = path.join(cwd, componentDir, componentName);
+  // Style goes alongside the global CSS in the styles directory
+  const styleDir = path.join(cwd, path.dirname(config.styleFile));
+  // Barrel goes one level above the implementation dir
+  const barrelPath = path.join(cwd, componentDir, `${componentName}.ts`);
+
   const results = [];
   const force = Boolean(flags.force);
 
-  // Copy shared files: contract, controller, style
+  // Copy component style to styles directory
+  results.push(
+    await copyRegistryFile(
+      registryUrl,
+      component.style,
+      path.join(styleDir, path.basename(component.style)),
+      force,
+    ),
+  );
+
+  // Copy shared files: contract, controller
   results.push(
     await copyRegistryFile(
       registryUrl,
@@ -64,18 +80,12 @@ export async function addComponent(componentName, flags) {
     ),
   );
 
-  results.push(
-    await copyRegistryFile(
-      registryUrl,
-      component.style,
-      path.join(targetDir, path.basename(component.style)),
-      force,
-    ),
-  );
-
-  // Copy framework-specific files; flatten subdir imports (../core/ → ./)
+  // Copy framework-specific files; resolve @bambiui/core imports to local siblings
   const flattenImports = (/** @type {string} */ content) =>
-    content.replace(/from "@bambiui\/core\/components\/tabs"/g, 'from "./tabs.controller"');
+    content.replace(
+      new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
+      `from "./${componentName}.controller"`,
+    );
 
   for (const filePath of frameworkFiles) {
     results.push(
@@ -89,10 +99,10 @@ export async function addComponent(componentName, flags) {
     );
   }
 
-  // Write generated index.ts
+  // Write barrel file at componentDir level (e.g. src/components/ui/tabs.ts)
   results.push(
     await writeProjectFile(
-      path.join(targetDir, "index.ts"),
+      barrelPath,
       getIndexContent(framework, componentName),
       force,
     ),

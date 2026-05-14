@@ -8,11 +8,10 @@ const repoRoot = path.resolve(scriptDir, "..");
 const cliEntry = path.join(repoRoot, "packages/cli/src/index.js");
 const shouldInstall = process.argv.includes("--install");
 
-const TABS_SHARED = [
+// Implementation files inside src/components/ui/tabs/
+const TABS_IMPL = [
   "src/components/ui/tabs/tabs.contract.ts",
   "src/components/ui/tabs/tabs.controller.ts",
-  "src/components/ui/tabs/tabs.css",
-  "src/components/ui/tabs/index.ts",
 ];
 
 const templates = [
@@ -24,8 +23,10 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      ...TABS_SHARED,
+      "src/styles/tabs.css",
+      ...TABS_IMPL,
       "src/components/ui/tabs/tabs.react.tsx",
+      "src/components/ui/tabs.ts",
     ],
   },
   {
@@ -36,11 +37,13 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      ...TABS_SHARED,
+      "src/styles/tabs.css",
+      ...TABS_IMPL,
       "src/components/ui/tabs/tabs.svelte",
       "src/components/ui/tabs/tabs-list.svelte",
       "src/components/ui/tabs/tabs-trigger.svelte",
       "src/components/ui/tabs/tabs-content.svelte",
+      "src/components/ui/tabs.ts",
     ],
   },
   {
@@ -51,11 +54,13 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      ...TABS_SHARED,
+      "src/styles/tabs.css",
+      ...TABS_IMPL,
       "src/components/ui/tabs/tabs.vue",
       "src/components/ui/tabs/tabs-list.vue",
       "src/components/ui/tabs/tabs-trigger.vue",
       "src/components/ui/tabs/tabs-content.vue",
+      "src/components/ui/tabs.ts",
     ],
   },
 ];

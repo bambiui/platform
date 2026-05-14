@@ -9,7 +9,7 @@
       "name": "tabs",
       "contract": "packages/core/src/components/tabs/tabs.contract.ts",
       "controller": "packages/core/src/components/tabs/tabs.controller.ts",
-      "style": "packages/registry/src/components/tabs/tabs.css",
+      "style": "packages/registry/src/styles/tabs.css",
       "files": {
         "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"],
         "vue": [

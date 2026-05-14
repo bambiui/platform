@@ -10,15 +10,15 @@ const cliRoot = path.resolve(scriptDir, "..");
 const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 
-// Shared files expected for every framework
-const SHARED_FILES = ["tabs.contract.ts", "tabs.controller.ts", "tabs.css", "index.ts"];
+// Implementation files expected inside componentDir/tabs/
+const SHARED_IMPL = ["tabs.contract.ts", "tabs.controller.ts"];
 
-const expectedFrameworkFiles = {
-  react:  [...SHARED_FILES, "tabs.react.tsx"],
-  vue:    [...SHARED_FILES, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
-  svelte: [...SHARED_FILES, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
-  solid:  [...SHARED_FILES, "tabs.solid.tsx"],
-  html:   [...SHARED_FILES, "tabs.html.ts"],
+const expectedImplFiles = {
+  react:  [...SHARED_IMPL, "tabs.react.tsx"],
+  vue:    [...SHARED_IMPL, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
+  svelte: [...SHARED_IMPL, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
+  solid:  [...SHARED_IMPL, "tabs.solid.tsx"],
+  html:   [...SHARED_IMPL, "tabs.html.ts"],
 };
 
 /**
@@ -60,7 +60,7 @@ function assertExists(filePath) {
 }
 
 // Test each framework
-for (const [framework, files] of Object.entries(expectedFrameworkFiles)) {
+for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
 
   try {
@@ -73,9 +73,16 @@ for (const [framework, files] of Object.entries(expectedFrameworkFiles)) {
     // Add tabs
     await runCli(["add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
-    const componentDir = path.join(cwd, "src/components/ui/tabs");
-    for (const file of files) {
-      assertExists(path.join(componentDir, file));
+    // Component CSS lands in styles/
+    assertExists(path.join(cwd, "src/styles/tabs.css"));
+
+    // Barrel at componentDir level
+    assertExists(path.join(cwd, "src/components/ui/tabs.ts"));
+
+    // Implementation files inside componentDir/tabs/
+    const implDir = path.join(cwd, "src/components/ui/tabs");
+    for (const file of implFiles) {
+      assertExists(path.join(implDir, file));
     }
 
     // Second add should skip existing files

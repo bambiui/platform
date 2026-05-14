@@ -1,10 +1,26 @@
 "use client";
-import { Button } from "@/src/components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs/tabs";
 export default function Home() {
   return (
-    <div className="flex flex-1 gap-4 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-        <Button intent="primary">Hello world</Button>
-        <Button intent="secondary" appearance="link" onClick={() => window.open("https://bambiui.com", "_blank")}>go to bambiui</Button>
+    <div>
+      bambiui-next
+      <Tabs defaultValue="account">
+        <TabsList>
+          <TabsTrigger value="account">Account</TabsTrigger>
+          <TabsTrigger value="password">Password</TabsTrigger>
+        </TabsList>
+        <TabsContent value="account">
+          <p>Account content</p>
+        </TabsContent>
+        <TabsContent value="password">
+          <p>Password content</p>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

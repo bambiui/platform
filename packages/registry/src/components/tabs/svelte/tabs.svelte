@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./tabs.css";
   import { onMount } from "svelte";
   import { TabsController } from "@bambiui/core/components/tabs";
   import type { TabsOptions } from "@bambiui/core/components/tabs";

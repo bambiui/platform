@@ -1,3 +1,4 @@
+import "./tabs.css";
 import { createEffect, onCleanup, type JSX } from "solid-js";
 import { TabsController } from "@bambiui/core/components/tabs";
 import type { TabsOptions } from "@bambiui/core/components/tabs";

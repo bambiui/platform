@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "./tabs.css";
 import { ref, watch, onMounted, onUnmounted, computed } from "vue";
 import { TabsController } from "./tabs.controller";
 import type { TabsOptions } from "./tabs.controller";

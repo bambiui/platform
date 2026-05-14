@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { TabsController } from "./tabs.controller";
 import type { TabsOptions } from "./tabs.controller";
+import "./tabs.css";
 
 export type { BambiController, TabsOptions, TabsOrientation } from "./tabs.controller";
 export type { TabsValueChangeDetail } from "./tabs.controller";

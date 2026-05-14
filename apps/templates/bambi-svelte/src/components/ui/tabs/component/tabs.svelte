@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./tabs.css";
   import { onMount } from "svelte";
   import { TabsController } from "./tabs.controller";
   import type { TabsOptions } from "./tabs.controller";

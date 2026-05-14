@@ -9,9 +9,9 @@ import {
   TABS_STATE,
   TABS_EVENT_VALUE_CHANGE,
   type TabsValueChangeDetail,
-} from "./tabs.contract.js";
+} from "./tabs.contract";
 
-export type { TabsValueChangeDetail } from "./tabs.contract.js";
+export type { TabsValueChangeDetail } from "./tabs.contract";
 
 // ── Inlined types ─────────────────────────────────────────────────────────
 

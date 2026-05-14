@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "./tabs.css";
 import { ref, watch, onMounted, onUnmounted, computed } from "vue";
 import { TabsController } from "@bambiui/core/components/tabs";
 import type { TabsOptions } from "@bambiui/core/components/tabs";

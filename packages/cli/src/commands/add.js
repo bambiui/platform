@@ -59,6 +59,10 @@ export async function addComponent(componentName, flags) {
     ),
   );
 
+  // Strips .js extensions from relative imports (ESM TS convention → bundler-friendly)
+  const stripJsExt = (/** @type {string} */ content) =>
+    content.replace(/from ("\.\.?\/[^"]+)\.js"/g, 'from $1"');
+
   // Shared files: contract, controller → implementation dir
   results.push(
     await copyRegistryFile(
@@ -66,6 +70,7 @@ export async function addComponent(componentName, flags) {
       component.contract,
       path.join(implDir, path.basename(component.contract)),
       force,
+      stripJsExt,
     ),
   );
 
@@ -75,6 +80,7 @@ export async function addComponent(componentName, flags) {
       component.controller,
       path.join(implDir, path.basename(component.controller)),
       force,
+      stripJsExt,
     ),
   );
 

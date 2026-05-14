@@ -3,6 +3,7 @@
  * Import once in your entry file. All [data-bambi-tabs] elements are mounted automatically,
  * including those added dynamically.
  */
+import "./tabs.css";
 import { TabsController } from "@bambiui/core/components/tabs";
 
 const controllers = new Map<Element, TabsController>();

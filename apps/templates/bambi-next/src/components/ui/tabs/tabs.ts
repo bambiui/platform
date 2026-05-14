@@ -1,1 +1,1 @@
-export { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/tabs.react";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./component/tabs.react";

@@ -8,10 +8,10 @@ const repoRoot = path.resolve(scriptDir, "..");
 const cliEntry = path.join(repoRoot, "packages/cli/src/index.js");
 const shouldInstall = process.argv.includes("--install");
 
-// Implementation files inside src/components/ui/tabs/components/
+// Implementation files inside src/components/ui/tabs/component/
 const TABS_IMPL = [
-  "src/components/ui/tabs/components/tabs.contract.ts",
-  "src/components/ui/tabs/components/tabs.controller.ts",
+  "src/components/ui/tabs/component/tabs.contract.ts",
+  "src/components/ui/tabs/component/tabs.controller.ts",
 ];
 
 const templates = [
@@ -23,9 +23,9 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/styles/tabs.css",
+      "src/components/ui/tabs/component/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/components/tabs.react.tsx",
+      "src/components/ui/tabs/component/tabs.react.tsx",
       "src/components/ui/tabs/tabs.ts",
     ],
   },
@@ -37,12 +37,12 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/styles/tabs.css",
+      "src/components/ui/tabs/component/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/components/tabs.svelte",
-      "src/components/ui/tabs/components/tabs-list.svelte",
-      "src/components/ui/tabs/components/tabs-trigger.svelte",
-      "src/components/ui/tabs/components/tabs-content.svelte",
+      "src/components/ui/tabs/component/tabs.svelte",
+      "src/components/ui/tabs/component/tabs-list.svelte",
+      "src/components/ui/tabs/component/tabs-trigger.svelte",
+      "src/components/ui/tabs/component/tabs-content.svelte",
       "src/components/ui/tabs/tabs.ts",
     ],
   },
@@ -54,12 +54,12 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/styles/tabs.css",
+      "src/components/ui/tabs/component/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/components/tabs.vue",
-      "src/components/ui/tabs/components/tabs-list.vue",
-      "src/components/ui/tabs/components/tabs-trigger.vue",
-      "src/components/ui/tabs/components/tabs-content.vue",
+      "src/components/ui/tabs/component/tabs.vue",
+      "src/components/ui/tabs/component/tabs-list.vue",
+      "src/components/ui/tabs/component/tabs-trigger.vue",
+      "src/components/ui/tabs/component/tabs-content.vue",
       "src/components/ui/tabs/tabs.ts",
     ],
   },

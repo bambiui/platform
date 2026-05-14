@@ -41,22 +41,20 @@ export async function addComponent(componentName, flags) {
     );
   }
 
-  // componentDir/<name>/components/  — implementation files
-  const implDir = path.join(cwd, componentDir, componentName, "components");
+  // componentDir/<name>/component/  — implementation files + CSS
+  const implDir = path.join(cwd, componentDir, componentName, "component");
   // componentDir/<name>/tabs.ts  — single barrel
   const barrelPath = path.join(cwd, componentDir, componentName, `${componentName}.ts`);
-  // styles dir — component CSS lands alongside global bambi.css
-  const styleDir = path.join(cwd, path.dirname(config.styleFile));
 
   const results = [];
   const force = Boolean(flags.force);
 
-  // Component CSS → styles directory
+  // Component CSS → implementation dir (alongside other component files)
   results.push(
     await copyRegistryFile(
       registryUrl,
       component.style,
-      path.join(styleDir, path.basename(component.style)),
+      path.join(implDir, path.basename(component.style)),
       force,
     ),
   );

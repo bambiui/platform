@@ -10,7 +10,7 @@ const cliRoot = path.resolve(scriptDir, "..");
 const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 
-// Implementation files expected inside componentDir/tabs/components/
+// Implementation files expected inside componentDir/tabs/component/
 const SHARED_IMPL = ["tabs.contract.ts", "tabs.controller.ts"];
 
 const expectedImplFiles = {
@@ -73,14 +73,14 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
     // Add tabs
     await runCli(["add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
-    // Component CSS in styles/
-    assertExists(path.join(cwd, "src/styles/tabs.css"));
+    // Component CSS inside component dir
+    assertExists(path.join(cwd, "src/components/ui/tabs/component/tabs.css"));
 
     // Single barrel at componentDir/tabs/tabs.ts
     assertExists(path.join(cwd, "src/components/ui/tabs/tabs.ts"));
 
-    // Implementation files inside componentDir/tabs/components/
-    const implDir = path.join(cwd, "src/components/ui/tabs/components");
+    // Implementation files inside componentDir/tabs/component/
+    const implDir = path.join(cwd, "src/components/ui/tabs/component");
     for (const file of implFiles) {
       assertExists(path.join(implDir, file));
     }

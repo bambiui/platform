@@ -134,7 +134,7 @@ export async function getConfig(cwd, flags = {}) {
  * @param {string} componentName
  */
 export function getIndexContent(framework, componentName) {
-  const c = `./components`;
+  const c = `./component`;
   switch (framework) {
     case "react":
       return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${c}/${componentName}.react";\n`;

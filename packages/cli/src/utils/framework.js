@@ -136,7 +136,7 @@ export async function getConfig(cwd, flags = {}) {
 export function getIndexContent(framework, componentName) {
   switch (framework) {
     case "react":
-      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "./${componentName}";\n`;
+      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "./${componentName}.react";\n`;
     case "vue":
       return (
         `export { default as Tabs } from "./${componentName}.vue";\n` +

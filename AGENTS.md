@@ -7,9 +7,8 @@ bambiui is a pnpm + Turborepo monorepo. CLI distributes source components for Re
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
-packages/registry   CLI-installable source templates (self-contained, no @bambiui/* runtime deps)
-packages/tokens     (suspended — contents moved to packages/registry/src/styles/bambi.css)
-apps/templates      Template projects for CLI smoke tests
+packages/registry   Framework wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
+apps/templates      Template projects for CLI smoke tests (bambi-next, bambi-svelte, bambi-vue)
 apps/_archived/     docs, studio, www — suspended during architecture reset
 registry.json       v2 manifest consumed by CLI
 ```
@@ -63,16 +62,34 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 
 ## Package Boundaries
 
-- `packages/core` — workspace source of truth; imports allowed between core files.
-- `packages/registry` — self-contained installable templates; must NOT import from `@bambiui/core` at runtime. Types/helpers are inlined.
+- `packages/core` — workspace source of truth; imports allowed between core files. Controllers are **self-contained** (no `@bambiui/core` imports within the controller itself) so the CLI can copy them directly to user projects.
+- `packages/registry` — framework wrapper templates. Framework files import from `@bambiui/core/components/<name>` **for workspace type-checking only** (devDep). The CLI replaces these imports with local `./tabs.controller` references on install. Installed output has no `@bambiui/*` runtime imports.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats registry.json as external input.
-- Installed output — no `@bambiui/*` runtime imports. CLI output is self-contained.
+- Installed output — no `@bambiui/*` runtime imports. `contract` and `controller` files come from `packages/core`; framework wrapper comes from `packages/registry`.
+
+## Registry File Layout
+
+Each component under `packages/registry/src/components/<name>/`:
+
+```
+<name>/
+  <name>.css          ← component styles (data-* state driven)
+  core/               ← (absent) contract + controller live in packages/core
+  react/              ← tabs.react.tsx
+  vue/                ← tabs.vue, tabs-list.vue, tabs-trigger.vue, tabs-content.vue
+  svelte/             ← tabs.svelte, tabs-list.svelte, tabs-trigger.svelte, tabs-content.svelte
+  solid/              ← tabs.solid.tsx
+  html/               ← tabs.html.ts
+  index.ts            ← workspace barrel (not installed)
+```
+
+Framework files use `import { … } from "@bambiui/core/components/<name>"` for workspace typecheck. The CLI `flattenImports` transform converts these to `"./tabs.controller"` in the installed output.
 
 ## Golden References
 
 - Tabs is the canonical reference component:
-  - Controller: `packages/core/src/components/tabs/tabs.controller.ts`
-  - Installable: `packages/registry/src/components/tabs/`
+  - Contract + Controller (single source): `packages/core/src/components/tabs/`
+  - Installable framework wrappers: `packages/registry/src/components/tabs/`
   - CSS: `packages/registry/src/components/tabs/tabs.css`
 - DOM protocol types: `packages/core/src/dom/`
 
@@ -87,6 +104,7 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 - Do NOT add apps/docs, apps/studio, apps/www, or deployment workflows (suspended — see apps/_archived/).
 - Do NOT reference "button canonical" — tabs is the new reference.
 - Do NOT add Astro framework wrapper until explicitly planned.
+- Do NOT put controller/contract files in `packages/registry` — they live in `packages/core` and are sourced from there by the CLI.
 
 ## Suspended
 
@@ -99,29 +117,42 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 
 ```sh
 pnpm install
-pnpm check
-pnpm check-types
-pnpm check-registry
-pnpm --filter bambiui smoke
-pnpm --filter bambiui dev  (not applicable — CLI has no dev mode)
+pnpm check                              # types + registry + CLI smoke
+pnpm check-types                        # turbo: core + registry + cli TypeScript
+pnpm check-registry                     # validate registry.json v2 schema
+pnpm --filter bambiui smoke             # CLI smoke: all 5 frameworks
+pnpm smoke:templates                    # template smoke (requires node_modules in templates)
+pnpm smoke:templates -- --install       # same, runs npm ci first
 ```
 
 ## Verification Matrix
 
-| Change                                    | Run                           |
-| ----------------------------------------- | ----------------------------- |
-| controller / contract / CSS / wrappers    | `pnpm check`                  |
-| CLI only                                  | `pnpm --filter bambiui check` |
-| registry only                             | `pnpm check-registry`         |
-| core types only                           | `pnpm check-types`            |
+| Change                                           | Run                              |
+| ------------------------------------------------ | -------------------------------- |
+| controller / contract / CSS / wrappers           | `pnpm check`                     |
+| CLI only                                         | `pnpm --filter bambiui check`    |
+| registry only                                    | `pnpm check-registry`            |
+| core types only                                  | `pnpm check-types`               |
+| template projects (end-to-end install + compile) | `pnpm smoke:templates`           |
 
 ## Add A Component
 
 1. Define DOM contract in `packages/core/src/components/<name>/<name>.contract.ts`.
-2. Implement controller in `packages/core/src/components/<name>/<name>.controller.ts`.
-3. Add self-contained installable versions under `packages/registry/src/components/<name>/`.
-4. Register in `registry.json` (v2 format).
-5. Run `pnpm check-registry` and `pnpm check-types`.
+2. Implement a **self-contained** controller in `packages/core/src/components/<name>/<name>.controller.ts`:
+   - Inline `BambiController`, types, and DOM helpers (`getAttr`, `setAttr`, `getBoolAttr`, event dispatch).
+   - Import only from `./  <name>.contract.js` (sibling) — no other `@bambiui/*` imports.
+   - Re-export types that framework wrappers need (e.g. `export type { TabsValueChangeDetail } from "./<name>.contract.js"`).
+3. Add framework wrappers under `packages/registry/src/components/<name>/`:
+   - Use subdirs: `react/`, `vue/`, `svelte/`, `solid/`, `html/`.
+   - Framework files import from `@bambiui/core/components/<name>` (workspace devDep, typecheck only).
+   - CSS goes at `packages/registry/src/components/<name>/<name>.css`.
+   - Add a workspace barrel at `packages/registry/src/components/<name>/index.ts`.
+4. Register in `registry.json` (v2 format):
+   - `contract` and `controller` → `packages/core/src/components/<name>/…`
+   - `style` → `packages/registry/src/components/<name>/<name>.css`
+   - `files.<framework>` → `packages/registry/src/components/<name>/<framework>/…`
+5. Update CLI `add.js` `flattenImports` transform to handle `@bambiui/core/components/<name>` → `"./  <name>.controller"`.
+6. Run `pnpm check-registry` and `pnpm check-types`.
 
 ## Multi-Agent Coordination
 

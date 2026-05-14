@@ -8,6 +8,13 @@ const repoRoot = path.resolve(scriptDir, "..");
 const cliEntry = path.join(repoRoot, "packages/cli/src/index.js");
 const shouldInstall = process.argv.includes("--install");
 
+const TABS_SHARED = [
+  "src/components/ui/tabs/tabs.contract.ts",
+  "src/components/ui/tabs/tabs.controller.ts",
+  "src/components/ui/tabs/tabs.css",
+  "src/components/ui/tabs/index.ts",
+];
+
 const templates = [
   {
     name: "bambi-next",
@@ -17,11 +24,8 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/button/button.tsx",
-      "src/components/ui/button/button.css",
-      "src/components/ui/button/index.ts",
-      "src/components/ui/button/recipe.ts",
-      "src/components/ui/button/types.ts",
+      ...TABS_SHARED,
+      "src/components/ui/tabs/tabs.react.tsx",
     ],
   },
   {
@@ -32,12 +36,11 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/button/Button.svelte",
-      "src/components/ui/button/button.css",
-      "src/components/ui/button/index.ts",
-      "src/components/ui/button/recipe.ts",
-      "src/components/ui/button/svelte.d.ts",
-      "src/components/ui/button/types.ts",
+      ...TABS_SHARED,
+      "src/components/ui/tabs/tabs.svelte",
+      "src/components/ui/tabs/tabs-list.svelte",
+      "src/components/ui/tabs/tabs-trigger.svelte",
+      "src/components/ui/tabs/tabs-content.svelte",
     ],
   },
   {
@@ -48,11 +51,11 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/button/Button.vue",
-      "src/components/ui/button/button.css",
-      "src/components/ui/button/index.ts",
-      "src/components/ui/button/recipe.ts",
-      "src/components/ui/button/types.ts",
+      ...TABS_SHARED,
+      "src/components/ui/tabs/tabs.vue",
+      "src/components/ui/tabs/tabs-list.vue",
+      "src/components/ui/tabs/tabs-trigger.vue",
+      "src/components/ui/tabs/tabs-content.vue",
     ],
   },
 ];
@@ -133,7 +136,7 @@ for (const template of templates) {
     process.execPath,
     cliEntry,
     "add",
-    "button",
+    "tabs",
     "--framework",
     template.framework,
     "--cwd",

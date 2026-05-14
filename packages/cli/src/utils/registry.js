@@ -73,13 +73,22 @@ export async function readRegistryFile(registryUrl, registryPath) {
 export async function readRegistryManifest(registryUrl) {
   const content = await readRegistryFile(registryUrl, DEFAULT_MANIFEST_PATH);
 
+  let manifest;
   try {
-    return JSON.parse(content);
+    manifest = JSON.parse(content);
   } catch (error) {
     throw new Error(
       `Invalid registry manifest at ${DEFAULT_MANIFEST_PATH}: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
+
+  if (manifest.version !== 2) {
+    throw new Error(
+      `Unsupported registry version ${manifest.version}. Expected version 2.`,
+    );
+  }
+
+  return manifest;
 }
 
 /**
@@ -117,8 +126,8 @@ export function getRegistryComponent(manifest, componentName) {
 }
 
 /**
- * @param {{ tokens?: { css?: string } }} manifest
+ * @param {{ styles?: { global?: string } }} manifest
  */
-export function getTokensPath(manifest) {
-  return manifest.tokens?.css ?? "packages/tokens/src/tokens.css";
+export function getStylePath(manifest) {
+  return manifest.styles?.global ?? "packages/registry/src/styles/bambi.css";
 }

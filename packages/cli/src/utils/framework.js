@@ -1,18 +1,18 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { moduleSpecifier, normalizeRelativePath, readJson } from "./files.js";
+import { normalizeRelativePath, readJson } from "./files.js";
 
 export const DEFAULT_COMPONENT_DIR = "src/components/ui";
-export const DEFAULT_TOKENS_FILE = "src/styles/bambi.css";
+export const DEFAULT_STYLE_FILE = "src/styles/bambi.css";
 
 export const frameworkFiles = {
-  astro: ["astro.config.mjs", "astro.config.ts"],
+  solid: ["vite.config.ts", "vite.config.js"],
   svelte: ["svelte.config.js", "svelte.config.ts"],
   vue: ["nuxt.config.ts", "nuxt.config.js"],
   react: ["next.config.js", "next.config.mjs", "next.config.ts"],
 };
 
-export const frameworkOptions = ["react", "svelte", "vue", "astro"];
+export const frameworkOptions = ["react", "svelte", "vue", "solid", "html"];
 
 /**
  * @param {string} framework
@@ -20,7 +20,7 @@ export const frameworkOptions = ["react", "svelte", "vue", "astro"];
 export function assertSupportedFramework(framework) {
   if (!frameworkOptions.includes(framework)) {
     throw new Error(
-      `Unknown framework "${framework}". Use ${frameworkOptions.join(", ")}.`,
+      `Unknown framework "${framework}". Supported: ${frameworkOptions.join(", ")}.`,
     );
   }
 }
@@ -37,15 +37,15 @@ export function createDefaultConfig(framework, overrides = {}) {
     componentDir: normalizeRelativePath(
       overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
     ),
-    tokensFile: normalizeRelativePath(
-      overrides.tokensFile ?? overrides.styleFile ?? DEFAULT_TOKENS_FILE,
+    styleFile: normalizeRelativePath(
+      overrides.styleFile ?? DEFAULT_STYLE_FILE,
     ),
   };
 }
 
 /**
  * @param {Record<string, string | undefined>} config
- * @param {{ framework: string, componentDir: string, tokensFile: string }} defaults
+ * @param {{ framework: string, componentDir: string, styleFile: string }} defaults
  * @param {Record<string, string | undefined>} [flags]
  */
 export function mergeConfig(config, defaults, flags = {}) {
@@ -57,12 +57,11 @@ export function mergeConfig(config, defaults, flags = {}) {
     componentDir: normalizeRelativePath(
       flags.componentDir ?? config.componentDir ?? defaults.componentDir,
     ),
-    tokensFile: normalizeRelativePath(
-      flags.tokensFile ??
-        flags.styleFile ??
-        config.tokensFile ??
+    styleFile: normalizeRelativePath(
+      flags.styleFile ??
         config.styleFile ??
-        defaults.tokensFile,
+        config.tokensFile ??
+        defaults.styleFile,
     ),
   };
 }
@@ -77,7 +76,10 @@ export async function detectFramework(cwd) {
     ...packageJson?.devDependencies,
   };
 
-  for (const framework of ["astro", "svelte", "vue", "react"]) {
+  // Check for solid-js
+  if (deps["solid-js"]) return "solid";
+
+  for (const framework of ["svelte", "vue", "react"]) {
     if (deps[framework] || deps[`@${framework}js/kit`]) {
       return framework;
     }
@@ -85,6 +87,19 @@ export async function detectFramework(cwd) {
 
   for (const [framework, files] of Object.entries(frameworkFiles)) {
     if (files.some((file) => existsSync(path.join(cwd, file)))) {
+      // For vite.config, check if solid-js is referenced
+      if (framework === "solid") {
+        try {
+          const vitePath = files.find((f) => existsSync(path.join(cwd, f)));
+          if (vitePath) {
+            const { readFileSync } = await import("node:fs");
+            const content = readFileSync(path.join(cwd, vitePath), "utf-8");
+            if (!content.includes("solid")) continue;
+          }
+        } catch {
+          continue;
+        }
+      }
       return framework;
     }
   }
@@ -113,80 +128,34 @@ export async function getConfig(cwd, flags = {}) {
 }
 
 /**
+ * Generate the index.ts barrel content for an installed component.
+ *
  * @param {string} framework
- * @param {string} exportName
- * @param {Record<string, string>} fileNames
- * @param {string[]} typeExports
- * @param {string[]} valueExports
+ * @param {string} componentName
  */
-export function getIndexContent(
-  framework,
-  exportName,
-  fileNames,
-  typeExports,
-  valueExports = [],
-) {
-  const typeExportList = typeExports.join(", ");
-  const valueExportList = valueExports.join(", ");
-  const recipeConst = `${exportName.slice(0, 1).toLowerCase()}${exportName.slice(1)}Recipe`;
-  const recipeType = `${exportName}Recipe`;
-  const recipeModule = fileNames.recipe
-    ? moduleSpecifier(fileNames.recipe)
-    : undefined;
-  const recipeLine = recipeModule
-    ? `export { ${recipeConst}, type ${recipeType} } from "${recipeModule}";\n`
-    : "";
-  const valueLine =
-    valueExportList && fileNames.types
-      ? `export { ${valueExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
-      : "";
-
-  if (framework === "react") {
-    const componentModule = moduleSpecifier(fileNames[framework]);
-    const typeLine = typeExportList
-      ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
-      : "";
-
-    return `export { ${exportName} } from "${componentModule}";\n${typeLine}${recipeLine}${valueLine}`;
+export function getIndexContent(framework, componentName) {
+  switch (framework) {
+    case "react":
+      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "./${componentName}";\n`;
+    case "vue":
+      return (
+        `export { default as Tabs } from "./${componentName}.vue";\n` +
+        `export { default as TabsList } from "./${componentName}-list.vue";\n` +
+        `export { default as TabsTrigger } from "./${componentName}-trigger.vue";\n` +
+        `export { default as TabsContent } from "./${componentName}-content.vue";\n`
+      );
+    case "svelte":
+      return (
+        `export { default as Tabs } from "./${componentName}.svelte";\n` +
+        `export { default as TabsList } from "./${componentName}-list.svelte";\n` +
+        `export { default as TabsTrigger } from "./${componentName}-trigger.svelte";\n` +
+        `export { default as TabsContent } from "./${componentName}-content.svelte";\n`
+      );
+    case "solid":
+      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "./${componentName}.solid";\n`;
+    case "html":
+      return `export { mount, unmount } from "./${componentName}.html";\n`;
+    default:
+      return `// bambiui ${componentName}\n`;
   }
-
-  const typeLine = typeExportList
-    ? `export type { ${typeExportList} } from "${moduleSpecifier(fileNames.types)}";\n`
-    : "";
-
-  return `export { default as ${exportName} } from "${componentSpecifier(framework, fileNames[framework])}";\n${typeLine}${recipeLine}${valueLine}`;
-}
-
-/**
- * @param {string} framework
- * @param {string} fileName
- */
-function componentSpecifier(framework, fileName) {
-  if (["astro", "svelte", "vue"].includes(framework)) {
-    return `./${fileName}`;
-  }
-
-  return moduleSpecifier(fileName);
-}
-
-/**
- * @param {string} framework
- */
-export function getFrameworkSupportFiles(framework) {
-  if (framework === "svelte") {
-    return [
-      {
-        fileName: "svelte.d.ts",
-        content: `declare module "*.svelte" {
-  import type { Component } from "svelte";
-
-  const component: Component<Record<string, unknown>>;
-  export default component;
-}
-`,
-      },
-    ];
-  }
-
-  return [];
 }

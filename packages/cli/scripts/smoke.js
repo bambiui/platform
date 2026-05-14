@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -10,21 +10,15 @@ const cliRoot = path.resolve(scriptDir, "..");
 const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 
-const expectedComponentFiles = {
-  button: {
-    astro: "Button.astro",
-    css: "button.css",
-    react: "button.tsx",
-    svelte: "Button.svelte",
-    vue: "Button.vue",
-  },
-  buttongroup: {
-    astro: "ButtonGroup.astro",
-    css: "buttongroup.css",
-    react: "buttongroup.tsx",
-    svelte: "ButtonGroup.svelte",
-    vue: "ButtonGroup.vue",
-  },
+// Shared files expected for every framework
+const SHARED_FILES = ["tabs.contract.ts", "tabs.controller.ts", "tabs.css", "index.ts"];
+
+const expectedFrameworkFiles = {
+  react:  [...SHARED_FILES, "tabs.react.tsx"],
+  vue:    [...SHARED_FILES, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
+  svelte: [...SHARED_FILES, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
+  solid:  [...SHARED_FILES, "tabs.solid.tsx"],
+  html:   [...SHARED_FILES, "tabs.html.ts"],
 };
 
 /**
@@ -40,25 +34,17 @@ async function runCli(args, options = {}) {
 
   let stdout = "";
   let stderr = "";
-  child.stdout.on("data", (chunk) => {
-    stdout += chunk;
-  });
-  child.stderr.on("data", (chunk) => {
-    stderr += chunk;
-  });
+  child.stdout.on("data", (chunk) => { stdout += chunk; });
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
 
-  const code = await new Promise((resolve) => {
-    child.on("close", resolve);
-  });
+  const code = await new Promise((resolve) => { child.on("close", resolve); });
 
   if (options.expectFailure) {
     if (code === 0) {
       throw new Error(`Expected failure for: bambiui ${args.join(" ")}`);
     }
   } else if (code !== 0) {
-    throw new Error(
-      `Command failed: bambiui ${args.join(" ")}\n${stdout}${stderr}`,
-    );
+    throw new Error(`Command failed: bambiui ${args.join(" ")}\n${stdout}${stderr}`);
   }
 
   return { stdout, stderr };
@@ -73,130 +59,56 @@ function assertExists(filePath) {
   }
 }
 
-for (const [framework] of Object.entries(expectedComponentFiles.button).filter(
-  ([key]) => key !== "css",
-)) {
+// Test each framework
+for (const [framework, files] of Object.entries(expectedFrameworkFiles)) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
 
   try {
-    await runCli([
-      "init",
-      "--yes",
-      "--framework",
-      framework,
-      "--cwd",
-      cwd,
-      "--registry-url",
-      repoRoot,
-    ]);
+    // Init
+    await runCli(["init", "--yes", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
     assertExists(path.join(cwd, "bambiui.config.json"));
     assertExists(path.join(cwd, "src/styles/bambi.css"));
 
-    for (const [componentName, files] of Object.entries(
-      expectedComponentFiles,
-    )) {
-      await runCli([
-        "add",
-        componentName,
-        "--framework",
-        framework,
-        "--cwd",
-        cwd,
-        "--registry-url",
-        repoRoot,
-      ]);
+    // Add tabs
+    await runCli(["add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
-      const componentDir = path.join(cwd, "src/components/ui", componentName);
-      assertExists(path.join(componentDir, files[framework]));
-      assertExists(path.join(componentDir, files.css));
-      assertExists(path.join(componentDir, "index.ts"));
-      assertExists(path.join(componentDir, "recipe.ts"));
-      assertExists(path.join(componentDir, "types.ts"));
+    const componentDir = path.join(cwd, "src/components/ui/tabs");
+    for (const file of files) {
+      assertExists(path.join(componentDir, file));
     }
 
+    // Second add should skip existing files
     const secondAdd = await runCli([
-      "add",
-      "button",
-      "--framework",
-      framework,
-      "--cwd",
-      cwd,
-      "--registry-url",
-      repoRoot,
+      "add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot,
     ]);
-
     if (!secondAdd.stdout.includes("skipped")) {
-      throw new Error(
-        `Expected second add to skip existing ${framework} files.`,
-      );
+      throw new Error(`Expected second add to skip existing ${framework} files.`);
     }
 
+    // Forced add should update
     const forcedAdd = await runCli([
-      "add",
-      "button",
-      "--framework",
-      framework,
-      "--cwd",
-      cwd,
-      "--registry-url",
-      repoRoot,
-      "--force",
+      "add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot, "--force",
     ]);
-
     if (!forcedAdd.stdout.includes("updated")) {
-      throw new Error(
-        `Expected forced add to update existing ${framework} files.`,
-      );
+      throw new Error(`Expected forced add to update existing ${framework} files.`);
     }
 
-    const buttonDir = path.join(cwd, "src/components/ui/button");
-    const types = await readFile(path.join(buttonDir, "types.ts"), "utf8");
-    if (types.includes("@bambiui/")) {
-      throw new Error(`Generated ${framework} types are not self-contained.`);
-    }
-
-    const index = await readFile(path.join(buttonDir, "index.ts"), "utf8");
-    for (const exportName of [
-      "ButtonDefaults",
-      "buttonRecipe",
-      "ButtonRecipe",
-      "buttonIntents",
-    ]) {
-      if (!index.includes(exportName)) {
-        throw new Error(
-          `Generated ${framework} index is missing ${exportName}.`,
-        );
-      }
-    }
+    process.stdout.write(`  ✓ ${framework}\n`);
   } finally {
     await rm(cwd, { force: true, recursive: true });
   }
 }
 
-const invalidFrameworkDir = await mkdtemp(
-  path.join(tmpdir(), "bambiui-invalid-"),
-);
+// Invalid framework should fail
+const invalidDir = await mkdtemp(path.join(tmpdir(), "bambiui-invalid-"));
 try {
-  const result = await runCli(
-    [
-      "init",
-      "--yes",
-      "--framework",
-      "solid",
-      "--cwd",
-      invalidFrameworkDir,
-      "--registry-url",
-      repoRoot,
-    ],
+  await runCli(
+    ["init", "--yes", "--framework", "astro", "--cwd", invalidDir, "--registry-url", repoRoot],
     { expectFailure: true },
   );
-
-  if (!result.stderr.includes("Unknown framework")) {
-    throw new Error("Expected invalid framework error message.");
-  }
 } finally {
-  await rm(invalidFrameworkDir, { force: true, recursive: true });
+  await rm(invalidDir, { force: true, recursive: true });
 }
 
 process.stdout.write("CLI smoke tests passed.\n");

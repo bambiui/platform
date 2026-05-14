@@ -8,7 +8,7 @@ import { color, writeProjectFile } from "../utils/files.js";
 import {
   copyRegistryFile,
   getRegistryUrl,
-  getTokensPath,
+  getStylePath,
   readRegistryManifest,
 } from "../utils/registry.js";
 import { normalizeRelativePath } from "../utils/files.js";
@@ -37,15 +37,15 @@ export async function initProject(flags) {
     ),
     await copyRegistryFile(
       registryUrl,
-      getTokensPath(manifest),
-      path.join(cwd, config.tokensFile),
+      getStylePath(manifest),
+      path.join(cwd, config.styleFile),
       Boolean(flags.force),
     ),
   ];
 }
 
 /**
- * @param {{ framework: string, componentDir: string, tokensFile: string }} defaults
+ * @param {{ framework: string, componentDir: string, styleFile: string }} defaults
  * @param {Record<string, string | boolean | undefined>} flags
  */
 async function promptForConfig(defaults, flags) {
@@ -66,7 +66,7 @@ async function promptForConfig(defaults, flags) {
     `  ${color("componentDir", "dim")} ${color(defaults.componentDir, "yellow")}\n`,
   );
   process.stdout.write(
-    `  ${color("tokensFile", "dim")}   ${color(defaults.tokensFile, "yellow")}\n\n`,
+    `  ${color("styleFile", "dim")}    ${color(defaults.styleFile, "yellow")}\n\n`,
   );
 
   const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -97,8 +97,8 @@ async function promptForConfig(defaults, flags) {
     const componentDir = await customRl.question(
       `Component directory (${defaults.componentDir}): `,
     );
-    const tokensFile = await customRl.question(
-      `Tokens file (${defaults.tokensFile}): `,
+    const styleFile = await customRl.question(
+      `Style file (${defaults.styleFile}): `,
     );
 
     return {
@@ -106,7 +106,7 @@ async function promptForConfig(defaults, flags) {
       componentDir: normalizeRelativePath(
         componentDir.trim() || defaults.componentDir,
       ),
-      tokensFile: normalizeRelativePath(tokensFile.trim() || defaults.tokensFile),
+      styleFile: normalizeRelativePath(styleFile.trim() || defaults.styleFile),
     };
   } finally {
     customRl.close();

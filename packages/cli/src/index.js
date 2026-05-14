@@ -9,17 +9,16 @@ function help() {
 
 Usage:
   bambiui init
-  bambiui add button
+  bambiui add tabs
 
 Options:
-  --framework react|svelte|vue|astro   Framework override
-  --component-dir <path>               Component destination (default: src/components/ui)
-  --registry-url <url>                 Registry base URL (default: https://bambiui.com)
-  --tokens-file <path>                 Global token CSS destination (default: src/styles/bambi.css)
-  --style-file <path>                  Alias for --tokens-file
-  --cwd <path>                         Target project (default: current directory)
-  --force                              Overwrite existing files
-  --yes, -y                            Accept detected defaults without prompts
+  --framework react|svelte|vue|solid|html   Framework override
+  --component-dir <path>                    Component destination (default: src/components/ui)
+  --registry-url <url>                      Registry base URL (default: https://bambiui.com)
+  --style-file <path>                       Global CSS destination (default: src/styles/bambi.css)
+  --cwd <path>                              Target project (default: current directory)
+  --force                                   Overwrite existing files
+  --yes, -y                                 Accept detected defaults without prompts
 `;
 }
 
@@ -47,15 +46,15 @@ async function main() {
     throw new Error(`Unknown command "${command}".\n\n${help()}`);
   }
 
-  const { config, exportName, framework, results } = await addComponent(
+  const { config, framework, componentName, results } = await addComponent(
     component,
     flags,
   );
 
-  process.stdout.write(`\nAdded ${component} for ${framework}.\n`);
+  process.stdout.write(`\nAdded ${componentName} for ${framework}.\n`);
   printResults(results);
   process.stdout.write(
-    `\nUse it with:\n  ${getImportHint(config.componentDir, exportName, component ?? "")}\n`,
+    `\nUse it with:\n  ${getImportHint(config.componentDir, componentName ?? "")}\n`,
   );
 }
 

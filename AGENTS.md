@@ -73,7 +73,7 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 - Tabs is the canonical reference component:
   - Controller: `packages/core/src/components/tabs/tabs.controller.ts`
   - Installable: `packages/registry/src/components/tabs/`
-  - CSS: `packages/registry/src/components/tabs/core/tabs.css`
+  - CSS: `packages/registry/src/components/tabs/tabs.css`
 - DOM protocol types: `packages/core/src/dom/`
 
 ## Forbidden

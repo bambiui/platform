@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from "vue";
-import { TabsController } from "../core/tabs.controller";
-import type { TabsOptions } from "../core/tabs.controller";
+import { TabsController } from "@bambiui/core/components/tabs";
+import type { TabsOptions } from "@bambiui/core/components/tabs";
 
 interface Props extends Omit<TabsOptions, "onValueChange"> {
   class?: string;

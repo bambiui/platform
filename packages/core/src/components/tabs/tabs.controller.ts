@@ -1,6 +1,3 @@
-import type { BambiController } from "../../dom/controller.js";
-import { dispatchBambiEvent } from "../../dom/events.js";
-import { getAttr, setAttr, getBoolAttr } from "../../dom/attributes.js";
 import {
   TABS_TRIGGER,
   TABS_CONTENT,
@@ -13,7 +10,58 @@ import {
   TABS_EVENT_VALUE_CHANGE,
   type TabsValueChangeDetail,
 } from "./tabs.contract.js";
-import type { TabsOptions, TabsOrientation } from "./tabs.types.js";
+
+export type { TabsValueChangeDetail } from "./tabs.contract.js";
+
+// ── Inlined types ─────────────────────────────────────────────────────────
+
+export interface BambiController {
+  sync(): void;
+  update?(options?: unknown): void;
+  destroy(): void;
+}
+
+export type TabsOrientation = "horizontal" | "vertical";
+
+export interface TabsOptions {
+  value?: string;
+  defaultValue?: string;
+  controlled?: boolean;
+  orientation?: TabsOrientation;
+  disabled?: boolean;
+  onValueChange?: (value: string) => void;
+}
+
+// ── Inlined DOM helpers ───────────────────────────────────────────────────
+
+function getAttr(el: Element, name: string, fallback: string): string {
+  return el.getAttribute(name) ?? fallback;
+}
+
+function setAttr(el: Element, name: string, value: string | null): void {
+  if (value === null) {
+    el.removeAttribute(name);
+  } else {
+    el.setAttribute(name, value);
+  }
+}
+
+function getBoolAttr(el: Element, name: string): boolean {
+  return el.getAttribute(name) === "true";
+}
+
+function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
+  element.dispatchEvent(
+    new CustomEvent<TabsValueChangeDetail>(TABS_EVENT_VALUE_CHANGE, {
+      bubbles: true,
+      cancelable: false,
+      composed: false,
+      detail,
+    }),
+  );
+}
+
+// ── Controller ────────────────────────────────────────────────────────────
 
 export class TabsController implements BambiController {
   private readonly root: Element;
@@ -102,9 +150,7 @@ export class TabsController implements BambiController {
       }
     }
 
-    dispatchBambiEvent<TabsValueChangeDetail>(this.root, TABS_EVENT_VALUE_CHANGE, {
-      detail: { value: newValue, previousValue, source },
-    });
+    dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
     this.options.onValueChange?.(newValue);
   }
 
@@ -127,8 +173,10 @@ export class TabsController implements BambiController {
         if (!isControlled) {
           this.applyValue(value, "click");
         } else {
-          dispatchBambiEvent<TabsValueChangeDetail>(this.root, TABS_EVENT_VALUE_CHANGE, {
-            detail: { value, previousValue: this.currentValue, source: "click" },
+          dispatchTabsEvent(this.root, {
+            value,
+            previousValue: this.currentValue,
+            source: "click",
           });
           this.options.onValueChange?.(value);
         }

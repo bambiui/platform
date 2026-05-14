@@ -75,7 +75,7 @@ export async function addComponent(componentName, flags) {
 
   // Copy framework-specific files; flatten subdir imports (../core/ → ./)
   const flattenImports = (/** @type {string} */ content) =>
-    content.replace(/from "\.\.\/core\//g, 'from "./');
+    content.replace(/from "@bambiui\/core\/components\/tabs"/g, 'from "./tabs.controller"');
 
   for (const filePath of frameworkFiles) {
     results.push(

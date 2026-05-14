@@ -7,9 +7,9 @@
   "components": {
     "tabs": {
       "name": "tabs",
-      "contract": "packages/registry/src/components/tabs/core/tabs.contract.ts",
-      "controller": "packages/registry/src/components/tabs/core/tabs.controller.ts",
-      "style": "packages/registry/src/components/tabs/core/tabs.css",
+      "contract": "packages/core/src/components/tabs/tabs.contract.ts",
+      "controller": "packages/core/src/components/tabs/tabs.controller.ts",
+      "style": "packages/registry/src/components/tabs/tabs.css",
       "files": {
         "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"],
         "vue": [

@@ -1,9 +1,9 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { TabsController } from "../core/tabs.controller";
-import type { TabsOptions } from "../core/tabs.controller";
+import { TabsController } from "@bambiui/core/components/tabs";
+import type { TabsOptions } from "@bambiui/core/components/tabs";
 
-export type { BambiController, TabsOptions, TabsOrientation } from "../core/tabs.controller";
-export type { TabsValueChangeDetail } from "../core/tabs.contract";
+export type { BambiController, TabsOptions, TabsOrientation } from "@bambiui/core/components/tabs";
+export type { TabsValueChangeDetail } from "@bambiui/core/components/tabs";
 
 export interface TabsProps extends TabsOptions {
   children?: ReactNode;

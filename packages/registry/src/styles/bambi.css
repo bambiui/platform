@@ -1,0 +1,180 @@
+/*
+  bambiui token layers:
+  primitive -> semantic -> intent/state -> component.
+*/
+
+:root {
+  --bambi-color-white: oklch(100% 0 0);
+  --bambi-color-black: oklch(0% 0 0);
+  --bambi-neutral-50: oklch(97% 0.01 271);
+  --bambi-neutral-100: oklch(95% 0.008 271);
+  --bambi-neutral-200: oklch(90% 0.01 271);
+  --bambi-neutral-300: oklch(83% 0.012 271);
+  --bambi-neutral-400: oklch(68% 0.018 271);
+  --bambi-neutral-500: oklch(55% 0.021 271);
+  --bambi-neutral-600: oklch(45% 0.02 271);
+  --bambi-neutral-700: oklch(36% 0.018 271);
+  --bambi-neutral-800: oklch(28% 0.014 271);
+  --bambi-neutral-900: oklch(21% 0.012 271);
+  --bambi-neutral-950: oklch(9% 0 0);
+  --bambi-primary-50: oklch(97% 0.018 271);
+  --bambi-primary-100: oklch(94% 0.036 271);
+  --bambi-primary-200: oklch(88% 0.072 271);
+  --bambi-primary-300: oklch(78% 0.12 271);
+  --bambi-primary-400: oklch(66% 0.18 271);
+  --bambi-primary-500: oklch(55% 0.22 271);
+  --bambi-primary-600: oklch(49% 0.23 271);
+  --bambi-primary-700: oklch(42% 0.2 271);
+  --bambi-primary-800: oklch(34% 0.16 271);
+  --bambi-primary-900: oklch(27% 0.12 271);
+  --bambi-primary-950: oklch(18% 0.08 271);
+  --bambi-danger-50: oklch(97% 0.02 28);
+  --bambi-danger-100: oklch(93% 0.045 28);
+  --bambi-danger-200: oklch(86% 0.09 28);
+  --bambi-danger-300: oklch(78% 0.15 28);
+  --bambi-danger-400: oklch(71% 0.2 28);
+  --bambi-danger-500: oklch(65% 0.233 28);
+  --bambi-danger-600: oklch(58% 0.22 28);
+  --bambi-danger-700: oklch(49% 0.19 28);
+  --bambi-danger-800: oklch(40% 0.15 28);
+  --bambi-danger-900: oklch(32% 0.11 28);
+  --bambi-danger-950: oklch(22% 0.08 28);
+  --bambi-success-50: oklch(97% 0.025 153);
+  --bambi-success-100: oklch(93% 0.055 153);
+  --bambi-success-200: oklch(87% 0.095 153);
+  --bambi-success-300: oklch(80% 0.145 153);
+  --bambi-success-400: oklch(76% 0.17 153);
+  --bambi-success-500: oklch(73% 0.194 153);
+  --bambi-success-600: oklch(64% 0.18 153);
+  --bambi-success-700: oklch(54% 0.15 153);
+  --bambi-success-800: oklch(43% 0.12 153);
+  --bambi-success-900: oklch(33% 0.09 153);
+  --bambi-success-950: oklch(22% 0.06 153);
+  --bambi-warning-50: oklch(98% 0.025 74);
+  --bambi-warning-100: oklch(95% 0.055 74);
+  --bambi-warning-200: oklch(90% 0.09 74);
+  --bambi-warning-300: oklch(84% 0.125 74);
+  --bambi-warning-400: oklch(81% 0.145 74);
+  --bambi-warning-500: oklch(78% 0.159 74);
+  --bambi-warning-600: oklch(69% 0.15 74);
+  --bambi-warning-700: oklch(58% 0.13 74);
+  --bambi-warning-800: oklch(46% 0.1 74);
+  --bambi-warning-900: oklch(35% 0.075 74);
+  --bambi-warning-950: oklch(24% 0.055 74);
+  --bambi-space-1: 0.25rem;
+  --bambi-space-1-5: 0.375rem;
+  --bambi-space-2: 0.5rem;
+  --bambi-space-3: 0.75rem;
+  --bambi-space-4: 1rem;
+  --bambi-space-5: 1.25rem;
+  --bambi-radius-sm: 0.375rem;
+  --bambi-radius-md: 0.5rem;
+  --bambi-radius-lg: 0.75rem;
+  --bambi-radius-xl: 1rem;
+  --bambi-radius-full: 9999px;
+  --bambi-font-sans: system-ui, sans-serif;
+  --bambi-font-mono: ui-monospace, monospace;
+  --bambi-text-xs: 0.75rem;
+  --bambi-text-sm: 0.875rem;
+  --bambi-text-base: 1rem;
+  --bambi-text-lg: 1.125rem;
+  --bambi-font-weight-normal: 400;
+  --bambi-font-weight-medium: 500;
+  --bambi-font-weight-semibold: 600;
+  --bambi-font-weight-bold: 700;
+  --bambi-shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.05);
+  --bambi-shadow-md:
+    0 4px 6px -1px oklch(0% 0 0 / 0.1), 0 2px 4px -2px oklch(0% 0 0 / 0.1);
+  --bambi-shadow-lg:
+    0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -4px oklch(0% 0 0 / 0.1);
+
+  --bambi-background: var(--bambi-neutral-50);
+  --bambi-foreground: var(--bambi-neutral-950);
+  --bambi-card: var(--bambi-color-white);
+  --bambi-card-foreground: var(--bambi-neutral-950);
+  --bambi-popover: var(--bambi-color-white);
+  --bambi-popover-foreground: var(--bambi-neutral-950);
+  --bambi-primary: var(--bambi-primary-500);
+  --bambi-primary-foreground: var(--bambi-color-white);
+  --bambi-secondary: var(--bambi-neutral-100);
+  --bambi-secondary-foreground: var(--bambi-neutral-950);
+  --bambi-accent: var(--bambi-neutral-100);
+  --bambi-accent-foreground: var(--bambi-neutral-950);
+  --bambi-muted: var(--bambi-neutral-100);
+  --bambi-muted-foreground: var(--bambi-neutral-500);
+  --bambi-danger: var(--bambi-danger-500);
+  --bambi-danger-foreground: var(--bambi-color-white);
+  --bambi-success: var(--bambi-success-500);
+  --bambi-success-foreground: var(--bambi-neutral-950);
+  --bambi-warning: var(--bambi-warning-500);
+  --bambi-warning-foreground: var(--bambi-neutral-950);
+  --bambi-border: var(--bambi-neutral-200);
+  --bambi-input: var(--bambi-neutral-200);
+  --bambi-input-background: var(--bambi-color-white);
+  --bambi-input-foreground: var(--bambi-neutral-950);
+  --bambi-input-placeholder: var(--bambi-neutral-500);
+  --bambi-ring: var(--bambi-primary);
+  --bambi-separator: var(--bambi-neutral-200);
+
+  --bambi-intent-primary-bg: var(--bambi-primary);
+  --bambi-intent-primary-fg: var(--bambi-primary-foreground);
+  --bambi-intent-primary-hover-bg: var(--bambi-primary-600);
+  --bambi-intent-secondary-bg: var(--bambi-secondary);
+  --bambi-intent-secondary-fg: var(--bambi-secondary-foreground);
+  --bambi-intent-secondary-hover-bg: var(--bambi-accent);
+  --bambi-intent-danger-bg: var(--bambi-danger);
+  --bambi-intent-danger-fg: var(--bambi-danger-foreground);
+  --bambi-intent-danger-hover-bg: var(--bambi-danger-600);
+  --bambi-intent-success-bg: var(--bambi-success);
+  --bambi-intent-success-fg: var(--bambi-success-foreground);
+  --bambi-intent-success-hover-bg: var(--bambi-success-600);
+  --bambi-intent-warning-bg: var(--bambi-warning);
+  --bambi-intent-warning-fg: var(--bambi-warning-foreground);
+  --bambi-intent-warning-hover-bg: var(--bambi-warning-600);
+  --bambi-state-hover-opacity: 1;
+  --bambi-state-disabled-opacity: 0.5;
+  --bambi-state-focus-ring: var(--bambi-ring);
+  --bambi-state-focus-ring-width: 2px;
+  --bambi-state-focus-ring-offset: 2px;
+
+}
+
+[data-theme="dark"],
+.dark {
+  --bambi-background: var(--bambi-neutral-950);
+  --bambi-foreground: var(--bambi-neutral-50);
+  --bambi-card: var(--bambi-neutral-900);
+  --bambi-card-foreground: var(--bambi-neutral-50);
+  --bambi-popover: var(--bambi-neutral-900);
+  --bambi-popover-foreground: var(--bambi-neutral-50);
+  --bambi-primary: var(--bambi-primary-400);
+  --bambi-primary-foreground: var(--bambi-neutral-950);
+  --bambi-secondary: var(--bambi-neutral-800);
+  --bambi-secondary-foreground: var(--bambi-neutral-50);
+  --bambi-accent: var(--bambi-neutral-800);
+  --bambi-accent-foreground: var(--bambi-neutral-50);
+  --bambi-muted: var(--bambi-neutral-800);
+  --bambi-muted-foreground: var(--bambi-neutral-400);
+  --bambi-danger: var(--bambi-danger-600);
+  --bambi-danger-foreground: var(--bambi-neutral-50);
+  --bambi-success: var(--bambi-success-500);
+  --bambi-success-foreground: var(--bambi-neutral-950);
+  --bambi-warning: var(--bambi-warning-400);
+  --bambi-warning-foreground: var(--bambi-neutral-950);
+  --bambi-border: var(--bambi-neutral-800);
+  --bambi-input: var(--bambi-neutral-800);
+  --bambi-input-background: var(--bambi-neutral-900);
+  --bambi-input-foreground: var(--bambi-neutral-50);
+  --bambi-input-placeholder: var(--bambi-neutral-400);
+  --bambi-ring: var(--bambi-primary);
+  --bambi-separator: var(--bambi-neutral-800);
+  --bambi-intent-primary-hover-bg: var(--bambi-primary-300);
+  --bambi-intent-danger-hover-bg: var(--bambi-danger-400);
+  --bambi-intent-success-hover-bg: var(--bambi-success-400);
+  --bambi-intent-warning-hover-bg: var(--bambi-warning-300);
+  --bambi-shadow-sm: 0 1px 2px 0 oklch(0% 0 0 / 0.3);
+  --bambi-shadow-md:
+    0 4px 6px -1px oklch(0% 0 0 / 0.4), 0 2px 4px -2px oklch(0% 0 0 / 0.4);
+  --bambi-shadow-lg:
+    0 10px 15px -3px oklch(0% 0 0 / 0.4), 0 4px 6px -4px oklch(0% 0 0 / 0.4);
+}

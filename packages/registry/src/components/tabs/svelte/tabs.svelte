@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { TabsController } from "./tabs.controller";
-  import type { TabsOptions } from "./tabs.controller";
+  import { TabsController } from "../core/tabs.controller";
+  import type { TabsOptions } from "../core/tabs.controller";
 
   interface Props extends Omit<TabsOptions, "onValueChange"> {
     class?: string;

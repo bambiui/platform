@@ -73,7 +73,10 @@ export async function addComponent(componentName, flags) {
     ),
   );
 
-  // Copy framework-specific files
+  // Copy framework-specific files; flatten subdir imports (../core/ → ./)
+  const flattenImports = (/** @type {string} */ content) =>
+    content.replace(/from "\.\.\/core\//g, 'from "./');
+
   for (const filePath of frameworkFiles) {
     results.push(
       await copyRegistryFile(
@@ -81,6 +84,7 @@ export async function addComponent(componentName, flags) {
         filePath,
         path.join(targetDir, path.basename(filePath)),
         force,
+        flattenImports,
       ),
     );
   }

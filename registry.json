@@ -7,25 +7,25 @@
   "components": {
     "tabs": {
       "name": "tabs",
-      "contract": "packages/registry/src/components/tabs/tabs.contract.ts",
-      "controller": "packages/registry/src/components/tabs/tabs.controller.ts",
-      "style": "packages/registry/src/components/tabs/tabs.css",
+      "contract": "packages/registry/src/components/tabs/core/tabs.contract.ts",
+      "controller": "packages/registry/src/components/tabs/core/tabs.controller.ts",
+      "style": "packages/registry/src/components/tabs/core/tabs.css",
       "files": {
-        "react": ["packages/registry/src/components/tabs/tabs.react.tsx"],
+        "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"],
         "vue": [
-          "packages/registry/src/components/tabs/tabs.vue",
-          "packages/registry/src/components/tabs/tabs-list.vue",
-          "packages/registry/src/components/tabs/tabs-trigger.vue",
-          "packages/registry/src/components/tabs/tabs-content.vue"
+          "packages/registry/src/components/tabs/vue/tabs.vue",
+          "packages/registry/src/components/tabs/vue/tabs-list.vue",
+          "packages/registry/src/components/tabs/vue/tabs-trigger.vue",
+          "packages/registry/src/components/tabs/vue/tabs-content.vue"
         ],
         "svelte": [
-          "packages/registry/src/components/tabs/tabs.svelte",
-          "packages/registry/src/components/tabs/tabs-list.svelte",
-          "packages/registry/src/components/tabs/tabs-trigger.svelte",
-          "packages/registry/src/components/tabs/tabs-content.svelte"
+          "packages/registry/src/components/tabs/svelte/tabs.svelte",
+          "packages/registry/src/components/tabs/svelte/tabs-list.svelte",
+          "packages/registry/src/components/tabs/svelte/tabs-trigger.svelte",
+          "packages/registry/src/components/tabs/svelte/tabs-content.svelte"
         ],
-        "solid": ["packages/registry/src/components/tabs/tabs.solid.tsx"],
-        "html": ["packages/registry/src/components/tabs/tabs.html.ts"]
+        "solid": ["packages/registry/src/components/tabs/solid/tabs.solid.tsx"],
+        "html": ["packages/registry/src/components/tabs/html/tabs.html.ts"]
       }
     }
   }

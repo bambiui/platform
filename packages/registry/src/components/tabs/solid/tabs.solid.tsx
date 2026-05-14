@@ -1,9 +1,9 @@
 import { createEffect, onCleanup, type JSX } from "solid-js";
-import { TabsController } from "./tabs.controller";
-import type { TabsOptions } from "./tabs.controller";
+import { TabsController } from "../core/tabs.controller";
+import type { TabsOptions } from "../core/tabs.controller";
 
-export type { BambiController, TabsOptions, TabsOrientation } from "./tabs.controller";
-export type { TabsValueChangeDetail } from "./tabs.contract";
+export type { BambiController, TabsOptions, TabsOrientation } from "../core/tabs.controller";
+export type { TabsValueChangeDetail } from "../core/tabs.contract";
 
 export interface TabsProps extends Omit<TabsOptions, "onValueChange"> {
   children?: JSX.Element;

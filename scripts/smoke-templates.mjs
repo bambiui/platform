@@ -8,10 +8,10 @@ const repoRoot = path.resolve(scriptDir, "..");
 const cliEntry = path.join(repoRoot, "packages/cli/src/index.js");
 const shouldInstall = process.argv.includes("--install");
 
-// Implementation files inside src/components/ui/tabs/
+// Implementation files inside src/components/ui/tabs/components/
 const TABS_IMPL = [
-  "src/components/ui/tabs/tabs.contract.ts",
-  "src/components/ui/tabs/tabs.controller.ts",
+  "src/components/ui/tabs/components/tabs.contract.ts",
+  "src/components/ui/tabs/components/tabs.controller.ts",
 ];
 
 const templates = [
@@ -25,8 +25,8 @@ const templates = [
       "src/styles/bambi.css",
       "src/styles/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/tabs.react.tsx",
-      "src/components/ui/tabs.ts",
+      "src/components/ui/tabs/components/tabs.react.tsx",
+      "src/components/ui/tabs/tabs.ts",
     ],
   },
   {
@@ -39,11 +39,11 @@ const templates = [
       "src/styles/bambi.css",
       "src/styles/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/tabs.svelte",
-      "src/components/ui/tabs/tabs-list.svelte",
-      "src/components/ui/tabs/tabs-trigger.svelte",
-      "src/components/ui/tabs/tabs-content.svelte",
-      "src/components/ui/tabs.ts",
+      "src/components/ui/tabs/components/tabs.svelte",
+      "src/components/ui/tabs/components/tabs-list.svelte",
+      "src/components/ui/tabs/components/tabs-trigger.svelte",
+      "src/components/ui/tabs/components/tabs-content.svelte",
+      "src/components/ui/tabs/tabs.ts",
     ],
   },
   {
@@ -56,24 +56,20 @@ const templates = [
       "src/styles/bambi.css",
       "src/styles/tabs.css",
       ...TABS_IMPL,
-      "src/components/ui/tabs/tabs.vue",
-      "src/components/ui/tabs/tabs-list.vue",
-      "src/components/ui/tabs/tabs-trigger.vue",
-      "src/components/ui/tabs/tabs-content.vue",
-      "src/components/ui/tabs.ts",
+      "src/components/ui/tabs/components/tabs.vue",
+      "src/components/ui/tabs/components/tabs-list.vue",
+      "src/components/ui/tabs/components/tabs-trigger.vue",
+      "src/components/ui/tabs/components/tabs-content.vue",
+      "src/components/ui/tabs/tabs.ts",
     ],
   },
 ];
 
 function getChildEnv() {
   const env = { ...process.env };
-
   for (const key of Object.keys(env)) {
-    if (key.toLowerCase().includes("bambiui")) {
-      delete env[key];
-    }
+    if (key.toLowerCase().includes("bambiui")) delete env[key];
   }
-
   return env;
 }
 
@@ -87,11 +83,7 @@ async function run(command, options = {}) {
     env: getChildEnv(),
     stdio: "inherit",
   });
-
-  const code = await new Promise((resolve) => {
-    child.on("close", resolve);
-  });
-
+  const code = await new Promise((resolve) => { child.on("close", resolve); });
   if (code !== 0) {
     throw new Error(`Command failed in ${options.cwd ?? repoRoot}: ${command.join(" ")}`);
   }
@@ -104,7 +96,6 @@ async function run(command, options = {}) {
 function assertFiles(templateDir, files) {
   for (const file of files) {
     const absolutePath = path.join(templateDir, file);
-
     if (!existsSync(absolutePath)) {
       throw new Error(`Expected generated file to exist: ${absolutePath}`);
     }
@@ -113,7 +104,6 @@ function assertFiles(templateDir, files) {
 
 for (const template of templates) {
   const templateDir = path.join(repoRoot, template.dir);
-
   process.stdout.write(`\nSmoke testing ${template.name}...\n`);
 
   if (shouldInstall) {
@@ -124,32 +114,11 @@ for (const template of templates) {
     );
   }
 
-  await run([
-    process.execPath,
-    cliEntry,
-    "init",
-    "--yes",
-    "--framework",
-    template.framework,
-    "--cwd",
-    templateDir,
-    "--registry-url",
-    repoRoot,
-  ]);
+  await run([process.execPath, cliEntry, "init", "--yes",
+    "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
 
-  await run([
-    process.execPath,
-    cliEntry,
-    "add",
-    "tabs",
-    "--framework",
-    template.framework,
-    "--cwd",
-    templateDir,
-    "--registry-url",
-    repoRoot,
-    "--force",
-  ]);
+  await run([process.execPath, cliEntry, "add", "tabs", "--force",
+    "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
 
   assertFiles(templateDir, template.expectedFiles);
   await run(template.check, { cwd: templateDir });

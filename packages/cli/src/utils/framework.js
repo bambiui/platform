@@ -134,28 +134,28 @@ export async function getConfig(cwd, flags = {}) {
  * @param {string} componentName
  */
 export function getIndexContent(framework, componentName) {
-  const d = `./${componentName}`;
+  const c = `./components`;
   switch (framework) {
     case "react":
-      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${d}/${componentName}.react";\n`;
+      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${c}/${componentName}.react";\n`;
     case "vue":
       return (
-        `export { default as Tabs } from "${d}/${componentName}.vue";\n` +
-        `export { default as TabsList } from "${d}/${componentName}-list.vue";\n` +
-        `export { default as TabsTrigger } from "${d}/${componentName}-trigger.vue";\n` +
-        `export { default as TabsContent } from "${d}/${componentName}-content.vue";\n`
+        `export { default as Tabs } from "${c}/${componentName}.vue";\n` +
+        `export { default as TabsList } from "${c}/${componentName}-list.vue";\n` +
+        `export { default as TabsTrigger } from "${c}/${componentName}-trigger.vue";\n` +
+        `export { default as TabsContent } from "${c}/${componentName}-content.vue";\n`
       );
     case "svelte":
       return (
-        `export { default as Tabs } from "${d}/${componentName}.svelte";\n` +
-        `export { default as TabsList } from "${d}/${componentName}-list.svelte";\n` +
-        `export { default as TabsTrigger } from "${d}/${componentName}-trigger.svelte";\n` +
-        `export { default as TabsContent } from "${d}/${componentName}-content.svelte";\n`
+        `export { default as Tabs } from "${c}/${componentName}.svelte";\n` +
+        `export { default as TabsList } from "${c}/${componentName}-list.svelte";\n` +
+        `export { default as TabsTrigger } from "${c}/${componentName}-trigger.svelte";\n` +
+        `export { default as TabsContent } from "${c}/${componentName}-content.svelte";\n`
       );
     case "solid":
-      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${d}/${componentName}.solid";\n`;
+      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${c}/${componentName}.solid";\n`;
     case "html":
-      return `export { mount, unmount } from "${d}/${componentName}.html";\n`;
+      return `export { mount, unmount } from "${c}/${componentName}.html";\n`;
     default:
       return `// bambiui ${componentName}\n`;
   }

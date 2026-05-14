@@ -41,17 +41,17 @@ export async function addComponent(componentName, flags) {
     );
   }
 
-  // Implementation files go into componentDir/<name>/
-  const targetDir = path.join(cwd, componentDir, componentName);
-  // Style goes alongside the global CSS in the styles directory
+  // componentDir/<name>/components/  — implementation files
+  const implDir = path.join(cwd, componentDir, componentName, "components");
+  // componentDir/<name>/tabs.ts  — single barrel
+  const barrelPath = path.join(cwd, componentDir, componentName, `${componentName}.ts`);
+  // styles dir — component CSS lands alongside global bambi.css
   const styleDir = path.join(cwd, path.dirname(config.styleFile));
-  // Barrel goes one level above the implementation dir
-  const barrelPath = path.join(cwd, componentDir, `${componentName}.ts`);
 
   const results = [];
   const force = Boolean(flags.force);
 
-  // Copy component style to styles directory
+  // Component CSS → styles directory
   results.push(
     await copyRegistryFile(
       registryUrl,
@@ -61,12 +61,12 @@ export async function addComponent(componentName, flags) {
     ),
   );
 
-  // Copy shared files: contract, controller
+  // Shared files: contract, controller → implementation dir
   results.push(
     await copyRegistryFile(
       registryUrl,
       component.contract,
-      path.join(targetDir, path.basename(component.contract)),
+      path.join(implDir, path.basename(component.contract)),
       force,
     ),
   );
@@ -75,12 +75,12 @@ export async function addComponent(componentName, flags) {
     await copyRegistryFile(
       registryUrl,
       component.controller,
-      path.join(targetDir, path.basename(component.controller)),
+      path.join(implDir, path.basename(component.controller)),
       force,
     ),
   );
 
-  // Copy framework-specific files; resolve @bambiui/core imports to local siblings
+  // Framework-specific files → implementation dir; resolve @bambiui/core imports to local siblings
   const flattenImports = (/** @type {string} */ content) =>
     content.replace(
       new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
@@ -92,20 +92,16 @@ export async function addComponent(componentName, flags) {
       await copyRegistryFile(
         registryUrl,
         filePath,
-        path.join(targetDir, path.basename(filePath)),
+        path.join(implDir, path.basename(filePath)),
         force,
         flattenImports,
       ),
     );
   }
 
-  // Write barrel file at componentDir level (e.g. src/components/ui/tabs.ts)
+  // Barrel at componentDir/<name>/tabs.ts
   results.push(
-    await writeProjectFile(
-      barrelPath,
-      getIndexContent(framework, componentName),
-      force,
-    ),
+    await writeProjectFile(barrelPath, getIndexContent(framework, componentName), force),
   );
 
   return { config, framework, componentName, results };
@@ -120,5 +116,5 @@ export function getImportHint(componentDir, componentName) {
     ? componentDir.slice("src/".length)
     : componentDir;
 
-  return `import { Tabs, TabsList, TabsTrigger, TabsContent } from "./${path.posix.join(sourceRelativeDir, componentName)}";`;
+  return `import { Tabs, TabsList, TabsTrigger, TabsContent } from "./${path.posix.join(sourceRelativeDir, componentName, componentName)}";`;
 }

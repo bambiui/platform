@@ -1,7 +1,7 @@
 {
   "name": "@bambiui/core",
-  "version": "0.0.1",
-  "description": "Framework-agnostic contracts and utilities for bambiui.",
+  "version": "0.1.0",
+  "description": "Framework-agnostic DOM protocol types and utilities for bambiui.",
   "license": "MIT",
   "type": "module",
   "types": "./src/index.ts",
@@ -11,40 +11,30 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./contracts": {
-      "types": "./src/contracts.ts",
-      "import": "./src/contracts.ts",
-      "default": "./src/contracts.ts"
+    "./dom/controller": {
+      "types": "./src/dom/controller.ts",
+      "import": "./src/dom/controller.ts",
+      "default": "./src/dom/controller.ts"
     },
-    "./button": {
-      "types": "./src/button.ts",
-      "import": "./src/button.ts",
-      "default": "./src/button.ts"
+    "./dom/events": {
+      "types": "./src/dom/events.ts",
+      "import": "./src/dom/events.ts",
+      "default": "./src/dom/events.ts"
     },
-    "./buttongroup": {
-      "types": "./src/buttongroup.ts",
-      "import": "./src/buttongroup.ts",
-      "default": "./src/buttongroup.ts"
+    "./dom/attributes": {
+      "types": "./src/dom/attributes.ts",
+      "import": "./src/dom/attributes.ts",
+      "default": "./src/dom/attributes.ts"
     },
-    "./card": {
-      "types": "./src/card.ts",
-      "import": "./src/card.ts",
-      "default": "./src/card.ts"
+    "./dom/mount": {
+      "types": "./src/dom/mount.ts",
+      "import": "./src/dom/mount.ts",
+      "default": "./src/dom/mount.ts"
     },
-    "./sidebar": {
-      "types": "./src/sidebar.ts",
-      "import": "./src/sidebar.ts",
-      "default": "./src/sidebar.ts"
-    },
-    "./drawer": {
-      "types": "./src/drawer.ts",
-      "import": "./src/drawer.ts",
-      "default": "./src/drawer.ts"
-    },
-    "./input": {
-      "types": "./src/input.ts",
-      "import": "./src/input.ts",
-      "default": "./src/input.ts"
+    "./components/tabs": {
+      "types": "./src/components/tabs/index.ts",
+      "import": "./src/components/tabs/index.ts",
+      "default": "./src/components/tabs/index.ts"
     }
   },
   "scripts": {

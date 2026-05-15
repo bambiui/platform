@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "build:static": "node scripts/build-static.mjs",
+    "build:static": "pnpm registry:refresh && node scripts/build-static.mjs",
     "check": "pnpm registry:refresh && pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter bambiui smoke",
     "check-registry": "node scripts/check-registry.mjs",
     "registry:refresh": "node scripts/registry-refresh.mjs",

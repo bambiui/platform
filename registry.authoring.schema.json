@@ -17,7 +17,7 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "contract", "controller", "style", "sourceFiles", "generatedFiles", "exports"],
+      "required": ["name", "contract", "controller", "style", "generatedFiles", "exports"],
       "properties": {
         "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
         "contract": { "$ref": "#/$defs/registryPath" },
@@ -25,20 +25,6 @@
         "primitiveFiles": { "$ref": "#/$defs/registryFileList" },
         "controller": { "$ref": "#/$defs/registryPath" },
         "style": { "$ref": "#/$defs/registryPath" },
-        "adapter": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "react": { "$ref": "#/$defs/registryFileList" }
-          }
-        },
-        "sourceFiles": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "react": { "$ref": "#/$defs/registryFileList" }
-          }
-        },
         "generatedFiles": {
           "type": "object",
           "additionalProperties": false,

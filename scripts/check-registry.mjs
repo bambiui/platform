@@ -219,16 +219,6 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
     checkFileList(component.primitiveFiles, "primitiveFiles");
   }
 
-  for (const [framework, files] of Object.entries(component.adapter ?? {})) {
-    if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`adapter has unknown framework "${framework}"`);
-    else checkFileList(files, `adapter.${framework}`);
-  }
-
-  for (const [framework, files] of Object.entries(component.sourceFiles ?? {})) {
-    if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`sourceFiles has unknown framework "${framework}"`);
-    else checkFileList(files, `sourceFiles.${framework}`);
-  }
-
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`generatedFiles has unknown framework "${framework}"`);
     else checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });

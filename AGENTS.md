@@ -72,19 +72,11 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 - `packages/core` — workspace source of truth; imports allowed between core files. Controllers are internal authoring/build-time inputs and are not copied by `bambiui add`.
 - `packages/adapters` — generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter helpers are internal authoring/build-time inputs and are not copied by `bambiui add`.
 - `packages/generator` — private internal parsers/generators used by maintainer scripts. The CLI and generated output must not depend on it.
-- `packages/registry` — internal React wrapper templates and generated public artifacts. `packages/registry/generated/<name>/<framework>/` is the only component artifact source public `registry.json` may reference.
+- `packages/registry` — generated public artifacts. `packages/registry/generated/<name>/<framework>/` is the only component artifact source public `registry.json` may reference.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats registry.json as external input.
 - Installed output — no `@bambiui/*` runtime imports and no internal contract/controller/adapter helper files.
 
 ## Registry File Layout
-
-Each component under `packages/registry/src/components/<name>/`:
-
-```
-<name>/
-  react/              ← tabs.react.tsx  (only active framework)
-  index.ts            ← workspace barrel (not installed)
-```
 
 Public generated artifacts live under:
 
@@ -96,13 +88,12 @@ packages/registry/generated/<name>/<framework>/
 
 Vue, Svelte, Solid, and HTML subdirectories are intentionally absent during the migration.
 
-Internal framework source may use `@bambiui/core` and `@bambiui/adapters` for workspace typecheck. Public generated artifacts must not. The CLI copies only the paths listed in public `registry.json` and does not run the internal contract/controller/adapter pipeline.
+The generator produces these files directly from the contract and controller — no internal wrapper template is needed. The CLI copies only the paths listed in public `registry.json` and does not run the internal contract/controller/adapter pipeline.
 
 ## Golden References
 
 - Tabs is the canonical reference component:
   - Contract + Controller (single source): `packages/core/src/components/tabs/`
-  - Internal React source: `packages/registry/src/components/tabs/`
   - Public React artifacts: `packages/registry/generated/tabs/react/`
   - CSS source: `packages/registry/src/styles/tabs.css`
 - DOM protocol types: `packages/core/src/dom/`
@@ -138,7 +129,7 @@ Archived AGENTS.md files under `apps/_archived/` carry a top-level warning. Do n
 The CLI distributes **framework-ready public source artifacts**, not internal authoring files.
 
 - Public `registry.json` describes only files safe to copy directly into a user project.
-- Internal `registry.authoring.json` describes contracts, controllers, adapters, primitives, and source inputs for maintainers.
+- Internal `registry.authoring.json` describes contracts, controllers, optional primitives, and generator metadata for maintainers.
 - Run `pnpm registry:refresh` after authoring changes. It uses `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata plus core controller behavior, copy CSS, and validate public/internal registry separation.
 
 ## Primitive Files
@@ -169,7 +160,7 @@ pnpm build:static                       # build apps/www and inject registry fil
 
 | Change                                           | Run                              |
 | ------------------------------------------------ | -------------------------------- |
-| controller / contract / CSS / wrappers           | `pnpm registry:refresh && pnpm check` |
+| controller / contract / CSS                      | `pnpm registry:refresh && pnpm check` |
 | CLI only                                         | `pnpm --filter bambiui check`    |
 | registry only                                    | `pnpm registry:refresh && pnpm check-registry` |
 | core types only                                  | `pnpm check-types`               |
@@ -183,17 +174,12 @@ pnpm build:static                       # build apps/www and inject registry fil
   - Allowed imports: `./<name>.contract.js` (sibling) and extensionless `@bambiui/core/primitives/<name>` package imports. No other `@bambiui/*` imports.
    - Re-export types that framework wrappers need (e.g. `export type { TabsValueChangeDetail } from "./<name>.contract.js"`).
   - If the controller uses a primitive, declare it in `registry.authoring.json` under `primitiveFiles`.
-3. Add React wrapper under `packages/registry/src/components/<name>/react/`:
-   - Framework files import from `@bambiui/core/components/<name>` (workspace devDep, typecheck only).
-   - CSS goes at `packages/registry/src/styles/<name>.css`.
-   - Add a workspace barrel at `packages/registry/src/components/<name>/index.ts`.
-   - **SSR**: React adapter code is server-safe — no DOM APIs run during render (all mutations are in `useEffect`). Do NOT add `"use client"` to library files; it is the consumer's responsibility in RSC environments (e.g. Next.js App Router).
+3. Add CSS at `packages/registry/src/styles/<name>.css`.
 4. Register authoring inputs in `registry.authoring.json`:
    - `contract`, `controller`, `contractFiles`, optional `primitiveFiles`
-   - `adapter.react` and `sourceFiles.react`
    - `generatedFiles.react` target paths under `packages/registry/generated/<name>/react/`
    - `generator.<framework>` metadata for framework-specific public API rules, such as which parts expose a value or disabled prop.
-5. Generate or update public artifacts under `packages/registry/generated/<name>/<framework>/`. For Tabs React, `pnpm registry:refresh` parses `tabs.contract.ts`, inlines behavior from `tabs.controller.ts`, emits React parts from contract metadata, applies `generator.react` metadata, and copies `tabs.css` from `packages/registry/src/styles/tabs.css`.
+5. Generate public artifacts: `pnpm registry:refresh` parses the contract, inlines behavior from the controller, emits React parts from contract metadata, applies `generator.react` metadata, and copies the CSS.
 6. Register only public artifact files in `registry.json` (v2 format):
    - `files.react` → generated `index.tsx`, `<name>.css` artifacts
    - `exports.react` → list of exported component names

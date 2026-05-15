@@ -11,16 +11,6 @@
       ],
       "controller": "packages/core/src/components/tabs/tabs.controller.ts",
       "style": "packages/registry/src/styles/tabs.css",
-      "adapter": {
-        "react": [
-          "packages/adapters/react/use-bambi-controller.ts",
-          "packages/adapters/react/create-react-part.tsx",
-          "packages/adapters/react/create-react-adapter.ts"
-        ]
-      },
-      "sourceFiles": {
-        "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"]
-      },
       "generatedFiles": {
         "react": [
           "packages/registry/generated/tabs/react/index.tsx",

@@ -7,7 +7,7 @@
   "components": {
     "tabs": {
       "name": "tabs",
-      "contract": "packages/core/tabs/tabs.contract.ts",
+      "contract": "packages/core/src/components/tabs/tabs.contract.ts",
       "contractFiles": [
         "packages/core/contract/types.ts",
         "packages/core/contract/define-contract.ts"

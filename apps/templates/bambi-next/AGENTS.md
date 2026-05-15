@@ -9,6 +9,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This app is a CLI smoke-test fixture, not a public starter template.
 
 - Generated bambiui files are intentionally committed.
-- `src/styles/bambi.css` should mirror `packages/tokens/src/tokens.css`.
-- `src/components/ui/button/button.css` should mirror `packages/components/button/src/button.css`.
-- `src/components/ui/button/index.ts` should re-export `Button`, recipe helpers, defaults, and public types.
+- `src/styles/bambi.css` should mirror `packages/registry/src/styles/bambi.css`.
+- `src/components/ui/tabs/component/` should mirror CLI-installed Tabs output.
+- `src/components/ui/tabs/tabs.ts` should re-export the installed Tabs framework exports.

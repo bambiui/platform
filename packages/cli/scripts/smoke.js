@@ -11,14 +11,19 @@ const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 
 // Implementation files expected inside componentDir/tabs/component/
-const SHARED_IMPL = ["tabs.contract.ts", "tabs.controller.ts"];
+const CONTRACT_IMPL = ["types.ts", "define-contract.ts", "tabs.contract.ts", "tabs.controller.ts"];
+const REACT_ADAPTER_IMPL = [
+  "use-bambi-controller.ts",
+  "create-react-part.tsx",
+  "create-react-adapter.ts",
+];
 
 const expectedImplFiles = {
-  react:  [...SHARED_IMPL, "tabs.react.tsx"],
-  vue:    [...SHARED_IMPL, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
-  svelte: [...SHARED_IMPL, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
-  solid:  [...SHARED_IMPL, "tabs.solid.tsx"],
-  html:   [...SHARED_IMPL, "tabs.html.ts"],
+  react:  [...CONTRACT_IMPL, ...REACT_ADAPTER_IMPL, "tabs.react.tsx"],
+  vue:    [...CONTRACT_IMPL, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
+  svelte: [...CONTRACT_IMPL, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
+  solid:  [...CONTRACT_IMPL, "tabs.solid.tsx"],
+  html:   [...CONTRACT_IMPL, "tabs.html.ts"],
 };
 
 // Expected barrel export names per framework (from registry exports metadata)

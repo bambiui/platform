@@ -44,7 +44,8 @@ npx bambiui init
 ```sh
 npx bambiui add tabs --framework react
 # Copies to src/components/ui/tabs/:
-#   tabs.react.tsx   tabs.controller.ts   tabs.contract.ts   tabs.css   index.ts
+#   component/tabs.react.tsx   component/tabs.controller.ts
+#   component/tabs.contract.ts  component/tabs.css  tabs.ts
 ```
 
 ## Controlled / Uncontrolled

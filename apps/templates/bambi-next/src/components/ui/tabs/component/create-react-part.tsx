@@ -13,13 +13,18 @@ export interface BambiPartProps extends HTMLAttributes<HTMLElement> {
   disabled?: boolean;
 }
 
+export interface BambiPartOptions {
+  valueAttribute?: string;
+  disabledAttribute?: string;
+}
+
 function toDataValue(value: unknown): string | undefined {
   if (value === undefined || value === null || value === false) return undefined;
   if (value === true) return "true";
   return String(value);
 }
 
-export function createReactPart(part: BambiPartDefinition) {
+export function createReactPart(part: BambiPartDefinition, options: BambiPartOptions = {}) {
   const element = (part.element ?? "div") as ElementType;
 
   return forwardRef<HTMLElement, BambiPartProps>(function BambiPart(
@@ -31,8 +36,10 @@ export function createReactPart(part: BambiPartDefinition) {
     };
 
     if (part.role) attributes.role = part.role;
-    if (value !== undefined) attributes["data-value"] = value;
-    if (disabled !== undefined) attributes["data-disabled"] = toDataValue(disabled);
+    if (value !== undefined) attributes[options.valueAttribute ?? "data-value"] = value;
+    if (disabled !== undefined) {
+      attributes[options.disabledAttribute ?? "data-disabled"] = toDataValue(disabled);
+    }
 
     if (part.name === "trigger") attributes.type = element === "button" ? "button" : undefined;
 

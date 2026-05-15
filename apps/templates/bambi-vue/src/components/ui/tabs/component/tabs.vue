@@ -45,9 +45,9 @@ onUnmounted(() => {
 });
 
 watch(
-  () => [props.modelValue, props.value, props.disabled, props.orientation] as const,
-  ([modelValue, value, disabled, orientation]) => {
-    controller?.update({ value: modelValue ?? value, disabled, orientation });
+  () => [props.modelValue, props.value, props.disabled, props.orientation, props.activationMode] as const,
+  ([modelValue, value, disabled, orientation, activationMode]) => {
+    controller?.update({ value: modelValue ?? value, disabled, orientation, activationMode });
   },
 );
 </script>
@@ -57,7 +57,9 @@ watch(
     ref="rootEl"
     data-bambi-tabs
     :data-orientation="orientation"
+    :data-activation-mode="activationMode"
     :data-controlled="isControlled ? 'true' : 'false'"
+    :data-disabled="disabled ? 'true' : undefined"
     :class="props.class"
   >
     <slot />

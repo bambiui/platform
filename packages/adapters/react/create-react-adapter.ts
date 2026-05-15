@@ -22,10 +22,12 @@ export interface BambiRootProps<TOptions> extends HTMLAttributes<RootElement> {
   value?: string;
   defaultValue?: string;
   orientation?: "horizontal" | "vertical";
+  activationMode?: "automatic" | "manual";
   controlled?: boolean;
   disabled?: boolean;
   onValueChange?: (value: string) => void;
   controllerOptions?: Partial<TOptions>;
+  [key: string]: unknown;
 }
 
 export interface ReactAdapterOptions<TOptions> {
@@ -46,7 +48,7 @@ function propAttribute(prop: string, definition: unknown): string | undefined {
   if (definition && typeof definition === "object" && "attribute" in definition) {
     return (definition as BambiPropDefinition).attribute;
   }
-  return prop === "value" ? "data-value" : undefined;
+  return undefined;
 }
 
 function toAttributeValue(value: unknown): string | undefined {
@@ -68,6 +70,23 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
   const parts = contract.parts.map(normalizePart);
   const rootPart = parts.find((part) => part.name === "root") ?? parts[0];
   const restParts = parts.filter((part) => part.name !== "root");
+  const propEntries = Object.entries(contract.props ?? {});
+  const propAttributes = new Map(
+    propEntries
+      .map(([prop, definition]) => [prop, propAttribute(prop, definition)] as const)
+      .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
+  );
+  const valueAttribute = propAttributes.get("value");
+  const disabledAttribute = propAttributes.get("disabled");
+  const eventEntries = Object.entries(contract.events ?? {});
+  const eventCallbacks = eventEntries.map(([eventKey, eventDefinition]) => {
+    const eventName =
+      eventDefinition && typeof eventDefinition === "object" && "name" in eventDefinition
+        ? eventDefinition.name
+        : undefined;
+    const callbackProp = `on${eventKey[0].toUpperCase()}${eventKey.slice(1)}`;
+    return { eventName, callbackProp };
+  });
 
   const Root = forwardRef<RootElement, BambiRootProps<TOptions>>(function BambiRoot(
     {
@@ -75,9 +94,9 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
       value,
       defaultValue,
       orientation = "horizontal",
+      activationMode,
       controlled,
       disabled,
-      onValueChange,
       controllerOptions,
       ...props
     },
@@ -85,78 +104,87 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
   ) {
     const rootRef = useMemo(() => ({ current: null as RootElement | null }), []);
     const isControlled = controlled ?? value !== undefined;
+    const propValues = useMemo(() => {
+      const values: Record<string, unknown> = {
+        value,
+        defaultValue,
+        orientation,
+        activationMode,
+        controlled: isControlled,
+        disabled,
+      };
+
+      for (const [prop] of propEntries) {
+        if (prop in props) values[prop] = props[prop];
+      }
+
+      return values;
+    }, [props, value, defaultValue, orientation, activationMode, isControlled, disabled]);
+
+    const domProps = useMemo(() => {
+      const next = { ...props };
+      for (const { callbackProp } of eventCallbacks) delete next[callbackProp];
+      for (const [prop] of propEntries) delete next[prop];
+      return next;
+    }, [props]);
+
     const controllerState = useMemo(
-      () =>
-        ({
-          ...controllerOptions,
-          value,
-          defaultValue,
-          controlled: isControlled,
-          orientation,
-          disabled,
-        }) as TOptions,
-      [controllerOptions, value, defaultValue, isControlled, orientation, disabled],
+      () => ({ ...(controllerOptions ?? {}), ...propValues }) as TOptions,
+      [controllerOptions, propValues],
     );
 
     useBambiController(rootRef, options.controller, controllerState);
 
     useEffect(() => {
       const root = rootRef.current;
-      if (!root || !onValueChange) return;
+      if (!root || eventCallbacks.length === 0) return;
 
-      const eventName =
-        typeof contract.events?.valueChange === "object" && "name" in contract.events.valueChange
-          ? contract.events.valueChange.name
-          : "bambi:value-change";
+      const cleanups: Array<() => void> = [];
 
-      const listener = (event: Event) => {
-        const detail = (event as CustomEvent<{ value?: string }>).detail;
-        if (typeof detail?.value === "string") onValueChange(detail.value);
+      for (const { eventName, callbackProp } of eventCallbacks) {
+        const callback = props[callbackProp];
+        if (!eventName || typeof callback !== "function") continue;
+        const eventListener = (event: Event) => {
+          const detail = (event as CustomEvent<{ value?: string }>).detail;
+          if (typeof detail?.value === "string") callback(detail.value);
+        };
+        root.addEventListener(eventName, eventListener);
+        cleanups.push(() => root.removeEventListener(eventName, eventListener));
+      }
+
+      return () => {
+        for (const cleanup of cleanups) cleanup();
       };
-
-      root.addEventListener(eventName, listener);
-      return () => root.removeEventListener(eventName, listener);
-    }, [onValueChange, rootRef]);
+    }, [props, rootRef]);
 
     const rootAttributes: Record<string, string | undefined> = {
       [rootPart.attribute]: "",
     };
 
-    for (const [prop, definition] of Object.entries(contract.props ?? {})) {
-      const attribute = propAttribute(prop, definition);
-      if (!attribute) continue;
-      const propValue =
-        prop === "value"
-          ? value
-          : prop === "defaultValue"
-            ? defaultValue
-            : prop === "orientation"
-              ? orientation
-              : prop === "controlled"
-                ? isControlled
-                : prop === "disabled"
-                  ? disabled
-                  : undefined;
-      rootAttributes[attribute] = toAttributeValue(propValue);
+    for (const [prop, attribute] of propAttributes) {
+      rootAttributes[attribute] = toAttributeValue(propValues[prop]);
     }
 
     return createElement(
       rootPart.element ?? "div",
       {
         ...rootAttributes,
-        ...props,
+        ...domProps,
         ref: (node: RootElement | null) => {
           rootRef.current = node;
           assignRef(forwardedRef, node);
         },
       },
-      children,
+      children as ReactNode,
     );
   });
 
   const adapter: Record<string, unknown> = { Root };
   for (const part of restParts) {
-    adapter[part.name[0].toUpperCase() + part.name.slice(1)] = createReactPart(part);
+    adapter[part.name[0].toUpperCase() + part.name.slice(1)] = createReactPart(part, {
+      valueAttribute,
+      disabledAttribute,
+    });
   }
 
   return adapter as {

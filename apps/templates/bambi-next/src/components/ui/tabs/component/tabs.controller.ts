@@ -6,13 +6,16 @@ import {
   TABS_DEFAULT_VALUE,
   TABS_CONTROLLED,
   TABS_ORIENTATION,
+  TABS_ACTIVATION_MODE,
   TABS_DISABLED,
   TABS_STATE,
   TABS_EVENT_VALUE_CHANGE,
+  type TabsActivationMode,
+  type TabsOrientation,
   type TabsValueChangeDetail,
 } from "./tabs.contract";
 
-export type { TabsValueChangeDetail } from "./tabs.contract";
+export type { TabsActivationMode, TabsOrientation, TabsValueChangeDetail } from "./tabs.contract";
 
 // ── Inlined types ─────────────────────────────────────────────────────────
 
@@ -22,13 +25,12 @@ export interface BambiController {
   destroy(): void;
 }
 
-export type TabsOrientation = "horizontal" | "vertical";
-
 export interface TabsOptions {
   value?: string;
   defaultValue?: string;
   controlled?: boolean;
   orientation?: TabsOrientation;
+  activationMode?: TabsActivationMode;
   disabled?: boolean;
   onValueChange?: (value: string) => void;
 }
@@ -93,9 +95,18 @@ export class TabsController implements BambiController {
     ) as TabsOrientation;
 
     setAttr(this.root, TABS_ORIENTATION, orientation);
+    setAttr(
+      this.root,
+      TABS_ACTIVATION_MODE,
+      this.options.activationMode ?? getAttr(this.root, TABS_ACTIVATION_MODE, "automatic"),
+    );
+    if (this.options.disabled !== undefined) {
+      setAttr(this.root, TABS_DISABLED, this.options.disabled ? "true" : null);
+    }
 
     // Set aria-orientation on all tablist elements
     for (const list of Array.from(this.root.querySelectorAll(`[${TABS_LIST}]`))) {
+      list.setAttribute("role", "tablist");
       list.setAttribute("aria-orientation", orientation);
     }
 
@@ -105,7 +116,7 @@ export class TabsController implements BambiController {
       this.firstTriggerValue();
 
     // Apply initial state without dispatching any events (mount is not a user interaction)
-    if (value) this.applyState(value, orientation);
+    if (value) this.applyState(value);
 
     this.bindEvents();
   }
@@ -114,13 +125,25 @@ export class TabsController implements BambiController {
     const prev = this.options;
     this.options = { ...this.options, ...options };
 
+    const orientation = (
+      this.options.orientation ??
+      getAttr(this.root, TABS_ORIENTATION, "horizontal")
+    ) as TabsOrientation;
+    setAttr(this.root, TABS_ORIENTATION, orientation);
+    setAttr(this.root, TABS_ACTIVATION_MODE, this.activationMode());
+    if (this.options.disabled !== undefined) {
+      setAttr(this.root, TABS_DISABLED, this.options.disabled ? "true" : null);
+    }
+    for (const list of Array.from(this.root.querySelectorAll(`[${TABS_LIST}]`))) {
+      list.setAttribute("role", "tablist");
+      list.setAttribute("aria-orientation", orientation);
+    }
+
     if (options.value !== undefined && options.value !== prev.value && options.value) {
-      const orientation = (
-        this.options.orientation ??
-        getAttr(this.root, TABS_ORIENTATION, "horizontal")
-      ) as TabsOrientation;
       // Prop update — apply state silently, no event dispatch
-      this.applyState(options.value, orientation);
+      this.applyState(options.value);
+    } else if (this.currentValue) {
+      this.applyState(this.currentValue);
     }
   }
 
@@ -142,7 +165,7 @@ export class TabsController implements BambiController {
   }
 
   /** Apply visual state for a value. Never dispatches events — only for sync/update. */
-  private applyState(newValue: string, orientation: TabsOrientation): void {
+  private applyState(newValue: string): void {
     const isControlled =
       this.options.controlled ?? getBoolAttr(this.root, TABS_CONTROLLED);
 
@@ -152,19 +175,26 @@ export class TabsController implements BambiController {
     for (const trigger of this.triggers()) {
       const val = trigger.getAttribute(TABS_VALUE) ?? "";
       if (!trigger.id) trigger.id = `${this._id}-trigger-${val}`;
+      trigger.setAttribute("role", "tab");
       trigger.setAttribute("aria-controls", `${this._id}-content-${val}`);
 
       const isActive = val === newValue;
       setAttr(trigger, TABS_STATE, isActive ? "active" : "inactive");
       trigger.setAttribute("aria-selected", String(isActive));
       trigger.setAttribute("tabindex", isActive ? "0" : "-1");
+      if (getBoolAttr(trigger, TABS_DISABLED)) {
+        trigger.setAttribute("aria-disabled", "true");
+      } else {
+        trigger.removeAttribute("aria-disabled");
+      }
     }
 
     for (const content of this.contents()) {
       const val = content.getAttribute(TABS_VALUE) ?? "";
       if (!content.id) content.id = `${this._id}-content-${val}`;
+      content.setAttribute("role", "tabpanel");
       content.setAttribute("aria-labelledby", `${this._id}-trigger-${val}`);
-      content.setAttribute("aria-orientation", orientation);
+      if (!content.hasAttribute("tabindex")) content.setAttribute("tabindex", "0");
 
       const isActive = val === newValue;
       setAttr(content, TABS_STATE, isActive ? "active" : "inactive");
@@ -184,16 +214,26 @@ export class TabsController implements BambiController {
       this.options.controlled ?? getBoolAttr(this.root, TABS_CONTROLLED);
     const previousValue = this.currentValue;
 
-    const orientation = (
-      this.options.orientation ??
-      getAttr(this.root, TABS_ORIENTATION, "horizontal")
-    ) as TabsOrientation;
-
-    if (!isControlled) this.applyState(newValue, orientation);
-    else this.currentValue = newValue;
+    if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
     this.options.onValueChange?.(newValue);
+  }
+
+  private activationMode(): TabsActivationMode {
+    return (
+      this.options.activationMode ??
+      getAttr(this.root, TABS_ACTIVATION_MODE, "automatic")
+    ) as TabsActivationMode;
+  }
+
+  private focusTrigger(trigger: Element | undefined): void {
+    if (trigger instanceof HTMLElement) trigger.focus();
+  }
+
+  private activateFocusedTrigger(trigger: Element | undefined): void {
+    const value = trigger?.getAttribute(TABS_VALUE);
+    if (value) this.applyValue(value, "keyboard");
   }
 
   private bindEvents(): void {
@@ -216,17 +256,7 @@ export class TabsController implements BambiController {
         const value = target.getAttribute(TABS_VALUE);
         if (!value) return;
 
-        const isControlled = this.options.controlled ?? getBoolAttr(this.root, TABS_CONTROLLED);
-        if (!isControlled) {
-          this.applyValue(value, "click");
-        } else {
-          dispatchTabsEvent(this.root, {
-            value,
-            previousValue: this.currentValue,
-            source: "click",
-          });
-          this.options.onValueChange?.(value);
-        }
+        this.applyValue(value, "click");
       },
       { signal },
     );
@@ -253,19 +283,29 @@ export class TabsController implements BambiController {
         const prevKey = isHorizontal ? "ArrowLeft" : "ArrowUp";
         const nextKey = isHorizontal ? "ArrowRight" : "ArrowDown";
 
+        let nextTrigger: Element | undefined;
+
         if (e.key === nextKey) {
           e.preventDefault();
-          (activeTriggers[(focused + 1) % activeTriggers.length] as HTMLElement).focus();
+          nextTrigger = activeTriggers[(focused + 1) % activeTriggers.length];
         } else if (e.key === prevKey) {
           e.preventDefault();
-          (activeTriggers[(focused - 1 + activeTriggers.length) % activeTriggers.length] as HTMLElement).focus();
+          nextTrigger = activeTriggers[(focused - 1 + activeTriggers.length) % activeTriggers.length];
         } else if (e.key === "Home") {
           e.preventDefault();
-          (activeTriggers[0] as HTMLElement).focus();
+          nextTrigger = activeTriggers[0];
         } else if (e.key === "End") {
           e.preventDefault();
-          (activeTriggers[activeTriggers.length - 1] as HTMLElement).focus();
+          nextTrigger = activeTriggers[activeTriggers.length - 1];
+        } else if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          this.activateFocusedTrigger(activeTriggers[focused]);
+          return;
         }
+
+        if (!nextTrigger) return;
+        this.focusTrigger(nextTrigger);
+        if (this.activationMode() === "automatic") this.activateFocusedTrigger(nextTrigger);
       },
       { signal },
     );

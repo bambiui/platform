@@ -18,12 +18,13 @@ export function useBambiController<TOptions>(
   options: TOptions,
 ): void {
   const controllerRef = useRef<BambiController | null>(null);
+  const initialOptionsRef = useRef(options);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root || !Controller) return;
 
-    const controller = new Controller(root, options);
+    const controller = new Controller(root, initialOptionsRef.current);
     controller.sync();
     controllerRef.current = controller;
 

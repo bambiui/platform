@@ -15,6 +15,7 @@
     defaultValue,
     controlled,
     orientation = "horizontal",
+    activationMode = "automatic",
     disabled,
     onValueChange,
     class: className,
@@ -33,6 +34,7 @@
       defaultValue,
       controlled: isControlled,
       orientation,
+      activationMode,
       disabled,
       onValueChange,
     });
@@ -41,7 +43,7 @@
   });
 
   $effect(() => {
-    controller?.update({ value, disabled, orientation, onValueChange });
+    controller?.update({ value, disabled, orientation, activationMode, onValueChange });
   });
 </script>
 
@@ -49,7 +51,9 @@
   bind:this={rootEl}
   data-bambi-tabs=""
   data-orientation={orientation}
+  data-activation-mode={activationMode}
   data-controlled={isControlled ? "true" : "false"}
+  data-disabled={disabled ? "true" : undefined}
   class={className}
 >
   {@render children?.()}

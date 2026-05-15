@@ -34,6 +34,7 @@ export interface BambiA11yDefinition {
   roles?: Record<string, string>;
   keyboard?: readonly string[];
   relationships?: Record<string, string>;
+  activation?: string;
 }
 
 export interface BambiComponentContract<

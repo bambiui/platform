@@ -19,8 +19,10 @@ bambiui copies framework-specific component source files directly into your app.
 
 - `src/styles/bambi.css` (if not already present)
 - `src/components/ui/<name>/component/<name>.css`
+- Shared contract helper files referenced by the registry, when present
 - `src/components/ui/<name>/component/<name>.contract.ts`
 - `src/components/ui/<name>/component/<name>.controller.ts`
+- Framework adapter helper files referenced by the registry, when present
 - Framework wrapper/template files (e.g. `tabs.react.tsx`, `tabs.svelte`, `tabs.vue`, etc.)
 - `src/components/ui/<name>/tabs.ts` barrel re-exporting all framework components
 

@@ -24,6 +24,7 @@ export function Tabs(props: TabsProps) {
       defaultValue: props.defaultValue,
       controlled: isControlled(),
       orientation: props.orientation ?? "horizontal",
+      activationMode: props.activationMode ?? "automatic",
       disabled: props.disabled,
       onValueChange: props.onValueChange,
     });
@@ -36,6 +37,7 @@ export function Tabs(props: TabsProps) {
       value: props.value,
       disabled: props.disabled,
       orientation: props.orientation,
+      activationMode: props.activationMode,
       onValueChange: props.onValueChange,
     });
   });
@@ -45,7 +47,9 @@ export function Tabs(props: TabsProps) {
       ref={rootEl}
       data-bambi-tabs=""
       data-orientation={props.orientation ?? "horizontal"}
+      data-activation-mode={props.activationMode ?? "automatic"}
       data-controlled={isControlled() ? "true" : "false"}
+      data-disabled={props.disabled ? "true" : undefined}
       class={props.class}
     >
       {props.children}

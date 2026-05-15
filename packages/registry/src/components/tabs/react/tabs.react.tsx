@@ -1,7 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { createReactAdapter } from "@bambiui/adapters/react";
-import { tabsContract } from "@bambiui/core/tabs/tabs.contract";
-import { TabsController } from "@bambiui/core/components/tabs";
+import { TabsController, tabsContract } from "@bambiui/core/components/tabs";
 import type { TabsOptions } from "@bambiui/core/components/tabs";
 import "./tabs.css";
 

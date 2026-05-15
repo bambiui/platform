@@ -68,6 +68,8 @@ export async function addComponent(componentName, flags) {
       .replace(/from "@bambiui\/core\/contract"/g, 'from "./types"')
       .replace(/from "@bambiui\/core\/tabs\/tabs\.contract"/g, 'from "./tabs.contract"')
       .replace(/from "\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
+      .replace(/from "\.\.\/\.\.\/\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
+      .replace(/from "\.\.\/\.\.\/\.\.\/\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
       .replace(
         new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
         `from "./${componentName}.controller"`,

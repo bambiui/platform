@@ -21,6 +21,12 @@ The CLI copies these files directly into the user project under `src/components/
 
 **Installed output must contain no `@bambiui/*` runtime imports.**
 
+## Type Limitation
+
+`create-react-part.tsx` currently types every generated part as `HTMLElement` plus broad HTML attributes. This is acceptable for the generic adapter baseline, including kebab-case part names converted to PascalCase by `create-react-adapter.ts`, but it is not the final typing model.
+
+Future per-part element typing should derive props from `BambiPartDefinition.element` so `button` parts receive button attributes, `input` parts receive input attributes, and `div` parts remain generic. Do this as an adapter type-system extension, not as component-specific wrapper logic.
+
 ## Package Boundaries
 
 - This package is `private: true`. It is a workspace utility, not a published package.

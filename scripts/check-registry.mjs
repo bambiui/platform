@@ -28,6 +28,23 @@ function checkFileExists(filePath, context) {
   return true;
 }
 
+function checkRegistryPath(filePath, context) {
+  if (typeof filePath !== "string" || filePath.length === 0) {
+    fail(`${context}: path must be a non-empty string`);
+    return false;
+  }
+  if (filePath.startsWith("/") || filePath.split("/").includes("..")) {
+    fail(`${context}: path must be repo-relative and must not contain '..' — ${filePath}`);
+    return false;
+  }
+  return true;
+}
+
+function checkPathAndFile(filePath, context) {
+  if (!checkRegistryPath(filePath, context)) return false;
+  return checkFileExists(filePath, context);
+}
+
 // ── Parse ─────────────────────────────────────────────────────────────────
 
 let registry;
@@ -53,7 +70,7 @@ if (registry.version !== 2) {
 if (!registry.styles || typeof registry.styles.global !== "string") {
   fail("missing styles.global path");
 } else {
-  checkFileExists(registry.styles.global, "styles.global");
+  checkPathAndFile(registry.styles.global, "styles.global");
   ok(`styles.global: ${registry.styles.global}`);
 }
 
@@ -81,7 +98,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     if (typeof component[field] !== "string") {
       fail(`missing required field "${field}"`);
     } else {
-      checkFileExists(component[field], field);
+      checkPathAndFile(component[field], field);
       ok(`${field}: ${component[field]}`);
     }
   }
@@ -95,7 +112,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
           fail("contractFiles contains non-string entry");
           continue;
         }
-        checkFileExists(filePath, "contractFiles");
+        checkPathAndFile(filePath, "contractFiles");
       }
       ok(`contractFiles: ${component.contractFiles.length} file(s)`);
     }
@@ -110,7 +127,14 @@ for (const [componentName, component] of Object.entries(registry.components)) {
           fail("primitiveFiles contains non-string entry");
           continue;
         }
-        checkFileExists(filePath, "primitiveFiles");
+        if (checkPathAndFile(filePath, "primitiveFiles")) {
+          if (
+            !filePath.startsWith("packages/core/src/primitives/") ||
+            !filePath.endsWith(".ts")
+          ) {
+            fail(`primitiveFiles path must point to packages/core/src/primitives/*.ts — ${filePath}`);
+          }
+        }
       }
       ok(`primitiveFiles: ${component.primitiveFiles.length} file(s)`);
     }
@@ -134,7 +158,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
             fail(`adapter.${framework} contains non-string entry`);
             continue;
           }
-          checkFileExists(filePath, `adapter.${framework}`);
+          checkPathAndFile(filePath, `adapter.${framework}`);
         }
         ok(`adapter.${framework}: ${files.length} file(s)`);
       }
@@ -192,7 +216,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
         fail(`files.${framework} contains non-string entry`);
         continue;
       }
-      checkFileExists(filePath, `files.${framework}`);
+      checkPathAndFile(filePath, `files.${framework}`);
     }
     ok(`files.${framework}: ${files.length} file(s)`);
   }

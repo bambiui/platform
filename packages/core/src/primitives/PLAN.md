@@ -4,7 +4,7 @@ These primitives are prerequisites for Dialog, Drawer, Popover, Select, Combobox
 
 ## Roving Focus
 
-**Status: implemented** — `packages/core/src/primitives/roving-focus.ts`
+**Status: implemented, tested** — `packages/core/src/primitives/roving-focus.ts`
 
 Purpose: one tab stop inside a composite widget, with arrow-key movement among enabled items.
 
@@ -35,6 +35,8 @@ Ideal first consumers: RadioGroup, Toolbar, Menu (auto-activation), Select listb
 
 ## Focus Scope
 
+**Status: planned** — `packages/core/src/primitives/focus-scope.ts` is a non-exported placeholder and must not be used by components yet.
+
 Purpose: trap and restore focus while modal content is active.
 
 Draft API: `createFocusScope(container, { trapped, restoreFocus, initialFocus?, fallbackFocus? })`.
@@ -44,6 +46,8 @@ Needed by: Dialog, Drawer, Popover modal mode, Select popover.
 Checklist: capture previously focused element; find tabbables; cycle Tab and Shift+Tab; focus initial target; restore on destroy; handle empty scopes with fallback.
 
 ## Dismissable Layer
+
+**Status: planned** — `packages/core/src/primitives/dismissable-layer.ts` is a non-exported placeholder and must not be used by components yet.
 
 Purpose: close floating UI on outside pointer, Escape, and focus leaving the layer.
 
@@ -55,6 +59,8 @@ Checklist: register with layer manager; only top layer dismisses; handle pointer
 
 ## Layer Manager
 
+**Status: planned** — `packages/core/src/primitives/layer-manager.ts` is a non-exported placeholder and must not be used by components yet.
+
 Purpose: maintain stack order for modal and non-modal layers.
 
 Draft API: `createLayerManager()` with `register(layer)`, `unregister(id)`, `isTopLayer(id)`, and `layers()`.
@@ -64,6 +70,8 @@ Needed by: DismissableLayer, Dialog, Drawer, Popover, Tooltip.
 Checklist: stable layer ids; modal flag; top-layer queries; inert/outside pointer coordination; deterministic cleanup order.
 
 ## Scroll Lock
+
+**Status: planned** — `packages/core/src/primitives/scroll-lock.ts` is a non-exported placeholder and must not be used by components yet.
 
 Purpose: prevent background scroll while modal layers are open.
 
@@ -82,3 +90,17 @@ Checklist: reference-count locks; preserve existing body styles; compensate scro
 5. Scroll Lock.
 
 Dialog and Drawer should wait for Layer Manager, Dismissable Layer, Focus Scope, and Scroll Lock. Popover and Select should wait for Layer Manager and Dismissable Layer; Select also needs Roving Focus.
+
+## Readiness Matrix
+
+| Primitive | Status | Tested | Required before |
+| --- | --- | --- | --- |
+| Roving Focus | implemented | yes | RadioGroup, Select |
+| Layer Manager | planned | no | Dialog, Drawer, Popover, Select |
+| Dismissable Layer | planned | no | Dialog, Drawer, Popover, Select |
+| Focus Scope | planned | no | Dialog, Drawer |
+| Scroll Lock | planned | no | Dialog, Drawer |
+
+Only implemented primitives are exported from `src/primitives/index.ts`. Placeholder files may remain in the tree as roadmap anchors, but components must not list them in `primitiveFiles` until their implementation and tests land.
+
+`primitiveFiles` is intentionally explicit: if a primitive imports another primitive or local helper, every transitive file must be listed in the component manifest. The CLI does not resolve primitive dependency graphs.

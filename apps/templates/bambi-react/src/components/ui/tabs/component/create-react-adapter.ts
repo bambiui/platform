@@ -21,7 +21,12 @@ type PartName<TPart> = TPart extends string
   : TPart extends { name: infer TName extends string }
     ? TName
     : never;
-type ComponentName<TName extends string> = Capitalize<TName>;
+// Converts kebab-case part names to PascalCase component names at the type level.
+// e.g. "trigger" → "Trigger", "tab-trigger" → "TabTrigger"
+type KebabToPascal<T extends string> = T extends `${infer Head}-${infer Tail}`
+  ? `${Capitalize<Head>}${KebabToPascal<Tail>}`
+  : Capitalize<T>;
+type ComponentName<TName extends string> = KebabToPascal<TName>;
 type PartComponentMap<TContract extends BambiComponentContract> = {
   [TName in PartName<TContract["parts"][number]> as TName extends "root"
     ? never
@@ -41,6 +46,13 @@ export type BambiRootProps<TOptions extends object> = HTMLAttributes<RootElement
 
 export interface ReactAdapterOptions<TOptions> {
   controller?: BambiControllerConstructor<TOptions>;
+}
+
+function toPascalCase(name: string): string {
+  return name
+    .split("-")
+    .map((s) => s[0].toUpperCase() + s.slice(1))
+    .join("");
 }
 
 function normalizePart(part: string | BambiPartDefinition): BambiPartDefinition {
@@ -210,7 +222,7 @@ export function createReactAdapter<
 
   const adapter: Record<string, unknown> = { Root };
   for (const part of restParts) {
-    adapter[part.name[0].toUpperCase() + part.name.slice(1)] = createReactPart(part, {
+    adapter[toPascalCase(part.name)] = createReactPart(part, {
       valueAttribute,
       disabledAttribute,
     });

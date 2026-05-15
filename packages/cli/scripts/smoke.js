@@ -243,12 +243,11 @@ try {
     `import { defineContract } from "../../../contract/define-contract.js";\nexport const primTestContract = defineContract({ name: "prim-test", parts: [] as const });\n`,
   );
 
-  // Mock controller that imports the primitive with the .js extension.
-  // The CLI must rewrite @bambiui/core/primitives/mock-primitive.js → ./primitives/mock-primitive
-  // (no @bambiui/ prefix, no .js extension in the output).
+  // Mock controller that imports the primitive with single quotes and the .js extension.
+  // The CLI must also rewrite dynamic imports and keep no @bambiui/ prefix or .js extension.
   await writeFile(
     path.join(mockRegistryDir, "components", "prim-test", "prim-test.controller.ts"),
-    `import { mockPrimitive } from "@bambiui/core/primitives/mock-primitive.js";\nexport class PrimTestController { sync(): void { mockPrimitive(); } destroy(): void {} }\n`,
+    `import { mockPrimitive } from '@bambiui/core/primitives/mock-primitive.js';\nexport async function loadMockPrimitive() { return import('@bambiui/core/primitives/mock-primitive'); }\nexport class PrimTestController { sync(): void { mockPrimitive(); } destroy(): void {} }\n`,
   );
 
   // Minimal adapter helpers
@@ -258,7 +257,7 @@ try {
   );
   await writeFile(
     path.join(mockRegistryDir, "adapters", "react", "create-react-part.tsx"),
-    "export function createReactPart(): () => null { return () => null; }\n",
+    "import type { BambiPartDefinition } from '@bambiui/core/contract';\nexport function createReactPart(_part?: BambiPartDefinition): () => null { return () => null; }\n",
   );
   await writeFile(
     path.join(mockRegistryDir, "adapters", "react", "create-react-adapter.ts"),
@@ -268,7 +267,7 @@ try {
   // Minimal React wrapper
   await writeFile(
     path.join(mockRegistryDir, "components", "prim-test", "react", "prim-test.react.tsx"),
-    `import { createReactAdapter } from "@bambiui/adapters/react";\nexport const PrimTest = createReactAdapter();\n`,
+    `import { createReactAdapter } from '@bambiui/adapters/react';\nimport { PrimTestController } from '@bambiui/core/components/prim-test.js';\nexport async function loadContract() { return import('@bambiui/core/components/prim-test/prim-test.contract.js'); }\nexport const PrimTest = createReactAdapter(PrimTestController);\n`,
   );
 
   // Global + component CSS
@@ -334,10 +333,27 @@ try {
       "Expected .js extension to be stripped from rewritten primitive import path",
     );
   }
-  if (!controllerOutput.includes(`"./primitives/mock-primitive"`)) {
+  if (
+    !controllerOutput.includes(`'./primitives/mock-primitive'`) ||
+    !controllerOutput.includes(`import('./primitives/mock-primitive')`)
+  ) {
     throw new Error(
-      `Expected rewritten primitive import './primitives/mock-primitive' in controller output`,
+      `Expected rewritten static and dynamic primitive imports in controller output`,
     );
+  }
+
+  const partOutput = await readFile(path.join(implDir, "create-react-part.tsx"), "utf8");
+  if (!partOutput.includes(`'./types'`)) {
+    throw new Error("Expected single-quote @bambiui/core/contract import to rewrite to './types'");
+  }
+
+  const wrapperOutput = await readFile(path.join(implDir, "prim-test.react.tsx"), "utf8");
+  if (
+    !wrapperOutput.includes(`'./create-react-adapter'`) ||
+    !wrapperOutput.includes(`'./prim-test.controller'`) ||
+    !wrapperOutput.includes(`import('./prim-test.contract')`)
+  ) {
+    throw new Error("Expected single-quote adapter/component imports and dynamic contract import to rewrite locally");
   }
 
   process.stdout.write("  ✓ primitiveFiles copy and import rewrite\n");

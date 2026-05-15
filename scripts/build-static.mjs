@@ -32,6 +32,7 @@ for (const component of Object.values(manifest.components ?? {})) {
   for (const file of component.contractFiles ?? []) filePaths.add(file);
   if (component.controller) filePaths.add(component.controller);
   if (component.style) filePaths.add(component.style);
+  for (const file of component.primitiveFiles ?? []) filePaths.add(file);
   for (const files of Object.values(component.adapter ?? {})) {
     for (const file of files) filePaths.add(file);
   }

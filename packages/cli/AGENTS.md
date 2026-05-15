@@ -22,7 +22,9 @@ For `bambiui add <component> --framework <fw>`:
    - `@bambiui/core/components/<name>` → local controller file from registry metadata
    - `@bambiui/adapters/<framework>` → local adapter entry file from registry metadata
    - `@bambiui/core/contract` → `"./types"`
+   - `@bambiui/core/primitives/<name>[.js]` → `"./primitives/<name>"`
    - Relative `.js` extensions stripped for bundler compat
+   - Static and dynamic import specifiers are quote-agnostic; both single and double quotes are supported.
 
 No type generation. No recipe.ts.
 

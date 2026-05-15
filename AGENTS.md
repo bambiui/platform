@@ -131,7 +131,7 @@ Possible future modes: `source` (current), `bundled` (pre-built artifact, not ye
 
 ## Primitive Files
 
-Controllers may import shared primitives from `@bambiui/core/primitives/<name>` in the workspace. The CLI's `flattenPackageImports` transform rewrites these to `./primitives/<name>` in the installed output, and copies the primitive source files into a `primitives/` subdirectory inside the component's implementation directory.
+Controllers may import implemented shared primitives from `@bambiui/core/primitives/<name>` in the workspace. New workspace source should use extensionless package specifiers such as `@bambiui/core/primitives/roving-focus`; the CLI also tolerates a `.js` suffix when rewriting installed output. The CLI's `flattenPackageImports` transform rewrites these to `./primitives/<name>` in the installed output, and copies the primitive source files into a `primitives/` subdirectory inside the component's implementation directory.
 
 **Primitive dependency chain**: `primitiveFiles` does NOT automatically resolve transitive dependencies. If a primitive imports from another local primitive or helper file, that file must also be listed explicitly in the component's `primitiveFiles` array. Automatic dependency graph resolution may be added in a later iteration if needed.
 
@@ -183,7 +183,7 @@ pnpm build:static                       # build apps/www and inject registry fil
 1. Define DOM contract in `packages/core/src/components/<name>/<name>.contract.ts`.
 2. Implement a **self-contained** controller in `packages/core/src/components/<name>/<name>.controller.ts`:
    - Inline `BambiController`, types, and DOM helpers (`getAttr`, `setAttr`, `getBoolAttr`, event dispatch).
-   - Allowed imports: `./<name>.contract.js` (sibling) and `@bambiui/core/primitives/<name>` (shared primitives — CLI rewrites to `./primitives/<name>` on install). No other `@bambiui/*` imports.
+   - Allowed imports: `./<name>.contract.js` (sibling) and extensionless `@bambiui/core/primitives/<name>` package imports (shared primitives — CLI rewrites to `./primitives/<name>` on install). No other `@bambiui/*` imports.
    - Re-export types that framework wrappers need (e.g. `export type { TabsValueChangeDetail } from "./<name>.contract.js"`).
    - If the controller uses a primitive, declare it in `registry.json` under `primitiveFiles`.
 3. Add React wrapper under `packages/registry/src/components/<name>/react/`:

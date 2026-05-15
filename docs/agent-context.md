@@ -88,11 +88,14 @@ src/components/ui/<name>/
     use-bambi-controller.ts
     create-react-part.tsx
     create-react-adapter.ts
+    primitives/        ← present only when registry primitiveFiles is declared
     <name>.react.tsx
   <name>.ts            ← barrel re-exporting framework components
 ```
 
 All `@bambiui/*` workspace imports are transformed to local sibling references during install. No `@bambiui/*` imports remain in the output.
+
+`define-contract.ts` intentionally remains in installed output for now. It is a tiny source-distributed helper copied from `contractFiles`; inlining it during install would add transform complexity without changing runtime dependencies. Adapter helper files also remain beside component files to keep current import rewriting simple.
 
 ## Supported Frameworks
 
@@ -110,7 +113,7 @@ Vue, Svelte and Solid support are intentionally removed during the generic adapt
 `apps/www` is the active minimal static host for bambiui and registry assets. It is NOT the old marketing site.
 
 - Built via `pnpm build:static` (runs `apps/www` Astro build, then injects registry files into `dist/`).
-- Serves `registry.json`, `registry.schema.json`, and all files referenced by the registry manifest.
+- Serves `registry.json`, `registry.schema.json`, and all files referenced by the registry manifest, including `contractFiles`, `primitiveFiles`, adapter files, framework files, and styles.
 
 ## Suspended / Archived
 

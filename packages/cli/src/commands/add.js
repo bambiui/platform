@@ -81,9 +81,22 @@ export async function addComponent(componentName, flags) {
     ),
   );
 
+  const rewriteModuleSpecifiers = (
+    /** @type {string} */ content,
+    /** @type {(specifier: string) => string} */ mapSpecifier,
+  ) => content
+    .replace(/(from\s+)(["'])([^"']+)\2/g, (_match, prefix, quote, specifier) => (
+      `${prefix}${quote}${mapSpecifier(specifier)}${quote}`
+    ))
+    .replace(/(import\(\s*)(["'])([^"']+)\2(\s*\))/g, (_match, prefix, quote, specifier, suffix) => (
+      `${prefix}${quote}${mapSpecifier(specifier)}${quote}${suffix}`
+    ));
+
   // Strips .js extensions from relative imports (ESM TS convention → bundler-friendly)
   const stripJsExt = (/** @type {string} */ content) =>
-    content.replace(/from ("\.\.?\/[^"]+)\.js"/g, 'from $1"');
+    rewriteModuleSpecifiers(content, (specifier) => (
+      specifier.startsWith(".") ? specifier.replace(/\.js$/, "") : specifier
+    ));
 
   const withoutExt = (/** @type {string} */ filePath) =>
     path.basename(filePath).replace(/\.(tsx?|jsx?)$/, "");
@@ -103,33 +116,29 @@ export async function addComponent(componentName, flags) {
   };
   if (adapterImport) packageImportMap[`@bambiui/adapters/${framework}`] = adapterImport;
 
-  const rewriteBarePackageImports = (/** @type {string} */ content) => {
-    let next = content;
-    for (const [from, to] of Object.entries(packageImportMap)) {
-      const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      next = next
-        .replace(new RegExp(`from "${escaped}"`, "g"), `from "${to}"`)
-        .replace(new RegExp(`import\\("${escaped}"\\)`, "g"), `import("${to}")`);
-    }
-    return next;
-  };
+  const rewriteBarePackageImports = (/** @type {string} */ content) =>
+    rewriteModuleSpecifiers(content, (specifier) => {
+      const normalized = specifier.replace(/\.js$/, "");
+      return packageImportMap[normalized] ?? specifier;
+    });
 
   const flattenPackageImports = (/** @type {string} */ content) =>
-    rewriteBarePackageImports(stripJsExt(content))
-      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/define-contract"/g, 'from "./define-contract"')
-      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/types"/g, 'from "./types"')
-      // Rewrite @bambiui/core/primitives/<name>[.js] → ./primitives/<name>
-      // This allows controllers to import shared primitives; the CLI copies those
-      // files into the primitives/ subdirectory alongside the component files.
-      // The .js extension is stripped (controllers may use either form).
-      .replace(
-        /from "@bambiui\/core\/primitives\/([^"]+)"/g,
-        (_, name) => `from "./primitives/${name.replace(/\.js$/, "")}"`,
-      )
-      .replace(
-        /import\("@bambiui\/core\/primitives\/([^"]+)"\)/g,
-        (_, name) => `import("./primitives/${name.replace(/\.js$/, "")}")`,
-      );
+    rewriteModuleSpecifiers(rewriteBarePackageImports(stripJsExt(content)), (specifier) => {
+      if (/^\.\.?\/(?:\.\.\/)*contract\/define-contract$/.test(specifier)) {
+        return "./define-contract";
+      }
+      if (/^\.\.?\/(?:\.\.\/)*contract\/types$/.test(specifier)) {
+        return "./types";
+      }
+
+      const primitivePrefix = "@bambiui/core/primitives/";
+      if (specifier.startsWith(primitivePrefix)) {
+        const name = specifier.slice(primitivePrefix.length).replace(/\.js$/, "");
+        return `./primitives/${name}`;
+      }
+
+      return specifier;
+    });
 
   for (const filePath of component.contractFiles ?? []) {
     results.push(

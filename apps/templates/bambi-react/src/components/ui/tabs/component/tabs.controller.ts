@@ -237,6 +237,14 @@ export class TabsController implements BambiController {
     if (value) this.applyValue(value, "keyboard");
   }
 
+  // NOTE: This controller implements keyboard navigation inline rather than delegating to
+  // the `createRovingFocus` primitive. Migration is safe when the primitive is stable and
+  // when the following behaviors can be preserved end-to-end:
+  //   - automatic vs manual activation mode (auto-activates on focus; manual needs Enter/Space)
+  //   - ARIA sync path: applyValue → applyState must remain the trigger for aria-selected updates
+  //   - orientation-aware arrow keys (horizontal ↔ vertical)
+  //   - disabled item skipping via both data-disabled and aria-disabled
+  // Until then, keep navigation self-contained to avoid silent regressions.
   private bindEvents(): void {
     const { signal } = this.bindAbort;
 

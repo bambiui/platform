@@ -41,24 +41,24 @@
       "import": "./runtime/index.ts",
       "default": "./runtime/index.ts"
     },
-    "./tabs/tabs.contract": {
-      "types": "./tabs/tabs.contract.ts",
-      "import": "./tabs/tabs.contract.ts",
-      "default": "./tabs/tabs.contract.ts"
-    },
     "./components/tabs": {
       "types": "./src/components/tabs/index.ts",
       "import": "./src/components/tabs/index.ts",
       "default": "./src/components/tabs/index.ts"
     },
-    "./primitives/*": {
-      "types": "./src/primitives/*.ts",
-      "import": "./src/primitives/*.ts",
-      "default": "./src/primitives/*.ts"
+    "./primitives": {
+      "types": "./src/primitives/index.ts",
+      "import": "./src/primitives/index.ts",
+      "default": "./src/primitives/index.ts"
+    },
+    "./primitives/roving-focus": {
+      "types": "./src/primitives/roving-focus.ts",
+      "import": "./src/primitives/roving-focus.ts",
+      "default": "./src/primitives/roving-focus.ts"
     }
   },
   "scripts": {
-    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts runtime/index.ts tabs/tabs.contract.ts src/primitives/roving-focus.ts",
+    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts runtime/index.ts src/primitives/index.ts",
     "test:tabs": "node scripts/test-tabs-controller.mjs",
     "test:roving-focus": "node scripts/test-roving-focus.mjs"
   }

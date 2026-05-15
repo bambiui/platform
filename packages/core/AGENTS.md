@@ -13,6 +13,8 @@
 - Every controller must implement `sync(): void` and `destroy(): void`. `update?()` is optional but recommended.
 - Controllers must be **self-contained**: no imports from `@bambiui/core` or any other `@bambiui/*` package within the controller file. Inline all needed helpers and types.
 - The only allowed sibling import is from `./<name>.contract.js` (the co-located contract file).
+- Controllers may import implemented shared primitives from `@bambiui/core/primitives/<name>` using extensionless package specifiers in workspace source. The CLI tolerates `.js`, but new source should omit it.
+- If a controller uses primitives, every primitive file, including transitive primitive dependencies, must be listed explicitly in `registry.json` `primitiveFiles`.
 - This self-contained constraint lets the CLI copy the controller directly into a user project without any runtime `@bambiui/*` dependency.
 
 ## Boundaries
@@ -25,6 +27,8 @@
 ## Golden References
 
 - Canonical component: `src/components/tabs/` (contract + controller).
+- Component exports: `@bambiui/core/components/<name>` is the standard workspace import path.
+- Primitive exports: `@bambiui/core/primitives/<name>` is the standard workspace import path for implemented primitives; `@bambiui/core/primitives` exports only primitives that are implemented and tested.
 - DOM Protocol types and shared interfaces: `src/dom/`.
 
 ## Forbidden

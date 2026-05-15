@@ -20,25 +20,16 @@ const REACT_ADAPTER_IMPL = [
 
 const expectedImplFiles = {
   react:  [...CONTRACT_IMPL, ...REACT_ADAPTER_IMPL, "tabs.react.tsx"],
-  vue:    [...CONTRACT_IMPL, "tabs.vue", "tabs-list.vue", "tabs-trigger.vue", "tabs-content.vue"],
-  svelte: [...CONTRACT_IMPL, "tabs.svelte", "tabs-list.svelte", "tabs-trigger.svelte", "tabs-content.svelte"],
-  solid:  [...CONTRACT_IMPL, "tabs.solid.tsx"],
-  html:   [...CONTRACT_IMPL, "tabs.html.ts"],
 };
 
 // Expected barrel export names per framework (from registry exports metadata)
 const expectedBarrelExports = {
   react:  ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  vue:    ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  svelte: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  solid:  ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  html:   ["mount", "unmount"],
 };
 
 // Framework wrappers that must contain a CSS import
 const frameworksRequiringCssImport = {
   react:  "tabs.react.tsx",
-  html:   "tabs.html.ts",
 };
 
 /**
@@ -189,15 +180,21 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
   }
 }
 
-// Invalid framework should fail
-const invalidDir = await mkdtemp(path.join(tmpdir(), "bambiui-invalid-"));
-try {
-  await runCli(
-    ["init", "--yes", "--framework", "astro", "--cwd", invalidDir, "--registry-url", repoRoot],
-    { expectFailure: true },
-  );
-} finally {
-  await rm(invalidDir, { force: true, recursive: true });
+const reactOnlyMessage = "bambiui generic adapter migration is currently React-only.";
+
+for (const framework of ["vue", "svelte", "solid", "astro"]) {
+  const invalidDir = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
+  try {
+    const result = await runCli(
+      ["init", "--yes", "--framework", framework, "--cwd", invalidDir, "--registry-url", repoRoot],
+      { expectFailure: true },
+    );
+    if (!result.stderr.includes(reactOnlyMessage)) {
+      throw new Error(`Expected React-only migration message for ${framework}.`);
+    }
+  } finally {
+    await rm(invalidDir, { force: true, recursive: true });
+  }
 }
 
 process.stdout.write("CLI smoke tests passed.\n");

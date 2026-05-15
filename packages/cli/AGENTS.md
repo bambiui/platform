@@ -17,8 +17,9 @@ No type generation. No recipe.ts. No module path transformation.
 
 ## Frameworks
 
-Supported: `react`, `svelte`, `vue`, `solid`, `html`  
-Not supported: `astro` (use `html` output instead; Astro support planned separately)
+Supported: `react`
+
+bambiui is currently focusing on React as the first canonical adapter target. Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ## Config Shape (bambiui.config.json)
 
@@ -40,7 +41,7 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 - Do not add component package dependencies to `packages/cli/package.json`.
 - Do not hardcode local workspace paths into installed output.
 - Do not generate `types.ts` or `recipe.ts` — the new model has no generated files.
-- Do not add Astro as a supported framework without a plan.
+- Do not add Astro or restore non-React framework support without a plan.
 - Do not change registry semantics without updating `scripts/check-registry.mjs`.
 
 ## Golden References

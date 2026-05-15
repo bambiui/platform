@@ -1,6 +1,9 @@
 # bambiui CLI
 
-CLI-first, source-distributed UI components for React, Svelte, Vue, Solid, and plain HTML.
+CLI-first, source-distributed UI components for React.
+
+bambiui is currently focusing on React as the first canonical adapter target.
+Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ```sh
 npx bambiui init
@@ -23,8 +26,8 @@ bambiui copies framework-specific component source files directly into your app.
 - `src/components/ui/<name>/component/<name>.contract.ts`
 - `src/components/ui/<name>/component/<name>.controller.ts`
 - Framework adapter helper files referenced by the registry, when present
-- Framework wrapper/template files (e.g. `tabs.react.tsx`, `tabs.svelte`, `tabs.vue`, etc.)
-- `src/components/ui/<name>/tabs.ts` barrel re-exporting all framework components
+- React wrapper/template files (e.g. `tabs.react.tsx`)
+- `src/components/ui/<name>/tabs.ts` barrel re-exporting React components
 
 ## Commands
 
@@ -36,7 +39,7 @@ bambiui add tabs --framework react
 Options:
 
 ```txt
---framework react|svelte|vue|solid|html
+--framework react
 --component-dir <path>
 --style-file <path>
 --registry-url <url>
@@ -44,8 +47,6 @@ Options:
 --force
 --yes, -y
 ```
-
-> **Astro**: there is no dedicated Astro wrapper. Astro users should use the `html` output, which provides a plain TypeScript auto-mount helper compatible with any HTML-based environment.
 
 > **`--tokens-file`**: removed. Use `--style-file` to specify a custom output path for the global style file.
 

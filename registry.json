@@ -25,43 +25,13 @@
         "react": {
           "status": "active",
           "mode": "generic"
-        },
-        "vue": {
-          "status": "legacy",
-          "mode": "frozen"
-        },
-        "svelte": {
-          "status": "legacy",
-          "mode": "frozen"
-        },
-        "solid": {
-          "status": "legacy",
-          "mode": "frozen"
         }
       },
       "files": {
-        "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"],
-        "vue": [
-          "packages/registry/src/components/tabs/vue/tabs.vue",
-          "packages/registry/src/components/tabs/vue/tabs-list.vue",
-          "packages/registry/src/components/tabs/vue/tabs-trigger.vue",
-          "packages/registry/src/components/tabs/vue/tabs-content.vue"
-        ],
-        "svelte": [
-          "packages/registry/src/components/tabs/svelte/tabs.svelte",
-          "packages/registry/src/components/tabs/svelte/tabs-list.svelte",
-          "packages/registry/src/components/tabs/svelte/tabs-trigger.svelte",
-          "packages/registry/src/components/tabs/svelte/tabs-content.svelte"
-        ],
-        "solid": ["packages/registry/src/components/tabs/solid/tabs.solid.tsx"],
-        "html": ["packages/registry/src/components/tabs/html/tabs.html.ts"]
+        "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"]
       },
       "exports": {
-        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "solid": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "html": ["mount", "unmount"]
+        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
       }
     }
   }

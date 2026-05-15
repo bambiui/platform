@@ -9,10 +9,6 @@
     "cli",
     "design-system",
     "react",
-    "svelte",
-    "vue",
-    "solid",
-    "html",
     "source-distributed"
   ],
   "homepage": "https://bambiui.com",

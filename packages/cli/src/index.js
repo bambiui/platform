@@ -12,7 +12,7 @@ Usage:
   bambiui add tabs
 
 Options:
-  --framework react|svelte|vue|solid|html   Framework override
+  --framework react                         Framework override
   --component-dir <path>                    Component destination (default: src/components/ui)
   --registry-url <url>                      Registry base URL (default: https://bambiui.com)
   --style-file <path>                       Global CSS destination (default: src/styles/bambi.css)

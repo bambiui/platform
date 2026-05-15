@@ -3,7 +3,7 @@
 DOM Protocol based, CLI-first UI kit.
 
 > **Status:** Architecture reset in progress. docs/studio temporarily suspended.  
-> Current focus: prove the architecture with Tabs. Accordion and Dialog to follow.
+> Current focus: stabilize React as the first canonical adapter target with Tabs.
 
 ## Quick Start
 
@@ -24,11 +24,8 @@ CLI output is **self-contained**: copied files have no `@bambiui/*` runtime impo
 
 ## Frameworks
 
-```
-react | vue | svelte | solid | html
-```
-
-Astro users can use the `html` output.
+bambiui is currently focusing on React as the first canonical adapter target.
+Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ## Usage
 

@@ -6,13 +6,13 @@ This is the long-form reference for agents. `AGENTS.md` is the quick source of t
 
 ## Architecture — DOM Protocol
 
-bambiui is a CLI-first, framework-agnostic source distribution UI kit built on the DOM Protocol.
+bambiui is a CLI-first, React-focused source distribution UI kit built on the DOM Protocol while the contract-driven generic adapter architecture is stabilized.
 
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
-packages/registry   Framework wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
-apps/templates      Template projects for CLI smoke tests (bambi-next, bambi-svelte, bambi-vue)
+packages/registry   React wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
+apps/templates      Template project for CLI smoke tests (bambi-react)
 apps/_archived/     docs, studio, www — suspended during architecture reset
 registry.json       v2 manifest consumed by CLI
 ```
@@ -21,7 +21,7 @@ registry.json       v2 manifest consumed by CLI
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
 - **Vanilla TypeScript controllers**: all interactive behavior lives in the controller (`packages/core`). Framework wrappers implement no behavior.
-- **Framework wrappers are thin bridges**: they translate props → DOM attributes, mount/destroy the controller, and call `controller.sync()` or `controller.update()` on prop changes.
+- **React wrapper is a thin bridge**: it translates props → DOM attributes, mounts/destroys the controller, and calls `controller.sync()` or `controller.update()` on prop changes.
 - **CustomEvents**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled/uncontrolled**: `data-controlled="true"` → controller fires event only. Without it, controller writes `data-value` and fires event.
 - **Self-contained installed output**: generated user files have no `@bambiui/*` runtime imports.
@@ -29,7 +29,7 @@ registry.json       v2 manifest consumed by CLI
 ## Package Boundaries
 
 - `packages/core` — DOM Protocol source of truth. Contract + controller live here. Controllers must be self-contained (no `@bambiui/*` imports in the controller itself).
-- `packages/registry` — framework wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install.
+- `packages/registry` — React wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
 - Installed output — no `@bambiui/*` runtime imports.
 
@@ -46,11 +46,7 @@ registry.json       v2 manifest consumed by CLI
       "controller": "packages/core/src/components/tabs/tabs.controller.ts",
       "style": "packages/registry/src/styles/tabs.css",
       "files": {
-        "react": ["..."],
-        "vue": ["..."],
-        "svelte": ["..."],
-        "solid": ["..."],
-        "html": ["..."]
+        "react": ["..."]
       }
     }
   }
@@ -66,7 +62,7 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 - Contract: `packages/core/src/components/tabs/tabs.contract.ts`
 - Controller: `packages/core/src/components/tabs/tabs.controller.ts`
 - CSS: `packages/registry/src/styles/tabs.css`
-- Framework wrappers: `packages/registry/src/components/tabs/{react,vue,svelte,solid,html}/`
+- React wrapper: `packages/registry/src/components/tabs/react/`
 
 ## CSS Delivery
 
@@ -76,15 +72,14 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 
 ## Supported Frameworks
 
-`react`, `vue`, `svelte`, `solid`, `html`.
+`react`.
 
-Astro: no dedicated wrapper. Use `html` output (`autoMount()` helper).
+bambiui is currently focusing on React as the first canonical adapter target.
+Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ## apps/templates — Smoke Fixtures
 
-`apps/templates` contains real framework project fixtures for CLI end-to-end smoke testing. Not a public product surface. Currently: `bambi-next` (React/Next), `bambi-svelte` (SvelteKit), `bambi-vue` (Vue/Vite).
-
-Solid and HTML are covered by the CLI unit smoke; real template fixtures for them are a future task.
+`apps/templates` contains a real React project fixture for CLI end-to-end smoke testing. Not a public product surface. Currently: `bambi-react` (React/Next).
 
 ## Suspended
 

@@ -24,9 +24,9 @@ const REACT_ADAPTER_IMPL = [
 
 const templates = [
   {
-    name: "bambi-next",
+    name: "bambi-react",
     framework: "react",
-    dir: "apps/templates/bambi-next",
+    dir: "apps/templates/bambi-react",
     check: ["npm", "exec", "tsc", "--", "--noEmit"],
     expectedFiles: [
       "bambiui.config.json",
@@ -35,40 +35,6 @@ const templates = [
       ...TABS_IMPL,
       ...REACT_ADAPTER_IMPL,
       "src/components/ui/tabs/component/tabs.react.tsx",
-      "src/components/ui/tabs/tabs.ts",
-    ],
-  },
-  {
-    name: "bambi-svelte",
-    framework: "svelte",
-    dir: "apps/templates/bambi-svelte",
-    check: ["npm", "run", "check"],
-    expectedFiles: [
-      "bambiui.config.json",
-      "src/styles/bambi.css",
-      "src/components/ui/tabs/component/tabs.css",
-      ...TABS_IMPL,
-      "src/components/ui/tabs/component/tabs.svelte",
-      "src/components/ui/tabs/component/tabs-list.svelte",
-      "src/components/ui/tabs/component/tabs-trigger.svelte",
-      "src/components/ui/tabs/component/tabs-content.svelte",
-      "src/components/ui/tabs/tabs.ts",
-    ],
-  },
-  {
-    name: "bambi-vue",
-    framework: "vue",
-    dir: "apps/templates/bambi-vue",
-    check: ["npm", "run", "build"],
-    expectedFiles: [
-      "bambiui.config.json",
-      "src/styles/bambi.css",
-      "src/components/ui/tabs/component/tabs.css",
-      ...TABS_IMPL,
-      "src/components/ui/tabs/component/tabs.vue",
-      "src/components/ui/tabs/component/tabs-list.vue",
-      "src/components/ui/tabs/component/tabs-trigger.vue",
-      "src/components/ui/tabs/component/tabs-content.vue",
       "src/components/ui/tabs/tabs.ts",
     ],
   },

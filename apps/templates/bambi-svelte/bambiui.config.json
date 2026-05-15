@@ -1,5 +1,0 @@
-{
-  "framework": "svelte",
-  "componentDir": "src/components/ui",
-  "styleFile": "src/styles/bambi.css"
-}

@@ -58,18 +58,6 @@
           "properties": {
             "react": {
               "$ref": "#/$defs/frameworkFiles"
-            },
-            "vue": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "svelte": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "solid": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "html": {
-              "$ref": "#/$defs/frameworkFiles"
             }
           }
         },
@@ -78,18 +66,6 @@
           "additionalProperties": false,
           "properties": {
             "react": {
-              "$ref": "#/$defs/adapterMetadata"
-            },
-            "vue": {
-              "$ref": "#/$defs/adapterMetadata"
-            },
-            "svelte": {
-              "$ref": "#/$defs/adapterMetadata"
-            },
-            "solid": {
-              "$ref": "#/$defs/adapterMetadata"
-            },
-            "html": {
               "$ref": "#/$defs/adapterMetadata"
             }
           }
@@ -100,18 +76,6 @@
           "properties": {
             "react": {
               "$ref": "#/$defs/frameworkFiles"
-            },
-            "vue": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "svelte": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "solid": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "html": {
-              "$ref": "#/$defs/frameworkFiles"
             }
           }
         },
@@ -119,11 +83,7 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": { "$ref": "#/$defs/exportNames" },
-            "vue": { "$ref": "#/$defs/exportNames" },
-            "svelte": { "$ref": "#/$defs/exportNames" },
-            "solid": { "$ref": "#/$defs/exportNames" },
-            "html": { "$ref": "#/$defs/exportNames" }
+            "react": { "$ref": "#/$defs/exportNames" }
           }
         }
       }
@@ -141,11 +101,11 @@
       "properties": {
         "status": {
           "type": "string",
-          "enum": ["active", "legacy"]
+          "enum": ["active"]
         },
         "mode": {
           "type": "string",
-          "enum": ["generic", "frozen"]
+          "enum": ["generic"]
         }
       }
     },

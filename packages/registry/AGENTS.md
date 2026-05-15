@@ -2,11 +2,11 @@
 
 ## Responsibility
 
-`packages/registry` holds framework wrapper templates for all supported frameworks. It is the source of the installable component files that the CLI copies into user projects.
+`packages/registry` holds React wrapper templates during the generic adapter migration. It is the source of the installable component files that the CLI copies into user projects.
 
 ## What Lives Here
 
-- Framework wrappers: `src/components/<name>/{react,vue,svelte,solid,html}/`
+- React wrappers: `src/components/<name>/react/`
 - Component CSS: `src/styles/<name>.css`
 - Global style file: `src/styles/bambi.css`
 - Workspace barrels: `src/components/<name>/index.ts` (not installed — workspace only)
@@ -31,9 +31,9 @@
 
 ## Supported Frameworks
 
-`react`, `vue`, `svelte`, `solid`, `html`.
+`react`.
 
-There is no Astro wrapper. Do not add one until explicitly planned. Astro users use the `html` output.
+bambiui is currently focusing on React as the first canonical adapter target. Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ## Workspace Barrel
 
@@ -43,7 +43,7 @@ There is no Astro wrapper. Do not add one until explicitly planned. Astro users 
 
 Tabs is the reference component:
 
-- Wrappers: `src/components/tabs/{react,vue,svelte,solid,html}/`
+- Wrappers: `src/components/tabs/react/`
 - CSS: `src/styles/tabs.css`
 
 ## Verify

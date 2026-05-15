@@ -6,11 +6,10 @@ They are not part of the public product surface. Keep them small, framework-spec
 
 ## Templates
 
-- `bambi-next`: React/Next.js fixture.
-- `bambi-svelte`: SvelteKit fixture.
-- `bambi-vue`: Vue/Vite fixture.
+- `bambi-react`: React/Next.js fixture.
 
-Solid and HTML are covered by the CLI unit smoke (`node packages/cli/scripts/smoke.js`). Real template fixtures for those frameworks are a separate future task.
+bambiui is currently focusing on React as the first canonical adapter target.
+Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
 ## Smoke Test
 
@@ -45,8 +44,6 @@ src/components/ui/tabs/component/tabs.react.tsx
 src/components/ui/tabs/tabs.ts
 ```
 
-For `svelte`, replace `tabs.react.tsx` with `tabs.svelte`, `tabs-list.svelte`, `tabs-trigger.svelte`, `tabs-content.svelte`. For `vue`, replace with the equivalent `.vue` files.
-
 If a template has no installed dependencies yet, install them first:
 
 ```sh
@@ -57,6 +54,6 @@ The templates use their own lock files, so the smoke script uses `npm ci` for te
 
 ## Notes
 
-- Do not commit `node_modules`, `.next`, `.svelte-kit`, `dist`, or other generated output.
+- Do not commit `node_modules`, `.next`, `dist`, or other generated output.
 - Generated bambiui component files may be committed when they intentionally represent the current fixture state.
 - These fixtures should stay boring: one page, one imported component, enough framework config to catch integration regressions.

@@ -64,9 +64,9 @@ if (!registry.components || typeof registry.components !== "object") {
   process.exit(1);
 }
 
-const KNOWN_FRAMEWORKS = ["react", "vue", "svelte", "solid", "html"];
-const ADAPTER_STATUSES = ["active", "legacy"];
-const ADAPTER_MODES = ["generic", "frozen"];
+const KNOWN_FRAMEWORKS = ["react"];
+const ADAPTER_STATUSES = ["active"];
+const ADAPTER_MODES = ["generic"];
 
 for (const [componentName, component] of Object.entries(registry.components)) {
   console.log(`\nComponent: ${componentName}`);

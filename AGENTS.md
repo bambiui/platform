@@ -19,6 +19,7 @@ Nested rules:
 
 - `packages/cli/AGENTS.md`
 - `packages/core/AGENTS.md`
+- `packages/adapters/AGENTS.md`
 - `packages/registry/AGENTS.md`
 
 ## Architecture Principles — DOM Protocol
@@ -83,7 +84,7 @@ Each component under `packages/registry/src/components/<name>/`:
 
 Vue, Svelte, Solid, and HTML subdirectories are intentionally absent during the migration.
 
-Framework files use `import { … } from "@bambiui/core/components/<name>"` for workspace typecheck. The CLI `flattenImports` transform converts these to `"./tabs.controller"` in the installed output. Adapter helper imports (`@bambiui/adapters/react`) are similarly transformed to `"./create-react-adapter"`.
+Framework files use `import { … } from "@bambiui/core/components/<name>"` for workspace typecheck. The CLI `flattenPackageImports` transform converts these to `"./<name>.controller"` in the installed output. Adapter helper imports (`@bambiui/adapters/react`) are similarly transformed to `"./create-react-adapter"`. This transform is generic — no per-component CLI update is required when adding new components.
 
 ## Golden References
 
@@ -110,9 +111,13 @@ Framework files use `import { … } from "@bambiui/core/components/<name>"` for 
 
 ## Suspended / Archived
 
+`apps/_archived/` contains suspended and archived apps. They are **not active workspace targets** and must not be used as architecture references.
+
 - `apps/_archived/docs` — Starlight documentation (suspended)
 - `apps/_archived/studio` — component playground (suspended)
 - `apps/_archived/www` — old marketing/landing site (archived; replaced by `apps/www`)
+
+Archived AGENTS.md files under `apps/_archived/` carry a top-level warning. Do not follow instructions in those files for active development.
 
 ## Active Static Host
 
@@ -161,8 +166,8 @@ pnpm build:static                       # build apps/www and inject registry fil
    - `style` → `packages/registry/src/styles/<name>.css`
    - `files.react` → `packages/registry/src/components/<name>/react/…`
    - `exports.react` → list of exported component names
-5. Update CLI `add.js` `flattenImports` transform to handle `@bambiui/core/components/<name>` → `"./<name>.controller"`.
-6. Run `pnpm check-registry` and `pnpm check-types`.
+5. Run `pnpm check-registry` and `pnpm check-types`.
+   - No CLI changes needed: `flattenPackageImports` is generic and handles all component imports automatically.
 
 ## Multi-Agent Coordination
 

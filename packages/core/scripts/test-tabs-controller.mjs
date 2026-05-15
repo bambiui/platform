@@ -4,7 +4,20 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import ts from "typescript";
+
+// Run with: node packages/core/scripts/test-tabs-controller.mjs
+// Requires workspace dependencies — run `pnpm install` first if you see a module error.
+let ts;
+try {
+  ts = (await import("typescript")).default;
+} catch {
+  console.error(
+    "\n[test-tabs-controller] Missing dependency: 'typescript'\n" +
+    "Run 'pnpm install' in the repo root, then try again:\n" +
+    "  node packages/core/scripts/test-tabs-controller.mjs\n",
+  );
+  process.exit(1);
+}
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const outDir = await mkdtemp(path.join(tmpdir(), "bambi-tabs-controller-"));

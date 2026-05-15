@@ -1,3 +1,7 @@
+> **ARCHIVED — DO NOT USE AS ACTIVE REFERENCE**
+> This app is suspended. It is not an active workspace target, build target, or registry/CLI consumer.
+> Do not follow these instructions for active development. See root `AGENTS.md` for current architecture.
+
 # bambiui Docs Agent Rules
 
 ## Responsibility

@@ -65,6 +65,8 @@ if (!registry.components || typeof registry.components !== "object") {
 }
 
 const KNOWN_FRAMEWORKS = ["react", "vue", "svelte", "solid", "html"];
+const ADAPTER_STATUSES = ["active", "legacy"];
+const ADAPTER_MODES = ["generic", "frozen"];
 
 for (const [componentName, component] of Object.entries(registry.components)) {
   console.log(`\nComponent: ${componentName}`);
@@ -120,6 +122,38 @@ for (const [componentName, component] of Object.entries(registry.components)) {
           checkFileExists(filePath, `adapter.${framework}`);
         }
         ok(`adapter.${framework}: ${files.length} file(s)`);
+      }
+    }
+  }
+
+  if (component.adapters !== undefined) {
+    if (!component.adapters || typeof component.adapters !== "object") {
+      fail("adapters must be an object when present");
+    } else {
+      for (const [framework, metadata] of Object.entries(component.adapters)) {
+        if (!KNOWN_FRAMEWORKS.includes(framework)) {
+          fail(`adapters: unknown framework key "${framework}"`);
+          continue;
+        }
+        if (!metadata || typeof metadata !== "object") {
+          fail(`adapters.${framework} must be an object`);
+          continue;
+        }
+
+        const { status, mode } = metadata;
+        if (!ADAPTER_STATUSES.includes(status)) {
+          fail(`adapters.${framework}.status must be one of: ${ADAPTER_STATUSES.join(", ")}`);
+        }
+        if (!ADAPTER_MODES.includes(mode)) {
+          fail(`adapters.${framework}.mode must be one of: ${ADAPTER_MODES.join(", ")}`);
+        }
+        if (status === "active" && mode !== "generic") {
+          fail(`adapters.${framework}: active adapters must use mode "generic"`);
+        }
+        if (mode === "generic" && (!component.adapter?.[framework] || component.adapter[framework].length === 0)) {
+          fail(`adapters.${framework}: generic mode requires adapter.${framework} files`);
+        }
+        ok(`adapters.${framework}: ${status}/${mode}`);
       }
     }
   }

@@ -30,7 +30,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, contract: string, contractFiles?: string[], controller: string, style: string, adapter?: Record<string, string[]>, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, contract: string, contractFiles?: string[], controller: string, style: string, adapter?: Record<string, string[]>, adapters?: Record<string, { status: "active" | "legacy", mode: "generic" | "frozen" }>, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -39,6 +39,16 @@ export async function addComponent(componentName, flags) {
     throw new Error(
       `No files found for framework "${framework}" in component "${componentName}".`,
     );
+  }
+
+  const adapterMetadata = component.adapters?.[framework];
+  if (adapterMetadata?.mode === "generic") {
+    const adapterFiles = component.adapter?.[framework];
+    if (!adapterFiles || adapterFiles.length === 0) {
+      throw new Error(
+        `Component "${componentName}" declares a generic ${framework} adapter but has no adapter.${framework} files.`,
+      );
+    }
   }
 
   // componentDir/<name>/component/  — implementation files + CSS
@@ -144,7 +154,7 @@ export async function addComponent(componentName, flags) {
     await writeProjectFile(barrelPath, getIndexContent(framework, componentName, frameworkExports), force),
   );
 
-  return { config, framework, componentName, results, exports: frameworkExports };
+  return { config, framework, componentName, results, exports: frameworkExports, adapter: adapterMetadata };
 }
 
 /**

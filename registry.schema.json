@@ -73,6 +73,27 @@
             }
           }
         },
+        "adapters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": {
+              "$ref": "#/$defs/adapterMetadata"
+            },
+            "vue": {
+              "$ref": "#/$defs/adapterMetadata"
+            },
+            "svelte": {
+              "$ref": "#/$defs/adapterMetadata"
+            },
+            "solid": {
+              "$ref": "#/$defs/adapterMetadata"
+            },
+            "html": {
+              "$ref": "#/$defs/adapterMetadata"
+            }
+          }
+        },
         "files": {
           "type": "object",
           "additionalProperties": false,
@@ -111,6 +132,21 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/registryPath"
+      }
+    },
+    "adapterMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mode"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["active", "legacy"]
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["generic", "frozen"]
+        }
       }
     },
     "exportNames": {

@@ -1,8 +1,6 @@
-import type { ComponentProps, ReactNode } from "react";
-import { createReactAdapter } from "./create-react-adapter";
-import { TabsController, tabsContract } from "./tabs.controller";
+import { useEffect, useRef, type ReactNode } from "react";
+import { TabsController } from "./tabs.controller";
 import type { TabsOptions } from "./tabs.controller";
-import "./tabs.css";
 
 export type { BambiController, TabsOptions, TabsOrientation } from "./tabs.controller";
 export type { TabsValueChangeDetail } from "./tabs.controller";
@@ -12,14 +10,16 @@ export interface TabsProps extends TabsOptions {
   className?: string;
 }
 
-const tabsAdapter = createReactAdapter<TabsOptions>(tabsContract, {
-  controller: TabsController,
-});
-const TabsRoot = tabsAdapter.Root;
-
-export function Tabs(props: TabsProps) {
-  const { value, defaultValue } = props;
-
+export function Tabs({
+  children,
+  className,
+  value,
+  defaultValue,
+  controlled,
+  orientation = "horizontal",
+  disabled,
+  onValueChange,
+}: TabsProps) {
   if (value !== undefined && defaultValue !== undefined) {
     console.warn(
       "[bambiui/tabs] Tabs received both `value` and `defaultValue`. " +
@@ -27,21 +27,99 @@ export function Tabs(props: TabsProps) {
     );
   }
 
-  return <TabsRoot {...props} />;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const controllerRef = useRef<TabsController | null>(null);
+  const isControlled = controlled ?? value !== undefined;
+
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const controller = new TabsController(el, {
+      value,
+      defaultValue,
+      controlled: isControlled,
+      orientation,
+      disabled,
+      onValueChange,
+    });
+    controller.sync();
+    controllerRef.current = controller;
+    return () => {
+      controller.destroy();
+      controllerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    controllerRef.current?.update({ value, disabled, orientation, onValueChange });
+  }, [value, disabled, orientation, onValueChange]);
+
+  return (
+    <div
+      ref={rootRef}
+      data-bambi-tabs=""
+      data-orientation={orientation}
+      data-controlled={isControlled ? "true" : "false"}
+      className={className}
+    >
+      {children}
+    </div>
+  );
 }
 
-export type TabsListProps = ComponentProps<typeof tabsAdapter.List>;
+export interface TabsListProps {
+  children?: ReactNode;
+  className?: string;
+}
 
-export const TabsList = tabsAdapter.List;
+export function TabsList({ children, className }: TabsListProps) {
+  return (
+    <div role="tablist" data-bambi-tabs-list="" className={className}>
+      {children}
+    </div>
+  );
+}
 
-export interface TabsTriggerProps extends ComponentProps<typeof tabsAdapter.Trigger> {
+export interface TabsTriggerProps {
   value: string;
+  children?: ReactNode;
+  className?: string;
+  disabled?: boolean;
 }
 
-export const TabsTrigger = tabsAdapter.Trigger;
+export function TabsTrigger({ value, children, className, disabled }: TabsTriggerProps) {
+  return (
+    <button
+      role="tab"
+      type="button"
+      data-bambi-tabs-trigger=""
+      data-value={value}
+      data-disabled={disabled ? "true" : undefined}
+      disabled={disabled}
+      className={className}
+    >
+      {children}
+    </button>
+  );
+}
 
-export interface TabsContentProps extends ComponentProps<typeof tabsAdapter.Content> {
+export interface TabsContentProps {
   value: string;
+  children?: ReactNode;
+  className?: string;
 }
 
-export const TabsContent = tabsAdapter.Content;
+export function TabsContent({ value, children, className }: TabsContentProps) {
+  return (
+    <div
+      role="tabpanel"
+      data-bambi-tabs-content=""
+      data-value={value}
+      className={className}
+      tabIndex={0}
+    >
+      {children}
+    </div>
+  );
+}

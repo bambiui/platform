@@ -21,6 +21,24 @@
           "packages/adapters/react/create-react-adapter.ts"
         ]
       },
+      "adapters": {
+        "react": {
+          "status": "active",
+          "mode": "generic"
+        },
+        "vue": {
+          "status": "legacy",
+          "mode": "frozen"
+        },
+        "svelte": {
+          "status": "legacy",
+          "mode": "frozen"
+        },
+        "solid": {
+          "status": "legacy",
+          "mode": "frozen"
+        }
+      },
       "files": {
         "react": ["packages/registry/src/components/tabs/react/tabs.react.tsx"],
         "vue": [

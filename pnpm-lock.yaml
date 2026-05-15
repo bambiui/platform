@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@bambiui/generator':
+        specifier: workspace:*
+        version: link:packages/generator
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
@@ -89,6 +92,8 @@ importers:
         version: 24.12.2
 
   packages/core: {}
+
+  packages/generator: {}
 
   packages/registry:
     devDependencies:

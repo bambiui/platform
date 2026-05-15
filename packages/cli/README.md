@@ -12,6 +12,8 @@ npx bambiui add tabs --framework react
 
 bambiui copies framework-ready public component artifacts directly into your app. It does not require a runtime component package. Generated output is self-contained and must not include `@bambiui/*` imports, contracts, controllers, adapter helpers, or generator files.
 
+Maintainers refresh public artifacts with `pnpm registry:refresh`; this calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and copies component CSS.
+
 ## Init
 
 `init` writes the global style file to `src/styles/bambi.css` by default and creates `bambiui.config.json`. If React cannot be detected, the CLI uses React defaults during the React-only migration.

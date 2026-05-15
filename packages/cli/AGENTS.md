@@ -15,6 +15,8 @@ For `bambiui add <component> --framework <fw>`:
 
 The CLI does not copy contracts, controllers, adapter helpers, primitives, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained.
 
+Maintainers produce those public files with `pnpm registry:refresh`; it calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and syncs CSS.
+
 ## Frameworks
 
 Supported: `react`
@@ -58,5 +60,6 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 pnpm --filter bambiui check-types
 pnpm --filter bambiui smoke
 pnpm --filter bambiui check
+pnpm registry:refresh
 pnpm check-registry
 ```

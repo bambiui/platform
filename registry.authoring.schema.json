@@ -46,6 +46,13 @@
             "react": { "$ref": "#/$defs/registryFileList" }
           }
         },
+        "generator": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/generatorOptions" },
+          "properties": {
+            "react": { "$ref": "#/$defs/generatorOptions" }
+          }
+        },
         "exports": {
           "type": "object",
           "additionalProperties": false,
@@ -63,6 +70,28 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 },
       "minItems": 1
+    },
+    "generatorOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "valuePropName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "valuePropParts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "disabledPropName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disabledPropParts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
     },
     "registryPath": {
       "type": "string",

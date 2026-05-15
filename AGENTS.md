@@ -9,6 +9,7 @@ packages/cli        bambiui init/add; fetches registry assets and writes user fi
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
 packages/adapters   Generic framework adapter helpers; currently only React helpers are active
 packages/registry   Internal React wrapper templates plus generated public artifacts
+packages/generator  Internal contract parsers and framework artifact generators
 apps/templates      Template project for CLI smoke tests (bambi-react only)
 apps/www            Active minimal static host for bambiui and registry assets
 apps/_archived/     docs, studio, old www — suspended during architecture reset
@@ -21,6 +22,7 @@ Nested rules:
 - `packages/cli/AGENTS.md`
 - `packages/core/AGENTS.md`
 - `packages/adapters/AGENTS.md`
+- `packages/generator/AGENTS.md`
 - `packages/registry/AGENTS.md`
 
 ## Architecture Principles — DOM Protocol
@@ -69,6 +71,7 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 
 - `packages/core` — workspace source of truth; imports allowed between core files. Controllers are internal authoring/build-time inputs and are not copied by `bambiui add`.
 - `packages/adapters` — generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter helpers are internal authoring/build-time inputs and are not copied by `bambiui add`.
+- `packages/generator` — private internal parsers/generators used by maintainer scripts. The CLI and generated output must not depend on it.
 - `packages/registry` — internal React wrapper templates and generated public artifacts. `packages/registry/generated/<name>/<framework>/` is the only component artifact source public `registry.json` may reference.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats registry.json as external input.
 - Installed output — no `@bambiui/*` runtime imports and no internal contract/controller/adapter helper files.
@@ -136,7 +139,7 @@ The CLI distributes **framework-ready public source artifacts**, not internal au
 
 - Public `registry.json` describes only files safe to copy directly into a user project.
 - Internal `registry.authoring.json` describes contracts, controllers, adapters, primitives, and source inputs for maintainers.
-- Run `pnpm registry:refresh` after authoring changes to refresh/validate generated artifacts.
+- Run `pnpm registry:refresh` after authoring changes. It uses `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata plus core controller behavior, copy CSS, and validate public/internal registry separation.
 
 ## Primitive Files
 
@@ -152,10 +155,10 @@ Public generated artifacts must inline or otherwise own any runtime behavior the
 
 ```sh
 pnpm install
-pnpm check                              # types + registry + CLI smoke
+pnpm check                              # registry refresh + types + registry + CLI smoke
 pnpm check-types                        # turbo: core + registry + cli TypeScript
 pnpm check-registry                     # validate registry.json v2 schema
-pnpm registry:refresh                   # refresh/validate generated registry artifacts
+pnpm registry:refresh                   # generate/validate public registry artifacts
 pnpm --filter bambiui smoke             # CLI smoke: react
 pnpm smoke:templates                    # template smoke (requires node_modules in templates)
 pnpm smoke:templates -- --install       # same, runs npm ci first
@@ -168,7 +171,7 @@ pnpm build:static                       # build apps/www and inject registry fil
 | ------------------------------------------------ | -------------------------------- |
 | controller / contract / CSS / wrappers           | `pnpm registry:refresh && pnpm check` |
 | CLI only                                         | `pnpm --filter bambiui check`    |
-| registry only                                    | `pnpm check-registry`            |
+| registry only                                    | `pnpm registry:refresh && pnpm check-registry` |
 | core types only                                  | `pnpm check-types`               |
 | template projects (end-to-end install + compile) | `pnpm smoke:templates`           |
 
@@ -189,7 +192,8 @@ pnpm build:static                       # build apps/www and inject registry fil
    - `contract`, `controller`, `contractFiles`, optional `primitiveFiles`
    - `adapter.react` and `sourceFiles.react`
    - `generatedFiles.react` target paths under `packages/registry/generated/<name>/react/`
-5. Generate or update public artifacts under `packages/registry/generated/<name>/react/`.
+   - `generator.<framework>` metadata for framework-specific public API rules, such as which parts expose a value or disabled prop.
+5. Generate or update public artifacts under `packages/registry/generated/<name>/<framework>/`. For Tabs React, `pnpm registry:refresh` parses `tabs.contract.ts`, inlines behavior from `tabs.controller.ts`, emits React parts from contract metadata, applies `generator.react` metadata, and copies `tabs.css` from `packages/registry/src/styles/tabs.css`.
 6. Register only public artifact files in `registry.json` (v2 format):
    - `files.react` → generated `index.tsx`, `<name>.css` artifacts
    - `exports.react` → list of exported component names

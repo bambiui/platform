@@ -13,6 +13,7 @@ packages/cli        bambiui init/add; fetches registry assets and writes user fi
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
 packages/adapters   Generic framework adapter helpers; currently only React helpers are active
 packages/registry   Internal React templates plus generated public artifacts
+packages/generator  Internal contract parsers and framework artifact generators
 apps/templates      Template project for CLI smoke tests (bambi-react)
 apps/www            Active minimal static host for bambiui and registry assets
 apps/_archived/     docs, studio, old www — suspended during architecture reset
@@ -33,6 +34,7 @@ registry.authoring.json internal source manifest for maintainers
 
 - `packages/core` — DOM Protocol source of truth. Contract + controller live here and are internal authoring inputs.
 - `packages/adapters` — Generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter files are internal authoring inputs.
+- `packages/generator` — Private internal parser/generator package used by `pnpm registry:refresh`; not a CLI runtime dependency and never imported by generated output.
 - `packages/registry` — Internal React wrapper templates plus generated public artifacts under `packages/registry/generated/`.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
 - Installed output — no `@bambiui/*` runtime imports and no internal helper files.
@@ -60,7 +62,7 @@ registry.authoring.json internal source manifest for maintainers
 }
 ```
 
-`registry.authoring.json` is internal and tracks contracts, controllers, adapter helpers, source wrappers, and generated artifact paths. Run `pnpm registry:refresh` after authoring changes.
+`registry.authoring.json` is internal and tracks contracts, controllers, adapter helpers, source wrappers, generated artifact paths, and generator metadata. Run `pnpm registry:refresh` after authoring changes. It calls `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate the manifests.
 
 Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
 

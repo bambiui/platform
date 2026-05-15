@@ -28,8 +28,6 @@ const FORBIDDEN_STRINGS = [
   "use-bambi-controller",
   "@bambiui/core",
   "@bambiui/adapters",
-  "tabs.contract",
-  "tabs.controller",
 ];
 
 function fail(msg) {
@@ -76,7 +74,16 @@ function checkPathAndFile(filePath, context) {
   return checkFileExists(filePath, context);
 }
 
-function checkFileList(files, context, { generatedOnly = false, scanForbidden = false } = {}) {
+function forbiddenStringsFor(componentName) {
+  if (!componentName) return FORBIDDEN_STRINGS;
+  return [
+    ...FORBIDDEN_STRINGS,
+    `${componentName}.contract`,
+    `${componentName}.controller`,
+  ];
+}
+
+function checkFileList(files, context, { generatedOnly = false, scanForbidden = false, componentName } = {}) {
   if (!Array.isArray(files) || files.length === 0) {
     fail(`${context} must be a non-empty array`);
     return;
@@ -95,7 +102,7 @@ function checkFileList(files, context, { generatedOnly = false, scanForbidden = 
 
     if (scanForbidden) {
       const content = readFileSync(resolve(root, filePath), "utf-8");
-      for (const forbidden of FORBIDDEN_STRINGS) {
+      for (const forbidden of forbiddenStringsFor(componentName)) {
         if (content.includes(forbidden)) {
           fail(`${context}: generated file contains forbidden string "${forbidden}" — ${filePath}`);
         }
@@ -175,7 +182,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
       fail(`unknown framework key "${framework}"`);
       continue;
     }
-    checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true });
+    checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true, componentName });
     ok(`files.${framework}: ${files.length} generated file(s)`);
   }
 
@@ -225,6 +232,42 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`generatedFiles has unknown framework "${framework}"`);
     else checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });
+  }
+
+  if (component.generator !== undefined) {
+    if (!component.generator || typeof component.generator !== "object") {
+      fail("generator must be an object when present");
+    } else {
+      for (const [framework, options] of Object.entries(component.generator)) {
+        if (!KNOWN_FRAMEWORKS.includes(framework)) {
+          fail(`generator has unknown framework "${framework}"`);
+          continue;
+        }
+        if (!options || typeof options !== "object") {
+          fail(`generator.${framework} must be an object`);
+          continue;
+        }
+        for (const field of ["valuePropName", "disabledPropName"]) {
+          if (options[field] !== undefined && (typeof options[field] !== "string" || options[field].length === 0)) {
+            fail(`generator.${framework}.${field} must be a non-empty string when present`);
+          }
+        }
+        for (const field of ["valuePropParts", "disabledPropParts"]) {
+          if (options[field] !== undefined) {
+            if (!Array.isArray(options[field])) {
+              fail(`generator.${framework}.${field} must be an array when present`);
+              continue;
+            }
+            for (const part of options[field]) {
+              if (typeof part !== "string" || part.length === 0) {
+                fail(`generator.${framework}.${field} contains invalid part name`);
+              }
+            }
+          }
+        }
+        ok(`generator.${framework}: configured`);
+      }
+    }
   }
 
   checkExports(component.exports, component.generatedFiles, `authoring ${componentName}`);

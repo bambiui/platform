@@ -28,8 +28,8 @@
 
 ## Internal Authoring Rules
 
-- `registry.authoring.json` tracks contract, controller, adapter, source wrapper, style, and generated artifact paths.
-- Run `pnpm registry:refresh` after changing authoring inputs or generated artifacts.
+- `registry.authoring.json` tracks contract, controller, adapter, source wrapper, style, generated artifact paths, and generator metadata.
+- Run `pnpm registry:refresh` after changing authoring inputs. It calls `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate generated artifacts.
 - Internal wrappers may import from `@bambiui/core/components/<name>` and `@bambiui/adapters/react` for workspace type-checking only.
 
 ## CSS Rules

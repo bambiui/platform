@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:static": "node scripts/build-static.mjs",
-    "check": "pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter bambiui smoke",
+    "check": "pnpm registry:refresh && pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter bambiui smoke",
     "check-registry": "node scripts/check-registry.mjs",
     "registry:refresh": "node scripts/registry-refresh.mjs",
     "dev": "turbo run dev",
@@ -14,6 +14,7 @@
     "check-types": "turbo run check-types"
   },
   "devDependencies": {
+    "@bambiui/generator": "workspace:*",
     "prettier": "^3.7.4",
     "turbo": "^2.9.9",
     "typescript": "5.9.2"

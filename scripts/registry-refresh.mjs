@@ -1,18 +1,113 @@
 #!/usr/bin/env node
 // Maintainer-only refresh for generated public registry artifacts.
 
-import { copyFile, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { createArtifact } from "@bambiui/generator";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const authoringPath = resolve(root, "registry.authoring.json");
+const registryPath = resolve(root, "registry.json");
 
 const authoring = JSON.parse(await readFile(authoringPath, "utf8"));
+const publicRegistry = JSON.parse(await readFile(registryPath, "utf8"));
+
+const globalForbiddenStrings = [
+  "create-react-adapter",
+  "create-react-part",
+  "define-contract",
+  "use-bambi-controller",
+  "@bambiui/core",
+  "@bambiui/adapters",
+];
+
+function assertSameFiles(actual, expected, context) {
+  const sortedActual = [...(actual ?? [])].sort();
+  const sortedExpected = [...(expected ?? [])].sort();
+
+  if (sortedActual.join("\n") !== sortedExpected.join("\n")) {
+    throw new Error(
+      `${context} does not match public registry files.\nExpected:\n${sortedExpected.join("\n")}\nActual:\n${sortedActual.join("\n")}`,
+    );
+  }
+}
+
+function forbiddenStringsFor(componentName) {
+  return [
+    ...globalForbiddenStrings,
+    `${componentName}.contract`,
+    `${componentName}.controller`,
+  ];
+}
+
+function assertNoForbiddenStrings(content, filePath, componentName) {
+  for (const forbidden of forbiddenStringsFor(componentName)) {
+    if (content.includes(forbidden)) {
+      throw new Error(`Generated artifact contains forbidden string "${forbidden}": ${filePath}`);
+    }
+  }
+}
+
+async function readExistingFile(filePath) {
+  try {
+    return await readFile(filePath, "utf8");
+  } catch {
+    return undefined;
+  }
+}
+
+async function writeGeneratedFile(filePath, content) {
+  await mkdir(dirname(filePath), { recursive: true });
+  const existing = await readExistingFile(filePath);
+  if (existing === content) return false;
+  await writeFile(filePath, content);
+  return true;
+}
+
+function contractExportName(componentName) {
+  return `${componentName.replace(/-([a-z0-9])/gu, (_match, char) => char.toUpperCase())}Contract`;
+}
+
+async function generateFramework(componentName, component, framework) {
+  const generatedFiles = component.generatedFiles?.[framework] ?? [];
+  const generatedIndex = generatedFiles.find((filePath) => filePath.endsWith("index.tsx"));
+
+  if (!generatedIndex) {
+    throw new Error(`${componentName}/${framework} requires a generated index.tsx artifact.`);
+  }
+
+  const contractSource = await readFile(resolve(root, component.contract), "utf8");
+  const controllerSource = await readFile(resolve(root, component.controller), "utf8");
+  const content = createArtifact({
+    framework,
+    contractSource,
+    controllerSource,
+    contractExportName: contractExportName(componentName),
+    generatorOptions: component.generator?.[framework] ?? {},
+  });
+  assertNoForbiddenStrings(content, generatedIndex, componentName);
+
+  const changed = await writeGeneratedFile(resolve(root, generatedIndex), content);
+  process.stdout.write(`${changed ? "generated" : "unchanged"} ${generatedIndex}\n`);
+}
 
 for (const [componentName, component] of Object.entries(authoring.components ?? {})) {
+  const publicComponent = publicRegistry.components?.[componentName];
+  if (!publicComponent) {
+    throw new Error(`Missing public registry component for "${componentName}".`);
+  }
+
+  for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
+    assertSameFiles(files, publicComponent.files?.[framework], `${componentName}/${framework}`);
+  }
+
+  for (const framework of Object.keys(component.generatedFiles ?? {})) {
+    await generateFramework(componentName, component, framework);
+  }
+
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     for (const filePath of files) {
       const abs = resolve(root, filePath);
@@ -24,11 +119,14 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
     }
   }
 
-  const reactGenerated = component.generatedFiles?.react ?? [];
-  const generatedCss = reactGenerated.find((filePath) => filePath.endsWith(".css"));
-  if (component.style && generatedCss) {
-    await copyFile(resolve(root, component.style), resolve(root, generatedCss));
-    process.stdout.write(`refreshed ${generatedCss}\n`);
+  for (const files of Object.values(component.generatedFiles ?? {})) {
+    const generatedCss = files.find((filePath) => filePath.endsWith(".css"));
+    if (component.style && generatedCss) {
+      const cssContent = await readFile(resolve(root, component.style), "utf8");
+      assertNoForbiddenStrings(cssContent, generatedCss, componentName);
+      const changed = await writeGeneratedFile(resolve(root, generatedCss), cssContent);
+      process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${generatedCss}\n`);
+    }
   }
 }
 

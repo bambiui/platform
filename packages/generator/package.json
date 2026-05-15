@@ -1,0 +1,11 @@
+{
+  "name": "@bambiui/generator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Internal artifact generators for bambiui registry output.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./react": "./src/react/index.js"
+  }
+}

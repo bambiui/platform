@@ -27,6 +27,14 @@
           "packages/registry/generated/tabs/react/tabs.css"
         ]
       },
+      "generator": {
+        "react": {
+          "valuePropName": "value",
+          "valuePropParts": ["trigger", "content"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["trigger"]
+        }
+      },
       "exports": {
         "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
       }

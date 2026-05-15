@@ -21,7 +21,7 @@
 ## Public Artifact Rules
 
 - `registry.json` may reference only framework-ready generated files.
-- Generated files must not import `@bambiui/core`, `@bambiui/adapters`, contracts, controllers, or adapter helpers.
+- Generated files must not import `@bambiui/core`, contracts, controllers, or generator files.
 - Tabs React installs as:
   - `src/components/ui/tabs/index.tsx`
   - `src/components/ui/tabs/tabs.css`
@@ -42,7 +42,7 @@
 
 `react`.
 
-bambiui is currently focusing on React as the first canonical adapter target. Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
 
 ## Canonical Reference
 

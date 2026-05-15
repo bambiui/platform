@@ -3,7 +3,7 @@
 DOM Protocol based, CLI-first UI kit.
 
 > **Status:** Architecture reset in progress. docs/studio temporarily suspended.  
-> Current focus: stabilize React as the first canonical adapter target with Tabs.
+> Current focus: stabilize React as the first framework target with Tabs.
 
 ## Quick Start
 
@@ -26,8 +26,7 @@ CLI output is **self-contained**: copied files have no `@bambiui/*` runtime impo
 
 ## Frameworks
 
-bambiui is currently focusing on React as the first canonical adapter target.
-Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
 
 ## Usage
 
@@ -68,8 +67,8 @@ npx bambiui add tabs --framework react
 | ----------------------------- | ---------------------------------------------------- |
 | `packages/cli`                | bambiui CLI — init, add                              |
 | `packages/core`               | DOM protocol interfaces, utilities, tab controller   |
-| `packages/adapters`           | Generic framework adapter helpers (React only)       |
-| `packages/registry`           | CLI-installable React component source templates     |
+| `packages/generator`          | Contract parsers and framework artifact generators   |
+| `packages/registry`           | Generated public artifacts and component CSS         |
 | `apps/templates`              | Template project for CLI smoke tests (bambi-react)   |
 | `apps/www`                    | Active minimal static host for registry assets       |
 | `apps/_archived/`             | docs, studio, old www — suspended                    |

@@ -73,21 +73,6 @@ importers:
         specifier: ^5.9.2
         version: 5.9.2
 
-  packages/adapters:
-    devDependencies:
-      '@bambiui/core':
-        specifier: workspace:*
-        version: link:../core
-      '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.14
-      react:
-        specifier: ^19.0.0
-        version: 19.2.4
-      typescript:
-        specifier: 5.9.2
-        version: 5.9.2
-
   packages/cli:
     devDependencies:
       '@types/node':
@@ -104,9 +89,6 @@ importers:
 
   packages/registry:
     devDependencies:
-      '@bambiui/adapters':
-        specifier: workspace:*
-        version: link:../adapters
       '@bambiui/core':
         specifier: workspace:*
         version: link:../core

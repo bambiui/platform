@@ -11,9 +11,8 @@ bambiui is a CLI-first, React-focused source distribution UI kit. Contract-drive
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
-packages/adapters   Generic framework adapter helpers; currently only React helpers are active
-packages/registry   Internal React templates plus generated public artifacts
 packages/generator  Internal contract parsers and framework artifact generators
+packages/registry   Generated public artifacts and component CSS
 apps/templates      Template project for CLI smoke tests (bambi-react)
 apps/www            Active minimal static host for bambiui and registry assets
 apps/_archived/     docs, studio, old www — suspended during architecture reset
@@ -21,11 +20,13 @@ registry.json       v2 public manifest consumed by CLI
 registry.authoring.json internal source manifest for maintainers
 ```
 
+Active data flow: `core → generator → registry → cli → user project`
+
 ### Core Principles
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
 - **Vanilla TypeScript controllers**: DOM Protocol controllers live in `packages/core` as internal source of truth.
-- **Public React artifacts**: generated user files are self-contained and do not copy or import contracts, controllers, adapter helpers, or generators.
+- **Public React artifacts**: generated user files are self-contained and do not copy or import contracts, controllers, or generator files.
 - **CustomEvents**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled/uncontrolled**: `data-controlled="true"` → controller fires event only. Without it, controller writes `data-value` and fires event.
 - **Self-contained installed output**: generated user files have no `@bambiui/*` runtime imports.
@@ -33,11 +34,10 @@ registry.authoring.json internal source manifest for maintainers
 ## Package Boundaries
 
 - `packages/core` — DOM Protocol source of truth. Contract + controller live here and are internal authoring inputs.
-- `packages/adapters` — Generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter files are internal authoring inputs.
 - `packages/generator` — Private internal parser/generator package used by `pnpm registry:refresh`; not a CLI runtime dependency and never imported by generated output.
-- `packages/registry` — Internal React wrapper templates plus generated public artifacts under `packages/registry/generated/`.
+- `packages/registry` — Generated public artifacts under `packages/registry/generated/` and component CSS under `src/styles/`.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
-- Installed output — no `@bambiui/*` runtime imports and no internal helper files.
+- Installed output — no `@bambiui/*` runtime imports and no internal contract or controller files. bambiui does not ship runtime adapter packages.
 
 ## Registry Manifests
 
@@ -64,7 +64,7 @@ registry.authoring.json internal source manifest for maintainers
 }
 ```
 
-`registry.authoring.json` is internal and tracks contracts, controllers, adapter helpers, source wrappers, generated artifact paths, and generator metadata. Run `pnpm registry:refresh` after authoring changes. It calls `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate the manifests.
+`registry.authoring.json` is internal and tracks contracts, controllers, generated artifact paths, and generator metadata. Run `pnpm registry:refresh` after authoring changes. It calls `@bambiui/generator` to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate the manifests.
 
 Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
 
@@ -75,7 +75,6 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 - Contract: `packages/core/src/components/tabs/tabs.contract.ts`
 - Controller: `packages/core/src/components/tabs/tabs.controller.ts`
 - CSS: `packages/registry/src/styles/tabs.css`
-- Internal React source: `packages/registry/src/components/tabs/react/`
 - Public React artifacts: `packages/registry/generated/tabs/react/`
 
 ## CSS Delivery
@@ -96,14 +95,13 @@ src/components/ui/
     tabs.css
 ```
 
-No contract files, controller files, adapter helpers, primitives, generators, or `@bambiui/*` imports may appear in installed output. `bambi-helpers.ts` is a generated public artifact — it is safe to distribute and contains no internal authoring references.
+No contract files, controller files, primitives, generator files, or `@bambiui/*` imports may appear in installed output. `bambi-helpers.ts` is a generated public artifact — it is safe to distribute and contains no internal authoring references.
 
 ## Supported Frameworks
 
 `react`.
 
-bambiui is currently focusing on React as the first canonical adapter target.
-Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
 
 ## apps/templates — Smoke Fixtures
 

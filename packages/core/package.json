@@ -31,6 +31,16 @@
       "import": "./src/dom/mount.ts",
       "default": "./src/dom/mount.ts"
     },
+    "./contract": {
+      "types": "./contract/index.ts",
+      "import": "./contract/index.ts",
+      "default": "./contract/index.ts"
+    },
+    "./tabs/tabs.contract": {
+      "types": "./tabs/tabs.contract.ts",
+      "import": "./tabs/tabs.contract.ts",
+      "default": "./tabs/tabs.contract.ts"
+    },
     "./components/tabs": {
       "types": "./src/components/tabs/index.ts",
       "import": "./src/components/tabs/index.ts",
@@ -38,6 +48,6 @@
     }
   },
   "scripts": {
-    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts"
+    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts tabs/tabs.contract.ts"
   }
 }

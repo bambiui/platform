@@ -30,7 +30,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, contract: string, controller: string, style: string, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, contract: string, contractFiles?: string[], controller: string, style: string, adapter?: Record<string, string[]>, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -63,6 +63,29 @@ export async function addComponent(componentName, flags) {
   const stripJsExt = (/** @type {string} */ content) =>
     content.replace(/from ("\.\.?\/[^"]+)\.js"/g, 'from $1"');
 
+  const flattenPackageImports = (/** @type {string} */ content) =>
+    stripJsExt(content)
+      .replace(/from "@bambiui\/core\/contract"/g, 'from "./types"')
+      .replace(/from "@bambiui\/core\/tabs\/tabs\.contract"/g, 'from "./tabs.contract"')
+      .replace(/from "\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
+      .replace(
+        new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
+        `from "./${componentName}.controller"`,
+      )
+      .replace(/from "@bambiui\/adapters\/react"/g, 'from "./create-react-adapter"');
+
+  for (const filePath of component.contractFiles ?? []) {
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        filePath,
+        path.join(implDir, path.basename(filePath)),
+        force,
+        flattenPackageImports,
+      ),
+    );
+  }
+
   // Shared files: contract, controller → implementation dir
   results.push(
     await copyRegistryFile(
@@ -70,7 +93,7 @@ export async function addComponent(componentName, flags) {
       component.contract,
       path.join(implDir, path.basename(component.contract)),
       force,
-      stripJsExt,
+      flattenPackageImports,
     ),
   );
 
@@ -80,16 +103,25 @@ export async function addComponent(componentName, flags) {
       component.controller,
       path.join(implDir, path.basename(component.controller)),
       force,
-      stripJsExt,
+      flattenPackageImports,
     ),
   );
 
+  for (const filePath of component.adapter?.[framework] ?? []) {
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        filePath,
+        path.join(implDir, path.basename(filePath)),
+        force,
+        flattenPackageImports,
+      ),
+    );
+  }
+
   // Framework-specific files → implementation dir; resolve @bambiui/core imports to local siblings
   const flattenImports = (/** @type {string} */ content) =>
-    content.replace(
-      new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
-      `from "./${componentName}.controller"`,
-    );
+    flattenPackageImports(content);
 
   for (const filePath of frameworkFiles) {
     results.push(

@@ -9,6 +9,7 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
+    "@bambiui/adapters": "workspace:*",
     "@bambiui/core": "workspace:*",
     "@types/react": "^19.2.7",
     "react": "^19.0.0",

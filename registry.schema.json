@@ -43,11 +43,35 @@
         "contract": {
           "$ref": "#/$defs/registryPath"
         },
+        "contractFiles": {
+          "$ref": "#/$defs/frameworkFiles"
+        },
         "controller": {
           "$ref": "#/$defs/registryPath"
         },
         "style": {
           "$ref": "#/$defs/registryPath"
+        },
+        "adapter": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "vue": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "svelte": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "solid": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "html": {
+              "$ref": "#/$defs/frameworkFiles"
+            }
+          }
         },
         "files": {
           "type": "object",

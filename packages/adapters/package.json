@@ -1,0 +1,24 @@
+{
+  "name": "@bambiui/adapters",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework adapter prototypes for bambiui DOM protocol components.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./react": {
+      "types": "./react/index.ts",
+      "import": "./react/index.ts",
+      "default": "./react/index.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@bambiui/core": "workspace:*",
+    "@types/react": "^19.2.7",
+    "react": "^19.0.0",
+    "typescript": "5.9.2"
+  }
+}

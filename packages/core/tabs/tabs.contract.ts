@@ -1,4 +1,4 @@
-import { defineContract } from "./define-contract";
+import { defineContract } from "../contract/define-contract.js";
 
 export const TABS_ROOT = "data-bambi-tabs" as const;
 export const TABS_LIST = "data-bambi-tabs-list" as const;

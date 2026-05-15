@@ -10,8 +10,16 @@ const shouldInstall = process.argv.includes("--install");
 
 // Implementation files inside src/components/ui/tabs/component/
 const TABS_IMPL = [
+  "src/components/ui/tabs/component/types.ts",
+  "src/components/ui/tabs/component/define-contract.ts",
   "src/components/ui/tabs/component/tabs.contract.ts",
   "src/components/ui/tabs/component/tabs.controller.ts",
+];
+
+const REACT_ADAPTER_IMPL = [
+  "src/components/ui/tabs/component/use-bambi-controller.ts",
+  "src/components/ui/tabs/component/create-react-part.tsx",
+  "src/components/ui/tabs/component/create-react-adapter.ts",
 ];
 
 const templates = [
@@ -25,6 +33,7 @@ const templates = [
       "src/styles/bambi.css",
       "src/components/ui/tabs/component/tabs.css",
       ...TABS_IMPL,
+      ...REACT_ADAPTER_IMPL,
       "src/components/ui/tabs/component/tabs.react.tsx",
       "src/components/ui/tabs/tabs.ts",
     ],

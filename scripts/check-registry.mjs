@@ -84,6 +84,46 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
   }
 
+  if (component.contractFiles !== undefined) {
+    if (!Array.isArray(component.contractFiles)) {
+      fail("contractFiles must be an array when present");
+    } else {
+      for (const filePath of component.contractFiles) {
+        if (typeof filePath !== "string") {
+          fail("contractFiles contains non-string entry");
+          continue;
+        }
+        checkFileExists(filePath, "contractFiles");
+      }
+      ok(`contractFiles: ${component.contractFiles.length} file(s)`);
+    }
+  }
+
+  if (component.adapter !== undefined) {
+    if (!component.adapter || typeof component.adapter !== "object") {
+      fail("adapter must be an object when present");
+    } else {
+      for (const [framework, files] of Object.entries(component.adapter)) {
+        if (!KNOWN_FRAMEWORKS.includes(framework)) {
+          fail(`adapter: unknown framework key "${framework}"`);
+          continue;
+        }
+        if (!Array.isArray(files) || files.length === 0) {
+          fail(`adapter.${framework} must be a non-empty array`);
+          continue;
+        }
+        for (const filePath of files) {
+          if (typeof filePath !== "string") {
+            fail(`adapter.${framework} contains non-string entry`);
+            continue;
+          }
+          checkFileExists(filePath, `adapter.${framework}`);
+        }
+        ok(`adapter.${framework}: ${files.length} file(s)`);
+      }
+    }
+  }
+
   if (!component.files || typeof component.files !== "object") {
     fail("missing files object");
     continue;

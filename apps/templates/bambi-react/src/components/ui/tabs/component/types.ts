@@ -1,4 +1,4 @@
-export type BambiPrimitiveType = "boolean" | "number" | "string";
+export type BambiPrimitiveType = "boolean" | "number" | "string" | "object";
 
 export type BambiEnumType = readonly string[];
 

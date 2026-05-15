@@ -39,7 +39,8 @@ export const tabsContract = defineContract({
     disabled: { type: "boolean", attribute: TABS_DISABLED },
   },
   events: {
-    valueChange: { name: TABS_EVENT_VALUE_CHANGE, detail: "string" },
+    // detail shape: TabsValueChangeDetail — { value: string, previousValue: string | null, source: "click" | "keyboard" }
+    valueChange: { name: TABS_EVENT_VALUE_CHANGE, detail: "object" },
   },
   dataAttributes: {
     state: ["active", "inactive"],

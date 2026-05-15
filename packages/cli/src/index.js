@@ -36,7 +36,7 @@ async function main() {
     process.stdout.write("\nbambiui is ready.\n");
     printResults(results);
     process.stdout.write(
-      "\nImport the token file once in your global stylesheet or app entry.\n",
+      "\nImport the global CSS file once in your global stylesheet or app entry.\n",
     );
 
     return;

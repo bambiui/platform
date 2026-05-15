@@ -32,7 +32,7 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (value: string) => void;
+  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 // ── Inlined DOM helpers ───────────────────────────────────────────────────
@@ -217,7 +217,7 @@ export class TabsController implements BambiController {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.(newValue);
+    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {

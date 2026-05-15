@@ -61,9 +61,11 @@ npx bambiui add tabs --framework react
 | ----------------------------- | ---------------------------------------------------- |
 | `packages/cli`                | bambiui CLI — init, add                              |
 | `packages/core`               | DOM protocol interfaces, utilities, tab controller   |
-| `packages/registry`           | CLI-installable component source templates           |
-| `apps/templates`              | Template projects for CLI smoke tests                |
-| `apps/_archived/`             | docs, studio, www — suspended                        |
+| `packages/adapters`           | Generic framework adapter helpers (React only)       |
+| `packages/registry`           | CLI-installable React component source templates     |
+| `apps/templates`              | Template project for CLI smoke tests (bambi-react)   |
+| `apps/www`                    | Active minimal static host for registry assets       |
+| `apps/_archived/`             | docs, studio, old www — suspended                    |
 
 ## Commands
 

@@ -10,10 +10,22 @@
 For `bambiui add <component> --framework <fw>`:
 1. Reads `bambiui.config.json`
 2. Reads `registry.json` (must be version 2)
-3. Copies: `contract`, `controller`, `style`, and `files[framework][]` into `componentDir/<name>/`
-4. Writes generated `index.ts` barrel via `getIndexContent(framework, componentName)`
+3. Creates `componentDir/<name>/component/` and copies there:
+   - `contractFiles[]` — shared contract helper files
+   - `contract` — component contract file
+   - `controller` — component controller file
+   - `style` — component CSS file
+   - `adapter[framework][]` — React adapter helper files
+   - `files[framework][]` — React wrapper file(s)
+4. Writes barrel `componentDir/<name>/<name>.ts` via `getIndexContent(framework, componentName)`
+5. Applies `flattenPackageImports` transform to all copied files:
+   - `@bambiui/core/components/<name>` → `"./<name>.controller"`
+   - `@bambiui/adapters/react` → `"./create-react-adapter"`
+   - `@bambiui/core/tabs/tabs.contract` → `"./tabs.contract"`
+   - `@bambiui/core/contract` → `"./types"`
+   - Relative `.js` extensions stripped for bundler compat
 
-No type generation. No recipe.ts. No module path transformation.
+No type generation. No recipe.ts.
 
 ## Frameworks
 

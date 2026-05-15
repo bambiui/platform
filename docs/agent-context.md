@@ -11,9 +11,11 @@ bambiui is a CLI-first, React-focused source distribution UI kit built on the DO
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
+packages/adapters   Generic framework adapter helpers; currently only React helpers are active
 packages/registry   React wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
 apps/templates      Template project for CLI smoke tests (bambi-react)
-apps/_archived/     docs, studio, www — suspended during architecture reset
+apps/www            Active minimal static host for bambiui and registry assets
+apps/_archived/     docs, studio, old www — suspended during architecture reset
 registry.json       v2 manifest consumed by CLI
 ```
 
@@ -29,7 +31,8 @@ registry.json       v2 manifest consumed by CLI
 ## Package Boundaries
 
 - `packages/core` — DOM Protocol source of truth. Contract + controller live here. Controllers must be self-contained (no `@bambiui/*` imports in the controller itself).
-- `packages/registry` — React wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install.
+- `packages/adapters` — Generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter files are copied into user projects by the CLI; installed output must contain no `@bambiui/*` runtime imports.
+- `packages/registry` — React wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install. Also imports `@bambiui/adapters/react` (workspace only) which the CLI transforms to `"./create-react-adapter"`.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
 - Installed output — no `@bambiui/*` runtime imports.
 
@@ -67,8 +70,29 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 ## CSS Delivery
 
 - Global style file: `packages/registry/src/styles/bambi.css`. CLI writes this to `src/styles/bambi.css` on `init`.
-- Component CSS: `packages/registry/src/styles/<name>.css`. CLI writes this to `src/components/ui/<name>/component/<name>.css`.
+- Component CSS: `packages/registry/src/styles/<name>.css`. CLI writes this to `src/components/ui/<name>/component/<name>.css` (alongside the other component files).
 - CSS is driven by `data-*` attribute state written by the controller.
+
+## CLI Output Layout
+
+`bambiui add <name> --framework react` copies files into:
+
+```
+src/components/ui/<name>/
+  component/           ← implementation files
+    types.ts
+    define-contract.ts
+    <name>.contract.ts
+    <name>.controller.ts
+    <name>.css
+    use-bambi-controller.ts
+    create-react-part.tsx
+    create-react-adapter.ts
+    <name>.react.tsx
+  <name>.ts            ← barrel re-exporting framework components
+```
+
+All `@bambiui/*` workspace imports are transformed to local sibling references during install. No `@bambiui/*` imports remain in the output.
 
 ## Supported Frameworks
 
@@ -81,14 +105,20 @@ Vue, Svelte and Solid support are intentionally removed during the generic adapt
 
 `apps/templates` contains a real React project fixture for CLI end-to-end smoke testing. Not a public product surface. Currently: `bambi-react` (React/Next).
 
-## Suspended
+## apps/www — Active Static Host
 
-- `apps/_archived/docs` — Starlight documentation
-- `apps/_archived/studio` — component playground
-- `apps/_archived/www` — marketing site
-- Deployment / static site build — no active production deploy target
+`apps/www` is the active minimal static host for bambiui and registry assets. It is NOT the old marketing site.
 
-Do not add `apps/docs`, `apps/studio`, or `apps/www` back. Do not re-introduce deployment workflows without an explicit architecture decision.
+- Built via `pnpm build:static` (runs `apps/www` Astro build, then injects registry files into `dist/`).
+- Serves `registry.json`, `registry.schema.json`, and all files referenced by the registry manifest.
+
+## Suspended / Archived
+
+- `apps/_archived/docs` — Starlight documentation (suspended)
+- `apps/_archived/studio` — component playground (suspended)
+- `apps/_archived/www` — old marketing/landing site (archived; do not reactivate)
+
+Do not add `apps/docs` or `apps/studio` back. Do not re-introduce deployment workflows without an explicit architecture decision.
 
 ## CLI Registry URL
 

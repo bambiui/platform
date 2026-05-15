@@ -17,18 +17,16 @@ import { useBambiController, type BambiControllerConstructor } from "./use-bambi
 
 type RootElement = HTMLDivElement;
 
-export interface BambiRootProps<TOptions> extends HTMLAttributes<RootElement> {
-  children?: ReactNode;
-  value?: string;
-  defaultValue?: string;
-  orientation?: "horizontal" | "vertical";
-  activationMode?: "automatic" | "manual";
-  controlled?: boolean;
-  disabled?: boolean;
-  onValueChange?: (value: string) => void;
-  controllerOptions?: Partial<TOptions>;
-  [key: string]: unknown;
-}
+/**
+ * Props accepted by the generated Root component.
+ * Includes all HTML div attributes, all controller option fields (Partial<TOptions>),
+ * plus children and controllerOptions. No framework-specific fields are hardcoded here.
+ */
+export type BambiRootProps<TOptions extends object> = HTMLAttributes<RootElement> &
+  Partial<TOptions> & {
+    children?: ReactNode;
+    controllerOptions?: Partial<TOptions>;
+  };
 
 export interface ReactAdapterOptions<TOptions> {
   controller?: BambiControllerConstructor<TOptions>;
@@ -44,7 +42,7 @@ function normalizePart(part: string | BambiPartDefinition): BambiPartDefinition 
   };
 }
 
-function propAttribute(prop: string, definition: unknown): string | undefined {
+function propAttribute(_prop: string, definition: unknown): string | undefined {
   if (definition && typeof definition === "object" && "attribute" in definition) {
     return (definition as BambiPropDefinition).attribute;
   }
@@ -88,45 +86,61 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
     return { eventName, callbackProp };
   });
 
+  // The prop marked `controlled: true` in the contract is the "value" prop whose presence
+  // indicates controlled mode (e.g. `value` for Tabs).
+  const controlledValuePropName = propEntries.find(
+    ([, def]) =>
+      def !== null &&
+      typeof def === "object" &&
+      !Array.isArray(def) &&
+      (def as BambiPropDefinition).controlled === true,
+  )?.[0];
+
+  // The `controlled` boolean prop in the contract (distinct from the controlled-value prop).
+  // Used to override computed controlled mode and to set the data-controlled attribute.
+  const controlledBoolPropName = propEntries.find(([name]) => name === "controlled")?.[0];
+
   const Root = forwardRef<RootElement, BambiRootProps<TOptions>>(function BambiRoot(
-    {
-      children,
-      value,
-      defaultValue,
-      orientation = "horizontal",
-      activationMode,
-      controlled,
-      disabled,
-      controllerOptions,
-      ...props
-    },
+    rawProps,
     forwardedRef,
   ) {
+    // Cast through unknown: forwardRef's React 19 types widen the props parameter to a union,
+    // preventing destructuring of known fields from the intersection type.
+    const { children, controllerOptions, ...rest } = rawProps as unknown as {
+      children?: ReactNode;
+      controllerOptions?: Partial<TOptions>;
+    } & Record<string, unknown>;
     const rootRef = useMemo(() => ({ current: null as RootElement | null }), []);
-    const isControlled = controlled ?? value !== undefined;
+
+    // Controlled mode: explicit `controlled` prop takes precedence; otherwise inferred from
+    // whether the controlled-value prop (e.g. `value`) is provided.
+    const isControlled = useMemo(
+      () =>
+        (rest.controlled as boolean | undefined) ??
+        (controlledValuePropName !== undefined
+          ? rest[controlledValuePropName] !== undefined
+          : false),
+      [rest],
+    );
+
+    // Build controller state from every prop declared in the contract.
+    // The controlled boolean is always set to the computed value, not the raw prop.
     const propValues = useMemo(() => {
-      const values: Record<string, unknown> = {
-        value,
-        defaultValue,
-        orientation,
-        activationMode,
-        controlled: isControlled,
-        disabled,
-      };
-
+      const values: Record<string, unknown> = {};
       for (const [prop] of propEntries) {
-        if (prop in props) values[prop] = props[prop];
+        if (prop in rest) values[prop] = rest[prop];
       }
-
+      if (controlledBoolPropName !== undefined) values[controlledBoolPropName] = isControlled;
       return values;
-    }, [props, value, defaultValue, orientation, activationMode, isControlled, disabled]);
+    }, [rest, isControlled]);
 
+    // DOM props: all remaining props after removing contract props and event callbacks.
     const domProps = useMemo(() => {
-      const next = { ...props };
+      const next = { ...rest };
       for (const { callbackProp } of eventCallbacks) delete next[callbackProp];
       for (const [prop] of propEntries) delete next[prop];
-      return next;
-    }, [props]);
+      return next as HTMLAttributes<RootElement>;
+    }, [rest]);
 
     const controllerState = useMemo(
       () => ({ ...(controllerOptions ?? {}), ...propValues }) as TOptions,
@@ -135,6 +149,8 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
 
     useBambiController(rootRef, options.controller, controllerState);
 
+    // Forward DOM events to React callback props. The full CustomEvent.detail is passed —
+    // the callback receives the same object the controller dispatched, not a subset.
     useEffect(() => {
       const root = rootRef.current;
       if (!root || eventCallbacks.length === 0) return;
@@ -142,11 +158,10 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
       const cleanups: Array<() => void> = [];
 
       for (const { eventName, callbackProp } of eventCallbacks) {
-        const callback = props[callbackProp];
+        const callback = rest[callbackProp];
         if (!eventName || typeof callback !== "function") continue;
         const eventListener = (event: Event) => {
-          const detail = (event as CustomEvent<{ value?: string }>).detail;
-          if (typeof detail?.value === "string") callback(detail.value);
+          callback((event as CustomEvent).detail);
         };
         root.addEventListener(eventName, eventListener);
         cleanups.push(() => root.removeEventListener(eventName, eventListener));
@@ -155,7 +170,7 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
       return () => {
         for (const cleanup of cleanups) cleanup();
       };
-    }, [props, rootRef]);
+    }, [rest, rootRef]);
 
     const rootAttributes: Record<string, string | undefined> = {
       [rootPart.attribute]: "",

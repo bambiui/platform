@@ -21,6 +21,21 @@ const expectedImplFiles = {
   html:   [...SHARED_IMPL, "tabs.html.ts"],
 };
 
+// Expected barrel export names per framework (from registry exports metadata)
+const expectedBarrelExports = {
+  react:  ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+  vue:    ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+  svelte: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+  solid:  ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+  html:   ["mount", "unmount"],
+};
+
+// Framework wrappers that must contain a CSS import
+const frameworksRequiringCssImport = {
+  react:  "tabs.react.tsx",
+  html:   "tabs.html.ts",
+};
+
 /**
  * @param {string[]} args
  * @param {{ cwd?: string, expectFailure?: boolean }} [options]
@@ -83,6 +98,31 @@ async function assertNoAmbiguiImports(dir) {
   }
 }
 
+/**
+ * Assert that a file contains a CSS import (./tabs.css).
+ * @param {string} filePath
+ */
+async function assertCssImport(filePath) {
+  const content = await readFile(filePath, "utf8");
+  if (!content.includes(`"./tabs.css"`) && !content.includes(`'./tabs.css'`)) {
+    throw new Error(`Expected CSS import in ${filePath} but none found`);
+  }
+}
+
+/**
+ * Assert that the barrel file exports all expected names.
+ * @param {string} barrelPath
+ * @param {string[]} expectedNames
+ */
+async function assertBarrelExports(barrelPath, expectedNames) {
+  const content = await readFile(barrelPath, "utf8");
+  for (const name of expectedNames) {
+    if (!content.includes(name)) {
+      throw new Error(`Barrel at ${barrelPath} is missing export: ${name}`);
+    }
+  }
+}
+
 // Test each framework
 for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
@@ -101,7 +141,8 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
     assertExists(path.join(cwd, "src/components/ui/tabs/component/tabs.css"));
 
     // Single barrel at componentDir/tabs/tabs.ts
-    assertExists(path.join(cwd, "src/components/ui/tabs/tabs.ts"));
+    const barrelPath = path.join(cwd, "src/components/ui/tabs/tabs.ts");
+    assertExists(barrelPath);
 
     // Implementation files inside componentDir/tabs/component/
     const implDir = path.join(cwd, "src/components/ui/tabs/component");
@@ -111,6 +152,15 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
 
     // Generated output must not contain @bambiui/ runtime imports
     await assertNoAmbiguiImports(implDir);
+
+    // Barrel must export all expected names from registry exports metadata
+    await assertBarrelExports(barrelPath, expectedBarrelExports[framework]);
+
+    // Framework wrappers that must have a CSS import
+    const wrapperFile = frameworksRequiringCssImport[framework];
+    if (wrapperFile) {
+      await assertCssImport(path.join(implDir, wrapperFile));
+    }
 
     // Second add should skip existing files
     const secondAdd = await runCli([

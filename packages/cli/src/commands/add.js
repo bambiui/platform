@@ -30,7 +30,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, contract: string, controller: string, style: string, files: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, contract: string, controller: string, style: string, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -103,22 +103,26 @@ export async function addComponent(componentName, flags) {
     );
   }
 
-  // Barrel at componentDir/<name>/tabs.ts
+  const frameworkExports = component.exports?.[framework];
+
+  // Barrel at componentDir/<name>/<name>.ts
   results.push(
-    await writeProjectFile(barrelPath, getIndexContent(framework, componentName), force),
+    await writeProjectFile(barrelPath, getIndexContent(framework, componentName, frameworkExports), force),
   );
 
-  return { config, framework, componentName, results };
+  return { config, framework, componentName, results, exports: frameworkExports };
 }
 
 /**
  * @param {string} componentDir
  * @param {string} componentName
+ * @param {string[]} [exports]
  */
-export function getImportHint(componentDir, componentName) {
+export function getImportHint(componentDir, componentName, exports) {
   const sourceRelativeDir = componentDir.startsWith("src/")
     ? componentDir.slice("src/".length)
     : componentDir;
 
-  return `import { Tabs, TabsList, TabsTrigger, TabsContent } from "./${path.posix.join(sourceRelativeDir, componentName, componentName)}";`;
+  const names = exports?.join(", ") ?? componentName;
+  return `import { ${names} } from "./${path.posix.join(sourceRelativeDir, componentName, componentName)}";`;
 }

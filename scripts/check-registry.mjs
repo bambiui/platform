@@ -107,6 +107,35 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
     ok(`files.${framework}: ${files.length} file(s)`);
   }
+
+  // Validate exports metadata
+  if (!component.exports || typeof component.exports !== "object") {
+    fail(`missing exports object — add framework export names for CLI barrel generation`);
+  } else {
+    for (const [framework, names] of Object.entries(component.exports)) {
+      if (!KNOWN_FRAMEWORKS.includes(framework)) {
+        fail(`exports: unknown framework key "${framework}"`);
+        continue;
+      }
+      if (!Array.isArray(names) || names.length === 0) {
+        fail(`exports.${framework} must be a non-empty array of export names`);
+        continue;
+      }
+      for (const name of names) {
+        if (typeof name !== "string" || name.length === 0) {
+          fail(`exports.${framework} contains invalid entry: ${JSON.stringify(name)}`);
+        }
+      }
+      ok(`exports.${framework}: ${names.join(", ")}`);
+    }
+
+    // Warn if files has a framework that exports doesn't cover
+    for (const framework of Object.keys(component.files)) {
+      if (!(framework in component.exports)) {
+        fail(`exports missing entry for framework "${framework}" (present in files)`);
+      }
+    }
+  }
 }
 
 // ── Result ────────────────────────────────────────────────────────────────

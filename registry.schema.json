@@ -34,7 +34,7 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "contract", "controller", "style", "files"],
+      "required": ["name", "contract", "controller", "style", "files", "exports"],
       "properties": {
         "name": {
           "type": "string",
@@ -69,6 +69,17 @@
               "$ref": "#/$defs/frameworkFiles"
             }
           }
+        },
+        "exports": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/exportNames" },
+            "vue": { "$ref": "#/$defs/exportNames" },
+            "svelte": { "$ref": "#/$defs/exportNames" },
+            "solid": { "$ref": "#/$defs/exportNames" },
+            "html": { "$ref": "#/$defs/exportNames" }
+          }
         }
       }
     },
@@ -77,6 +88,14 @@
       "items": {
         "$ref": "#/$defs/registryPath"
       }
+    },
+    "exportNames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
     },
     "registryPath": {
       "type": "string",

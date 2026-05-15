@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { TabsController } from "@bambiui/core/components/tabs";
 import type { TabsOptions } from "@bambiui/core/components/tabs";
+import "./tabs.css";
 
 export type { BambiController, TabsOptions, TabsOrientation } from "@bambiui/core/components/tabs";
 export type { TabsValueChangeDetail } from "@bambiui/core/components/tabs";

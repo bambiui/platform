@@ -26,6 +26,13 @@
         ],
         "solid": ["packages/registry/src/components/tabs/solid/tabs.solid.tsx"],
         "html": ["packages/registry/src/components/tabs/html/tabs.html.ts"]
+      },
+      "exports": {
+        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "solid": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "html": ["mount", "unmount"]
       }
     }
   }

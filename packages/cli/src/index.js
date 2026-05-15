@@ -46,7 +46,7 @@ async function main() {
     throw new Error(`Unknown command "${command}".\n\n${help()}`);
   }
 
-  const { config, framework, componentName, results } = await addComponent(
+  const { config, framework, componentName, results, exports: componentExports } = await addComponent(
     component,
     flags,
   );
@@ -54,7 +54,7 @@ async function main() {
   process.stdout.write(`\nAdded ${componentName} for ${framework}.\n`);
   printResults(results);
   process.stdout.write(
-    `\nUse it with:\n  ${getImportHint(config.componentDir, componentName ?? "")}\n`,
+    `\nUse it with:\n  ${getImportHint(config.componentDir, componentName ?? "", componentExports)}\n`,
   );
 }
 

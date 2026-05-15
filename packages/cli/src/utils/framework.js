@@ -128,34 +128,51 @@ export async function getConfig(cwd, flags = {}) {
 }
 
 /**
+ * Convert PascalCase to kebab-case (e.g. TabsList → tabs-list).
+ * @param {string} name
+ */
+function pascalToKebab(name) {
+  return name.replace(/([A-Z])/g, (char, _, offset) =>
+    (offset > 0 ? "-" : "") + char.toLowerCase(),
+  );
+}
+
+/**
  * Generate the index.ts barrel content for an installed component.
  *
  * @param {string} framework
  * @param {string} componentName
+ * @param {string[]} [exports] - export names from registry metadata
  */
-export function getIndexContent(framework, componentName) {
+export function getIndexContent(framework, componentName, exports) {
   const c = `./component`;
+
+  /** @type {Record<string, string[]>} */
+  const defaultExports = {
+    react: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    vue: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    svelte: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    solid: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+    html: ["mount", "unmount"],
+  };
+
+  const names = exports ?? defaultExports[framework] ?? [];
+
   switch (framework) {
     case "react":
-      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${c}/${componentName}.react";\n`;
-    case "vue":
-      return (
-        `export { default as Tabs } from "${c}/${componentName}.vue";\n` +
-        `export { default as TabsList } from "${c}/${componentName}-list.vue";\n` +
-        `export { default as TabsTrigger } from "${c}/${componentName}-trigger.vue";\n` +
-        `export { default as TabsContent } from "${c}/${componentName}-content.vue";\n`
-      );
-    case "svelte":
-      return (
-        `export { default as Tabs } from "${c}/${componentName}.svelte";\n` +
-        `export { default as TabsList } from "${c}/${componentName}-list.svelte";\n` +
-        `export { default as TabsTrigger } from "${c}/${componentName}-trigger.svelte";\n` +
-        `export { default as TabsContent } from "${c}/${componentName}-content.svelte";\n`
-      );
+      return `export { ${names.join(", ")} } from "${c}/${componentName}.react";\n`;
     case "solid":
-      return `export { Tabs, TabsList, TabsTrigger, TabsContent } from "${c}/${componentName}.solid";\n`;
+      return `export { ${names.join(", ")} } from "${c}/${componentName}.solid";\n`;
     case "html":
-      return `export { mount, unmount } from "${c}/${componentName}.html";\n`;
+      return `export { ${names.join(", ")} } from "${c}/${componentName}.html";\n`;
+    case "vue":
+      return names
+        .map((/** @type {string} */ n) => `export { default as ${n} } from "${c}/${pascalToKebab(n)}.vue";\n`)
+        .join("");
+    case "svelte":
+      return names
+        .map((/** @type {string} */ n) => `export { default as ${n} } from "${c}/${pascalToKebab(n)}.svelte";\n`)
+        .join("");
     default:
       return `// bambiui ${componentName}\n`;
   }

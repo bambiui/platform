@@ -2,6 +2,8 @@
  * Plain HTML / HTMX auto-mount helper.
  * Import once in your entry file. All [data-bambi-tabs] elements are mounted automatically,
  * including those added dynamically.
+ *
+ * Safe to import in SSR / build environments — all DOM access is guarded.
  */
 import "./tabs.css";
 import { TabsController } from "@bambiui/core/components/tabs";
@@ -29,25 +31,31 @@ function mountAll(root: Document | Element = document): void {
   }
 }
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => mountAll());
-} else {
+function init(): void {
   mountAll();
+  // document.body is guaranteed to exist at DOMContentLoaded or readyState != loading
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node instanceof Element) {
+          if (node.matches("[data-bambi-tabs]")) mount(node);
+          for (const child of node.querySelectorAll("[data-bambi-tabs]")) mount(child);
+        }
+      }
+      for (const node of mutation.removedNodes) {
+        if (node instanceof Element) {
+          if (controllers.has(node)) unmount(node);
+          for (const child of node.querySelectorAll("[data-bambi-tabs]")) unmount(child);
+        }
+      }
+    }
+  }).observe(document.body, { childList: true, subtree: true });
 }
 
-new MutationObserver((mutations) => {
-  for (const mutation of mutations) {
-    for (const node of mutation.addedNodes) {
-      if (node instanceof Element) {
-        if (node.matches("[data-bambi-tabs]")) mount(node);
-        for (const child of node.querySelectorAll("[data-bambi-tabs]")) mount(child);
-      }
-    }
-    for (const node of mutation.removedNodes) {
-      if (node instanceof Element) {
-        if (controllers.has(node)) unmount(node);
-        for (const child of node.querySelectorAll("[data-bambi-tabs]")) unmount(child);
-      }
-    }
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
   }
-}).observe(document.body, { childList: true, subtree: true });
+}

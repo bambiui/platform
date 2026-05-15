@@ -2,7 +2,7 @@
   "name": "@bambiui/registry",
   "version": "0.1.0",
   "private": true,
-  "description": "CLI-installable source templates for bambiui components.",
+  "description": "Internal templates and generated public artifacts for bambiui components.",
   "license": "MIT",
   "type": "module",
   "scripts": {

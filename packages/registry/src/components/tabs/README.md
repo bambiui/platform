@@ -1,11 +1,11 @@
 # Tabs
 
-Tabs follows the DOM Protocol model: React props become `data-*` attributes, and `TabsController` owns behavior and ARIA sync.
+Tabs follows the DOM Protocol model internally. The public CLI artifact is a self-contained React implementation generated under `packages/registry/generated/tabs/react/`.
 
 ## Usage
 
 ```tsx
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 
 export function Example() {
   return (
@@ -39,8 +39,8 @@ const [tab, setTab] = useState("overview");
 
 ## Props
 
-- `value`: controlled active tab value. The controller dispatches change events but does not mutate `data-value`.
-- `defaultValue`: uncontrolled initial tab value. The controller updates `data-value` after user interaction.
+- `value`: controlled active tab value. Change events fire, and the host updates `value`.
+- `defaultValue`: uncontrolled initial tab value. The component updates `data-value` after user interaction.
 - `onValueChange`: called with the full event detail object.
 - `activationMode`: `"automatic"` activates on arrow-key focus; `"manual"` waits for Enter or Space.
 - `orientation`: `"horizontal"` or `"vertical"` keyboard direction and ARIA orientation.

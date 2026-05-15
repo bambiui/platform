@@ -5,8 +5,8 @@ Next.js fixture used by the bambiui CLI smoke tests.
 This project intentionally contains generated bambiui files so the CLI can be tested against a real React/Next app:
 
 - `src/styles/bambi.css` mirrors `packages/registry/src/styles/bambi.css`.
-- `src/components/ui/tabs/component/` mirrors CLI-installed Tabs output.
-- `src/components/ui/tabs/tabs.ts` re-exports the installed React Tabs components.
+- `src/components/ui/tabs/` mirrors CLI-installed Tabs public output.
+- Tabs output contains `index.tsx` and `tabs.css`.
 
 Run from the monorepo root:
 

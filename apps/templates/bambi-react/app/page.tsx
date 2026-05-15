@@ -4,7 +4,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/src/components/ui/tabs/tabs";
+} from "@/src/components/ui/tabs";
 export default function Home() {
   return (
     <div>

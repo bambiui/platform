@@ -2,32 +2,41 @@
 
 ## Responsibility
 
-`packages/registry` holds React wrapper templates during the generic adapter migration. It is the source of the installable component files that the CLI copies into user projects.
+`packages/registry` holds internal React wrapper templates and generated public artifacts. Public artifacts are the only component files the CLI copies into user projects.
 
 ## What Lives Here
 
-- React wrappers: `src/components/<name>/react/`
-- Component CSS: `src/styles/<name>.css`
+- Internal React wrappers: `src/components/<name>/react/`
+- Component CSS source: `src/styles/<name>.css`
 - Global style file: `src/styles/bambi.css`
-- Workspace barrels: `src/components/<name>/index.ts` (not installed — workspace only)
+- Public generated artifacts: `generated/<name>/<framework>/`
+- Workspace barrels: `src/components/<name>/index.ts` (not installed)
 
 ## What Does NOT Live Here
 
 - Contract files (`<name>.contract.ts`) — those live in `packages/core/src/components/<name>/`.
 - Controller files (`<name>.controller.ts`) — those live in `packages/core/src/components/<name>/`.
-- CLI logic, registry schema validation, or deployment scripts.
+- CLI logic or registry validation scripts.
 
-## Framework Wrapper Rules
+## Public Artifact Rules
 
-- Wrappers translate props → DOM attributes, mount/destroy the controller, and call `controller.sync()` or `controller.update()` on prop changes.
-- Wrappers must NOT implement component behavior. All behavior lives in the controller.
-- Wrappers import from `@bambiui/core/components/<name>` **for workspace type-checking only**. This is a devDep that is NOT present in user projects.
-- During `bambiui add`, the CLI's `flattenImports` transform rewrites these imports to local `./<name>.controller` references. The installed output has no `@bambiui/*` imports.
+- `registry.json` may reference only framework-ready generated files.
+- Generated files must not import `@bambiui/core`, `@bambiui/adapters`, contracts, controllers, or adapter helpers.
+- Tabs React currently installs as:
+  - `index.tsx`
+  - `tabs.css`
+
+## Internal Authoring Rules
+
+- `registry.authoring.json` tracks contract, controller, adapter, source wrapper, style, and generated artifact paths.
+- Run `pnpm registry:refresh` after changing authoring inputs or generated artifacts.
+- Internal wrappers may import from `@bambiui/core/components/<name>` and `@bambiui/adapters/react` for workspace type-checking only.
 
 ## CSS Rules
 
-- Component CSS lives at `src/styles/<name>.css`, not inside the component subdirectory.
-- CSS uses `data-*` attribute selectors to express state — no JS-injected class names.
+- Component CSS source lives at `src/styles/<name>.css`.
+- Generated public CSS lives beside the generated framework artifact.
+- CSS uses `data-*` attribute selectors to express state.
 
 ## Supported Frameworks
 
@@ -35,21 +44,19 @@
 
 bambiui is currently focusing on React as the first canonical adapter target. Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
 
-## Workspace Barrel
-
-`src/components/<name>/index.ts` is a workspace-only barrel for local development. It is NOT installed into user projects.
-
 ## Canonical Reference
 
 Tabs is the reference component:
 
-- Wrappers: `src/components/tabs/react/`
-- CSS: `src/styles/tabs.css`
+- Internal source: `src/components/tabs/react/`
+- Public artifacts: `generated/tabs/react/`
+- CSS source: `src/styles/tabs.css`
 
 ## Verify
 
 ```sh
-pnpm check-types         # workspace typecheck for registry wrappers
-pnpm check-registry      # validate registry.json against schema
-pnpm check               # full suite including CLI smoke
+pnpm registry:refresh
+pnpm check-types
+pnpm check-registry
+pnpm check
 ```

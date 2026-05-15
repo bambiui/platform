@@ -6,37 +6,40 @@ This is the long-form reference for agents. `AGENTS.md` is the quick source of t
 
 ## Architecture — DOM Protocol
 
-bambiui is a CLI-first, React-focused source distribution UI kit built on the DOM Protocol while the contract-driven generic adapter architecture is stabilized.
+bambiui is a CLI-first, React-focused source distribution UI kit. Contract-driven DOM Protocol files remain internal authoring inputs; the CLI copies only generated, framework-ready public artifacts.
 
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
 packages/adapters   Generic framework adapter helpers; currently only React helpers are active
-packages/registry   React wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
+packages/registry   Internal React templates plus generated public artifacts
 apps/templates      Template project for CLI smoke tests (bambi-react)
 apps/www            Active minimal static host for bambiui and registry assets
 apps/_archived/     docs, studio, old www — suspended during architecture reset
-registry.json       v2 manifest consumed by CLI
+registry.json       v2 public manifest consumed by CLI
+registry.authoring.json internal source manifest for maintainers
 ```
 
 ### Core Principles
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
-- **Vanilla TypeScript controllers**: all interactive behavior lives in the controller (`packages/core`). Framework wrappers implement no behavior.
-- **React wrapper is a thin bridge**: it translates props → DOM attributes, mounts/destroys the controller, and calls `controller.sync()` or `controller.update()` on prop changes.
+- **Vanilla TypeScript controllers**: DOM Protocol controllers live in `packages/core` as internal source of truth.
+- **Public React artifacts**: generated user files are self-contained and do not copy or import contracts, controllers, adapter helpers, or generators.
 - **CustomEvents**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled/uncontrolled**: `data-controlled="true"` → controller fires event only. Without it, controller writes `data-value` and fires event.
 - **Self-contained installed output**: generated user files have no `@bambiui/*` runtime imports.
 
 ## Package Boundaries
 
-- `packages/core` — DOM Protocol source of truth. Contract + controller live here. Controllers must be self-contained (no `@bambiui/*` imports in the controller itself).
-- `packages/adapters` — Generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter files are copied into user projects by the CLI; installed output must contain no `@bambiui/*` runtime imports.
-- `packages/registry` — React wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install. Also imports `@bambiui/adapters/react` (workspace only) which the CLI transforms to `"./create-react-adapter"`.
+- `packages/core` — DOM Protocol source of truth. Contract + controller live here and are internal authoring inputs.
+- `packages/adapters` — Generic framework adapter helpers. Only React helpers (`react/`) are active. Adapter files are internal authoring inputs.
+- `packages/registry` — Internal React wrapper templates plus generated public artifacts under `packages/registry/generated/`.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
-- Installed output — no `@bambiui/*` runtime imports.
+- Installed output — no `@bambiui/*` runtime imports and no internal helper files.
 
-## Registry v2 Format
+## Registry Manifests
+
+`registry.json` is public and consumed by the CLI. It may reference only generated files safe to copy into user projects:
 
 ```json
 {
@@ -45,16 +48,19 @@ registry.json       v2 manifest consumed by CLI
   "components": {
     "tabs": {
       "name": "tabs",
-      "contract": "packages/core/src/components/tabs/tabs.contract.ts",
-      "controller": "packages/core/src/components/tabs/tabs.controller.ts",
-      "style": "packages/registry/src/styles/tabs.css",
       "files": {
-        "react": ["..."]
-      }
+        "react": [
+          "packages/registry/generated/tabs/react/index.tsx",
+          "packages/registry/generated/tabs/react/tabs.css"
+        ]
+      },
+      "exports": { "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"] }
     }
   }
 }
 ```
+
+`registry.authoring.json` is internal and tracks contracts, controllers, adapter helpers, source wrappers, and generated artifact paths. Run `pnpm registry:refresh` after authoring changes.
 
 Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
 
@@ -65,37 +71,26 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 - Contract: `packages/core/src/components/tabs/tabs.contract.ts`
 - Controller: `packages/core/src/components/tabs/tabs.controller.ts`
 - CSS: `packages/registry/src/styles/tabs.css`
-- React wrapper: `packages/registry/src/components/tabs/react/`
+- Internal React source: `packages/registry/src/components/tabs/react/`
+- Public React artifacts: `packages/registry/generated/tabs/react/`
 
 ## CSS Delivery
 
 - Global style file: `packages/registry/src/styles/bambi.css`. CLI writes this to `src/styles/bambi.css` on `init`.
-- Component CSS: `packages/registry/src/styles/<name>.css`. CLI writes this to `src/components/ui/<name>/component/<name>.css` (alongside the other component files).
+- Component CSS source: `packages/registry/src/styles/<name>.css`. Generated public CSS is copied beside the public framework artifact.
 - CSS is driven by `data-*` attribute state written by the controller.
 
 ## CLI Output Layout
 
-`bambiui add <name> --framework react` copies files into:
+`bambiui add tabs --framework react` copies files into:
 
 ```
 src/components/ui/<name>/
-  component/           ← implementation files
-    types.ts
-    define-contract.ts
-    <name>.contract.ts
-    <name>.controller.ts
-    <name>.css
-    use-bambi-controller.ts
-    create-react-part.tsx
-    create-react-adapter.ts
-    primitives/        ← present only when registry primitiveFiles is declared
-    <name>.react.tsx
-  <name>.ts            ← barrel re-exporting framework components
+  index.tsx
+  tabs.css
 ```
 
-All `@bambiui/*` workspace imports are transformed to local sibling references during install. No `@bambiui/*` imports remain in the output.
-
-`define-contract.ts` intentionally remains in installed output for now. It is a tiny source-distributed helper copied from `contractFiles`; inlining it during install would add transform complexity without changing runtime dependencies. Adapter helper files also remain beside component files to keep current import rewriting simple.
+No contract files, controller files, adapter helpers, primitives, generators, or `@bambiui/*` imports may appear in installed output.
 
 ## Supported Frameworks
 
@@ -113,7 +108,7 @@ Vue, Svelte and Solid support are intentionally removed during the generic adapt
 `apps/www` is the active minimal static host for bambiui and registry assets. It is NOT the old marketing site.
 
 - Built via `pnpm build:static` (runs `apps/www` Astro build, then injects registry files into `dist/`).
-- Serves `registry.json`, `registry.schema.json`, and all files referenced by the registry manifest, including `contractFiles`, `primitiveFiles`, adapter files, framework files, and styles.
+- Serves `registry.json`, `registry.schema.json`, and all public generated files referenced by the registry manifest.
 
 ## Suspended / Archived
 

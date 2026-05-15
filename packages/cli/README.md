@@ -1,6 +1,6 @@
 # bambiui CLI
 
-CLI-first, source-distributed UI components for React.
+CLI-first, public source-distributed UI components for React.
 
 bambiui is currently focusing on React as the first canonical adapter target.
 Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
@@ -10,7 +10,7 @@ npx bambiui init
 npx bambiui add tabs --framework react
 ```
 
-bambiui copies framework-specific component source files directly into your app. It does not require a runtime component package. Generated output is self-contained — no `@bambiui/*` imports remain after install.
+bambiui copies framework-ready public component artifacts directly into your app. It does not require a runtime component package. Generated output is self-contained and must not include `@bambiui/*` imports, contracts, controllers, adapter helpers, or generator files.
 
 ## Init
 
@@ -21,13 +21,14 @@ bambiui copies framework-specific component source files directly into your app.
 `add <component>` copies the following into your project:
 
 - `src/styles/bambi.css` (if not already present)
-- `src/components/ui/<name>/component/<name>.css`
-- Shared contract helper files referenced by the registry, when present
-- `src/components/ui/<name>/component/<name>.contract.ts`
-- `src/components/ui/<name>/component/<name>.controller.ts`
-- Framework adapter helper files referenced by the registry, when present
-- React wrapper/template files (e.g. `tabs.react.tsx`)
-- `src/components/ui/<name>/tabs.ts` barrel re-exporting React components
+- Files listed in public `registry.json` for the selected framework
+
+For Tabs React today, that means:
+
+```txt
+src/components/ui/tabs/index.tsx
+src/components/ui/tabs/tabs.css
+```
 
 `add` also ensures the global style file exists, so `bambiui add tabs --framework react` is safe before `init`. Running `init` is still recommended so `bambiui.config.json` records your paths.
 

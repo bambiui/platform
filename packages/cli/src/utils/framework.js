@@ -124,28 +124,3 @@ export async function getConfig(cwd, flags = {}) {
 
   return mergeConfig(config, defaults, flags);
 }
-
-/**
- * Generate the index.ts barrel content for an installed component.
- *
- * @param {string} framework
- * @param {string} componentName
- * @param {string[]} [exports] - export names from registry metadata
- */
-export function getIndexContent(framework, componentName, exports) {
-  const c = `./component`;
-
-  /** @type {Record<string, string[]>} */
-  const defaultExports = {
-    react: ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-  };
-
-  const names = exports ?? defaultExports[framework] ?? [];
-
-  switch (framework) {
-    case "react":
-      return `export { ${names.join(", ")} } from "${c}/${componentName}.react";\n`;
-    default:
-      return `// bambiui ${componentName}\n`;
-  }
-}

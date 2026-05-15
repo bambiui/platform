@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Validates registry.json against the v2 schema.
+// Validates the public CLI registry and the internal authoring manifest.
 
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -7,11 +7,33 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = resolve(root, "registry.json");
+const authoringPath = resolve(root, "registry.authoring.json");
 
 let errors = 0;
 
+const KNOWN_FRAMEWORKS = ["react"];
+const PUBLIC_FORBIDDEN_FIELDS = [
+  "contract",
+  "contractFiles",
+  "controller",
+  "adapter",
+  "adapters",
+  "primitiveFiles",
+  "style",
+];
+const FORBIDDEN_STRINGS = [
+  "create-react-adapter",
+  "create-react-part",
+  "define-contract",
+  "use-bambi-controller",
+  "@bambiui/core",
+  "@bambiui/adapters",
+  "tabs.contract",
+  "tabs.controller",
+];
+
 function fail(msg) {
-  console.error(`  ✗ ${msg}`);
+  console.error(`  x ${msg}`);
   errors++;
 }
 
@@ -19,13 +41,13 @@ function ok(msg) {
   console.log(`  ✓ ${msg}`);
 }
 
-function checkFileExists(filePath, context) {
-  const abs = resolve(root, filePath);
-  if (!existsSync(abs)) {
-    fail(`${context}: file not found — ${filePath}`);
-    return false;
+function readJson(filePath, label) {
+  try {
+    return JSON.parse(readFileSync(filePath, "utf-8"));
+  } catch {
+    fail(`${label} is not valid JSON`);
+    return undefined;
   }
-  return true;
 }
 
 function checkRegistryPath(filePath, context) {
@@ -40,32 +62,84 @@ function checkRegistryPath(filePath, context) {
   return true;
 }
 
+function checkFileExists(filePath, context) {
+  const abs = resolve(root, filePath);
+  if (!existsSync(abs)) {
+    fail(`${context}: file not found — ${filePath}`);
+    return false;
+  }
+  return true;
+}
+
 function checkPathAndFile(filePath, context) {
   if (!checkRegistryPath(filePath, context)) return false;
   return checkFileExists(filePath, context);
 }
 
-// ── Parse ─────────────────────────────────────────────────────────────────
+function checkFileList(files, context, { generatedOnly = false, scanForbidden = false } = {}) {
+  if (!Array.isArray(files) || files.length === 0) {
+    fail(`${context} must be a non-empty array`);
+    return;
+  }
 
-let registry;
-try {
-  registry = JSON.parse(readFileSync(registryPath, "utf-8"));
-} catch {
-  fail("registry.json is not valid JSON");
-  process.exit(1);
+  for (const filePath of files) {
+    if (typeof filePath !== "string") {
+      fail(`${context} contains non-string entry`);
+      continue;
+    }
+    if (!checkPathAndFile(filePath, context)) continue;
+
+    if (generatedOnly && !filePath.startsWith("packages/registry/generated/")) {
+      fail(`${context}: public files must live under packages/registry/generated/ — ${filePath}`);
+    }
+
+    if (scanForbidden) {
+      const content = readFileSync(resolve(root, filePath), "utf-8");
+      for (const forbidden of FORBIDDEN_STRINGS) {
+        if (content.includes(forbidden)) {
+          fail(`${context}: generated file contains forbidden string "${forbidden}" — ${filePath}`);
+        }
+      }
+    }
+  }
+}
+
+function checkExports(exports, files, context) {
+  if (!exports || typeof exports !== "object") {
+    fail(`${context}: missing exports object`);
+    return;
+  }
+
+  for (const [framework, names] of Object.entries(exports)) {
+    if (!KNOWN_FRAMEWORKS.includes(framework)) {
+      fail(`${context}: exports has unknown framework "${framework}"`);
+      continue;
+    }
+    if (!Array.isArray(names) || names.length === 0) {
+      fail(`${context}: exports.${framework} must be a non-empty array`);
+      continue;
+    }
+    for (const name of names) {
+      if (typeof name !== "string" || name.length === 0) {
+        fail(`${context}: exports.${framework} contains invalid entry`);
+      }
+    }
+    ok(`${context}: exports.${framework}: ${names.join(", ")}`);
+  }
+
+  for (const framework of Object.keys(files ?? {})) {
+    if (!(framework in exports)) {
+      fail(`${context}: exports missing entry for framework "${framework}"`);
+    }
+  }
 }
 
 console.log("Checking registry.json...\n");
+const registry = readJson(registryPath, "registry.json");
+if (!registry) process.exit(1);
 
-// ── Version ───────────────────────────────────────────────────────────────
-
-if (registry.version !== 2) {
-  fail(`version must be 2, got ${registry.version}`);
-} else {
-  ok("version: 2");
-}
-
-// ── Global styles ─────────────────────────────────────────────────────────
+if (registry.version !== 2) fail(`version must be 2, got ${registry.version}`);
+else ok("version: 2");
 
 if (!registry.styles || typeof registry.styles.global !== "string") {
   fail("missing styles.global path");
@@ -74,126 +148,20 @@ if (!registry.styles || typeof registry.styles.global !== "string") {
   ok(`styles.global: ${registry.styles.global}`);
 }
 
-// ── Components ────────────────────────────────────────────────────────────
-
 if (!registry.components || typeof registry.components !== "object") {
   fail("missing components object");
   process.exit(1);
 }
 
-const KNOWN_FRAMEWORKS = ["react"];
-const ADAPTER_STATUSES = ["active"];
-const ADAPTER_MODES = ["generic"];
-
 for (const [componentName, component] of Object.entries(registry.components)) {
-  console.log(`\nComponent: ${componentName}`);
+  console.log(`\nPublic component: ${componentName}`);
 
-  if (component.name !== componentName) {
-    fail(`name field "${component.name}" does not match key "${componentName}"`);
-  } else {
-    ok(`name: ${componentName}`);
-  }
+  if (component.name !== componentName) fail(`name field "${component.name}" does not match key "${componentName}"`);
+  else ok(`name: ${componentName}`);
 
-  for (const field of ["contract", "controller", "style"]) {
-    if (typeof component[field] !== "string") {
-      fail(`missing required field "${field}"`);
-    } else {
-      checkPathAndFile(component[field], field);
-      ok(`${field}: ${component[field]}`);
-    }
-  }
-
-  if (component.contractFiles !== undefined) {
-    if (!Array.isArray(component.contractFiles)) {
-      fail("contractFiles must be an array when present");
-    } else {
-      for (const filePath of component.contractFiles) {
-        if (typeof filePath !== "string") {
-          fail("contractFiles contains non-string entry");
-          continue;
-        }
-        checkPathAndFile(filePath, "contractFiles");
-      }
-      ok(`contractFiles: ${component.contractFiles.length} file(s)`);
-    }
-  }
-
-  if (component.primitiveFiles !== undefined) {
-    if (!Array.isArray(component.primitiveFiles)) {
-      fail("primitiveFiles must be an array when present");
-    } else {
-      for (const filePath of component.primitiveFiles) {
-        if (typeof filePath !== "string") {
-          fail("primitiveFiles contains non-string entry");
-          continue;
-        }
-        if (checkPathAndFile(filePath, "primitiveFiles")) {
-          if (
-            !filePath.startsWith("packages/core/src/primitives/") ||
-            !filePath.endsWith(".ts")
-          ) {
-            fail(`primitiveFiles path must point to packages/core/src/primitives/*.ts — ${filePath}`);
-          }
-        }
-      }
-      ok(`primitiveFiles: ${component.primitiveFiles.length} file(s)`);
-    }
-  }
-
-  if (component.adapter !== undefined) {
-    if (!component.adapter || typeof component.adapter !== "object") {
-      fail("adapter must be an object when present");
-    } else {
-      for (const [framework, files] of Object.entries(component.adapter)) {
-        if (!KNOWN_FRAMEWORKS.includes(framework)) {
-          fail(`adapter: unknown framework key "${framework}"`);
-          continue;
-        }
-        if (!Array.isArray(files) || files.length === 0) {
-          fail(`adapter.${framework} must be a non-empty array`);
-          continue;
-        }
-        for (const filePath of files) {
-          if (typeof filePath !== "string") {
-            fail(`adapter.${framework} contains non-string entry`);
-            continue;
-          }
-          checkPathAndFile(filePath, `adapter.${framework}`);
-        }
-        ok(`adapter.${framework}: ${files.length} file(s)`);
-      }
-    }
-  }
-
-  if (component.adapters !== undefined) {
-    if (!component.adapters || typeof component.adapters !== "object") {
-      fail("adapters must be an object when present");
-    } else {
-      for (const [framework, metadata] of Object.entries(component.adapters)) {
-        if (!KNOWN_FRAMEWORKS.includes(framework)) {
-          fail(`adapters: unknown framework key "${framework}"`);
-          continue;
-        }
-        if (!metadata || typeof metadata !== "object") {
-          fail(`adapters.${framework} must be an object`);
-          continue;
-        }
-
-        const { status, mode } = metadata;
-        if (!ADAPTER_STATUSES.includes(status)) {
-          fail(`adapters.${framework}.status must be one of: ${ADAPTER_STATUSES.join(", ")}`);
-        }
-        if (!ADAPTER_MODES.includes(mode)) {
-          fail(`adapters.${framework}.mode must be one of: ${ADAPTER_MODES.join(", ")}`);
-        }
-        if (status === "active" && mode !== "generic") {
-          fail(`adapters.${framework}: active adapters must use mode "generic"`);
-        }
-        if (mode === "generic" && (!component.adapter?.[framework] || component.adapter[framework].length === 0)) {
-          fail(`adapters.${framework}: generic mode requires adapter.${framework} files`);
-        }
-        ok(`adapters.${framework}: ${status}/${mode}`);
-      }
+  for (const field of PUBLIC_FORBIDDEN_FIELDS) {
+    if (Object.hasOwn(component, field)) {
+      fail(`public registry must not contain internal field "${field}"`);
     }
   }
 
@@ -204,59 +172,68 @@ for (const [componentName, component] of Object.entries(registry.components)) {
 
   for (const [framework, files] of Object.entries(component.files)) {
     if (!KNOWN_FRAMEWORKS.includes(framework)) {
-      fail(`unknown framework key "${framework}" (expected: ${KNOWN_FRAMEWORKS.join(", ")})`);
+      fail(`unknown framework key "${framework}"`);
       continue;
     }
-    if (!Array.isArray(files) || files.length === 0) {
-      fail(`files.${framework} must be a non-empty array`);
-      continue;
-    }
-    for (const filePath of files) {
-      if (typeof filePath !== "string") {
-        fail(`files.${framework} contains non-string entry`);
-        continue;
-      }
-      checkPathAndFile(filePath, `files.${framework}`);
-    }
-    ok(`files.${framework}: ${files.length} file(s)`);
+    checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true });
+    ok(`files.${framework}: ${files.length} generated file(s)`);
   }
 
-  // Validate exports metadata
-  if (!component.exports || typeof component.exports !== "object") {
-    fail(`missing exports object — add framework export names for CLI barrel generation`);
-  } else {
-    for (const [framework, names] of Object.entries(component.exports)) {
-      if (!KNOWN_FRAMEWORKS.includes(framework)) {
-        fail(`exports: unknown framework key "${framework}"`);
-        continue;
-      }
-      if (!Array.isArray(names) || names.length === 0) {
-        fail(`exports.${framework} must be a non-empty array of export names`);
-        continue;
-      }
-      for (const name of names) {
-        if (typeof name !== "string" || name.length === 0) {
-          fail(`exports.${framework} contains invalid entry: ${JSON.stringify(name)}`);
-        }
-      }
-      ok(`exports.${framework}: ${names.join(", ")}`);
-    }
-
-    // Warn if files has a framework that exports doesn't cover
-    for (const framework of Object.keys(component.files)) {
-      if (!(framework in component.exports)) {
-        fail(`exports missing entry for framework "${framework}" (present in files)`);
-      }
-    }
-  }
+  checkExports(component.exports, component.files, componentName);
 }
 
-// ── Result ────────────────────────────────────────────────────────────────
+console.log("\nChecking registry.authoring.json...\n");
+const authoring = readJson(authoringPath, "registry.authoring.json");
+if (!authoring) process.exit(1);
+
+if (authoring.version !== 1) fail(`authoring version must be 1, got ${authoring.version}`);
+else ok("authoring version: 1");
+
+if (!authoring.components || typeof authoring.components !== "object") {
+  fail("authoring: missing components object");
+  process.exit(1);
+}
+
+for (const [componentName, component] of Object.entries(authoring.components)) {
+  console.log(`\nAuthoring component: ${componentName}`);
+
+  if (component.name !== componentName) fail(`name field "${component.name}" does not match key "${componentName}"`);
+  else ok(`name: ${componentName}`);
+
+  for (const field of ["contract", "controller", "style"]) {
+    if (typeof component[field] !== "string") fail(`missing authoring field "${field}"`);
+    else checkPathAndFile(component[field], field);
+  }
+
+  if (component.contractFiles !== undefined) {
+    checkFileList(component.contractFiles, "contractFiles");
+  }
+  if (component.primitiveFiles !== undefined) {
+    checkFileList(component.primitiveFiles, "primitiveFiles");
+  }
+
+  for (const [framework, files] of Object.entries(component.adapter ?? {})) {
+    if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`adapter has unknown framework "${framework}"`);
+    else checkFileList(files, `adapter.${framework}`);
+  }
+
+  for (const [framework, files] of Object.entries(component.sourceFiles ?? {})) {
+    if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`sourceFiles has unknown framework "${framework}"`);
+    else checkFileList(files, `sourceFiles.${framework}`);
+  }
+
+  for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
+    if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`generatedFiles has unknown framework "${framework}"`);
+    else checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });
+  }
+
+  checkExports(component.exports, component.generatedFiles, `authoring ${componentName}`);
+}
 
 console.log("");
 if (errors > 0) {
   console.error(`Registry check failed with ${errors} error(s).`);
   process.exit(1);
-} else {
-  console.log("Registry OK.");
 }
+
+console.log("Registry OK.");

@@ -34,46 +34,11 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "contract", "controller", "style", "files", "exports"],
+      "required": ["name", "files", "exports"],
       "properties": {
         "name": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*$"
-        },
-        "contract": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "contractFiles": {
-          "$ref": "#/$defs/registryFileList",
-          "description": "Shared contract helper files copied next to the component contract."
-        },
-        "primitiveFiles": {
-          "$ref": "#/$defs/registryFileList",
-          "description": "Optional explicit list of shared primitive source files copied into component/primitives/. Transitive primitive dependencies must be listed explicitly."
-        },
-        "controller": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "style": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "adapter": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "react": {
-              "$ref": "#/$defs/registryFileList"
-            }
-          }
-        },
-        "adapters": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "react": {
-              "$ref": "#/$defs/adapterMetadata"
-            }
-          }
         },
         "files": {
           "type": "object",
@@ -97,21 +62,6 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/registryPath"
-      }
-    },
-    "adapterMetadata": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["status", "mode"],
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["active"]
-        },
-        "mode": {
-          "type": "string",
-          "enum": ["generic"]
-        }
       }
     },
     "exportNames": {

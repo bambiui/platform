@@ -10,5 +10,5 @@ This app is a CLI smoke-test fixture, not a public starter template.
 
 - Generated bambiui files are intentionally committed.
 - `src/styles/bambi.css` should mirror `packages/registry/src/styles/bambi.css`.
-- `src/components/ui/tabs/component/` should mirror CLI-installed Tabs output.
-- `src/components/ui/tabs/tabs.ts` should re-export the installed Tabs framework exports.
+- `src/components/ui/tabs/` should mirror CLI-installed Tabs public output.
+- Tabs output should contain only `index.tsx` and `tabs.css`.

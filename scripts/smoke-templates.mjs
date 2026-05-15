@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -8,18 +9,25 @@ const repoRoot = path.resolve(scriptDir, "..");
 const cliEntry = path.join(repoRoot, "packages/cli/src/index.js");
 const shouldInstall = process.argv.includes("--install");
 
-// Implementation files inside src/components/ui/tabs/component/
-const TABS_IMPL = [
-  "src/components/ui/tabs/component/types.ts",
-  "src/components/ui/tabs/component/define-contract.ts",
-  "src/components/ui/tabs/component/tabs.contract.ts",
-  "src/components/ui/tabs/component/tabs.controller.ts",
-];
+const forbiddenFileNames = new Set([
+  "define-contract.ts",
+  "types.ts",
+  "tabs.contract.ts",
+  "tabs.controller.ts",
+  "create-react-adapter.ts",
+  "create-react-part.tsx",
+  "use-bambi-controller.ts",
+]);
 
-const REACT_ADAPTER_IMPL = [
-  "src/components/ui/tabs/component/use-bambi-controller.ts",
-  "src/components/ui/tabs/component/create-react-part.tsx",
-  "src/components/ui/tabs/component/create-react-adapter.ts",
+const forbiddenStrings = [
+  "create-react-adapter",
+  "create-react-part",
+  "define-contract",
+  "use-bambi-controller",
+  "@bambiui/core",
+  "@bambiui/adapters",
+  "tabs.contract",
+  "tabs.controller",
 ];
 
 const templates = [
@@ -31,11 +39,8 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/tabs/component/tabs.css",
-      ...TABS_IMPL,
-      ...REACT_ADAPTER_IMPL,
-      "src/components/ui/tabs/component/tabs.react.tsx",
-      "src/components/ui/tabs/tabs.ts",
+      "src/components/ui/tabs/tabs.css",
+      "src/components/ui/tabs/index.tsx",
     ],
   },
 ];
@@ -77,6 +82,32 @@ function assertFiles(templateDir, files) {
   }
 }
 
+async function walkFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) files.push(...await walkFiles(full));
+    else if (entry.isFile()) files.push(full);
+  }
+  return files;
+}
+
+async function assertNoForbiddenOutput(dir) {
+  for (const filePath of await walkFiles(dir)) {
+    if (forbiddenFileNames.has(path.basename(filePath))) {
+      throw new Error(`Template output contains forbidden file: ${filePath}`);
+    }
+
+    const content = await readFile(filePath, "utf8");
+    for (const forbidden of forbiddenStrings) {
+      if (content.includes(forbidden)) {
+        throw new Error(`Template output contains forbidden string "${forbidden}": ${filePath}`);
+      }
+    }
+  }
+}
+
 for (const template of templates) {
   const templateDir = path.join(repoRoot, template.dir);
   process.stdout.write(`\nSmoke testing ${template.name}...\n`);
@@ -96,6 +127,7 @@ for (const template of templates) {
     "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
 
   assertFiles(templateDir, template.expectedFiles);
+  await assertNoForbiddenOutput(path.join(templateDir, "src/components/ui/tabs"));
   await run(template.check, { cwd: templateDir });
 }
 

@@ -2,7 +2,7 @@
 
 These apps are local fixture projects for testing the bambiui CLI against real framework projects.
 
-They are not part of the public product surface. Keep them small, framework-specific, and useful for validating source-distributed component installs.
+They are not part of the public product surface. Keep them small, framework-specific, and useful for validating public artifact component installs.
 
 ## Templates
 
@@ -32,16 +32,8 @@ Expected generated output (example for `react`):
 
 ```
 src/styles/bambi.css
-src/components/ui/tabs/component/tabs.css
-src/components/ui/tabs/component/types.ts
-src/components/ui/tabs/component/define-contract.ts
-src/components/ui/tabs/component/tabs.contract.ts
-src/components/ui/tabs/component/tabs.controller.ts
-src/components/ui/tabs/component/create-react-adapter.ts
-src/components/ui/tabs/component/create-react-part.tsx
-src/components/ui/tabs/component/use-bambi-controller.ts
-src/components/ui/tabs/component/tabs.react.tsx
-src/components/ui/tabs/tabs.ts
+src/components/ui/tabs/index.tsx
+src/components/ui/tabs/tabs.css
 ```
 
 If a template has no installed dependencies yet, install them first:
@@ -56,4 +48,5 @@ The templates use their own lock files, so the smoke script uses `npm ci` for te
 
 - Do not commit `node_modules`, `.next`, `dist`, or other generated output.
 - Generated bambiui component files may be committed when they intentionally represent the current fixture state.
+- Internal contract/controller/adapter helper files must not appear in template output.
 - These fixtures should stay boring: one page, one imported component, enough framework config to catch integration regressions.

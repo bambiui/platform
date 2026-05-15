@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bambiui.com/registry.authoring.schema.json",
+  "title": "bambiui authoring registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "components"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "const": 1 },
+    "components": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/component" }
+    }
+  },
+  "$defs": {
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "contract", "controller", "style", "sourceFiles", "generatedFiles", "exports"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "contract": { "$ref": "#/$defs/registryPath" },
+        "contractFiles": { "$ref": "#/$defs/registryFileList" },
+        "primitiveFiles": { "$ref": "#/$defs/registryFileList" },
+        "controller": { "$ref": "#/$defs/registryPath" },
+        "style": { "$ref": "#/$defs/registryPath" },
+        "adapter": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/registryFileList" }
+          }
+        },
+        "sourceFiles": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/registryFileList" }
+          }
+        },
+        "generatedFiles": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/registryFileList" }
+          }
+        },
+        "exports": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/exportNames" }
+          }
+        }
+      }
+    },
+    "registryFileList": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/registryPath" }
+    },
+    "exportNames": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "registryPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    }
+  }
+}

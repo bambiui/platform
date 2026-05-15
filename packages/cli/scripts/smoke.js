@@ -118,6 +118,8 @@ for (const [framework, files] of Object.entries(expectedFiles)) {
     await assertOnlyExpectedFiles(componentDir, files);
     await assertNoForbiddenOutput(componentDir);
 
+    assertExists(path.join(cwd, "src/components/ui/bambi-helpers.ts"));
+
     const wrapper = await readFile(path.join(componentDir, "index.tsx"), "utf8");
     if (!wrapper.includes(`"./tabs.css"`)) {
       throw new Error("Expected index.tsx to import ./tabs.css");

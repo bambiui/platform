@@ -155,6 +155,27 @@ if (!registry.styles || typeof registry.styles.global !== "string") {
   ok(`styles.global: ${registry.styles.global}`);
 }
 
+if (registry.shared !== undefined) {
+  if (!registry.shared || typeof registry.shared !== "object") {
+    fail("shared must be an object when present");
+  } else {
+    for (const [framework, filePath] of Object.entries(registry.shared)) {
+      if (!KNOWN_FRAMEWORKS.includes(framework)) {
+        fail(`shared has unknown framework "${framework}"`);
+        continue;
+      }
+      if (!checkPathAndFile(filePath, `shared.${framework}`)) continue;
+      const content = readFileSync(resolve(root, filePath), "utf-8");
+      for (const forbidden of FORBIDDEN_STRINGS) {
+        if (content.includes(forbidden)) {
+          fail(`shared.${framework}: file contains forbidden string "${forbidden}"`);
+        }
+      }
+      ok(`shared.${framework}: ${filePath}`);
+    }
+  }
+}
+
 if (!registry.components || typeof registry.components !== "object") {
   fail("missing components object");
   process.exit(1);
@@ -184,6 +205,23 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
     checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true, componentName });
     ok(`files.${framework}: ${files.length} generated file(s)`);
+  }
+
+  if (component.helpers !== undefined) {
+    if (!component.helpers || typeof component.helpers !== "object") {
+      fail(`${componentName}: helpers must be an object when present`);
+    } else {
+      for (const [framework, names] of Object.entries(component.helpers)) {
+        if (!KNOWN_FRAMEWORKS.includes(framework)) {
+          fail(`${componentName}: helpers has unknown framework "${framework}"`);
+          continue;
+        }
+        if (!Array.isArray(names) || names.length === 0) {
+          fail(`${componentName}: helpers.${framework} must be a non-empty array`);
+        }
+        ok(`${componentName}: helpers.${framework}: ${names.join(", ")}`);
+      }
+    }
   }
 
   checkExports(component.exports, component.files, componentName);

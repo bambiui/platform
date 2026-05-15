@@ -30,7 +30,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, files: Record<string, string[]>, helpers?: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -63,6 +63,19 @@ export async function addComponent(componentName, flags) {
         registryUrl,
         filePath,
         path.join(outputDir, path.basename(filePath)),
+        force,
+      ),
+    );
+  }
+
+  const sharedSrc = manifest.shared?.[framework];
+  const needsHelper = (component.helpers?.[framework] ?? []).length > 0;
+  if (sharedSrc && needsHelper) {
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        sharedSrc,
+        path.join(cwd, componentDir, "bambi-helpers.ts"),
         force,
       ),
     );

@@ -132,6 +132,22 @@ The CLI distributes **framework-ready public source artifacts**, not internal au
 - Internal `registry.authoring.json` describes contracts, controllers, optional primitives, and generator metadata for maintainers.
 - Run `pnpm registry:refresh` after authoring changes. It uses `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata plus core controller behavior, copy CSS, and validate public/internal registry separation.
 
+### Shared Helper File (`bambi-helpers.ts`)
+
+Controllers inline `BambiBehavior`, `getAttr`, `setAttr`, and `getBoolAttr` in their source. The generator detects and removes these from the inlined behavior, replacing them with an import from `../bambi-helpers`. The extracted helpers land in a single static file:
+
+```
+outputDir/
+  bambi-helpers.ts          ← installed once, shared across components
+  tabs/
+    index.tsx               ← imports "../bambi-helpers" when helpers are used
+    tabs.css
+```
+
+`registry.json` carries a top-level `shared.react` path pointing to the static helper file, and each component that uses helpers lists them in `helpers.react`. The CLI copies `bambi-helpers.ts` to `outputDir/` only when the component being installed declares a non-empty `helpers.react` — components that use no helpers (e.g. a future `button`) never trigger helper installation.
+
+`registry-refresh.mjs` enforces that `registry.json`'s `helpers.react` exactly matches what the generator detected — mismatch is a hard error.
+
 ## Primitive Files
 
 Controllers may import implemented shared primitives from `@bambiui/core/primitives/<name>` in the workspace. Primitive source files are internal authoring inputs and belong in `registry.authoring.json`, not public `registry.json`.
@@ -179,10 +195,11 @@ pnpm build:static                       # build apps/www and inject registry fil
    - `contract`, `controller`, `contractFiles`, optional `primitiveFiles`
    - `generatedFiles.react` target paths under `packages/registry/generated/<name>/react/`
    - `generator.<framework>` metadata for framework-specific public API rules, such as which parts expose a value or disabled prop.
-5. Generate public artifacts: `pnpm registry:refresh` parses the contract, inlines behavior from the controller, emits React parts from contract metadata, applies `generator.react` metadata, and copies the CSS.
+5. Generate public artifacts: `pnpm registry:refresh` parses the contract, inlines behavior from the controller, emits React parts from contract metadata, applies `generator.react` metadata, and copies the CSS. The generator auto-detects which shared helpers (`BambiBehavior`, `getAttr`, `setAttr`, `getBoolAttr`) the controller used and returns them as `usedHelpers`.
 6. Register only public artifact files in `registry.json` (v2 format):
    - `files.react` → generated `index.tsx`, `<name>.css` artifacts
    - `exports.react` → list of exported component names
+   - `helpers.react` → list of shared helper names detected by the generator (omit if the component uses none)
 7. Run `pnpm registry:refresh`, `pnpm check-registry`, and `pnpm check-types`.
 
 ## Multi-Agent Coordination

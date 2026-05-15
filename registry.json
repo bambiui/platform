@@ -4,6 +4,9 @@
   "styles": {
     "global": "packages/registry/src/styles/bambi.css"
   },
+  "shared": {
+    "react": "packages/registry/generated/shared/react/bambi-helpers.ts"
+  },
   "components": {
     "tabs": {
       "name": "tabs",
@@ -12,6 +15,9 @@
           "packages/registry/generated/tabs/react/index.tsx",
           "packages/registry/generated/tabs/react/tabs.css"
         ]
+      },
+      "helpers": {
+        "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"]
       },
       "exports": {
         "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]

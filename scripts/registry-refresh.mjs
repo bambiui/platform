@@ -71,7 +71,7 @@ function contractExportName(componentName) {
   return `${componentName.replace(/-([a-z0-9])/gu, (_match, char) => char.toUpperCase())}Contract`;
 }
 
-async function generateFramework(componentName, component, framework) {
+async function generateFramework(componentName, component, framework, publicComponent) {
   const generatedFiles = component.generatedFiles?.[framework] ?? [];
   const generatedIndex = generatedFiles.find((filePath) => filePath.endsWith("index.tsx"));
 
@@ -81,7 +81,7 @@ async function generateFramework(componentName, component, framework) {
 
   const contractSource = await readFile(resolve(root, component.contract), "utf8");
   const controllerSource = await readFile(resolve(root, component.controller), "utf8");
-  const content = createArtifact({
+  const { content, usedHelpers } = createArtifact({
     framework,
     contractSource,
     controllerSource,
@@ -89,6 +89,18 @@ async function generateFramework(componentName, component, framework) {
     generatorOptions: component.generator?.[framework] ?? {},
   });
   assertNoForbiddenStrings(content, generatedIndex, componentName);
+
+  // Validate that registry.json's helpers.react matches what the generator detected.
+  const declaredHelpers = [...(publicComponent.helpers?.[framework] ?? [])].sort().join(",");
+  const detectedHelpers = [...usedHelpers].sort().join(",");
+  if (declaredHelpers !== detectedHelpers) {
+    throw new Error(
+      `${componentName}/${framework}: helpers mismatch.\n` +
+      `  registry.json declares: [${declaredHelpers || "(none)"}]\n` +
+      `  generator detected:     [${detectedHelpers || "(none)"}]\n` +
+      `  Set "helpers": { "${framework}": ${JSON.stringify(usedHelpers)} } in registry.json for "${componentName}".`,
+    );
+  }
 
   const changed = await writeGeneratedFile(resolve(root, generatedIndex), content);
   process.stdout.write(`${changed ? "generated" : "unchanged"} ${generatedIndex}\n`);
@@ -105,7 +117,7 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
   }
 
   for (const framework of Object.keys(component.generatedFiles ?? {})) {
-    await generateFramework(componentName, component, framework);
+    await generateFramework(componentName, component, framework, publicComponent);
   }
 
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {

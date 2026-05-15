@@ -46,6 +46,9 @@
         "contractFiles": {
           "$ref": "#/$defs/frameworkFiles"
         },
+        "primitiveFiles": {
+          "$ref": "#/$defs/frameworkFiles"
+        },
         "controller": {
           "$ref": "#/$defs/registryPath"
         },

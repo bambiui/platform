@@ -101,6 +101,21 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
   }
 
+  if (component.primitiveFiles !== undefined) {
+    if (!Array.isArray(component.primitiveFiles)) {
+      fail("primitiveFiles must be an array when present");
+    } else {
+      for (const filePath of component.primitiveFiles) {
+        if (typeof filePath !== "string") {
+          fail("primitiveFiles contains non-string entry");
+          continue;
+        }
+        checkFileExists(filePath, "primitiveFiles");
+      }
+      ok(`primitiveFiles: ${component.primitiveFiles.length} file(s)`);
+    }
+  }
+
   if (component.adapter !== undefined) {
     if (!component.adapter || typeof component.adapter !== "object") {
       fail("adapter must be an object when present");

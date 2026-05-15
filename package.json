@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "build:static": "node scripts/build-static.mjs",
-    "check": "pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter bambiui smoke",
+    "check": "pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter bambiui smoke",
     "check-registry": "node scripts/check-registry.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",

@@ -1,4 +1,4 @@
-import { mkdtemp, rm, readdir, readFile } from "node:fs/promises";
+import { mkdtemp, rm, readdir, readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -204,6 +204,132 @@ try {
   await assertNoAmbiguiImports(path.join(addOnlyDir, "src/components/ui/tabs/component"));
 } finally {
   await rm(addOnlyDir, { force: true, recursive: true });
+}
+
+// ── primitiveFiles install test ───────────────────────────────────────────
+// Uses a temporary mock registry (not the real registry.json) to test that
+// the CLI copies primitiveFiles into the primitives/ subdirectory and that
+// import rewrites leave no @bambiui/ imports in the generated output.
+
+const mockRegistryDir = await mkdtemp(path.join(tmpdir(), "bambiui-mock-registry-"));
+const mockProjectDir = await mkdtemp(path.join(tmpdir(), "bambiui-prim-test-"));
+
+try {
+  await mkdir(path.join(mockRegistryDir, "primitives"), { recursive: true });
+  await mkdir(path.join(mockRegistryDir, "components", "prim-test", "react"), { recursive: true });
+  await mkdir(path.join(mockRegistryDir, "contract"), { recursive: true });
+  await mkdir(path.join(mockRegistryDir, "adapters", "react"), { recursive: true });
+  await mkdir(path.join(mockRegistryDir, "styles"), { recursive: true });
+
+  // Mock primitive — must not contain @bambiui/ imports in final output
+  await writeFile(
+    path.join(mockRegistryDir, "primitives", "mock-primitive.ts"),
+    "// mock primitive\nexport function mockPrimitive(): void {}\n",
+  );
+
+  // Mock contract helpers
+  await writeFile(
+    path.join(mockRegistryDir, "contract", "types.ts"),
+    "export type BambiPropDefinition = { attribute: string };\nexport interface BambiComponentContract { name: string; parts: readonly unknown[]; }\n",
+  );
+  await writeFile(
+    path.join(mockRegistryDir, "contract", "define-contract.ts"),
+    "export function defineContract<T>(c: T): T { return c; }\n",
+  );
+
+  // Mock contract — no @bambiui/ imports in installed output (uses local rewrite)
+  await writeFile(
+    path.join(mockRegistryDir, "components", "prim-test", "prim-test.contract.ts"),
+    `import { defineContract } from "../../../contract/define-contract.js";\nexport const primTestContract = defineContract({ name: "prim-test", parts: [] as const });\n`,
+  );
+
+  // Mock controller that imports the primitive via @bambiui/core/primitives/...
+  // The CLI must rewrite this to ./primitives/mock-primitive
+  await writeFile(
+    path.join(mockRegistryDir, "components", "prim-test", "prim-test.controller.ts"),
+    `import { mockPrimitive } from "@bambiui/core/primitives/mock-primitive";\nexport class PrimTestController { sync(): void { mockPrimitive(); } destroy(): void {} }\n`,
+  );
+
+  // Minimal adapter helpers
+  await writeFile(
+    path.join(mockRegistryDir, "adapters", "react", "use-bambi-controller.ts"),
+    "export function useBambiController(): void {}\n",
+  );
+  await writeFile(
+    path.join(mockRegistryDir, "adapters", "react", "create-react-part.tsx"),
+    "export function createReactPart(): () => null { return () => null; }\n",
+  );
+  await writeFile(
+    path.join(mockRegistryDir, "adapters", "react", "create-react-adapter.ts"),
+    "export function createReactAdapter(): { Root: () => null } { return { Root: () => null }; }\n",
+  );
+
+  // Minimal React wrapper
+  await writeFile(
+    path.join(mockRegistryDir, "components", "prim-test", "react", "prim-test.react.tsx"),
+    `import { createReactAdapter } from "@bambiui/adapters/react";\nexport const PrimTest = createReactAdapter();\n`,
+  );
+
+  // Global + component CSS
+  await writeFile(path.join(mockRegistryDir, "styles", "bambi.css"), "/* mock global */\n");
+  await writeFile(path.join(mockRegistryDir, "styles", "prim-test.css"), "/* mock component */\n");
+
+  // Mock registry manifest
+  await writeFile(
+    path.join(mockRegistryDir, "registry.json"),
+    JSON.stringify(
+      {
+        version: 2,
+        styles: { global: "styles/bambi.css" },
+        components: {
+          "prim-test": {
+            name: "prim-test",
+            contract: "components/prim-test/prim-test.contract.ts",
+            contractFiles: ["contract/types.ts", "contract/define-contract.ts"],
+            controller: "components/prim-test/prim-test.controller.ts",
+            style: "styles/prim-test.css",
+            primitiveFiles: ["primitives/mock-primitive.ts"],
+            adapter: {
+              react: [
+                "adapters/react/use-bambi-controller.ts",
+                "adapters/react/create-react-part.tsx",
+                "adapters/react/create-react-adapter.ts",
+              ],
+            },
+            adapters: { react: { status: "active", mode: "generic" } },
+            files: { react: ["components/prim-test/react/prim-test.react.tsx"] },
+            exports: { react: ["PrimTest"] },
+          },
+        },
+      },
+      null,
+      2,
+    ),
+  );
+
+  await runCli([
+    "add",
+    "prim-test",
+    "--framework",
+    "react",
+    "--cwd",
+    mockProjectDir,
+    "--registry-url",
+    mockRegistryDir,
+  ]);
+
+  const implDir = path.join(mockProjectDir, "src", "components", "ui", "prim-test", "component");
+
+  // Primitive must be inside primitives/ subdir
+  assertExists(path.join(implDir, "primitives", "mock-primitive.ts"));
+
+  // No @bambiui/ imports must remain anywhere in the generated output
+  await assertNoAmbiguiImports(implDir);
+
+  process.stdout.write("  ✓ primitiveFiles copy and import rewrite\n");
+} finally {
+  await rm(mockRegistryDir, { force: true, recursive: true });
+  await rm(mockProjectDir, { force: true, recursive: true });
 }
 
 process.stdout.write("CLI smoke tests passed.\n");

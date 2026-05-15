@@ -119,6 +119,36 @@ Framework files use `import { … } from "@bambiui/core/components/<name>"` for 
 
 Archived AGENTS.md files under `apps/_archived/` carry a top-level warning. Do not follow instructions in those files for active development.
 
+## Distribution Model
+
+The CLI distributes **source files**, not compiled or bundled output.
+
+- **Why source**: easier to debug, preserves TypeScript types, no toolchain imposed on user projects, avoids import resolution mismatches.
+- **Why not compile at install time**: adds a compiler dependency to the CLI, complicates error reporting, and provides little benefit for the current scale.
+- **Future option**: a `bundled` output mode could be produced as a build artifact by a registry build step — outside the CLI's responsibility. If this is ever needed, it belongs in a `registry build` pipeline, not in `bambiui add`.
+
+Possible future modes: `source` (current), `bundled` (pre-built artifact, not yet implemented).
+
+## Primitive Files
+
+Controllers may import shared primitives from `@bambiui/core/primitives/<name>` in the workspace. The CLI's `flattenPackageImports` transform rewrites these to `./primitives/<name>` in the installed output, and copies the primitive source files into a `primitives/` subdirectory inside the component's implementation directory.
+
+To declare which primitive files a component needs, add `primitiveFiles` to its registry entry:
+
+```json
+"primitiveFiles": ["packages/core/src/primitives/roving-focus.ts"]
+```
+
+The installed layout becomes:
+```
+src/components/ui/<name>/
+  component/
+    <name>.contract.ts
+    <name>.controller.ts
+    primitives/
+      roving-focus.ts   ← copied here; import rewritten to ./primitives/roving-focus
+```
+
 ## Active Static Host
 
 - `apps/www` — minimal static host for bambiui and registry assets. Built via `pnpm build:static`. Not the old marketing site.
@@ -151,8 +181,9 @@ pnpm build:static                       # build apps/www and inject registry fil
 1. Define DOM contract in `packages/core/src/components/<name>/<name>.contract.ts`.
 2. Implement a **self-contained** controller in `packages/core/src/components/<name>/<name>.controller.ts`:
    - Inline `BambiController`, types, and DOM helpers (`getAttr`, `setAttr`, `getBoolAttr`, event dispatch).
-   - Import only from `./<name>.contract.js` (sibling) — no other `@bambiui/*` imports.
+   - Allowed imports: `./<name>.contract.js` (sibling) and `@bambiui/core/primitives/<name>` (shared primitives — CLI rewrites to `./primitives/<name>` on install). No other `@bambiui/*` imports.
    - Re-export types that framework wrappers need (e.g. `export type { TabsValueChangeDetail } from "./<name>.contract.js"`).
+   - If the controller uses a primitive, declare it in `registry.json` under `primitiveFiles`.
 3. Add React wrapper under `packages/registry/src/components/<name>/react/`:
    - Framework files import from `@bambiui/core/components/<name>` (workspace devDep, typecheck only).
    - CSS goes at `packages/registry/src/styles/<name>.css`.

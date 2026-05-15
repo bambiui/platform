@@ -4,13 +4,34 @@ These primitives are prerequisites for Dialog, Drawer, Popover, Select, Combobox
 
 ## Roving Focus
 
+**Status: implemented** — `packages/core/src/primitives/roving-focus.ts`
+
 Purpose: one tab stop inside a composite widget, with arrow-key movement among enabled items.
 
-Draft API: `createRovingFocus(root, { itemSelector, orientation, loop, currentValue?, getValue?, onNavigate? })`.
+Real API:
 
-Needed by: Tabs, RadioGroup, Toolbar, Menu, Select listbox.
+```ts
+createRovingFocus(container: Element, options: RovingFocusOptions): RovingFocus
 
-Checklist: collect enabled items; sync `tabindex`; support horizontal, vertical, and both axes; Home/End; loop option; ignore disabled items; expose `destroy()`.
+interface RovingFocusOptions {
+  orientation?: "horizontal" | "vertical" | "both"; // default: "horizontal"
+  loop?: boolean;                                    // default: true
+  getItems: () => Element[];                         // called fresh on each keydown
+  isDisabled?: (item: Element) => boolean;           // return true to skip item
+  onFocus: (item: Element) => void;                  // move focus to this item
+  onActivate?: (item: Element) => void;              // Enter / Space — omit to disable
+}
+
+interface RovingFocus {
+  destroy(): void; // removes keydown listener via AbortController
+}
+```
+
+Supported behaviors: horizontal navigation (ArrowLeft/Right), vertical navigation (ArrowUp/Down), `both` axes, loop wrapping, disabled-item skip via `isDisabled`, Home/End, Enter/Space activation, cleanup via `destroy()`.
+
+**Tabs note**: Tabs still does its own inline keyboard navigation. Migration to `createRovingFocus` is safe when activation-mode (automatic vs manual), ARIA sync path, and disabled-item handling are verified to be preserved end-to-end.
+
+Ideal first consumers: RadioGroup, Toolbar, Menu (auto-activation), Select listbox.
 
 ## Focus Scope
 

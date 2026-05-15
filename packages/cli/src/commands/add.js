@@ -31,7 +31,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, contract: string, contractFiles?: string[], controller: string, style: string, adapter?: Record<string, string[]>, adapters?: Record<string, { status: "active" | "legacy", mode: "generic" | "frozen" }>, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, contract: string, contractFiles?: string[], primitiveFiles?: string[], controller: string, style: string, adapter?: Record<string, string[]>, adapters?: Record<string, { status: "active" | "legacy", mode: "generic" | "frozen" }>, files: Record<string, string[]>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -117,7 +117,12 @@ export async function addComponent(componentName, flags) {
   const flattenPackageImports = (/** @type {string} */ content) =>
     rewriteBarePackageImports(stripJsExt(content))
       .replace(/from "\.\.?\/(?:\.\.\/)*contract\/define-contract"/g, 'from "./define-contract"')
-      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/types"/g, 'from "./types"');
+      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/types"/g, 'from "./types"')
+      // Rewrite @bambiui/core/primitives/<name> → ./primitives/<name>
+      // This allows controllers to import shared primitives; the CLI copies those
+      // files into the primitives/ subdirectory alongside the component files.
+      .replace(/from "@bambiui\/core\/primitives\/([^"]+)"/g, 'from "./primitives/$1"')
+      .replace(/import\("@bambiui\/core\/primitives\/([^"]+)"\)/g, 'import("./primitives/$1")');
 
   for (const filePath of component.contractFiles ?? []) {
     results.push(
@@ -158,6 +163,21 @@ export async function addComponent(componentName, flags) {
         registryUrl,
         filePath,
         path.join(implDir, path.basename(filePath)),
+        force,
+        flattenPackageImports,
+      ),
+    );
+  }
+
+  // Primitive files → implementation dir/primitives/<basename>
+  // Controllers that import from @bambiui/core/primitives/<name> will have those
+  // imports rewritten to ./primitives/<name> by flattenPackageImports above.
+  for (const filePath of component.primitiveFiles ?? []) {
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        filePath,
+        path.join(implDir, "primitives", path.basename(filePath)),
         force,
         flattenPackageImports,
       ),

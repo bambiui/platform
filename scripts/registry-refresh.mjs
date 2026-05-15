@@ -104,6 +104,7 @@ async function generateFramework(componentName, component, framework, publicComp
 
   const changed = await writeGeneratedFile(resolve(root, generatedIndex), content);
   process.stdout.write(`${changed ? "generated" : "unchanged"} ${generatedIndex}\n`);
+  return usedHelpers;
 }
 
 for (const [componentName, component] of Object.entries(authoring.components ?? {})) {
@@ -116,8 +117,17 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
     assertSameFiles(files, publicComponent.files?.[framework], `${componentName}/${framework}`);
   }
 
+  const componentUsedHelpers = new Set();
   for (const framework of Object.keys(component.generatedFiles ?? {})) {
-    await generateFramework(componentName, component, framework, publicComponent);
+    const usedHelpers = await generateFramework(componentName, component, framework, publicComponent);
+    for (const h of usedHelpers) componentUsedHelpers.add(h);
+  }
+
+  if (componentUsedHelpers.size > 0) {
+    const shimPath = resolve(root, `packages/registry/generated/${componentName}/bambi-helpers.ts`);
+    const shimContent = `// Workspace-only shim — not distributed. Satisfies the ../bambi-helpers import in generated/${componentName}/react/.\nexport * from "../shared/react/bambi-helpers";\n`;
+    const shimChanged = await writeGeneratedFile(shimPath, shimContent);
+    process.stdout.write(`${shimChanged ? "generated" : "unchanged"} packages/registry/generated/${componentName}/bambi-helpers.ts (workspace shim)\n`);
   }
 
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {

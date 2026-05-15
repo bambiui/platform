@@ -1,5 +1,3 @@
-import { DEFAULT_COMPONENT_DIR, DEFAULT_STYLE_FILE } from "./framework.js";
-
 /**
  * @param {string[]} argv
  */
@@ -9,13 +7,13 @@ export function parseArgs(argv) {
   const component = hasComponent ? maybeComponent : undefined;
   const rest = hasComponent ? tail : argv.slice(1);
   const flags = {
-    componentDir: DEFAULT_COMPONENT_DIR,
+    componentDir: undefined,
     cwd: process.cwd(),
     force: false,
     framework: undefined,
     yes: false,
     registryUrl: process.env.BAMBIUI_REGISTRY_URL,
-    styleFile: DEFAULT_STYLE_FILE,
+    styleFile: undefined,
     tokensFile: undefined,
   };
 

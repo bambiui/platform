@@ -362,7 +362,11 @@ function createReactAdapterSource({ contract, behaviorClassName, optionsTypeName
   }, [${defaultProp.name}, ${controlledProp.name}]);
 ` : "";
 
-  return `export interface ${contract.componentName}Props extends ${optionsTypeName}, Omit<React.HTMLAttributes<HTMLDivElement>, keyof ${optionsTypeName}> {
+  const publicOptionsType = controlledProp
+    ? `Omit<${optionsTypeName}, "controlled">`
+    : optionsTypeName;
+
+  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<React.HTMLAttributes<HTMLDivElement>, keyof ${publicOptionsType}> {
   children?: React.ReactNode;
   className?: string;
 }

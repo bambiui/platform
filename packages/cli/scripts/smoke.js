@@ -229,4 +229,56 @@ try {
   await rm(mockProjectDir, { force: true, recursive: true });
 }
 
+// Test: config file custom paths are respected (no CLI path flags)
+const customConfigDir = await mkdtemp(path.join(tmpdir(), "bambiui-custom-config-"));
+try {
+  await writeFile(
+    path.join(customConfigDir, "bambiui.config.json"),
+    JSON.stringify({ framework: "react", componentDir: "custom/ui", styleFile: "custom/bambi.css" }),
+  );
+
+  await runCli(["add", "tabs", "--cwd", customConfigDir, "--registry-url", repoRoot]);
+
+  assertExists(path.join(customConfigDir, "custom/ui/tabs/index.tsx"));
+  assertExists(path.join(customConfigDir, "custom/ui/tabs/tabs.css"));
+  assertExists(path.join(customConfigDir, "custom/bambi.css"));
+
+  if (existsSync(path.join(customConfigDir, "src/components/ui/tabs"))) {
+    throw new Error("Default component path should not be used when config overrides it.");
+  }
+  if (existsSync(path.join(customConfigDir, "src/styles/bambi.css"))) {
+    throw new Error("Default style path should not be used when config overrides it.");
+  }
+
+  process.stdout.write("  ✓ config file custom paths respected\n");
+} finally {
+  await rm(customConfigDir, { force: true, recursive: true });
+}
+
+// Test: CLI flags override config file values
+const flagOverrideDir = await mkdtemp(path.join(tmpdir(), "bambiui-flag-override-"));
+try {
+  await writeFile(
+    path.join(flagOverrideDir, "bambiui.config.json"),
+    JSON.stringify({ framework: "react", componentDir: "custom/ui", styleFile: "custom/bambi.css" }),
+  );
+
+  await runCli([
+    "add", "tabs",
+    "--cwd", flagOverrideDir,
+    "--registry-url", repoRoot,
+    "--component-dir", "override/ui",
+  ]);
+
+  assertExists(path.join(flagOverrideDir, "override/ui/tabs/index.tsx"));
+
+  if (existsSync(path.join(flagOverrideDir, "custom/ui/tabs"))) {
+    throw new Error("Config componentDir should be overridden by --component-dir flag.");
+  }
+
+  process.stdout.write("  ✓ CLI flags override config file values\n");
+} finally {
+  await rm(flagOverrideDir, { force: true, recursive: true });
+}
+
 process.stdout.write("CLI smoke tests passed.\n");

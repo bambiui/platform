@@ -287,7 +287,7 @@ class TabsBehavior implements BambiBehavior {
   }
 }
 
-export interface TabsProps extends TabsOptions, Omit<React.HTMLAttributes<HTMLDivElement>, keyof TabsOptions> {
+export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.HTMLAttributes<HTMLDivElement>, keyof Omit<TabsOptions, "controlled">> {
   children?: React.ReactNode;
   className?: string;
 }

@@ -50,10 +50,15 @@
       "types": "./src/components/tabs/index.ts",
       "import": "./src/components/tabs/index.ts",
       "default": "./src/components/tabs/index.ts"
+    },
+    "./primitives/*": {
+      "types": "./src/primitives/*.ts",
+      "import": "./src/primitives/*.ts",
+      "default": "./src/primitives/*.ts"
     }
   },
   "scripts": {
-    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts runtime/index.ts tabs/tabs.contract.ts",
+    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts runtime/index.ts tabs/tabs.contract.ts src/primitives/roving-focus.ts",
     "test:tabs": "node scripts/test-tabs-controller.mjs",
     "test:roving-focus": "node scripts/test-roving-focus.mjs"
   }

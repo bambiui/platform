@@ -118,11 +118,18 @@ export async function addComponent(componentName, flags) {
     rewriteBarePackageImports(stripJsExt(content))
       .replace(/from "\.\.?\/(?:\.\.\/)*contract\/define-contract"/g, 'from "./define-contract"')
       .replace(/from "\.\.?\/(?:\.\.\/)*contract\/types"/g, 'from "./types"')
-      // Rewrite @bambiui/core/primitives/<name> → ./primitives/<name>
+      // Rewrite @bambiui/core/primitives/<name>[.js] → ./primitives/<name>
       // This allows controllers to import shared primitives; the CLI copies those
       // files into the primitives/ subdirectory alongside the component files.
-      .replace(/from "@bambiui\/core\/primitives\/([^"]+)"/g, 'from "./primitives/$1"')
-      .replace(/import\("@bambiui\/core\/primitives\/([^"]+)"\)/g, 'import("./primitives/$1")');
+      // The .js extension is stripped (controllers may use either form).
+      .replace(
+        /from "@bambiui\/core\/primitives\/([^"]+)"/g,
+        (_, name) => `from "./primitives/${name.replace(/\.js$/, "")}"`,
+      )
+      .replace(
+        /import\("@bambiui\/core\/primitives\/([^"]+)"\)/g,
+        (_, name) => `import("./primitives/${name.replace(/\.js$/, "")}")`,
+      );
 
   for (const filePath of component.contractFiles ?? []) {
     results.push(

@@ -133,6 +133,8 @@ Possible future modes: `source` (current), `bundled` (pre-built artifact, not ye
 
 Controllers may import shared primitives from `@bambiui/core/primitives/<name>` in the workspace. The CLI's `flattenPackageImports` transform rewrites these to `./primitives/<name>` in the installed output, and copies the primitive source files into a `primitives/` subdirectory inside the component's implementation directory.
 
+**Primitive dependency chain**: `primitiveFiles` does NOT automatically resolve transitive dependencies. If a primitive imports from another local primitive or helper file, that file must also be listed explicitly in the component's `primitiveFiles` array. Automatic dependency graph resolution may be added in a later iteration if needed.
+
 To declare which primitive files a component needs, add `primitiveFiles` to its registry entry:
 
 ```json

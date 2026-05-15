@@ -243,11 +243,12 @@ try {
     `import { defineContract } from "../../../contract/define-contract.js";\nexport const primTestContract = defineContract({ name: "prim-test", parts: [] as const });\n`,
   );
 
-  // Mock controller that imports the primitive via @bambiui/core/primitives/...
-  // The CLI must rewrite this to ./primitives/mock-primitive
+  // Mock controller that imports the primitive with the .js extension.
+  // The CLI must rewrite @bambiui/core/primitives/mock-primitive.js → ./primitives/mock-primitive
+  // (no @bambiui/ prefix, no .js extension in the output).
   await writeFile(
     path.join(mockRegistryDir, "components", "prim-test", "prim-test.controller.ts"),
-    `import { mockPrimitive } from "@bambiui/core/primitives/mock-primitive";\nexport class PrimTestController { sync(): void { mockPrimitive(); } destroy(): void {} }\n`,
+    `import { mockPrimitive } from "@bambiui/core/primitives/mock-primitive.js";\nexport class PrimTestController { sync(): void { mockPrimitive(); } destroy(): void {} }\n`,
   );
 
   // Minimal adapter helpers
@@ -325,6 +326,19 @@ try {
 
   // No @bambiui/ imports must remain anywhere in the generated output
   await assertNoAmbiguiImports(implDir);
+
+  // The rewritten import must not keep the .js extension
+  const controllerOutput = await readFile(path.join(implDir, "prim-test.controller.ts"), "utf8");
+  if (controllerOutput.includes("./primitives/mock-primitive.js")) {
+    throw new Error(
+      "Expected .js extension to be stripped from rewritten primitive import path",
+    );
+  }
+  if (!controllerOutput.includes(`"./primitives/mock-primitive"`)) {
+    throw new Error(
+      `Expected rewritten primitive import './primitives/mock-primitive' in controller output`,
+    );
+  }
 
   process.stdout.write("  ✓ primitiveFiles copy and import rewrite\n");
 } finally {

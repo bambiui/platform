@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, readdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -59,6 +59,30 @@ function assertExists(filePath) {
   }
 }
 
+/**
+ * Recursively scan a directory and assert no file contains `@bambiui/`.
+ * @param {string} dir
+ */
+async function assertNoAmbiguiImports(dir) {
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await assertNoAmbiguiImports(full);
+    } else if (entry.isFile()) {
+      const content = await readFile(full, "utf8");
+      if (content.includes("@bambiui/")) {
+        throw new Error(`Generated output contains @bambiui/ import: ${full}`);
+      }
+    }
+  }
+}
+
 // Test each framework
 for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
   const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
@@ -84,6 +108,9 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
     for (const file of implFiles) {
       assertExists(path.join(implDir, file));
     }
+
+    // Generated output must not contain @bambiui/ runtime imports
+    await assertNoAmbiguiImports(implDir);
 
     // Second add should skip existing files
     const secondAdd = await runCli([

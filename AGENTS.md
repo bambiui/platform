@@ -16,7 +16,8 @@ registry.json       v2 manifest consumed by CLI
 Nested rules:
 
 - `packages/cli/AGENTS.md`
-- `packages/core/AGENTS.md` (if present)
+- `packages/core/AGENTS.md`
+- `packages/registry/AGENTS.md`
 
 ## Architecture Principles — DOM Protocol
 
@@ -63,7 +64,7 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 ## Package Boundaries
 
 - `packages/core` — workspace source of truth; imports allowed between core files. Controllers are **self-contained** (no `@bambiui/core` imports within the controller itself) so the CLI can copy them directly to user projects.
-- `packages/registry` — framework wrapper templates. Framework files import from `@bambiui/core/components/<name>` **for workspace type-checking only** (devDep). The CLI replaces these imports with local `./tabs.controller` references on install. Installed output has no `@bambiui/*` runtime imports.
+- `packages/registry` — framework wrapper templates. Framework files import from `@bambiui/core/components/<name>` **for workspace type-checking only** (devDep). The CLI replaces these imports with local `./<name>.controller` references on install. Installed output has no `@bambiui/*` runtime imports.
 - `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats registry.json as external input.
 - Installed output — no `@bambiui/*` runtime imports. `contract` and `controller` files come from `packages/core`; framework wrapper comes from `packages/registry`.
 
@@ -73,7 +74,6 @@ Each component under `packages/registry/src/components/<name>/`:
 
 ```
 <name>/
-  <name>.css          ← component styles (data-* state driven)
   core/               ← (absent) contract + controller live in packages/core
   react/              ← tabs.react.tsx
   vue/                ← tabs.vue, tabs-list.vue, tabs-trigger.vue, tabs-content.vue
@@ -90,7 +90,7 @@ Framework files use `import { … } from "@bambiui/core/components/<name>"` for 
 - Tabs is the canonical reference component:
   - Contract + Controller (single source): `packages/core/src/components/tabs/`
   - Installable framework wrappers: `packages/registry/src/components/tabs/`
-  - CSS: `packages/registry/src/components/tabs/tabs.css`
+  - CSS: `packages/registry/src/styles/tabs.css`
 - DOM protocol types: `packages/core/src/dom/`
 
 ## Forbidden
@@ -140,18 +140,18 @@ pnpm smoke:templates -- --install       # same, runs npm ci first
 1. Define DOM contract in `packages/core/src/components/<name>/<name>.contract.ts`.
 2. Implement a **self-contained** controller in `packages/core/src/components/<name>/<name>.controller.ts`:
    - Inline `BambiController`, types, and DOM helpers (`getAttr`, `setAttr`, `getBoolAttr`, event dispatch).
-   - Import only from `./  <name>.contract.js` (sibling) — no other `@bambiui/*` imports.
+   - Import only from `./<name>.contract.js` (sibling) — no other `@bambiui/*` imports.
    - Re-export types that framework wrappers need (e.g. `export type { TabsValueChangeDetail } from "./<name>.contract.js"`).
 3. Add framework wrappers under `packages/registry/src/components/<name>/`:
    - Use subdirs: `react/`, `vue/`, `svelte/`, `solid/`, `html/`.
    - Framework files import from `@bambiui/core/components/<name>` (workspace devDep, typecheck only).
-   - CSS goes at `packages/registry/src/components/<name>/<name>.css`.
+   - CSS goes at `packages/registry/src/styles/<name>.css`.
    - Add a workspace barrel at `packages/registry/src/components/<name>/index.ts`.
 4. Register in `registry.json` (v2 format):
    - `contract` and `controller` → `packages/core/src/components/<name>/…`
    - `style` → `packages/registry/src/components/<name>/<name>.css`
    - `files.<framework>` → `packages/registry/src/components/<name>/<framework>/…`
-5. Update CLI `add.js` `flattenImports` transform to handle `@bambiui/core/components/<name>` → `"./  <name>.controller"`.
+5. Update CLI `add.js` `flattenImports` transform to handle `@bambiui/core/components/<name>` → `"./<name>.controller"`.
 6. Run `pnpm check-registry` and `pnpm check-types`.
 
 ## Multi-Agent Coordination

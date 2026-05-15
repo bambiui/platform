@@ -2,13 +2,15 @@
 
 These apps are local fixture projects for testing the bambiui CLI against real framework projects.
 
-They are not part of the public product surface and are not distributed as starter templates yet. Keep them small, framework-specific, and useful for validating source-distributed component installs before adding or releasing components.
+They are not part of the public product surface. Keep them small, framework-specific, and useful for validating source-distributed component installs.
 
 ## Templates
 
-- `bambi-next`: React/Next fixture.
+- `bambi-next`: React/Next.js fixture.
 - `bambi-svelte`: SvelteKit fixture.
 - `bambi-vue`: Vue/Vite fixture.
+
+Solid and HTML are covered by the CLI unit smoke (`node packages/cli/scripts/smoke.js`). Real template fixtures for those frameworks are a separate future task.
 
 ## Smoke Test
 
@@ -22,20 +24,31 @@ The smoke test runs the local CLI against each template:
 
 ```sh
 node packages/cli/src/index.js init --yes --framework <framework> --cwd <template> --registry-url <repo>
-node packages/cli/src/index.js add button --framework <framework> --cwd <template> --registry-url <repo> --force
+node packages/cli/src/index.js add tabs --framework <framework> --cwd <template> --registry-url <repo> --force
 ```
 
 Then it verifies the expected generated files and runs the template's framework check.
 
-The generated fixtures intentionally include both global token CSS (`src/styles/bambi.css`) and component-local CSS (`src/components/ui/button/button.css`). Global tokens should stay synced with `packages/tokens/src/tokens.css`; button CSS should stay synced with `packages/components/button/src/button.css`.
+Expected generated output (example for `react`):
 
-If a template has no installed dependencies yet, install them explicitly:
+```
+src/styles/bambi.css
+src/components/ui/tabs/component/tabs.css
+src/components/ui/tabs/component/tabs.contract.ts
+src/components/ui/tabs/component/tabs.controller.ts
+src/components/ui/tabs/component/tabs.react.tsx
+src/components/ui/tabs/tabs.ts
+```
+
+For `svelte`, replace `tabs.react.tsx` with `tabs.svelte`, `tabs-list.svelte`, `tabs-trigger.svelte`, `tabs-content.svelte`. For `vue`, replace with the equivalent `.vue` files.
+
+If a template has no installed dependencies yet, install them first:
 
 ```sh
 pnpm smoke:templates -- --install
 ```
 
-The templates use their own `package-lock.json` files, so the smoke script uses `npm ci` for template installs.
+The templates use their own lock files, so the smoke script uses `npm ci` for template installs.
 
 ## Notes
 

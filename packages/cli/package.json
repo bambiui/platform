@@ -11,7 +11,8 @@
     "react",
     "svelte",
     "vue",
-    "astro",
+    "solid",
+    "html",
     "source-distributed"
   ],
   "homepage": "https://bambiui.com",

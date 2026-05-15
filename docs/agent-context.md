@@ -1,128 +1,101 @@
 # bambiui — Detailed Agent Context
 
-This is the long-form reference for Codex. `AGENTS.md` is the quick source of truth for commands, verification, no-go rules, component standards, registry entry shape, and commit rules. Read this file only when the current task needs deeper architecture, deployment, or component details.
+This is the long-form reference for agents. `AGENTS.md` is the quick source of truth for commands, verification, no-go rules, component standards, registry entry shape, and commit rules. Read this file when the current task needs deeper architecture details.
 
-## Additional Structure Detail
+> **Legacy context**: an older version of this file described `apps/docs`, `apps/studio`, `apps/www`, `packages/tokens`, `packages/components/button`, Button API conventions, and a Cloudflare Pages deploy flow. All of that has been superseded by the DOM Protocol architecture below. Those apps and packages no longer exist at their prior paths (see `apps/_archived/`).
+
+## Architecture — DOM Protocol
+
+bambiui is a CLI-first, framework-agnostic source distribution UI kit built on the DOM Protocol.
 
 ```txt
-apps/
-  www/                     # Custom Astro marketing/landing site (served at /)
-  docs/                    # Starlight documentation site (served at /docs)
-  studio/                  # Grid-based token editor and playground (served at /studio)
-packages/
-  cli/                     # bambiui CLI — init + add source components
-  core/                    # @bambiui/core — shared contracts and framework-agnostic types
-  tokens/                  # @bambiui/tokens — global primitive, semantic, intent, and state tokens
-  components/              # @bambiui/components — source components + CSS
-    button/
+packages/cli        bambiui init/add; fetches registry assets and writes user files
+packages/core       DOM protocol interfaces, utilities, and workspace component implementations
+packages/registry   Framework wrapper templates; uses @bambiui/core as devDep for workspace typecheck only
+apps/templates      Template projects for CLI smoke tests (bambi-next, bambi-svelte, bambi-vue)
+apps/_archived/     docs, studio, www — suspended during architecture reset
+registry.json       v2 manifest consumed by CLI
 ```
 
-## CLI-First Component Delivery
+### Core Principles
 
-- User-facing installation happens through `packages/cli`, which fetches component source, component CSS, and global tokens from the configured registry URL.
-- The default registry is the hosted static site at `https://bambiui.com`; `--registry-url` and `BAMBIUI_REGISTRY_URL` can point to local or preview registries.
+- **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
+- **Vanilla TypeScript controllers**: all interactive behavior lives in the controller (`packages/core`). Framework wrappers implement no behavior.
+- **Framework wrappers are thin bridges**: they translate props → DOM attributes, mount/destroy the controller, and call `controller.sync()` or `controller.update()` on prop changes.
+- **CustomEvents**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
+- **Controlled/uncontrolled**: `data-controlled="true"` → controller fires event only. Without it, controller writes `data-value` and fires event.
+- **Self-contained installed output**: generated user files have no `@bambiui/*` runtime imports.
 
-## Source Of Truth
+## Package Boundaries
 
-- Shared component-agnostic contracts live in `packages/core/src/contracts.ts`; component-specific contracts such as button derive from them.
-- `packages/components` should consume shared type contracts internally where useful, while CLI-installed user files must remain source-distributed and self-contained.
-- If adding a new component, avoid duplicating intent, appearance, size, or default values without deciding which layer owns them first.
+- `packages/core` — DOM Protocol source of truth. Contract + controller live here. Controllers must be self-contained (no `@bambiui/*` imports in the controller itself).
+- `packages/registry` — framework wrapper templates. Import `@bambiui/core/components/<name>` for workspace typecheck only (devDep). CLI replaces these with local `"./<name>.controller"` on install.
+- `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
+- Installed output — no `@bambiui/*` runtime imports.
+
+## Registry v2 Format
+
+```json
+{
+  "version": 2,
+  "styles": { "global": "packages/registry/src/styles/bambi.css" },
+  "components": {
+    "tabs": {
+      "name": "tabs",
+      "contract": "packages/core/src/components/tabs/tabs.contract.ts",
+      "controller": "packages/core/src/components/tabs/tabs.controller.ts",
+      "style": "packages/registry/src/styles/tabs.css",
+      "files": {
+        "react": ["..."],
+        "vue": ["..."],
+        "svelte": ["..."],
+        "solid": ["..."],
+        "html": ["..."]
+      }
+    }
+  }
+}
+```
+
+Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
+
+## Canonical Component — Tabs
+
+Tabs is the reference implementation for all DOM Protocol patterns:
+
+- Contract: `packages/core/src/components/tabs/tabs.contract.ts`
+- Controller: `packages/core/src/components/tabs/tabs.controller.ts`
+- CSS: `packages/registry/src/styles/tabs.css`
+- Framework wrappers: `packages/registry/src/components/tabs/{react,vue,svelte,solid,html}/`
 
 ## CSS Delivery
 
-- All button CSS lives in `packages/components/button/src/button.css`; it is the single source consumed by all frameworks.
-- Public user projects receive global tokens from `packages/tokens/src/tokens.css` and component CSS from `packages/components/<name>/src/<name>.css`.
-- Component-specific token defaults live in component CSS, not in global `tokens.css`. For example, `--bambi-button-*` defaults are scoped on `.bambi-button` inside `packages/components/button/src/button.css`.
-- In the docs site, app-level CSS is loaded via Starlight's `customCss` array in `astro.config.mjs`; token CSS is imported from `@bambiui/tokens/tokens.css` inside `src/styles/global.css`.
-- Studio imports `@bambiui/tokens/tokens.css` from its page entry and imports component source from `@bambiui/components`.
+- Global style file: `packages/registry/src/styles/bambi.css`. CLI writes this to `src/styles/bambi.css` on `init`.
+- Component CSS: `packages/registry/src/styles/<name>.css`. CLI writes this to `src/components/ui/<name>/component/<name>.css`.
+- CSS is driven by `data-*` attribute state written by the controller.
 
-## Design Tokens
+## Supported Frameworks
 
-- Global design tokens are CSS custom properties in `packages/tokens/src/tokens.css`.
-- Colors use OKLCH scale tokens (`--bambi-primary-50` through `--bambi-primary-950`, plus neutral/danger/success/warning scales). Light semantic defaults live in `:root`, dark semantic overrides live in `[data-theme="dark"], .dark`.
-- Global token layering is primitive scale -> semantic -> intent/state.
-- Component token layering happens in component CSS so scoped user overrides can target the component without changing global theme values.
+`react`, `vue`, `svelte`, `solid`, `html`.
 
-## Theme Management
+Astro: no dedicated wrapper. Use `html` output (`autoMount()` helper).
 
-- Docs and Studio share the `starlight-theme` localStorage key (`"light"` or `"dark"`) as the single source of truth for the active theme.
-- Docs: Starlight reads and writes this key natively.
-- Studio: reads on page load, writes on toggle, and listens to the `storage` event so tabs stay in sync.
-- Dark mode is activated by `data-theme="dark"` on `<html>` plus the `.dark` class to match both Starlight and bambiui token conventions.
+## apps/templates — Smoke Fixtures
 
-## Button API Conventions
+`apps/templates` contains real framework project fixtures for CLI end-to-end smoke testing. Not a public product surface. Currently: `bambi-next` (React/Next), `bambi-svelte` (SvelteKit), `bambi-vue` (Vue/Vite).
 
-Every button component across all frameworks follows the same shape:
+Solid and HTML are covered by the CLI unit smoke; real template fixtures for them are a future task.
 
-- Props: `intent`, `appearance`, `size`, `loading`, `disabled`, `type`; all optional with defaults.
-- Default `type="button"` prevents accidental form submission.
-- `data-intent`, `data-appearance`, and `data-size` attributes drive CSS styling.
-- `data-loading` and `aria-busy="true"` represent loading state.
-- Use `opacity: 0`, not `visibility: hidden`, on `.bambi-button-content` during loading so text stays accessible to screen readers.
-- Set `aria-disabled` when `loading || disabled`.
-- Icon-only buttons must have an accessible name, usually `aria-label`.
+## Suspended
 
-## www App (`apps/www`)
+- `apps/_archived/docs` — Starlight documentation
+- `apps/_archived/studio` — component playground
+- `apps/_archived/www` — marketing site
+- Deployment / static site build — no active production deploy target
 
-- Custom Astro site — no Starlight, no docs theme.
-- Serves the product landing/marketing page at `/`.
-- Owns: hero, feature highlights, navigation to `/docs` and `/studio`, root-level HTML/meta/OG/favicon.
-- Does NOT own: documentation content, Starlight UI, token editor, component previews.
-- Do not add marketing sections to `apps/docs`. Do not add Starlight UI to `apps/www`.
+Do not add `apps/docs`, `apps/studio`, or `apps/www` back. Do not re-introduce deployment workflows without an explicit architecture decision.
 
-## Docs Site (`apps/docs`)
+## CLI Registry URL
 
-- Built with Starlight on top of Astro. Base path: `/docs`.
-- Serves all documentation pages. Focused on usage, API references, and minimal examples.
-- Integrations: `@astrojs/react`, `@astrojs/svelte`, `@astrojs/vue`; all four frameworks can render in the same MDX page when needed.
-- Tab groups use `<Tabs syncKey="framework">` so switching framework in one section switches all sections on the page.
-- Preview wrappers use `.preview`, `.preview-row`, `.preview-col` CSS classes from `src/styles/preview.css`.
-- Global CSS (`src/styles/global.css`) imports the token sheet; button CSS is imported by the package component source.
-- Keep docs lightweight. Avoid heavy live previews and interactive playgrounds — link to Studio instead.
-
-## Studio App (`apps/studio`)
-
-- A single-page grid-based token editor with pan/zoom navigation. Base path: `/studio`.
-- `base: '/studio'` is set in `astro.config.mjs` so all assets resolve correctly when served under the `/studio` subpath.
-- The logo in the left drawer links back to `/` (www root).
-- Color token generation uses OKLCH math to generate scale tokens for neutral, primary, danger, success, and warning. Semantic and intent tokens stay linked to those scales.
-- Global token edits apply to `document.documentElement`. Component-local token edits, such as button tokens, are written as scoped runtime overrides for `.bambi-button`.
-- Heavy previews, live examples, token editing, visual testing, component playgrounds, and interactive demos belong here.
-
-## Deployment (Cloudflare Pages)
-
-All three apps are deployed as a single Cloudflare Pages project. `pnpm deploy-static`:
-
-1. Builds `apps/www`, `apps/docs`, and `apps/studio` with Turborepo.
-2. Copies `apps/docs/dist/` into `apps/www/dist/docs/`.
-3. Copies `apps/studio/dist/` into `apps/www/dist/studio/`.
-4. Copies `registry.json`, `registry.schema.json`, and all source files referenced by `registry.json` into `apps/www/dist/`.
-5. Cloudflare Pages serves `apps/www/dist/` — marketing at `/`, docs at `/docs`, studio at `/studio`, registry files at the site root.
-
-| Setting                | Value                |
-| ---------------------- | -------------------- |
-| Build command          | `pnpm deploy-static` |
-| Build output directory | `apps/www/dist`      |
-| Node.js version        | `22.12.0` or newer   |
-
-## Dependency Graph
-
-```txt
-bambiui CLI          (fetches source from registry URL)
-@bambiui/core        (shared contracts)
-@bambiui/tokens      (global CSS tokens)
-@bambiui/components  -> @bambiui/core
-docs                 -> source components and tokens
-studio               -> source components and tokens
-www                  (standalone, no bambiui runtime deps)
-```
-
-## Things To Watch Out For
-
-- Node version: use Node `>=22.12.0` across the repo.
-- Registry URL: CLI defaults to `https://bambiui.com` and supports `--registry-url` / `BAMBIUI_REGISTRY_URL` for local or preview registries.
-- Recipes in installed components: keep component-local recipes self-contained so users do not need extra bambiui runtime packages. Only create a shared recipe or helper after at least two components need it, and only if the generated installed output remains self-contained.
-- Studio `base: '/studio'`: all internal asset paths in studio are prefixed with `/studio`, which is why production assets resolve under the merged www output.
-- `starlight-theme` localStorage key: docs and studio share this key. Never rename it in studio without updating Starlight's config in docs, and vice versa.
-- Do not reintroduce `/builder` paths or `apps/builder`. The rename to `studio` is permanent.
-- Keep `docs/agent-context.md` as the long-form architecture reference; keep `AGENTS.md` short and operational.
+- Default: `https://bambiui.com` (hosted, when active).
+- Override: `--registry-url <path>` or `BAMBIUI_REGISTRY_URL` env var. Points to local repo root or preview registry for development.

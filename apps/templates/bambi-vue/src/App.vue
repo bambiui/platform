@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { Button } from "./components/ui/button";
-
-function goToBambiui() {
-  window.open("https://bambiui.com", "_blank");
-}
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs/tabs";
 </script>
 
 <template>
-  <Button intent="primary">Hello world</Button>
-  <Button intent="secondary" appearance="link" @click="goToBambiui">go to bambiui</Button>
+  <Tabs default-value="account">
+    <TabsList>
+      <TabsTrigger value="account">Account</TabsTrigger>
+      <TabsTrigger value="password">Password</TabsTrigger>
+    </TabsList>
+    <TabsContent value="account">
+      <p>Account content</p>
+    </TabsContent>
+    <TabsContent value="password">
+      <p>Password content</p>
+    </TabsContent>
+  </Tabs>
 </template>
 
 <style scoped></style>

@@ -1,24 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://bambiui.com/registry.schema.json",
-  "title": "bambiui registry",
+  "title": "bambiui registry v2",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "tokens", "components"],
+  "required": ["version", "styles", "components"],
   "properties": {
     "$schema": {
       "type": "string"
     },
     "version": {
       "type": "integer",
-      "minimum": 1
+      "const": 2
     },
-    "tokens": {
+    "styles": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["css"],
+      "required": ["global"],
       "properties": {
-        "css": {
+        "global": {
           "$ref": "#/$defs/registryPath"
         }
       }
@@ -34,220 +34,49 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["exportName", "api", "style", "shared", "files"],
+      "required": ["name", "contract", "controller", "style", "files"],
       "properties": {
-        "exportName": {
-          "$ref": "#/$defs/exportName"
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
         },
-        "api": {
-          "$ref": "#/$defs/componentApi"
+        "contract": {
+          "$ref": "#/$defs/registryPath"
+        },
+        "controller": {
+          "$ref": "#/$defs/registryPath"
         },
         "style": {
-          "$ref": "#/$defs/styleFile"
-        },
-        "shared": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/registryFile"
-          }
+          "$ref": "#/$defs/registryPath"
         },
         "files": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["react", "svelte", "vue", "astro"],
           "properties": {
             "react": {
-              "$ref": "#/$defs/frameworkFiles"
-            },
-            "svelte": {
               "$ref": "#/$defs/frameworkFiles"
             },
             "vue": {
               "$ref": "#/$defs/frameworkFiles"
             },
-            "astro": {
+            "svelte": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "solid": {
+              "$ref": "#/$defs/frameworkFiles"
+            },
+            "html": {
               "$ref": "#/$defs/frameworkFiles"
             }
           }
-        }
-      }
-    },
-    "componentApi": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["typeExports"],
-      "properties": {
-        "typeExports": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/exportName"
-          },
-          "uniqueItems": true
-        },
-        "types": {
-          "$ref": "#/$defs/generatedTypes"
-        }
-      }
-    },
-    "generatedTypes": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "consts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "values"],
-            "properties": {
-              "name": {
-                "$ref": "#/$defs/exportName"
-              },
-              "values": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                },
-                "minItems": 1
-              }
-            }
-          }
-        },
-        "aliasesFromConsts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "constName"],
-            "properties": {
-              "name": {
-                "$ref": "#/$defs/exportName"
-              },
-              "constName": {
-                "$ref": "#/$defs/exportName"
-              }
-            }
-          }
-        },
-        "interfaces": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "props"],
-            "properties": {
-              "name": {
-                "$ref": "#/$defs/exportName"
-              },
-              "props": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["name", "type"],
-                  "properties": {
-                    "name": {
-                      "$ref": "#/$defs/propertyName"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "optional": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "requiredPicks": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "source", "keys"],
-            "properties": {
-              "name": {
-                "$ref": "#/$defs/exportName"
-              },
-              "source": {
-                "$ref": "#/$defs/exportName"
-              },
-              "keys": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/propertyName"
-                },
-                "minItems": 1
-              }
-            }
-          }
-        }
-      }
-    },
-    "styleFile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["from", "fileName"],
-      "properties": {
-        "from": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "fileName": {
-          "$ref": "#/$defs/fileName"
         }
       }
     },
     "frameworkFiles": {
       "type": "array",
       "items": {
-        "$ref": "#/$defs/registryFile"
-      },
-      "minItems": 1
-    },
-    "registryFile": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "to"],
-      "properties": {
-        "kind": {
-          "$ref": "#/$defs/kind"
-        },
-        "from": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "to": {
-          "$ref": "#/$defs/fileName"
-        },
-        "generate": {
-          "enum": ["types"]
-        }
-      },
-      "oneOf": [
-        {
-          "required": ["from"]
-        },
-        {
-          "required": ["generate"]
-        }
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9-]*$"
-    },
-    "exportName": {
-      "type": "string",
-      "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$"
-    },
-    "propertyName": {
-      "type": "string",
-      "pattern": "^[A-Za-z_$][A-Za-z0-9_$]*$"
-    },
-    "fileName": {
-      "type": "string",
-      "pattern": "^[^/]+$"
+        "$ref": "#/$defs/registryPath"
+      }
     },
     "registryPath": {
       "type": "string",

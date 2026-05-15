@@ -2,26 +2,37 @@
 
 ## Responsibility
 
-- Owns framework-agnostic contracts, shared type primitives, and component contract derivations.
-- This package is the source of truth for reusable component API vocabulary.
+`packages/core` is the DOM Protocol source of truth for bambiui components. It owns:
+
+- Component contracts (`<name>.contract.ts`) — DOM attribute shapes, event detail types, controller options interfaces.
+- Component controllers (`<name>.controller.ts`) — vanilla TypeScript classes that implement `BambiController`.
+- DOM Protocol shared interfaces and utilities (`src/dom/`).
+
+## Controller Rules
+
+- Every controller must implement `sync(): void` and `destroy(): void`. `update?()` is optional but recommended.
+- Controllers must be **self-contained**: no imports from `@bambiui/core` or any other `@bambiui/*` package within the controller file. Inline all needed helpers and types.
+- The only allowed sibling import is from `./<name>.contract.js` (the co-located contract file).
+- This self-contained constraint lets the CLI copy the controller directly into a user project without any runtime `@bambiui/*` dependency.
 
 ## Boundaries
 
-- Keep core free of framework imports, DOM behavior, CSS, CLI logic, docs logic, and registry fetching.
-- Put shared component-agnostic contracts in `src/contracts.ts`.
-- Put component-specific derived contracts in files such as `src/button.ts`.
-
-## Forbidden
-
-- Do not import React, Svelte, Vue, Astro, CLI, tokens, docs, or builder code.
-- Do not add runtime styling, recipes, file generation, or registry logic.
-- Do not duplicate component-specific defaults here unless they are true shared contracts.
+- Framework code (React, Vue, Svelte, Solid, HTML wrappers) belongs in `packages/registry`, not here.
+- CSS belongs in `packages/registry/src/styles/`, not here.
+- CLI logic, registry schema, and deployment scripts do not belong here.
+- Do not import from framework packages (React, Svelte, Vue, Solid).
 
 ## Golden References
 
-- Shared primitives: `src/contracts.ts`.
-- Button contract derivation: `src/button.ts`.
-- Public barrel: `src/index.ts`.
+- Canonical component: `src/components/tabs/` (contract + controller).
+- DOM Protocol types and shared interfaces: `src/dom/`.
+
+## Forbidden
+
+- Do not write component behavior in framework wrappers — that belongs in the controller here.
+- Do not add `@bambiui/*` imports inside controller files.
+- Do not put CSS or framework wrapper files in this package.
+- Do not reference `src/contracts.ts`, `src/button.ts`, or any other pre-DOM-Protocol paths — those files no longer exist.
 
 ## Verify
 
@@ -29,4 +40,4 @@
 pnpm --filter @bambiui/core check-types
 ```
 
-If exported contracts affect components or registry generation, run `pnpm check`.
+If controllers or contracts change, run `pnpm check` from the repo root.

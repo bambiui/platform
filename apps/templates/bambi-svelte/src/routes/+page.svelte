@@ -1,6 +1,16 @@
 <script>
-  import { Button } from "../components/ui/button";
+  import { Tabs, TabsList, TabsTrigger, TabsContent } from "../components/ui/tabs/tabs";
 </script>
 
-<Button intent="primary">Hello world</Button>
-<Button intent="secondary" appearance="link" onclick={() => window.open("https://bambiui.com", "_blank")}>go to bambiui</Button>
+<Tabs defaultValue="account">
+  <TabsList>
+    <TabsTrigger value="account">Account</TabsTrigger>
+    <TabsTrigger value="password">Password</TabsTrigger>
+  </TabsList>
+  <TabsContent value="account">
+    <p>Account content</p>
+  </TabsContent>
+  <TabsContent value="password">
+    <p>Password content</p>
+  </TabsContent>
+</Tabs>

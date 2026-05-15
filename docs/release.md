@@ -6,41 +6,49 @@ Use this checklist when publishing a new bambiui CLI or registry release.
 
 ```sh
 pnpm install
+pnpm check-types
+pnpm check-registry
+pnpm --filter bambiui smoke
 pnpm check
-pnpm deploy-static
 ```
 
-Confirm the generated docs output contains the hosted registry files:
+Run end-to-end template smoke if template dependencies are available:
 
 ```sh
-ls apps/docs/dist/registry.json
-ls apps/docs/dist/registry.schema.json
-ls apps/docs/dist/packages/tokens/src/tokens.css
+pnpm smoke:templates -- --install
 ```
 
-## 2. Deploy The Site
-
-Deploy `apps/docs/dist` to Cloudflare Pages.
-
-After deploy, verify:
+## 2. Test Local Registry Install
 
 ```sh
-curl -I https://bambiui.com
-curl -I https://bambiui.com/builder/
-curl -I https://bambiui.com/registry.json
-curl -I https://bambiui.com/registry.schema.json
-curl -I https://bambiui.com/packages/tokens/src/tokens.css
+tmpdir="$(mktemp -d)"
+node packages/cli/src/index.js init --yes --framework react --cwd "$tmpdir" --registry-url .
+node packages/cli/src/index.js add tabs --framework react --cwd "$tmpdir" --registry-url .
+grep -r "@bambiui/" "$tmpdir" || echo "OK — no @bambiui/ imports in generated output"
 ```
 
-## 3. Test Hosted Registry
+Expect no matches. Generated output must be self-contained.
+
+## 3. Test Hosted Registry (after deploy)
+
+> **Note**: no active static site deploy target exists as of the current architecture. Skip this section until deployment is re-established.
+
+When a hosted registry is available:
 
 ```sh
 tmpdir="$(mktemp -d)"
 npx bambiui init --yes --framework react --cwd "$tmpdir"
-npx bambiui add button --framework react --cwd "$tmpdir"
+npx bambiui add tabs --framework react --cwd "$tmpdir"
+grep -r "@bambiui/" "$tmpdir" || echo "OK"
 ```
 
-The generated component files should be self-contained and should not import `@bambiui/*`.
+Verify registry files are reachable:
+
+```sh
+curl -I https://bambiui.com/registry.json
+curl -I https://bambiui.com/registry.schema.json
+curl -I https://bambiui.com/packages/registry/src/styles/bambi.css
+```
 
 ## 4. Publish CLI
 
@@ -65,7 +73,7 @@ npx bambiui --help
 Commit the release changes and create a matching git tag:
 
 ```sh
-git add .
+git add packages/cli/package.json
 git commit -m "Release bambiui <version>"
 git tag bambiui@<version>
 ```

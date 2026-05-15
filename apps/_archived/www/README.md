@@ -1,3 +1,7 @@
+# Archived
+
+This old marketing site is suspended and is not an active workspace, build, registry, or CLI target. Do not use its old package references or examples as current bambiui architecture guidance.
+
 # bambiui — www
 
 Custom Astro marketing and landing site for bambiui. Served at `/` (site root).

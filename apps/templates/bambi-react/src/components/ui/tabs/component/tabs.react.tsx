@@ -1,7 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { createReactAdapter } from "./create-react-adapter";
-import { tabsContract } from "./tabs.contract";
-import { TabsController } from "./tabs.controller";
+import { TabsController, tabsContract } from "./tabs.controller";
 import type { TabsOptions } from "./tabs.controller";
 import "./tabs.css";
 
@@ -13,7 +12,7 @@ export interface TabsProps extends TabsOptions {
   className?: string;
 }
 
-const tabsAdapter = createReactAdapter<TabsOptions>(tabsContract, {
+const tabsAdapter = createReactAdapter(tabsContract, {
   controller: TabsController,
 });
 const TabsRoot = tabsAdapter.Root;

@@ -12,6 +12,8 @@ npx bambiui init
 npx bambiui add tabs --framework react
 ```
 
+If framework auto-detection is inconclusive during this React-only phase, the CLI uses React defaults.
+
 ## Architecture
 
 bambiui uses a DOM Protocol model. Each component has three layers:
@@ -43,6 +45,7 @@ npx bambiui add tabs --framework react
 # Copies to src/components/ui/tabs/:
 #   component/tabs.react.tsx   component/tabs.controller.ts
 #   component/tabs.contract.ts  component/tabs.css  tabs.ts
+# Also ensures the global token file exists at src/styles/bambi.css
 ```
 
 ## Controlled / Uncontrolled
@@ -52,8 +55,10 @@ npx bambiui add tabs --framework react
 <Tabs defaultValue="one">...</Tabs>
 
 // Controlled — you manage state, controller fires bambi:value-change
-<Tabs value={tab} onValueChange={setTab}>...</Tabs>
+<Tabs value={tab} onValueChange={(detail) => setTab(detail.value)}>...</Tabs>
 ```
+
+`onValueChange` receives `{ value, previousValue, source }`. Use `value` for controlled state updates. `source` is `"click"` or `"keyboard"`.
 
 ## Workspace
 

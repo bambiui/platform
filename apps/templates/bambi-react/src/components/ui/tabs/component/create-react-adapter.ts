@@ -15,11 +15,22 @@ import type {
 import { createReactPart } from "./create-react-part";
 import { useBambiController, type BambiControllerConstructor } from "./use-bambi-controller";
 
-type RootElement = HTMLDivElement;
+type RootElement = HTMLElement;
+type PartName<TPart> = TPart extends string
+  ? TPart
+  : TPart extends { name: infer TName extends string }
+    ? TName
+    : never;
+type ComponentName<TName extends string> = Capitalize<TName>;
+type PartComponentMap<TContract extends BambiComponentContract> = {
+  [TName in PartName<TContract["parts"][number]> as TName extends "root"
+    ? never
+    : ComponentName<TName>]: ReturnType<typeof createReactPart>;
+};
 
 /**
  * Props accepted by the generated Root component.
- * Includes all HTML div attributes, all controller option fields (Partial<TOptions>),
+ * Includes all HTML element attributes, all controller option fields (Partial<TOptions>),
  * plus children and controllerOptions. No framework-specific fields are hardcoded here.
  */
 export type BambiRootProps<TOptions extends object> = HTMLAttributes<RootElement> &
@@ -61,8 +72,11 @@ function assignRef<T>(target: Ref<T> | undefined, value: T | null): void {
   else target.current = value;
 }
 
-export function createReactAdapter<TOptions extends object = Record<string, unknown>>(
-  contract: BambiComponentContract,
+export function createReactAdapter<
+  TOptions extends object = Record<string, unknown>,
+  TContract extends BambiComponentContract = BambiComponentContract,
+>(
+  contract: TContract,
   options: ReactAdapterOptions<TOptions> = {},
 ) {
   const parts = contract.parts.map(normalizePart);
@@ -202,10 +216,5 @@ export function createReactAdapter<TOptions extends object = Record<string, unkn
     });
   }
 
-  return adapter as {
-    Root: typeof Root;
-    List: ReturnType<typeof createReactPart>;
-    Trigger: ReturnType<typeof createReactPart>;
-    Content: ReturnType<typeof createReactPart>;
-  };
+  return adapter as { Root: typeof Root } & PartComponentMap<TContract>;
 }

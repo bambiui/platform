@@ -1,3 +1,7 @@
+# Archived
+
+This studio app is suspended and is not an active workspace, build, registry, or CLI target. Do not use its old package references or examples as current bambiui architecture guidance.
+
 # bambiui — Studio
 
 A grid-based design token editor and component playground for the bambiui design system. Inspect and live-edit global CSS custom properties, edit component-local token defaults, generate OKLCH color scales from a primary hue, and switch between light and dark mode — all without a page reload.

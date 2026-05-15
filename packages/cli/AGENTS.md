@@ -19,9 +19,8 @@ For `bambiui add <component> --framework <fw>`:
    - `files[framework][]` — React wrapper file(s)
 4. Writes barrel `componentDir/<name>/<name>.ts` via `getIndexContent(framework, componentName)`
 5. Applies `flattenPackageImports` transform to all copied files:
-   - `@bambiui/core/components/<name>` → `"./<name>.controller"`
-   - `@bambiui/adapters/react` → `"./create-react-adapter"`
-   - `@bambiui/core/tabs/tabs.contract` → `"./tabs.contract"`
+   - `@bambiui/core/components/<name>` → local controller file from registry metadata
+   - `@bambiui/adapters/<framework>` → local adapter entry file from registry metadata
    - `@bambiui/core/contract` → `"./types"`
    - Relative `.js` extensions stripped for bundler compat
 

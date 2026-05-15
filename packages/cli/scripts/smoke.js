@@ -180,7 +180,7 @@ for (const [framework, implFiles] of Object.entries(expectedImplFiles)) {
   }
 }
 
-const reactOnlyMessage = "bambiui generic adapter migration is currently React-only.";
+const reactOnlyMessage = "bambiui is currently React-only.";
 
 for (const framework of ["vue", "svelte", "solid", "astro"]) {
   const invalidDir = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
@@ -195,6 +195,15 @@ for (const framework of ["vue", "svelte", "solid", "astro"]) {
   } finally {
     await rm(invalidDir, { force: true, recursive: true });
   }
+}
+
+const addOnlyDir = await mkdtemp(path.join(tmpdir(), "bambiui-add-only-"));
+try {
+  await runCli(["add", "tabs", "--cwd", addOnlyDir, "--registry-url", repoRoot]);
+  assertExists(path.join(addOnlyDir, "src/styles/bambi.css"));
+  await assertNoAmbiguiImports(path.join(addOnlyDir, "src/components/ui/tabs/component"));
+} finally {
+  await rm(addOnlyDir, { force: true, recursive: true });
 }
 
 process.stdout.write("CLI smoke tests passed.\n");

@@ -1,3 +1,7 @@
+# Archived
+
+This docs app is suspended and is not an active workspace, build, registry, or CLI target. Do not use its old package references or examples as current bambiui architecture guidance.
+
 # bambiui — Docs
 
 The documentation site for bambiui, built with [Starlight](https://starlight.astro.build/) on Astro. Starlight provides the docs shell, routing, sidebar, and search. Docs pages are explanatory reference pages; rich live previews belong in Studio.

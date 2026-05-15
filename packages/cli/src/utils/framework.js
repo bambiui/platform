@@ -5,8 +5,7 @@ import { normalizeRelativePath, readJson } from "./files.js";
 export const DEFAULT_COMPONENT_DIR = "src/components/ui";
 export const DEFAULT_STYLE_FILE = "src/styles/bambi.css";
 export const REACT_ONLY_MIGRATION_MESSAGE =
-  "bambiui generic adapter migration is currently React-only.\n" +
-  "Vue, Svelte and Solid support will be rebuilt later on top of the new contract-driven adapter architecture.";
+  "bambiui is currently React-only. Use --framework react.";
 
 export const frameworkFiles = {
   svelte: ["svelte.config.js", "svelte.config.ts"],
@@ -21,18 +20,18 @@ const knownUnsupportedFrameworks = new Set(["vue", "svelte", "solid"]);
  * @param {string} framework
  */
 export function assertSupportedFramework(framework) {
-  if (framework === "react") {
+  if (framework === "react" || framework === "unknown") {
     return;
   }
 
   if (knownUnsupportedFrameworks.has(framework)) {
     throw new Error(
-      `${REACT_ONLY_MIGRATION_MESSAGE}\nRequested framework: ${framework}.`,
+      `${REACT_ONLY_MIGRATION_MESSAGE}\nRequested: ${framework}.`,
     );
   }
 
   throw new Error(
-    `Unknown framework "${framework}".\n${REACT_ONLY_MIGRATION_MESSAGE}`,
+    `Unknown framework "${framework}". Defaulting is only used for auto-detection.\n${REACT_ONLY_MIGRATION_MESSAGE}`,
   );
 }
 
@@ -42,9 +41,10 @@ export function assertSupportedFramework(framework) {
  */
 export function createDefaultConfig(framework, overrides = {}) {
   assertSupportedFramework(framework);
+  const resolvedFramework = framework === "unknown" ? "react" : framework;
 
   return {
-    framework,
+    framework: resolvedFramework,
     componentDir: normalizeRelativePath(
       overrides.componentDir ?? DEFAULT_COMPONENT_DIR,
     ),
@@ -62,9 +62,10 @@ export function createDefaultConfig(framework, overrides = {}) {
 export function mergeConfig(config, defaults, flags = {}) {
   const framework = flags.framework ?? config.framework ?? defaults.framework;
   assertSupportedFramework(framework);
+  const resolvedFramework = framework === "unknown" ? "react" : framework;
 
   return {
-    framework,
+    framework: resolvedFramework,
     componentDir: normalizeRelativePath(
       flags.componentDir ?? config.componentDir ?? defaults.componentDir,
     ),

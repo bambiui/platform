@@ -5,6 +5,7 @@ import {
   copyRegistryFile,
   getRegistryComponent,
   getRegistryUrl,
+  getStylePath,
   readRegistryManifest,
 } from "../utils/registry.js";
 
@@ -59,6 +60,17 @@ export async function addComponent(componentName, flags) {
   const results = [];
   const force = Boolean(flags.force);
 
+  // Keep `add` usable even when `init` has not been run yet: component CSS is local to
+  // the component, while global design tokens live at config.styleFile.
+  results.push(
+    await copyRegistryFile(
+      registryUrl,
+      getStylePath(manifest),
+      path.join(cwd, config.styleFile),
+      force,
+    ),
+  );
+
   // Component CSS → implementation dir (alongside other component files)
   results.push(
     await copyRegistryFile(
@@ -73,18 +85,39 @@ export async function addComponent(componentName, flags) {
   const stripJsExt = (/** @type {string} */ content) =>
     content.replace(/from ("\.\.?\/[^"]+)\.js"/g, 'from $1"');
 
+  const withoutExt = (/** @type {string} */ filePath) =>
+    path.basename(filePath).replace(/\.(tsx?|jsx?)$/, "");
+
+  const contractImport = `./${withoutExt(component.contract)}`;
+  const controllerImport = `./${withoutExt(component.controller)}`;
+  const adapterEntry = (component.adapter?.[framework] ?? []).find((filePath) =>
+    withoutExt(filePath) === `create-${framework}-adapter`
+  );
+  const adapterImport = adapterEntry ? `./${withoutExt(adapterEntry)}` : undefined;
+
+  /** @type {Record<string, string>} */
+  const packageImportMap = {
+    "@bambiui/core/contract": "./types",
+    [`@bambiui/core/components/${componentName}`]: controllerImport,
+    [`@bambiui/core/components/${componentName}/${withoutExt(component.contract)}`]: contractImport,
+  };
+  if (adapterImport) packageImportMap[`@bambiui/adapters/${framework}`] = adapterImport;
+
+  const rewriteBarePackageImports = (/** @type {string} */ content) => {
+    let next = content;
+    for (const [from, to] of Object.entries(packageImportMap)) {
+      const escaped = from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      next = next
+        .replace(new RegExp(`from "${escaped}"`, "g"), `from "${to}"`)
+        .replace(new RegExp(`import\\("${escaped}"\\)`, "g"), `import("${to}")`);
+    }
+    return next;
+  };
+
   const flattenPackageImports = (/** @type {string} */ content) =>
-    stripJsExt(content)
-      .replace(/from "@bambiui\/core\/contract"/g, 'from "./types"')
-      .replace(/from "@bambiui\/core\/tabs\/tabs\.contract"/g, 'from "./tabs.contract"')
-      .replace(/from "\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
-      .replace(/from "\.\.\/\.\.\/\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
-      .replace(/from "\.\.\/\.\.\/\.\.\/\.\.\/contract\/define-contract"/g, 'from "./define-contract"')
-      .replace(
-        new RegExp(`from "@bambiui/core/components/${componentName}"`, "g"),
-        `from "./${componentName}.controller"`,
-      )
-      .replace(/from "@bambiui\/adapters\/react"/g, 'from "./create-react-adapter"');
+    rewriteBarePackageImports(stripJsExt(content))
+      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/define-contract"/g, 'from "./define-contract"')
+      .replace(/from "\.\.?\/(?:\.\.\/)*contract\/types"/g, 'from "./types"');
 
   for (const filePath of component.contractFiles ?? []) {
     results.push(

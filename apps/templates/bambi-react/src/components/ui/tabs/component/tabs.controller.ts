@@ -16,6 +16,7 @@ import {
 } from "./tabs.contract";
 
 export type { TabsActivationMode, TabsOrientation, TabsValueChangeDetail } from "./tabs.contract";
+export { tabsContract } from "./tabs.contract";
 
 // ── Inlined types ─────────────────────────────────────────────────────────
 

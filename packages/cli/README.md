@@ -14,7 +14,7 @@ bambiui copies framework-specific component source files directly into your app.
 
 ## Init
 
-`init` writes the global style file to `src/styles/bambi.css` by default and creates `bambiui.config.json`.
+`init` writes the global style file to `src/styles/bambi.css` by default and creates `bambiui.config.json`. If React cannot be detected, the CLI uses React defaults during the React-only migration.
 
 ## Add
 
@@ -28,6 +28,8 @@ bambiui copies framework-specific component source files directly into your app.
 - Framework adapter helper files referenced by the registry, when present
 - React wrapper/template files (e.g. `tabs.react.tsx`)
 - `src/components/ui/<name>/tabs.ts` barrel re-exporting React components
+
+`add` also ensures the global style file exists, so `bambiui add tabs --framework react` is safe before `init`. Running `init` is still recommended so `bambiui.config.json` records your paths.
 
 ## Commands
 

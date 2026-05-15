@@ -11,6 +11,7 @@ export interface BambiPartProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode;
   value?: string;
   disabled?: boolean;
+  type?: string;
 }
 
 export interface BambiPartOptions {
@@ -28,7 +29,7 @@ export function createReactPart(part: BambiPartDefinition, options: BambiPartOpt
   const element = (part.element ?? "div") as ElementType;
 
   return forwardRef<HTMLElement, BambiPartProps>(function BambiPart(
-    { value, disabled, ...props },
+    { value, disabled, type, ...props },
     ref,
   ) {
     const attributes: Record<string, string | undefined> = {
@@ -40,17 +41,7 @@ export function createReactPart(part: BambiPartDefinition, options: BambiPartOpt
     if (disabled !== undefined) {
       attributes[options.disabledAttribute ?? "data-disabled"] = toDataValue(disabled);
     }
-
-    if (part.name === "trigger") attributes.type = element === "button" ? "button" : undefined;
-
-    if (part.name === "content") {
-      return createElement("div", {
-        ...attributes,
-        ...props,
-        ref,
-        tabIndex: props.tabIndex ?? 0,
-      });
-    }
+    if (element === "button") attributes.type = String(type ?? "button");
 
     return createElement(element, { ...attributes, ...props, disabled, ref });
   });

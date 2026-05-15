@@ -1,5 +1,6 @@
 packages:
   - "apps/templates/*"
+  - "apps/www"
   - "packages/*"
 onlyBuiltDependencies:
   - esbuild

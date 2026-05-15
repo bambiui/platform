@@ -6,10 +6,10 @@
 
 ## What Lives Here
 
-- Internal React wrappers: `src/components/<name>/react/`
 - Component CSS source: `src/styles/<name>.css`
 - Global style file: `src/styles/bambi.css`
 - Public generated artifacts: `generated/<name>/<framework>/`
+- Shared public helper: `generated/shared/react/bambi-helpers.ts`
 - Workspace barrels: `src/components/<name>/index.ts` (not installed)
 
 ## What Does NOT Live Here
@@ -22,15 +22,15 @@
 
 - `registry.json` may reference only framework-ready generated files.
 - Generated files must not import `@bambiui/core`, `@bambiui/adapters`, contracts, controllers, or adapter helpers.
-- Tabs React currently installs as:
-  - `index.tsx`
-  - `tabs.css`
+- Tabs React installs as:
+  - `src/components/ui/tabs/index.tsx`
+  - `src/components/ui/tabs/tabs.css`
+  - `src/components/ui/bambi-helpers.ts` (shared public helper, only when the component uses helpers)
 
 ## Internal Authoring Rules
 
-- `registry.authoring.json` tracks contract, controller, adapter, source wrapper, style, generated artifact paths, and generator metadata.
-- Run `pnpm registry:refresh` after changing authoring inputs. It calls `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate generated artifacts.
-- Internal wrappers may import from `@bambiui/core/components/<name>` and `@bambiui/adapters/react` for workspace type-checking only.
+- `registry.authoring.json` tracks contract, controller, style, generated artifact paths, and generator metadata.
+- Run `pnpm registry:refresh` after changing authoring inputs. It calls `@bambiui/generator` framework dispatch to parse contracts, generate public framework artifacts from contract metadata, inline behavior from core controllers, copy CSS, and validate generated artifacts. The generator auto-detects which shared helpers the controller used.
 
 ## CSS Rules
 
@@ -48,9 +48,9 @@ bambiui is currently focusing on React as the first canonical adapter target. Vu
 
 Tabs is the reference component:
 
-- Internal source: `src/components/tabs/react/`
 - Public artifacts: `generated/tabs/react/`
 - CSS source: `src/styles/tabs.css`
+- Shared helper: `generated/shared/react/bambi-helpers.ts`
 
 ## Verify
 

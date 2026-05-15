@@ -43,9 +43,11 @@ npx bambiui init
 ```sh
 npx bambiui add tabs --framework react
 # Copies to src/components/ui/tabs/:
-#   component/tabs.react.tsx   component/tabs.controller.ts
-#   component/tabs.contract.ts  component/tabs.css  tabs.ts
-# Also ensures the global token file exists at src/styles/bambi.css
+#   index.tsx
+#   tabs.css
+# Copies once to src/components/ui/ (only for components that use shared helpers):
+#   bambi-helpers.ts
+# Also ensures the global style file exists at src/styles/bambi.css
 ```
 
 ## Controlled / Uncontrolled

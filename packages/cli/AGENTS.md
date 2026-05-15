@@ -12,8 +12,9 @@ For `bambiui add <component> --framework <fw>`:
 2. Reads public `registry.json` (must be version 2).
 3. Copies `styles.global` to the configured global style file.
 4. Copies only `components[component].files[framework][]` into `componentDir/<name>/`.
+5. If `components[component].helpers[framework]` is non-empty, copies `manifest.shared[framework]` to `componentDir/bambi-helpers.ts` (one level above the component directory).
 
-The CLI does not copy contracts, controllers, adapter helpers, primitives, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained.
+The CLI does not copy contracts, controllers, adapter helpers, primitives, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained. `bambi-helpers.ts` is a generated public artifact and is safe to distribute.
 
 Maintainers produce those public files with `pnpm registry:refresh`; it calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and syncs CSS.
 

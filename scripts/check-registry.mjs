@@ -4,10 +4,13 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import Ajv from "ajv/dist/2020.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = resolve(root, "registry.json");
 const authoringPath = resolve(root, "registry.authoring.json");
+const registrySchemaPath = resolve(root, "registry.schema.json");
+const authoringSchemaPath = resolve(root, "registry.authoring.schema.json");
 
 let errors = 0;
 
@@ -45,6 +48,20 @@ function readJson(filePath, label) {
   } catch {
     fail(`${label} is not valid JSON`);
     return undefined;
+  }
+}
+
+function validateWithSchema(data, schemaPath, label) {
+  const schema = readJson(schemaPath, `${label} schema`);
+  if (!schema) return;
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(schema);
+  if (!validate(data)) {
+    for (const err of validate.errors ?? []) {
+      fail(`${label} schema: ${err.instancePath || "root"} — ${err.message}`);
+    }
+  } else {
+    ok(`${label}: passes JSON Schema validation`);
   }
 }
 
@@ -144,6 +161,7 @@ function checkExports(exports, files, context) {
 console.log("Checking registry.json...\n");
 const registry = readJson(registryPath, "registry.json");
 if (!registry) process.exit(1);
+validateWithSchema(registry, registrySchemaPath, "registry.json");
 
 if (registry.version !== 2) fail(`version must be 2, got ${registry.version}`);
 else ok("version: 2");
@@ -230,6 +248,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
 console.log("\nChecking registry.authoring.json...\n");
 const authoring = readJson(authoringPath, "registry.authoring.json");
 if (!authoring) process.exit(1);
+validateWithSchema(authoring, authoringSchemaPath, "registry.authoring.json");
 
 if (authoring.version !== 1) fail(`authoring version must be 1, got ${authoring.version}`);
 else ok("authoring version: 1");

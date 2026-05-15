@@ -47,6 +47,7 @@ registry.authoring.json internal source manifest for maintainers
 {
   "version": 2,
   "styles": { "global": "packages/registry/src/styles/bambi.css" },
+  "shared": { "react": "packages/registry/generated/shared/react/bambi-helpers.ts" },
   "components": {
     "tabs": {
       "name": "tabs",
@@ -56,6 +57,7 @@ registry.authoring.json internal source manifest for maintainers
           "packages/registry/generated/tabs/react/tabs.css"
         ]
       },
+      "helpers": { "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"] },
       "exports": { "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"] }
     }
   }
@@ -87,12 +89,14 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 `bambiui add tabs --framework react` copies files into:
 
 ```
-src/components/ui/<name>/
-  index.tsx
-  tabs.css
+src/components/ui/
+  bambi-helpers.ts          ← only when the component uses shared helpers
+  <name>/
+    index.tsx
+    tabs.css
 ```
 
-No contract files, controller files, adapter helpers, primitives, generators, or `@bambiui/*` imports may appear in installed output.
+No contract files, controller files, adapter helpers, primitives, generators, or `@bambiui/*` imports may appear in installed output. `bambi-helpers.ts` is a generated public artifact — it is safe to distribute and contains no internal authoring references.
 
 ## Supported Frameworks
 

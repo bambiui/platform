@@ -1,4 +1,5 @@
 import { readFile, copyFile, mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
@@ -32,6 +33,9 @@ for (const component of Object.values(manifest.components ?? {})) {
     for (const file of files) filePaths.add(file);
   }
 }
+for (const filePath of Object.values(manifest.shared ?? {})) {
+  filePaths.add(filePath);
+}
 
 for (const filePath of filePaths) {
   const src = path.join(repoRoot, filePath);
@@ -40,5 +44,11 @@ for (const filePath of filePaths) {
   await copyFile(src, dest);
 }
 
-process.stdout.write(`Registry injected: ${filePaths.size + 2} files → dist/\n`);
+for (const filePath of filePaths) {
+  if (!existsSync(path.join(distDir, filePath))) {
+    throw new Error(`Registry completeness check failed: ${filePath} missing from dist`);
+  }
+}
+
+process.stdout.write(`Registry injected: ${filePaths.size + 2} file(s) → dist/\n`);
 process.stdout.write("Static build complete.\n");

@@ -41,6 +41,7 @@ const templates = [
       "src/styles/bambi.css",
       "src/components/ui/tabs/tabs.css",
       "src/components/ui/tabs/index.tsx",
+      "src/components/ui/bambi-helpers.ts",
     ],
   },
 ];

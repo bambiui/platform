@@ -23,6 +23,12 @@
         }
       }
     },
+    "shared": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/registryPath"
+      }
+    },
     "components": {
       "type": "object",
       "additionalProperties": {
@@ -47,6 +53,13 @@
             "react": {
               "$ref": "#/$defs/registryFileList"
             }
+          }
+        },
+        "helpers": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "react": { "$ref": "#/$defs/exportNames" }
           }
         },
         "exports": {

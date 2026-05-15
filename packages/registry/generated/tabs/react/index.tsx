@@ -25,6 +25,7 @@ export interface TabsValueChangeDetail {
 }
 
 
+
 interface BambiBehavior {
   sync(): void;
   update?(options?: unknown): void;

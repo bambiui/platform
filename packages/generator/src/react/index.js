@@ -1,3 +1,7 @@
+import { Project, SyntaxKind } from "ts-morph";
+
+// ── Core utilities ─────────────────────────────────────────────────────────
+
 function pascalCase(value) {
   return value
     .split(/[-_]/u)
@@ -6,82 +10,206 @@ function pascalCase(value) {
     .join("");
 }
 
-function attrNameFromConst(constantsSource, constName) {
-  const match = constantsSource.match(new RegExp(`const ${constName} = "([^"]+)" as const;`, "u"));
-  if (!match) throw new Error(`Unable to resolve attribute constant: ${constName}`);
-  return match[1];
+function makeProject() {
+  return new Project({ useInMemoryFileSystem: true, skipAddingFilesFromTsConfig: true });
 }
 
-function extractPublicContractSource(source, contractExportName) {
-  const withoutImport = source.replace(/^import[\s\S]*?;\n\n/u, "");
-  const [publicContract] = withoutImport.split(`\nexport const ${contractExportName} = `);
+// Unwrap a single `as const` / `as T` layer from an expression node.
+function unwrapAs(node) {
+  return node && node.getKind() === SyntaxKind.AsExpression ? node.getExpression() : node;
+}
 
-  if (!publicContract) {
-    throw new Error(`Unable to extract public contract before ${contractExportName}.`);
+// Extract the raw string value from a StringLiteral node, handling an optional
+// enclosing AsExpression.
+function stringLiteralValue(node) {
+  if (!node) return undefined;
+  const kind = node.getKind();
+  if (kind === SyntaxKind.StringLiteral) return node.getLiteralValue();
+  if (kind === SyntaxKind.AsExpression) return stringLiteralValue(node.getExpression());
+  return undefined;
+}
+
+// Build a name→value map for every top-level `const NAME = "..." as const`
+// declaration found in the source file.
+function buildConstMap(sf) {
+  const map = new Map();
+  for (const vs of sf.getVariableStatements()) {
+    for (const decl of vs.getDeclarationList().getDeclarations()) {
+      const val = stringLiteralValue(decl.getInitializer());
+      if (val !== undefined) map.set(decl.getName(), val);
+    }
   }
+  return map;
+}
 
-  return publicContract
+// Resolve a DOM-attribute node that is either an Identifier (const reference)
+// or a StringLiteral.  Returns { attribute, attributeConst }.
+function resolveAttrNode(node, constMap) {
+  if (!node) return { attribute: undefined, attributeConst: "" };
+  if (node.getKind() === SyntaxKind.Identifier) {
+    const name = node.getText();
+    return { attribute: constMap.get(name), attributeConst: name };
+  }
+  return { attribute: stringLiteralValue(node), attributeConst: "" };
+}
+
+// ── Contract parsing ───────────────────────────────────────────────────────
+
+function parseContractSource(source, contractExportName) {
+  const sf = makeProject().createSourceFile("contract.ts", source);
+  const constMap = buildConstMap(sf);
+
+  const statements = sf.getStatements();
+
+  // Locate the VariableStatement that exports the contract object.
+  const contractIdx = statements.findIndex((s) => {
+    if (s.getKind() !== SyntaxKind.VariableStatement) return false;
+    return s.getDeclarationList().getDeclarations().some((d) => d.getName() === contractExportName);
+  });
+  if (contractIdx === -1) throw new Error(`Unable to find contract: ${contractExportName}`);
+
+  const contractStmt = statements[contractIdx];
+
+  // Public contract source: everything before the contract declaration, minus the
+  // import block.  Uses the AST start position to avoid splitting on the export
+  // name string, which is fragile.
+  const priorText = source.slice(0, contractStmt.getStart());
+  const publicContractSource = priorText
+    .replace(/^import[\s\S]*?;\n\n?/u, "")
     .replaceAll(/export const ([A-Z0-9_]+) =/gu, "const $1 =")
     .replace(/\n$/u, "");
-}
 
-function parseContract(source, publicContractSource, contractExportName) {
-  const contractMatch = source.match(
-    new RegExp(`export const ${contractExportName} = defineContract\\(([\\s\\S]*?)\\s+as const\\);`, "u"),
-  );
-  if (!contractMatch) {
-    throw new Error(`Unable to parse contract: ${contractExportName}.`);
+  // ── Parse the defineContract() call ──────────────────────────────────────
+
+  const contractDecl = contractStmt.getDeclarationList().getDeclarations()[0];
+  const callExpr = unwrapAs(contractDecl.getInitializer());
+  if (callExpr.getKind() !== SyntaxKind.CallExpression) {
+    throw new Error(`${contractExportName}: expected CallExpression, got ${callExpr.getKindName()}`);
   }
 
-  const contractBody = contractMatch[1];
-  const nameMatch = contractBody.match(/name:\s*"([^"]+)"/u);
-  if (!nameMatch) throw new Error(`Unable to parse contract name: ${contractExportName}.`);
+  const arg = unwrapAs(callExpr.getArguments()[0]);
+  if (arg.getKind() !== SyntaxKind.ObjectLiteralExpression) {
+    throw new Error(`${contractExportName}: expected an ObjectLiteralExpression as the defineContract argument`);
+  }
 
-  const partsBlock = contractBody.match(/parts:\s*\[([\s\S]*?)\],\n\s*props:/u)?.[1];
-  const propsBlock = contractBody.match(/props:\s*\{([\s\S]*?)\},\n\s*events:/u)?.[1];
-  if (!partsBlock || !propsBlock) {
-    throw new Error(`Unable to parse contract parts or props: ${contractExportName}.`);
+  // name
+  const nameProp = arg.getProperty("name");
+  if (!nameProp || nameProp.getKind() !== SyntaxKind.PropertyAssignment) {
+    throw new Error(`${contractExportName}: missing or invalid 'name' property`);
+  }
+  const nameStr = stringLiteralValue(nameProp.getInitializer());
+  if (!nameStr) throw new Error(`${contractExportName}: 'name' must be a string literal`);
+
+  // parts
+  const partsProp = arg.getProperty("parts");
+  if (!partsProp || partsProp.getKind() !== SyntaxKind.PropertyAssignment) {
+    throw new Error(`${contractExportName}: missing or invalid 'parts' property`);
+  }
+  const partsArr = unwrapAs(partsProp.getInitializer());
+  if (partsArr.getKind() !== SyntaxKind.ArrayLiteralExpression) {
+    throw new Error(`${contractExportName}: 'parts' must be an ArrayLiteralExpression`);
   }
 
   const parts = [];
-  for (const match of partsBlock.matchAll(/\{\s*name:\s*"([^"]+)"[\s\S]*?attribute:\s*([A-Z0-9_]+)[\s\S]*?element:\s*"([^"]+)"/gu)) {
-    parts.push({
-      name: match[1],
-      attributeConst: match[2],
-      attribute: attrNameFromConst(publicContractSource, match[2]),
-      element: match[3],
-    });
+  for (const el of partsArr.getElements()) {
+    const obj = unwrapAs(el);
+    if (obj.getKind() !== SyntaxKind.ObjectLiteralExpression) continue;
+
+    const elNameProp = obj.getProperty("name");
+    const elAttrProp = obj.getProperty("attribute");
+    const elElemProp = obj.getProperty("element");
+    if (
+      !elNameProp || elNameProp.getKind() !== SyntaxKind.PropertyAssignment ||
+      !elAttrProp || elAttrProp.getKind() !== SyntaxKind.PropertyAssignment ||
+      !elElemProp || elElemProp.getKind() !== SyntaxKind.PropertyAssignment
+    ) continue;
+
+    const partName = stringLiteralValue(elNameProp.getInitializer());
+    const { attribute, attributeConst } = resolveAttrNode(elAttrProp.getInitializer(), constMap);
+    const element = stringLiteralValue(elElemProp.getInitializer());
+    if (!partName || !attribute || !element) continue;
+
+    parts.push({ name: partName, attributeConst, attribute, element });
+  }
+
+  // props
+  const propsProp = arg.getProperty("props");
+  if (!propsProp || propsProp.getKind() !== SyntaxKind.PropertyAssignment) {
+    throw new Error(`${contractExportName}: missing or invalid 'props' property`);
+  }
+  const propsObj = unwrapAs(propsProp.getInitializer());
+  if (propsObj.getKind() !== SyntaxKind.ObjectLiteralExpression) {
+    throw new Error(`${contractExportName}: 'props' must be an ObjectLiteralExpression`);
   }
 
   const props = [];
-  for (const match of propsBlock.matchAll(/(\w+):\s*\{([^}]+)\}/gu)) {
-    const body = match[2];
-    const attributeConst = body.match(/attribute:\s*([A-Z0-9_]+)/u)?.[1];
-    if (!attributeConst) continue;
+  for (const pp of propsObj.getProperties()) {
+    if (pp.getKind() !== SyntaxKind.PropertyAssignment) continue;
 
-    props.push({
-      name: match[1],
-      attributeConst,
-      attribute: attrNameFromConst(publicContractSource, attributeConst),
-      type: body.includes('type: "boolean"') ? "boolean" : "string",
-      controlled: body.includes("controlled: true"),
-      defaultValue: body.match(/defaultValue:\s*"([^"]+)"/u)?.[1],
-    });
+    const propName = pp.getName();
+    const propObj = unwrapAs(pp.getInitializer());
+    if (propObj.getKind() !== SyntaxKind.ObjectLiteralExpression) continue;
+
+    const attrPropNode = propObj.getProperty("attribute");
+    if (!attrPropNode || attrPropNode.getKind() !== SyntaxKind.PropertyAssignment) continue;
+    const { attribute, attributeConst } = resolveAttrNode(attrPropNode.getInitializer(), constMap);
+    if (!attribute) continue;
+
+    // `type: "boolean"` → boolean; array literal or any other value → string
+    const typePropNode = propObj.getProperty("type");
+    const type =
+      typePropNode &&
+      typePropNode.getKind() === SyntaxKind.PropertyAssignment &&
+      stringLiteralValue(typePropNode.getInitializer()) === "boolean"
+        ? "boolean"
+        : "string";
+
+    // `controlled: true` (TrueKeyword only — not a truthy presence check)
+    const controlledNode = propObj.getProperty("controlled");
+    const controlled =
+      !!controlledNode &&
+      controlledNode.getKind() === SyntaxKind.PropertyAssignment &&
+      controlledNode.getInitializer().getKind() === SyntaxKind.TrueKeyword;
+
+    const defaultValueNode = propObj.getProperty("defaultValue");
+    const defaultValue =
+      defaultValueNode && defaultValueNode.getKind() === SyntaxKind.PropertyAssignment
+        ? stringLiteralValue(defaultValueNode.getInitializer())
+        : undefined;
+
+    props.push({ name: propName, attributeConst, attribute, type, controlled, defaultValue });
   }
 
   return {
-    name: nameMatch[1],
-    componentName: pascalCase(nameMatch[1]),
-    parts,
-    props,
+    publicContractSource,
+    contract: { name: nameStr, componentName: pascalCase(nameStr), parts, props },
   };
 }
 
+// ── Options interface parsing ──────────────────────────────────────────────
+
+function parseOptionsNames(source, optionsTypeName) {
+  const sf = makeProject().createSourceFile("controller.ts", source);
+  const iface = sf.getInterface(optionsTypeName);
+  if (!iface) throw new Error(`Unable to parse options interface: ${optionsTypeName}`);
+  return iface
+    .getMembers()
+    .filter((m) => m.getKind() === SyntaxKind.PropertySignature)
+    .map((m) => m.getName());
+}
+
+// ── Controller behavior extraction ────────────────────────────────────────
+
 function extractControllerBehavior(source, componentName) {
-  return source
-    .replace(/^import[\s\S]*?;\n\n/u, "")
-    .replace(/^export type \{[\s\S]*?\} from "[^"]+";\n/gmu, "")
-    .replace(/^export \{[\s\S]*?\} from "[^"]+";\n\n?/gmu, "")
+  const sf = makeProject().createSourceFile("controller.ts", source);
+
+  // Remove all import declarations and module re-exports via AST so that format
+  // variations (multi-line imports, extra blank lines, etc.) never matter.
+  [...sf.getImportDeclarations()].reverse().forEach((n) => n.remove());
+  [...sf.getExportDeclarations()].reverse().forEach((n) => n.remove());
+
+  return sf
+    .getFullText()
     .replaceAll("export interface BambiController", "interface BambiBehavior")
     .replaceAll("implements BambiController", "implements BambiBehavior")
     .replaceAll(`export class ${componentName}Controller`, `class ${componentName}Behavior`)
@@ -91,12 +219,7 @@ function extractControllerBehavior(source, componentName) {
     .replace(/\n$/u, "");
 }
 
-function parseOptionsNames(controllerSource, optionsTypeName) {
-  const match = controllerSource.match(new RegExp(`export interface ${optionsTypeName} \\{([\\s\\S]*?)\\n\\}`, "u"));
-  if (!match) throw new Error(`Unable to parse options interface: ${optionsTypeName}`);
-
-  return Array.from(match[1].matchAll(/^\s*(\w+)\??:/gmu), (item) => item[1]);
-}
+// ── React code generation (unchanged from original) ───────────────────────
 
 function reactAttributeValue(prop) {
   if (prop.name === "controlled") return "controlled ? \"true\" : undefined";
@@ -269,9 +392,10 @@ ${rootAttrs}${controlledLine}
 ${reactPartComponentSource(contract, generatorOptions)}`;
 }
 
+// ── Public API ─────────────────────────────────────────────────────────────
+
 export function createReactArtifact({ contractSource, controllerSource, contractExportName, generatorOptions = {} }) {
-  const publicContract = extractPublicContractSource(contractSource, contractExportName);
-  const contract = parseContract(contractSource, publicContract, contractExportName);
+  const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
   const behaviorClassName = `${contract.componentName}Behavior`;
   const optionsTypeName = `${contract.componentName}Options`;
   const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
@@ -280,7 +404,7 @@ export function createReactArtifact({ contractSource, controllerSource, contract
 import * as React from "react";
 import "./${contract.name}.css";
 
-${publicContract}
+${publicContractSource}
 
 ${extractControllerBehavior(controllerSource, contract.componentName)}
 

@@ -6,7 +6,7 @@ This is the long-form reference for agents. `AGENTS.md` is the quick source of t
 
 ## Architecture — DOM Protocol
 
-bambiui is a CLI-first, React-focused source distribution UI kit. Contract-driven DOM Protocol files remain internal authoring inputs; the CLI copies only generated, framework-ready public artifacts.
+bambiui is a CLI-first, React-focused source distribution UI kit. Contract-driven DOM Protocol files remain internal authoring inputs; the build-time generator turns them into generated artifacts, and the CLI copies only generated, framework-ready public artifacts.
 
 ```txt
 packages/cli        bambiui init/add; fetches registry assets and writes user files
@@ -26,7 +26,7 @@ Active data flow: `core → generator → registry → cli → user project`
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
 - **Vanilla TypeScript controllers**: DOM Protocol controllers live in `packages/core` as internal source of truth.
-- **Public React artifacts**: generated user files are self-contained and do not copy or import contracts, controllers, or generator files.
+- **Public React artifacts**: generated user files are self-contained and do not copy or import contracts, controllers, internal primitives, generator files, or runtime bambiui packages.
 - **CustomEvents**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled/uncontrolled**: `data-controlled="true"` → controller fires event only. Without it, controller writes `data-value` and fires event.
 - **Self-contained installed output**: generated user files have no `@bambiui/*` runtime imports.
@@ -36,8 +36,8 @@ Active data flow: `core → generator → registry → cli → user project`
 - `packages/core` — DOM Protocol source of truth. Contract + controller live here and are internal authoring inputs.
 - `packages/generator` — Private internal parser/generator package used by `pnpm registry:refresh`; not a CLI runtime dependency and never imported by generated output.
 - `packages/registry` — Generated public artifacts under `packages/registry/generated/` and component CSS under `src/styles/`.
-- `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats `registry.json` as external input.
-- Installed output — no `@bambiui/*` runtime imports and no internal contract or controller files. bambiui does not ship runtime adapter packages.
+- `packages/cli` — must NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/registry` at runtime. Treats `registry.json` as external input and only copies registry artifacts.
+- Installed output — no `@bambiui/*` runtime imports and no internal contract, controller, primitive, or generator files.
 
 ## Registry Manifests
 
@@ -101,7 +101,7 @@ No contract files, controller files, primitives, generator files, or `@bambiui/*
 
 `react`.
 
-bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
+React is the first generated output target. Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
 
 ## apps/templates — Smoke Fixtures
 

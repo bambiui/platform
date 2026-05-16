@@ -15,11 +15,11 @@
 - The only allowed sibling import is from `./<name>.contract.js` (the co-located contract file).
 - Controllers may import implemented shared primitives from `@bambiui/core/primitives/<name>` using extensionless package specifiers in workspace source. The CLI tolerates `.js`, but new source should omit it.
 - If a controller uses primitives, every primitive file, including transitive primitive dependencies, must be listed explicitly in `registry.authoring.json` `primitiveFiles`.
-- Controllers are internal authoring inputs. `bambiui add` must not copy them into user projects.
+- Controllers are internal authoring inputs. `bambiui add` must not copy them into user projects, and generated registry output must not import them.
 
 ## Boundaries
 
-- Framework code (React, Vue, Svelte, Solid, HTML wrappers) belongs in `packages/registry`, not here.
+- Framework wrapper output belongs in `packages/registry/generated/`, not here. React is the first active output target.
 - CSS belongs in `packages/registry/src/styles/`, not here.
 - CLI logic, registry schema, and deployment scripts do not belong here.
 - Do not import from framework packages (React, Svelte, Vue, Solid).
@@ -37,6 +37,8 @@
 - Do not add `@bambiui/*` imports inside controller files.
 - Do not put CSS or framework wrapper files in this package.
 - Do not make public CLI output depend on files in this package.
+- Do not make public CLI output import `@bambiui/core`, `@bambiui/generator`, `@bambiui/adapters`, contracts, controllers, or internal primitives.
+- Do not add non-React framework files until React generated output is stable and there is an explicit plan.
 - Do not reference `src/contracts.ts`, `src/button.ts`, or any other pre-DOM-Protocol paths — those files no longer exist.
 
 ## Verify

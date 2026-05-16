@@ -16,17 +16,19 @@ If framework auto-detection is inconclusive during this React-only phase, the CL
 
 ## Architecture
 
-bambiui uses a DOM Protocol model. Each component has three layers:
+bambiui uses a DOM Protocol model. Internal component contracts and controllers are transformed by the build-time generator into public generated artifacts. The CLI copies those artifacts into user projects; users do not install runtime bambiui packages.
+
+Each component has three layers:
 
 - **Controller** — vanilla TypeScript, manages DOM state via `data-*` attributes. No framework dependency.
 - **CSS** — driven entirely by `data-*` attribute selectors. No JavaScript class toggling.
-- **Framework wrapper** — a thin bridge. Translates props → DOM attributes, mounts/destroys the controller, calls `controller.sync()` on prop changes. Contains zero behavior logic.
+- **Framework wrapper** — generated React output source that translates props → DOM attributes, mounts/destroys the controller behavior, calls `controller.sync()` on prop changes, and contains zero independent behavior logic.
 
-CLI output is **self-contained**: copied files have no `@bambiui/*` runtime imports.
+CLI output is **self-contained registry output**: copied files have no `@bambiui/*` runtime imports and do not include contract, controller, primitive, or generator files.
 
 ## Frameworks
 
-bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
+React is the first and primary generated output target. Vue, Svelte, Solid, and other framework targets are not the current focus; React output is being stabilized first.
 
 ## Usage
 

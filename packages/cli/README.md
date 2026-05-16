@@ -2,17 +2,17 @@
 
 CLI-first, public source-distributed UI components for React.
 
-bambiui is currently focusing on React as the first canonical adapter target.
-Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui is currently focusing on React as the first generated output target.
+Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
 
 ```sh
 npx bambiui init
 npx bambiui add tabs --framework react
 ```
 
-bambiui copies framework-ready public component artifacts directly into your app. It does not require a runtime component package. Generated output is self-contained and must not include `@bambiui/*` imports, contracts, controllers, adapter helpers, or generator files.
+bambiui copies framework-ready public component artifacts directly into your app. It does not require a runtime component package. Generated output is self-contained and must not include `@bambiui/*` imports, contracts, controllers, internal primitives, or generator files.
 
-Maintainers refresh public artifacts with `pnpm registry:refresh`; this calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and copies component CSS.
+Maintainers refresh public artifacts with `pnpm registry:refresh`; this calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits React framework wrappers from contract metadata, inlines controller behavior, and copies component CSS.
 
 ## Init
 

@@ -2,13 +2,13 @@
 
 ## Responsibility
 
-`packages/registry` holds internal React wrapper templates and generated public artifacts. Public artifacts are the only component files the CLI copies into user projects.
+`packages/registry` holds generated public artifacts and CSS. Public artifacts are the only component files the CLI copies into user projects.
 
 ## What Lives Here
 
 - Component CSS source: `src/styles/<name>.css`
 - Global style file: `src/styles/bambi.css`
-- Public generated artifacts: `generated/<name>/<framework>/`
+- Public generated artifacts: `generated/<name>/<framework>/` (currently React)
 - Shared public helper: `generated/shared/react/bambi-helpers.ts`
 - Workspace barrels: `src/components/<name>/index.ts` (not installed)
 
@@ -17,11 +17,13 @@
 - Contract files (`<name>.contract.ts`) — those live in `packages/core/src/components/<name>/`.
 - Controller files (`<name>.controller.ts`) — those live in `packages/core/src/components/<name>/`.
 - CLI logic or registry validation scripts.
+- Contract, controller, internal primitive, or generator source files.
 
 ## Public Artifact Rules
 
 - `registry.json` may reference only framework-ready generated files.
-- Generated files must not import `@bambiui/core`, contracts, controllers, or generator files.
+- Generated files must not import `@bambiui/core`, `@bambiui/generator`, `@bambiui/adapters`, contracts, controllers, internal primitives, or generator files.
+- Generated files must be self-contained registry output safe for direct CLI copying.
 - Tabs React installs as:
   - `src/components/ui/tabs/index.tsx`
   - `src/components/ui/tabs/tabs.css`
@@ -42,7 +44,7 @@
 
 `react`.
 
-bambiui generates React-ready component artifacts. Vue, Svelte and Solid are not supported in this release.
+React is the first generated output target. Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
 
 ## Canonical Reference
 

@@ -317,7 +317,7 @@ function reactPartComponentSource(contract, options) {
     .join("\n\n");
 }
 
-function createReactAdapterSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
+function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
   const root = contract.parts.find((part) => part.name === "root");
   if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
 
@@ -440,7 +440,7 @@ ${publicContractSource}
 
 ${behaviorSource}
 
-${createReactAdapterSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions })}
+${createReactWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions })}
 `;
 
   return { content, usedHelpers };

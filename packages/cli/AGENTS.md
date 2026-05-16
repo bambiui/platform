@@ -14,7 +14,7 @@ For `bambiui add <component> --framework <fw>`:
 4. Copies only `components[component].files[framework][]` into `componentDir/<name>/`.
 5. If `components[component].helpers[framework]` is non-empty, copies `manifest.shared[framework]` to `componentDir/bambi-helpers.ts` (one level above the component directory).
 
-The CLI does not copy contracts, controllers, adapter helpers, primitives, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained. `bambi-helpers.ts` is a generated public artifact and is safe to distribute.
+The CLI does not copy contracts, controllers, internal primitives, runtime package helpers, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained. `bambi-helpers.ts` is a generated public artifact and is safe to distribute.
 
 Maintainers produce those public files with `pnpm registry:refresh`; it calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and syncs CSS.
 
@@ -22,7 +22,7 @@ Maintainers produce those public files with `pnpm registry:refresh`; it calls in
 
 Supported: `react`
 
-bambiui is currently focusing on React as the first canonical adapter target. Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui is currently focusing on React as the first generated output target. Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
 
 ## Config Shape (bambiui.config.json)
 
@@ -34,8 +34,9 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 
 ## Boundaries
 
-- CLI runtime must NOT import `@bambiui/core` or `@bambiui/registry`.
-- Installed output must be self-contained and must not contain `@bambiui/*` runtime imports.
+- CLI runtime must NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/registry`.
+- Installed output must be self-contained and must not contain `@bambiui/*` runtime imports, including `@bambiui/core`, `@bambiui/generator`, or `@bambiui/adapters`.
+- CLI only copies registry artifacts and the generated shared helper file declared by `registry.json`.
 - Registry version check: reject manifests where `version !== 2`.
 - Preserve `--registry-url` flow for local development.
 
@@ -43,9 +44,10 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 
 - Do not add component package dependencies to `packages/cli/package.json`.
 - Do not hardcode local workspace paths into installed output.
-- Do not generate or copy `types.ts`, `define-contract.ts`, controller files, adapter helper files, or primitive files into user projects.
+- Do not generate or copy `types.ts`, `define-contract.ts`, controller files, internal helper files, primitive files, or generator files into user projects.
 - Do not add import rewrite logic for internal package imports; fix the generated public artifact instead.
-- Do not add Astro or restore non-React framework support without a plan.
+- Do not use adapter terminology for active architecture; use generator, framework wrapper, or output target.
+- Do not add Astro or restore non-React framework support until React generated output is stable and there is an explicit plan.
 - Do not change registry semantics without updating `scripts/check-registry.mjs`.
 
 ## Golden References

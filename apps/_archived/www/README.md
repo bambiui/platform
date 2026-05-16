@@ -1,47 +1,13 @@
 # Archived
 
-This old marketing site is suspended and is not an active workspace, build, registry, or CLI target. Do not use its old package references or examples as current bambiui architecture guidance.
+This old marketing site is suspended and is not an active workspace, build, registry, or CLI target. Do not use its old package, docs, studio, or legacy runtime-package examples as current bambiui architecture guidance.
 
-# bambiui — www
+Current bambiui uses CLI-first delivery:
 
-Custom Astro marketing and landing site for bambiui. Served at `/` (site root).
+- `packages/core` keeps internal DOM Protocol contracts, controllers, and primitive logic.
+- `packages/generator` creates generated artifacts at maintainer/build time.
+- `packages/registry` stores self-contained React output and CSS for CLI copying.
+- `packages/cli` copies registry artifacts into user projects without runtime `@bambiui/*` dependencies.
+- `apps/www` is the active static host for the landing/site and registry assets.
 
-This is not a Starlight app. It is a plain Astro site with a hand-crafted landing page. Documentation lives under `/docs` (`apps/docs`); the Studio token editor lives under `/studio` (`apps/studio`).
-
-## Development
-
-```sh
-pnpm --filter www dev
-```
-
-## Production build
-
-```sh
-# standalone www output → apps/www/dist/
-pnpm --filter www build
-
-# full deploy build — merges www + docs + studio into apps/www/dist/
-pnpm deploy-static
-```
-
-## Cloudflare Pages project settings
-
-| Setting                | Value                |
-| ---------------------- | -------------------- |
-| Framework preset       | None                 |
-| Root directory         | `/` (monorepo root)  |
-| Build command          | `pnpm deploy-static` |
-| Build output directory | `apps/www/dist`      |
-| Node.js version        | `22.12.0` or newer   |
-
-## What goes here
-
-- Marketing copy, hero sections, feature highlights
-- Links to docs and Studio
-- Root-level HTML, meta tags, OG tags, favicon, robots.txt, site.webmanifest
-
-## What does NOT go here
-
-- Documentation pages → `apps/docs`
-- Token editor or component previews → `apps/studio`
-- Starlight UI elements
+React is the first generated output target. Non-React framework output is deferred until the React output is stable.

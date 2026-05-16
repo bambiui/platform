@@ -8,8 +8,8 @@ They are not part of the public product surface. Keep them small, framework-spec
 
 - `bambi-react`: React/Next.js fixture.
 
-bambiui is currently focusing on React as the first canonical adapter target.
-Vue, Svelte and Solid support are intentionally removed during the generic adapter migration and will be rebuilt later.
+bambiui is currently focusing on React as the first generated output target.
+Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
 
 ## Smoke Test
 
@@ -48,5 +48,6 @@ The templates use their own lock files, so the smoke script uses `npm ci` for te
 
 - Do not commit `node_modules`, `.next`, `dist`, or other generated output.
 - Generated bambiui component files may be committed when they intentionally represent the current fixture state.
-- Internal contract/controller/adapter helper files must not appear in template output.
+- Internal contract, controller, primitive, generator, or runtime package files must not appear in template output.
+- Template output must stay self-contained: no `@bambiui/*` runtime imports.
 - These fixtures should stay boring: one page, one imported component, enough framework config to catch integration regressions.

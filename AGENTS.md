@@ -29,7 +29,7 @@ Nested rules:
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
 - **Vanilla TypeScript controllers**: controllers remain the internal DOM Protocol source of truth.
-- **Generated public artifacts**: user-installed React files are framework-ready and self-contained. They do not import or copy contract, controller, or generator files.
+- **Generated public artifacts**: user-installed React files are framework-ready and self-contained. They do not import or copy contract, controller, internal primitive, generator, or runtime bambiui package files.
 - **CustomEvents for callbacks**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled mode**: controller fires `bambi:<event-name>` only; does NOT mutate source state (`data-value`). Host framework is responsible for updating.
 - **Uncontrolled mode**: controller manages source state directly.
@@ -72,8 +72,8 @@ uncontrolled: (no data-controlled)    →  controller writes data-value and fire
 - `packages/core` — workspace source of truth; imports allowed between core files. Controllers are internal authoring/build-time inputs and are not copied by `bambiui add`.
 - `packages/generator` — private internal parsers/generators used by maintainer scripts. The CLI and generated output must not depend on it.
 - `packages/registry` — generated public artifacts. `packages/registry/generated/<name>/<framework>/` is the only component artifact source public `registry.json` may reference.
-- `packages/cli` — must NOT import `@bambiui/core` or `@bambiui/registry` at runtime. Treats registry.json as external input.
-- Installed output — no `@bambiui/*` runtime imports and no internal contract or controller files.
+- `packages/cli` — must NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/registry` at runtime. Treats registry.json as external input and only copies public registry artifacts.
+- Installed output — no `@bambiui/*` runtime imports and no internal contract, controller, primitive, or generator files.
 
 ## Registry File Layout
 
@@ -85,7 +85,7 @@ packages/registry/generated/<name>/<framework>/
   <name>.css
 ```
 
-Vue, Svelte, Solid, and HTML subdirectories are intentionally absent during the migration.
+React is the first generated output target. Vue, Svelte, Solid, and HTML subdirectories are intentionally absent while React output is stabilized.
 
 The generator produces these files directly from the contract and controller — no internal wrapper template is needed. The CLI copies only the paths listed in public `registry.json` and does not run the internal contract/controller/generator pipeline.
 
@@ -103,7 +103,10 @@ The generator produces these files directly from the contract and controller —
 - Do NOT use MutationObserver for framework state sync.
 - Do NOT write callbacks, functions, or objects into `data-*` attributes.
 - Do NOT import `@bambiui/core` or `@bambiui/registry` from installed component output.
-- Do NOT copy contract, controller, or generator files into user projects.
+- Do NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/adapters` from installed component output.
+- Do NOT copy contract, controller, internal primitive, or generator files into user projects.
+- Do NOT use adapter terminology for active architecture; use generator, framework wrapper, or output target.
+- Do NOT add non-React framework output unless React generated output is stable and the work is explicitly planned.
 - Do NOT create per-component packages or per-component build steps.
 - Do NOT redesign registry v2 schema or package layout without updating check-registry.mjs and CLI.
 - Do NOT add apps/docs or apps/studio (suspended — see apps/_archived/).
@@ -111,7 +114,7 @@ The generator produces these files directly from the contract and controller —
 - Do NOT reference "button canonical" — tabs is the new reference.
 - Do NOT add Astro framework wrapper until explicitly planned.
 - Do NOT put controller/contract files in `packages/registry` — they live in `packages/core` and are sourced by internal generation only.
-- Do NOT ship runtime adapter packages — bambiui generates self-contained artifacts, it does not provide runtime framework adapters.
+- Do NOT ship runtime bambiui packages — bambiui generates self-contained artifacts.
 
 ## Suspended / Archived
 
@@ -125,7 +128,7 @@ Archived AGENTS.md files under `apps/_archived/` carry a top-level warning. Do n
 
 ## Distribution Model
 
-The CLI distributes **framework-ready public source artifacts**, not internal authoring files.
+The CLI distributes **framework-ready public source artifacts**, not internal authoring files. This is CLI-first delivery: the user project receives self-contained files instead of runtime bambiui packages.
 
 - Public `registry.json` describes only files safe to copy directly into a user project.
 - Internal `registry.authoring.json` describes contracts, controllers, optional primitives, and generator metadata for maintainers.

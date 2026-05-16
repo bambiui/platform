@@ -2,6 +2,8 @@
 
 Tabs follows the DOM Protocol model internally. The public CLI artifact is a self-contained React implementation generated under `packages/registry/generated/tabs/react/`.
 
+The generated artifact is copied into user projects by the CLI and does not require `@bambiui/core`, `@bambiui/generator`, or any runtime bambiui package. React is the first generated output target; other framework output targets are deferred until the React wrapper is stable.
+
 ## Usage
 
 ```tsx

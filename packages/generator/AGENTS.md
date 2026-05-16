@@ -7,7 +7,7 @@
 ## What Lives Here
 
 - Contract parsers that read internal DOM Protocol component contracts.
-- Framework artifact generators, currently the React output target.
+- Framework artifact generators for React, Solid, Svelte 5, and Vue 3 output targets.
 - Framework dispatch entrypoint in `src/index.js`.
 - Small generation utilities shared across components.
 
@@ -23,10 +23,10 @@
 
 - Do not make user-installed files depend on `@bambiui/generator`.
 - Do not make user-installed files depend on `@bambiui/core`, `@bambiui/adapters`, or any runtime bambiui package.
-- Do not add React runtime behavior here that should remain in core controllers.
+- Do not add framework runtime behavior here that should remain in core controllers.
 - Do not hardcode component-specific part semantics in parser code. Put component API hints in `registry.authoring.json` `generator.<framework>` metadata.
-- Do not use adapter terminology for active output; use generator, framework wrapper, React output source, or generated component source.
-- Do not add non-React framework output until React generated output is stable and there is an explicit plan.
+- Do not use adapter terminology for active output; use generator, framework wrapper, or generated component source.
+- Do not add Astro framework output without an explicit plan.
 - Do not build a broad compiler without an explicit plan; extend parser/generator support component by component and output target by output target.
 
 ## Verify

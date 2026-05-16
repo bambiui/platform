@@ -2,17 +2,19 @@
 
 DOM Protocol based, CLI-first UI kit.
 
-> **Status:** Architecture reset in progress. docs/studio temporarily suspended.  
-> Current focus: stabilize React as the first framework target with Tabs.
+> **Status:** Architecture reset in progress. docs/studio temporarily suspended.
 
 ## Quick Start
 
 ```sh
 npx bambiui init
 npx bambiui add tabs --framework react
+npx bambiui add tabs --framework solid
+npx bambiui add tabs --framework svelte
+npx bambiui add tabs --framework vue
 ```
 
-If framework auto-detection is inconclusive during this React-only phase, the CLI uses React defaults.
+If framework auto-detection is inconclusive, the CLI uses React defaults.
 
 ## Architecture
 
@@ -22,13 +24,13 @@ Each component has three layers:
 
 - **Controller** — vanilla TypeScript, manages DOM state via `data-*` attributes. No framework dependency.
 - **CSS** — driven entirely by `data-*` attribute selectors. No JavaScript class toggling.
-- **Framework wrapper** — generated React output source that translates props → DOM attributes, mounts/destroys the controller behavior, calls `controller.sync()` on prop changes, and contains zero independent behavior logic.
+- **Framework wrapper** — generated framework output source (React, Solid, Svelte, Vue) that translates props → DOM attributes, mounts/destroys the controller behavior, calls `controller.sync()` on prop changes, and contains zero independent behavior logic.
 
 CLI output is **self-contained registry output**: copied files have no `@bambiui/*` runtime imports and do not include contract, controller, primitive, or generator files.
 
 ## Frameworks
 
-React is the first and primary generated output target. Vue, Svelte, Solid, and other framework targets are not the current focus; React output is being stabilized first.
+Supported output targets: **React**, **Solid**, **Svelte 5**, **Vue 3**.
 
 ## Usage
 
@@ -42,13 +44,25 @@ npx bambiui init
 ### Add a component
 
 ```sh
+# React
 npx bambiui add tabs --framework react
-# Copies to src/components/ui/tabs/:
-#   index.tsx
-#   tabs.css
-# Copies once to src/components/ui/ (only for components that use shared helpers):
+# → src/components/ui/tabs/index.tsx + tabs.css
+
+# Solid
+npx bambiui add tabs --framework solid
+# → src/components/ui/tabs/index.tsx + tabs.css
+
+# Svelte 5
+npx bambiui add tabs --framework svelte
+# → src/components/ui/tabs/{Tabs,TabsList,TabsTrigger,TabsContent}.svelte + index.ts + tabs.css
+
+# Vue 3
+npx bambiui add tabs --framework vue
+# → src/components/ui/tabs/{Tabs,TabsList,TabsTrigger,TabsContent}.vue + index.ts + tabs.css
+
+# All frameworks also copy once to src/components/ui/ (when helpers are used):
 #   bambi-helpers.ts
-# Also ensures the global style file exists at src/styles/bambi.css
+# And ensure the global style file exists at src/styles/bambi.css
 ```
 
 ## Controlled / Uncontrolled
@@ -71,7 +85,7 @@ npx bambiui add tabs --framework react
 | `packages/core`               | DOM protocol interfaces, utilities, tab controller   |
 | `packages/generator`          | Contract parsers and framework artifact generators   |
 | `packages/registry`           | Generated public artifacts and component CSS         |
-| `apps/templates`              | Template project for CLI smoke tests (bambi-react)   |
+| `apps/templates`              | Template projects for CLI smoke tests (react, solid, svelte, vue) |
 | `apps/www`                    | Active minimal static host for registry assets       |
 | `apps/_archived/`             | docs, studio, old www — suspended                    |
 

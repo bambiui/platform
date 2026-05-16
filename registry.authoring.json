@@ -16,6 +16,26 @@
         "react": [
           "packages/registry/generated/tabs/react/index.tsx",
           "packages/registry/generated/tabs/react/tabs.css"
+        ],
+        "solid": [
+          "packages/registry/generated/tabs/solid/index.tsx",
+          "packages/registry/generated/tabs/solid/tabs.css"
+        ],
+        "svelte": [
+          "packages/registry/generated/tabs/svelte/Tabs.svelte",
+          "packages/registry/generated/tabs/svelte/TabsList.svelte",
+          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte",
+          "packages/registry/generated/tabs/svelte/TabsContent.svelte",
+          "packages/registry/generated/tabs/svelte/index.ts",
+          "packages/registry/generated/tabs/svelte/tabs.css"
+        ],
+        "vue": [
+          "packages/registry/generated/tabs/vue/Tabs.vue",
+          "packages/registry/generated/tabs/vue/TabsList.vue",
+          "packages/registry/generated/tabs/vue/TabsTrigger.vue",
+          "packages/registry/generated/tabs/vue/TabsContent.vue",
+          "packages/registry/generated/tabs/vue/index.ts",
+          "packages/registry/generated/tabs/vue/tabs.css"
         ]
       },
       "generator": {
@@ -24,10 +44,31 @@
           "valuePropParts": ["trigger", "content"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["trigger"]
+        },
+        "solid": {
+          "valuePropName": "value",
+          "valuePropParts": ["trigger", "content"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["trigger"]
+        },
+        "svelte": {
+          "valuePropName": "value",
+          "valuePropParts": ["trigger", "content"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["trigger"]
+        },
+        "vue": {
+          "valuePropName": "value",
+          "valuePropParts": ["trigger", "content"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["trigger"]
         }
       },
       "exports": {
-        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
+        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "solid": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
+        "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
       }
     }
   }

@@ -6,7 +6,10 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js",
-    "./react": "./src/react/index.js"
+    "./react": "./src/react/index.js",
+    "./solid": "./src/solid/index.js",
+    "./svelte": "./src/svelte/index.js",
+    "./vue": "./src/vue/index.js"
   },
   "scripts": {
     "test": "vitest run"

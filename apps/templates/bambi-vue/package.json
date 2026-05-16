@@ -1,0 +1,19 @@
+{
+  "name": "bambi-vue",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "vue": "^3.5.16"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "^5",
+    "vite": "^6",
+    "vue-tsc": "^2.2.10"
+  }
+}

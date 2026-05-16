@@ -12,6 +12,17 @@ const cliEntry = path.join(cliRoot, "src/index.js");
 
 const expectedFiles = {
   react: ["index.tsx", "tabs.css"],
+  solid: ["index.tsx", "tabs.css"],
+  svelte: ["index.ts", "Tabs.svelte", "TabsList.svelte", "TabsTrigger.svelte", "TabsContent.svelte", "tabs.css"],
+  vue: ["index.ts", "Tabs.vue", "TabsList.vue", "TabsTrigger.vue", "TabsContent.vue", "tabs.css"],
+};
+
+// Per-framework: which file should import ./tabs.css
+const cssImportFile = {
+  react: "index.tsx",
+  solid: "index.tsx",
+  svelte: "Tabs.svelte",
+  vue: "Tabs.vue",
 };
 
 const forbiddenFileNames = new Set([
@@ -120,9 +131,10 @@ for (const [framework, files] of Object.entries(expectedFiles)) {
 
     assertExists(path.join(cwd, "src/components/ui/bambi-helpers.ts"));
 
-    const wrapper = await readFile(path.join(componentDir, "index.tsx"), "utf8");
+    const cssFile = cssImportFile[framework] ?? "index.tsx";
+    const wrapper = await readFile(path.join(componentDir, cssFile), "utf8");
     if (!wrapper.includes(`"./tabs.css"`)) {
-      throw new Error("Expected index.tsx to import ./tabs.css");
+      throw new Error(`Expected ${cssFile} to import ./tabs.css`);
     }
 
     const secondAdd = await runCli([
@@ -145,17 +157,17 @@ for (const [framework, files] of Object.entries(expectedFiles)) {
   }
 }
 
-const reactOnlyMessage = "bambiui is currently React-only.";
+const unknownFrameworkMessage = "Unknown framework";
 
-for (const framework of ["vue", "svelte", "solid", "astro"]) {
+for (const framework of ["astro"]) {
   const invalidDir = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
   try {
     const result = await runCli(
       ["init", "--yes", "--framework", framework, "--cwd", invalidDir, "--registry-url", repoRoot],
       { expectFailure: true },
     );
-    if (!result.stderr.includes(reactOnlyMessage)) {
-      throw new Error(`Expected React-only migration message for ${framework}.`);
+    if (!result.stderr.includes(unknownFrameworkMessage)) {
+      throw new Error(`Expected unknown framework error for ${framework}, got: ${result.stderr}`);
     }
   } finally {
     await rm(invalidDir, { force: true, recursive: true });

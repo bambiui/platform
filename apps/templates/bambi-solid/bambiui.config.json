@@ -1,0 +1,5 @@
+{
+  "framework": "solid",
+  "componentDir": "src/components/ui",
+  "styleFile": "src/styles/bambi.css"
+}

@@ -20,9 +20,7 @@ Maintainers produce those public files with `pnpm registry:refresh`; it calls in
 
 ## Frameworks
 
-Supported: `react`
-
-bambiui is currently focusing on React as the first generated output target. Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
+Supported: `react`, `solid`, `svelte`, `vue`
 
 ## Config Shape (bambiui.config.json)
 
@@ -47,7 +45,7 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 - Do not generate or copy `types.ts`, `define-contract.ts`, controller files, internal helper files, primitive files, or generator files into user projects.
 - Do not add import rewrite logic for internal package imports; fix the generated public artifact instead.
 - Do not use adapter terminology for active architecture; use generator, framework wrapper, or output target.
-- Do not add Astro or restore non-React framework support until React generated output is stable and there is an explicit plan.
+- Do not add Astro framework support without an explicit plan.
 - Do not change registry semantics without updating `scripts/check-registry.mjs`.
 
 ## Golden References

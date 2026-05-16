@@ -4,34 +4,27 @@ import { normalizeRelativePath, readJson } from "./files.js";
 
 export const DEFAULT_COMPONENT_DIR = "src/components/ui";
 export const DEFAULT_STYLE_FILE = "src/styles/bambi.css";
-export const REACT_ONLY_MIGRATION_MESSAGE =
-  "bambiui is currently React-only. Use --framework react.";
 
 export const frameworkFiles = {
+  solid: ["vite.config.ts", "vite.config.js"],
   svelte: ["svelte.config.js", "svelte.config.ts"],
   vue: ["nuxt.config.ts", "nuxt.config.js"],
   react: ["next.config.js", "next.config.mjs", "next.config.ts"],
 };
 
-export const frameworkOptions = ["react"];
-const knownUnsupportedFrameworks = new Set(["vue", "svelte", "solid"]);
+export const frameworkOptions = ["react", "solid", "svelte", "vue"];
+const knownFrameworks = new Set(frameworkOptions);
 
 /**
  * @param {string} framework
  */
 export function assertSupportedFramework(framework) {
-  if (framework === "react" || framework === "unknown") {
+  if (knownFrameworks.has(framework) || framework === "unknown") {
     return;
   }
 
-  if (knownUnsupportedFrameworks.has(framework)) {
-    throw new Error(
-      `${REACT_ONLY_MIGRATION_MESSAGE}\nRequested: ${framework}.`,
-    );
-  }
-
   throw new Error(
-    `Unknown framework "${framework}". Defaulting is only used for auto-detection.\n${REACT_ONLY_MIGRATION_MESSAGE}`,
+    `Unknown framework "${framework}". Supported frameworks: ${frameworkOptions.join(", ")}.`,
   );
 }
 

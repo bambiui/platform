@@ -50,16 +50,20 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": {
-              "$ref": "#/$defs/registryFileList"
-            }
+            "react": { "$ref": "#/$defs/registryFileList" },
+            "solid": { "$ref": "#/$defs/registryFileList" },
+            "svelte": { "$ref": "#/$defs/registryFileList" },
+            "vue": { "$ref": "#/$defs/registryFileList" }
           }
         },
         "helpers": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": { "$ref": "#/$defs/exportNames" }
+            "react": { "$ref": "#/$defs/exportNames" },
+            "solid": { "$ref": "#/$defs/exportNames" },
+            "svelte": { "$ref": "#/$defs/exportNames" },
+            "vue": { "$ref": "#/$defs/exportNames" }
           }
         },
         "hashes": {
@@ -73,7 +77,10 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": { "$ref": "#/$defs/exportNames" }
+            "react": { "$ref": "#/$defs/exportNames" },
+            "solid": { "$ref": "#/$defs/exportNames" },
+            "svelte": { "$ref": "#/$defs/exportNames" },
+            "vue": { "$ref": "#/$defs/exportNames" }
           }
         }
       }

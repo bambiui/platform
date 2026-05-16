@@ -1,6 +1,6 @@
 # bambiui Agent Entry
 
-bambiui is a pnpm + Turborepo monorepo. The CLI distributes public, framework-ready React component artifacts into user projects. DOM Protocol contract and controller files remain internal authoring inputs; the generator produces framework-specific artifacts from them. React is the only active framework target.
+bambiui is a pnpm + Turborepo monorepo. The CLI distributes public, framework-ready component artifacts into user projects. DOM Protocol contract and controller files remain internal authoring inputs; the generator produces framework-specific artifacts from them. Supported output targets: React, Solid, Svelte 5, Vue 3.
 
 ## Navigate
 
@@ -9,7 +9,7 @@ packages/cli        bambiui init/add; fetches registry assets and writes user fi
 packages/core       DOM protocol interfaces, utilities, and workspace component implementations
 packages/generator  Internal contract parsers and framework artifact generators
 packages/registry   Generated public artifacts and component CSS
-apps/templates      Template project for CLI smoke tests (bambi-react only)
+apps/templates      Template projects for CLI smoke tests (bambi-react, bambi-solid, bambi-svelte, bambi-vue)
 apps/www            Active minimal static host for bambiui and registry assets
 apps/_archived/     docs, studio, old www — suspended during architecture reset
 registry.json       v2 public manifest consumed by CLI
@@ -29,7 +29,7 @@ Nested rules:
 
 - **HTML-first, CSS-first**: all component state is expressed via `data-*` attributes.
 - **Vanilla TypeScript controllers**: controllers remain the internal DOM Protocol source of truth.
-- **Generated public artifacts**: user-installed React files are framework-ready and self-contained. They do not import or copy contract, controller, internal primitive, generator, or runtime bambiui package files.
+- **Generated public artifacts**: user-installed files are framework-ready and self-contained. They do not import or copy contract, controller, internal primitive, generator, or runtime bambiui package files.
 - **CustomEvents for callbacks**: wrappers listen to `bambi:<event-name>` events and forward to framework callbacks/emitters.
 - **Controlled mode**: controller fires `bambi:<event-name>` only; does NOT mutate source state (`data-value`). Host framework is responsible for updating.
 - **Uncontrolled mode**: controller manages source state directly.
@@ -81,11 +81,10 @@ Public generated artifacts live under:
 
 ```txt
 packages/registry/generated/<name>/<framework>/
-  index.tsx
-  <name>.css
+  # React / Solid: index.tsx + <name>.css
+  # Svelte: Tabs.svelte, TabsList.svelte, TabsTrigger.svelte, TabsContent.svelte, index.ts, <name>.css
+  # Vue:    Tabs.vue, TabsList.vue, TabsTrigger.vue, TabsContent.vue, index.ts, <name>.css
 ```
-
-React is the first generated output target. Vue, Svelte, Solid, and HTML subdirectories are intentionally absent while React output is stabilized.
 
 The generator produces these files directly from the contract and controller — no internal wrapper template is needed. The CLI copies only the paths listed in public `registry.json` and does not run the internal contract/controller/generator pipeline.
 
@@ -93,7 +92,7 @@ The generator produces these files directly from the contract and controller —
 
 - Tabs is the canonical reference component:
   - Contract + Controller (single source): `packages/core/src/components/tabs/`
-  - Public React artifacts: `packages/registry/generated/tabs/react/`
+  - Public artifacts: `packages/registry/generated/tabs/{react,solid,svelte,vue}/`
   - CSS source: `packages/registry/src/styles/tabs.css`
 - DOM protocol types: `packages/core/src/dom/`
 
@@ -106,7 +105,7 @@ The generator produces these files directly from the contract and controller —
 - Do NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/adapters` from installed component output.
 - Do NOT copy contract, controller, internal primitive, or generator files into user projects.
 - Do NOT use adapter terminology for active architecture; use generator, framework wrapper, or output target.
-- Do NOT add non-React framework output unless React generated output is stable and the work is explicitly planned.
+- Do NOT add Astro framework output without an explicit plan.
 - Do NOT create per-component packages or per-component build steps.
 - Do NOT redesign registry v2 schema or package layout without updating check-registry.mjs and CLI.
 - Do NOT add apps/docs or apps/studio (suspended — see apps/_archived/).
@@ -146,9 +145,9 @@ outputDir/
     tabs.css
 ```
 
-`registry.json` carries a top-level `shared.react` path pointing to the static helper file, and each component that uses helpers lists them in `helpers.react`. The CLI copies `bambi-helpers.ts` to `outputDir/` only when the component being installed declares a non-empty `helpers.react` — components that use no helpers (e.g. a future `button`) never trigger helper installation.
+`registry.json` carries a top-level `shared.<framework>` path pointing to the static helper file, and each component that uses helpers lists them in `helpers.<framework>`. The CLI copies `bambi-helpers.ts` to `outputDir/` only when the component being installed declares a non-empty `helpers.<framework>` — components that use no helpers (e.g. a future `button`) never trigger helper installation.
 
-`registry-refresh.mjs` enforces that `registry.json`'s `helpers.react` exactly matches what the generator detected — mismatch is a hard error.
+`registry-refresh.mjs` enforces that `registry.json`'s `helpers.<framework>` exactly matches what the generator detected — mismatch is a hard error.
 
 ## Primitive Files
 
@@ -168,7 +167,7 @@ pnpm check                              # registry refresh + types + registry + 
 pnpm check-types                        # turbo: core + registry + cli TypeScript
 pnpm check-registry                     # validate registry.json v2 schema
 pnpm registry:refresh                   # generate/validate public registry artifacts
-pnpm --filter bambiui smoke             # CLI smoke: react
+pnpm --filter bambiui smoke             # CLI smoke: react, solid, svelte, vue
 pnpm smoke:templates                    # template smoke (requires node_modules in templates)
 pnpm smoke:templates -- --install       # same, runs npm ci first
 pnpm build:static                       # build apps/www and inject registry files into dist
@@ -195,13 +194,13 @@ pnpm build:static                       # build apps/www and inject registry fil
 3. Add CSS at `packages/registry/src/styles/<name>.css`.
 4. Register authoring inputs in `registry.authoring.json`:
    - `contract`, `controller`, `contractFiles`, optional `primitiveFiles`
-   - `generatedFiles.react` target paths under `packages/registry/generated/<name>/react/`
+   - `generatedFiles.<framework>` target paths under `packages/registry/generated/<name>/<framework>/`
    - `generator.<framework>` metadata for framework-specific public API rules, such as which parts expose a value or disabled prop.
-5. Generate public artifacts: `pnpm registry:refresh` parses the contract, inlines behavior from the controller, emits React parts from contract metadata, applies `generator.react` metadata, and copies the CSS. The generator auto-detects which shared helpers (`BambiBehavior`, `getAttr`, `setAttr`, `getBoolAttr`) the controller used and returns them as `usedHelpers`.
-6. Register only public artifact files in `registry.json` (v2 format):
-   - `files.react` → generated `index.tsx`, `<name>.css` artifacts
-   - `exports.react` → list of exported component names
-   - `helpers.react` → list of shared helper names detected by the generator (omit if the component uses none)
+5. Generate public artifacts: `pnpm registry:refresh` parses the contract, inlines behavior from the controller, emits framework parts from contract metadata, applies `generator.<framework>` metadata, and copies the CSS. The generator auto-detects which shared helpers (`BambiBehavior`, `getAttr`, `setAttr`, `getBoolAttr`) the controller used and returns them as `usedHelpers`.
+6. Register only public artifact files in `registry.json` (v2 format) for each framework:
+   - `files.<framework>` → generated component files and `<name>.css`
+   - `exports.<framework>` → list of exported component names
+   - `helpers.<framework>` → list of shared helper names detected by the generator (omit if the component uses none)
 7. Run `pnpm registry:refresh`, `pnpm check-registry`, and `pnpm check-types`.
 
 ## Multi-Agent Coordination

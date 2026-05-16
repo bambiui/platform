@@ -5,7 +5,10 @@
     "global": "packages/registry/src/styles/bambi.css"
   },
   "shared": {
-    "react": "packages/registry/generated/shared/react/bambi-helpers.ts"
+    "react": "packages/registry/generated/shared/react/bambi-helpers.ts",
+    "solid": "packages/registry/generated/shared/solid/bambi-helpers.ts",
+    "svelte": "packages/registry/generated/shared/svelte/bambi-helpers.ts",
+    "vue": "packages/registry/generated/shared/vue/bambi-helpers.ts"
   },
   "components": {
     "tabs": {
@@ -14,10 +17,48 @@
         "react": [
           "packages/registry/generated/tabs/react/index.tsx",
           "packages/registry/generated/tabs/react/tabs.css"
+        ],
+        "solid": [
+          "packages/registry/generated/tabs/solid/index.tsx",
+          "packages/registry/generated/tabs/solid/tabs.css"
+        ],
+        "svelte": [
+          "packages/registry/generated/tabs/svelte/Tabs.svelte",
+          "packages/registry/generated/tabs/svelte/TabsList.svelte",
+          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte",
+          "packages/registry/generated/tabs/svelte/TabsContent.svelte",
+          "packages/registry/generated/tabs/svelte/index.ts",
+          "packages/registry/generated/tabs/svelte/tabs.css"
+        ],
+        "vue": [
+          "packages/registry/generated/tabs/vue/Tabs.vue",
+          "packages/registry/generated/tabs/vue/TabsList.vue",
+          "packages/registry/generated/tabs/vue/TabsTrigger.vue",
+          "packages/registry/generated/tabs/vue/TabsContent.vue",
+          "packages/registry/generated/tabs/vue/index.ts",
+          "packages/registry/generated/tabs/vue/tabs.css"
         ]
       },
       "helpers": {
         "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "solid": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "svelte": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "vue": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
@@ -30,12 +71,50 @@
           "TabsList",
           "TabsTrigger",
           "TabsContent"
+        ],
+        "solid": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ],
+        "svelte": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ],
+        "vue": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
         ]
       },
       "hashes": {
         "react": {
           "packages/registry/generated/tabs/react/index.tsx": "e85b92b49519ac18d3308094e73c084a05e13bb46134d729d591189ae0f5d9ae",
           "packages/registry/generated/tabs/react/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+        },
+        "solid": {
+          "packages/registry/generated/tabs/solid/index.tsx": "1408df4ef20b8958ffa63bd6f727330d160259ce034fedddc337732caae858b5",
+          "packages/registry/generated/tabs/solid/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+        },
+        "svelte": {
+          "packages/registry/generated/tabs/svelte/Tabs.svelte": "d7b940bac9cff76f1b25bdef4802a1c155089ddc5b6f0b2de1bf8fc304b3aac6",
+          "packages/registry/generated/tabs/svelte/TabsList.svelte": "5bc930a3c1436c0e206e4e0e5bf51d45faf0d6c6a39c9760f7b1c0dfd2f1a2fc",
+          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "5a78916ab776f85ff4c18441b290bca1f65a25b73c6a7572143e7bef1d26452e",
+          "packages/registry/generated/tabs/svelte/TabsContent.svelte": "5c175ea58337f12121b7b45cbf2218e97b1563edbb31995362fe44262e53c765",
+          "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b",
+          "packages/registry/generated/tabs/svelte/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+        },
+        "vue": {
+          "packages/registry/generated/tabs/vue/Tabs.vue": "3e880e0b305d609488adf5f4f5cbcc70add58689bd05e5a68ea85afa81108e65",
+          "packages/registry/generated/tabs/vue/TabsList.vue": "613317bb7dc65a3c305412d532820e33ef5e7ff04cad9c5e1af741600c25ff4d",
+          "packages/registry/generated/tabs/vue/TabsTrigger.vue": "2915deb8ea65bfc61171eabe215525467508856871cd94fec02ae0963a144cba",
+          "packages/registry/generated/tabs/vue/TabsContent.vue": "1bd37c92711245748f322a23886297b6646e905acba0928f47c1e66f897159fe",
+          "packages/registry/generated/tabs/vue/index.ts": "91aa8722e76041dee2c447c4e876c40f7ae74aa047f195e2dd01d67cae469f2d",
+          "packages/registry/generated/tabs/vue/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
         }
       }
     }

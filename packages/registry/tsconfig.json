@@ -9,5 +9,10 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react"
   },
-  "include": ["src", "generated"]
+  "include": ["src", "generated"],
+  "exclude": [
+    "generated/tabs/solid",
+    "generated/tabs/svelte",
+    "generated/tabs/vue"
+  ]
 }

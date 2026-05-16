@@ -7,9 +7,9 @@ They are not part of the public product surface. Keep them small, framework-spec
 ## Templates
 
 - `bambi-react`: React/Next.js fixture.
-
-bambiui is currently focusing on React as the first generated output target.
-Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
+- `bambi-solid`: Solid + Vite fixture.
+- `bambi-svelte`: Svelte 5 + Vite fixture.
+- `bambi-vue`: Vue 3 + Vite fixture.
 
 ## Smoke Test
 
@@ -28,13 +28,16 @@ node packages/cli/src/index.js add tabs --framework <framework> --cwd <template>
 
 Then it verifies the expected generated files and runs the template's framework check.
 
-Expected generated output (example for `react`):
+Expected generated output varies by framework. Example for `react`:
 
 ```
 src/styles/bambi.css
+src/components/ui/bambi-helpers.ts
 src/components/ui/tabs/index.tsx
 src/components/ui/tabs/tabs.css
 ```
+
+Example for `svelte` / `vue`, the `tabs/` directory contains per-part component files instead of a single `index.tsx`.
 
 If a template has no installed dependencies yet, install them first:
 

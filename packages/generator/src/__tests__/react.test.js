@@ -33,10 +33,10 @@ beforeAll(async () => {
 });
 
 describe("createArtifact — tabs/react", () => {
-  it("returns content and usedHelpers", () => {
-    expect(result).toHaveProperty("content");
+  it("returns files map and usedHelpers", () => {
+    expect(result).toHaveProperty("files");
     expect(result).toHaveProperty("usedHelpers");
-    expect(typeof result.content).toBe("string");
+    expect(typeof result.files["index.tsx"]).toBe("string");
     expect(Array.isArray(result.usedHelpers)).toBe(true);
   });
 
@@ -49,42 +49,42 @@ describe("createArtifact — tabs/react", () => {
   });
 
   it("output contains React hook usage", () => {
-    expect(result.content).toContain("useRef");
-    expect(result.content).toContain("useEffect");
+    expect(result.files["index.tsx"]).toContain("useRef");
+    expect(result.files["index.tsx"]).toContain("useEffect");
   });
 
   it("output exports expected component names", () => {
-    expect(result.content).toContain("export function Tabs(");
-    expect(result.content).toContain("export function TabsList(");
-    expect(result.content).toContain("export function TabsTrigger(");
-    expect(result.content).toContain("export function TabsContent(");
+    expect(result.files["index.tsx"]).toContain("export function Tabs(");
+    expect(result.files["index.tsx"]).toContain("export function TabsList(");
+    expect(result.files["index.tsx"]).toContain("export function TabsTrigger(");
+    expect(result.files["index.tsx"]).toContain("export function TabsContent(");
   });
 
   it("output contains inlined roving-focus primitive", () => {
-    expect(result.content).toContain("createRovingFocus");
-    expect(result.content).toContain("RovingFocusOptions");
+    expect(result.files["index.tsx"]).toContain("createRovingFocus");
+    expect(result.files["index.tsx"]).toContain("RovingFocusOptions");
   });
 
   it("inlined primitive has no export keywords on its own declarations", () => {
-    expect(result.content).not.toContain("export interface RovingFocusOptions");
-    expect(result.content).not.toContain("export interface RovingFocus");
-    expect(result.content).not.toContain("export function createRovingFocus");
+    expect(result.files["index.tsx"]).not.toContain("export interface RovingFocusOptions");
+    expect(result.files["index.tsx"]).not.toContain("export interface RovingFocus");
+    expect(result.files["index.tsx"]).not.toContain("export function createRovingFocus");
   });
 
   it("output contains TabsBehavior class (renamed from TabsController)", () => {
-    expect(result.content).toContain("class TabsBehavior");
-    expect(result.content).not.toContain("class TabsController");
+    expect(result.files["index.tsx"]).toContain("class TabsBehavior");
+    expect(result.files["index.tsx"]).not.toContain("class TabsController");
   });
 
   it("output does not contain forbidden bambiui imports", () => {
-    expect(result.content).not.toContain("@bambiui/core");
-    expect(result.content).not.toContain("@bambiui/adapters");
-    expect(result.content).not.toContain("tabs.controller");
-    expect(result.content).not.toContain("tabs.contract");
+    expect(result.files["index.tsx"]).not.toContain("@bambiui/core");
+    expect(result.files["index.tsx"]).not.toContain("@bambiui/adapters");
+    expect(result.files["index.tsx"]).not.toContain("tabs.controller");
+    expect(result.files["index.tsx"]).not.toContain("tabs.contract");
   });
 
   it("output imports helpers from ../bambi-helpers", () => {
-    expect(result.content).toContain('from "../bambi-helpers"');
+    expect(result.files["index.tsx"]).toContain('from "../bambi-helpers"');
   });
 });
 
@@ -92,7 +92,7 @@ describe("createArtifact — unknown framework", () => {
   it("throws for unsupported framework", () => {
     expect(() =>
       createArtifact({
-        framework: "vue",
+        framework: "astro",
         contractSource,
         controllerSource,
         contractExportName: "tabsContract",

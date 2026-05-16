@@ -8,8 +8,8 @@
 
 - Component CSS source: `src/styles/<name>.css`
 - Global style file: `src/styles/bambi.css`
-- Public generated artifacts: `generated/<name>/<framework>/` (currently React)
-- Shared public helper: `generated/shared/react/bambi-helpers.ts`
+- Public generated artifacts: `generated/<name>/<framework>/` (react, solid, svelte, vue)
+- Shared public helpers: `generated/shared/{react,solid,svelte,vue}/bambi-helpers.ts`
 - Workspace barrels: `src/components/<name>/index.ts` (not installed)
 
 ## What Does NOT Live Here
@@ -42,17 +42,15 @@
 
 ## Supported Frameworks
 
-`react`.
-
-React is the first generated output target. Vue, Svelte and Solid output targets are not the current focus; React output is being stabilized first.
+`react`, `solid`, `svelte`, `vue`.
 
 ## Canonical Reference
 
 Tabs is the reference component:
 
-- Public artifacts: `generated/tabs/react/`
+- Public artifacts: `generated/tabs/{react,solid,svelte,vue}/`
 - CSS source: `src/styles/tabs.css`
-- Shared helper: `generated/shared/react/bambi-helpers.ts`
+- Shared helpers: `generated/shared/{react,solid,svelte,vue}/bambi-helpers.ts`
 
 ## Verify
 

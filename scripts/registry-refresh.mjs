@@ -4,7 +4,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { dirname, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { createArtifact } from "@bambiui/generator";
@@ -74,10 +74,11 @@ function contractExportName(componentName) {
 
 async function generateFramework(componentName, component, framework, publicComponent) {
   const generatedFiles = component.generatedFiles?.[framework] ?? [];
-  const generatedIndex = generatedFiles.find((filePath) => filePath.endsWith("index.tsx"));
 
-  if (!generatedIndex) {
-    throw new Error(`${componentName}/${framework} requires a generated index.tsx artifact.`);
+  // Non-CSS generated files: matched by basename to what the generator returns.
+  const nonCssFiles = generatedFiles.filter((f) => !f.endsWith(".css"));
+  if (nonCssFiles.length === 0) {
+    throw new Error(`${componentName}/${framework} requires at least one non-CSS generated artifact.`);
   }
 
   const contractSource = await readFile(resolve(root, component.contract), "utf8");
@@ -85,7 +86,8 @@ async function generateFramework(componentName, component, framework, publicComp
   const primitiveFiles = await Promise.all(
     (component.primitiveFiles ?? []).map((p) => readFile(resolve(root, p), "utf8")),
   );
-  const { content, usedHelpers } = createArtifact({
+
+  const { files, usedHelpers } = createArtifact({
     framework,
     contractSource,
     controllerSource,
@@ -93,9 +95,23 @@ async function generateFramework(componentName, component, framework, publicComp
     contractExportName: contractExportName(componentName),
     generatorOptions: component.generator?.[framework] ?? {},
   });
-  assertNoForbiddenStrings(content, generatedIndex, componentName);
 
-  // Validate that registry.json's helpers.react matches what the generator detected.
+  // Match each generated filename (key) to its full repo-relative path.
+  for (const [fileName, content] of Object.entries(files)) {
+    const fullPath = nonCssFiles.find((p) => basename(p) === fileName);
+    if (!fullPath) {
+      throw new Error(
+        `${componentName}/${framework}: generator produced "${fileName}" but no matching path found in generatedFiles.\n` +
+        `  generatedFiles (non-CSS): ${nonCssFiles.join(", ")}`,
+      );
+    }
+    assertNoForbiddenStrings(content, fullPath, componentName);
+
+    const changed = await writeGeneratedFile(resolve(root, fullPath), content);
+    process.stdout.write(`${changed ? "generated" : "unchanged"} ${fullPath}\n`);
+  }
+
+  // Validate that registry.json's helpers[framework] matches what the generator detected.
   const declaredHelpers = [...(publicComponent.helpers?.[framework] ?? [])].sort().join(",");
   const detectedHelpers = [...usedHelpers].sort().join(",");
   if (declaredHelpers !== detectedHelpers) {
@@ -107,8 +123,6 @@ async function generateFramework(componentName, component, framework, publicComp
     );
   }
 
-  const changed = await writeGeneratedFile(resolve(root, generatedIndex), content);
-  process.stdout.write(`${changed ? "generated" : "unchanged"} ${generatedIndex}\n`);
   return usedHelpers;
 }
 
@@ -130,9 +144,20 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
 
   if (componentUsedHelpers.size > 0) {
     const shimPath = resolve(root, `packages/registry/generated/${componentName}/bambi-helpers.ts`);
-    const shimContent = `// Workspace-only shim — not distributed. Satisfies the ../bambi-helpers import in generated/${componentName}/react/.\nexport * from "../shared/react/bambi-helpers";\n`;
+    const shimContent = `// Workspace-only shim — not distributed. Satisfies the ../bambi-helpers import in all generated/${componentName}/{framework}/ files.\nexport * from "../shared/react/bambi-helpers";\n`;
     const shimChanged = await writeGeneratedFile(shimPath, shimContent);
     process.stdout.write(`${shimChanged ? "generated" : "unchanged"} packages/registry/generated/${componentName}/bambi-helpers.ts (workspace shim)\n`);
+  }
+
+  // Copy CSS from source to all framework output directories (before existence check).
+  for (const [, files] of Object.entries(component.generatedFiles ?? {})) {
+    const generatedCss = files.find((filePath) => filePath.endsWith(".css"));
+    if (component.style && generatedCss) {
+      const cssContent = await readFile(resolve(root, component.style), "utf8");
+      assertNoForbiddenStrings(cssContent, generatedCss, componentName);
+      const changed = await writeGeneratedFile(resolve(root, generatedCss), cssContent);
+      process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${generatedCss}\n`);
+    }
   }
 
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
@@ -143,16 +168,6 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
           `Missing generated artifact for ${componentName}/${framework}: ${filePath}`,
         );
       }
-    }
-  }
-
-  for (const files of Object.values(component.generatedFiles ?? {})) {
-    const generatedCss = files.find((filePath) => filePath.endsWith(".css"));
-    if (component.style && generatedCss) {
-      const cssContent = await readFile(resolve(root, component.style), "utf8");
-      assertNoForbiddenStrings(cssContent, generatedCss, componentName);
-      const changed = await writeGeneratedFile(resolve(root, generatedCss), cssContent);
-      process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${generatedCss}\n`);
     }
   }
 

@@ -14,7 +14,7 @@ const authoringSchemaPath = resolve(root, "registry.authoring.schema.json");
 
 let errors = 0;
 
-const KNOWN_FRAMEWORKS = ["react"];
+const KNOWN_FRAMEWORKS = ["react", "solid", "svelte", "vue"];
 const PUBLIC_FORBIDDEN_FIELDS = [
   "contract",
   "contractFiles",

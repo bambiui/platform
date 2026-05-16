@@ -1,0 +1,19 @@
+{
+  "name": "bambi-svelte",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "svelte": "^5.33.9"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "svelte-check": "^4.2.1",
+    "typescript": "^5",
+    "vite": "^6"
+  }
+}

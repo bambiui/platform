@@ -19,7 +19,7 @@
 
 ## Boundaries
 
-- Framework wrapper output belongs in `packages/registry/generated/`, not here. React is the first active output target.
+- Framework wrapper output belongs in `packages/registry/generated/`, not here. Supported output targets: React, Solid, Svelte, Vue.
 - CSS belongs in `packages/registry/src/styles/`, not here.
 - CLI logic, registry schema, and deployment scripts do not belong here.
 - Do not import from framework packages (React, Svelte, Vue, Solid).
@@ -38,7 +38,7 @@
 - Do not put CSS or framework wrapper files in this package.
 - Do not make public CLI output depend on files in this package.
 - Do not make public CLI output import `@bambiui/core`, `@bambiui/generator`, `@bambiui/adapters`, contracts, controllers, or internal primitives.
-- Do not add non-React framework files until React generated output is stable and there is an explicit plan.
+- Do not add Astro framework files without an explicit plan.
 - Do not reference `src/contracts.ts`, `src/button.ts`, or any other pre-DOM-Protocol paths — those files no longer exist.
 
 ## Verify

@@ -29,21 +29,30 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": { "$ref": "#/$defs/registryFileList" }
+            "react": { "$ref": "#/$defs/registryFileList" },
+            "solid": { "$ref": "#/$defs/registryFileList" },
+            "svelte": { "$ref": "#/$defs/registryFileList" },
+            "vue": { "$ref": "#/$defs/registryFileList" }
           }
         },
         "generator": {
           "type": "object",
           "additionalProperties": { "$ref": "#/$defs/generatorOptions" },
           "properties": {
-            "react": { "$ref": "#/$defs/generatorOptions" }
+            "react": { "$ref": "#/$defs/generatorOptions" },
+            "solid": { "$ref": "#/$defs/generatorOptions" },
+            "svelte": { "$ref": "#/$defs/generatorOptions" },
+            "vue": { "$ref": "#/$defs/generatorOptions" }
           }
         },
         "exports": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "react": { "$ref": "#/$defs/exportNames" }
+            "react": { "$ref": "#/$defs/exportNames" },
+            "solid": { "$ref": "#/$defs/exportNames" },
+            "svelte": { "$ref": "#/$defs/exportNames" },
+            "vue": { "$ref": "#/$defs/exportNames" }
           }
         }
       }

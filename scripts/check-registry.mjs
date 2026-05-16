@@ -310,6 +310,32 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
   }
 
+  if (component.css !== undefined) {
+    if (checkPathAndFile(component.css, `${componentName}.css`)) {
+      if (!component.css.startsWith("packages/registry/generated/")) {
+        fail(`${componentName}.css: must live under packages/registry/generated/ — ${component.css}`);
+      }
+      const content = readFileSync(resolve(root, component.css), "utf-8");
+      for (const forbidden of forbiddenStringsFor(componentName)) {
+        if (content.includes(forbidden)) {
+          fail(`${componentName}.css: contains forbidden string "${forbidden}"`);
+        }
+      }
+      if (!component.cssHash) {
+        fail(`${componentName}: cssHash missing (required when css is declared)`);
+      } else if (!/^[a-f0-9]{64}$/.test(component.cssHash)) {
+        fail(`${componentName}: cssHash invalid SHA-256 hex string`);
+      } else {
+        const actual = createHash("sha256").update(content).digest("hex");
+        if (actual !== component.cssHash) {
+          fail(`${componentName}: cssHash mismatch for ${component.css}`);
+        } else {
+          ok(`${componentName}: cssHash verified`);
+        }
+      }
+    }
+  }
+
   if (component.helpers !== undefined) {
     if (!component.helpers || typeof component.helpers !== "object") {
       fail(`${componentName}: helpers must be an object when present`);

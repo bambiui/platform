@@ -30,7 +30,7 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, files: Record<string, string[]>, helpers?: Record<string, string[]>, hashes?: Record<string, Record<string, string>>, exports?: Record<string, string[]> }} */ (
+  const component = /** @type {{ name: string, css?: string, cssHash?: string, files: Record<string, string[]>, helpers?: Record<string, string[]>, hashes?: Record<string, Record<string, string>>, exports?: Record<string, string[]> }} */ (
     getRegistryComponent(manifest, componentName)
   );
 
@@ -66,6 +66,18 @@ export async function addComponent(componentName, flags) {
         path.join(outputDir, path.basename(filePath)),
         force,
         { expectedHash: component.hashes?.[framework]?.[filePath] },
+      ),
+    );
+  }
+
+  if (component.css) {
+    results.push(
+      await copyRegistryFile(
+        registryUrl,
+        component.css,
+        path.join(outputDir, path.basename(component.css)),
+        force,
+        { expectedHash: component.cssHash },
       ),
     );
   }

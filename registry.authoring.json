@@ -12,30 +12,27 @@
       "controller": "packages/core/src/components/tabs/tabs.controller.ts",
       "primitiveFiles": ["packages/core/src/primitives/roving-focus.ts"],
       "style": "packages/registry/src/styles/tabs.css",
+      "generatedCss": "packages/registry/generated/tabs/tabs.css",
       "generatedFiles": {
         "react": [
-          "packages/registry/generated/tabs/react/index.tsx",
-          "packages/registry/generated/tabs/react/tabs.css"
+          "packages/registry/generated/tabs/react/index.tsx"
         ],
         "solid": [
-          "packages/registry/generated/tabs/solid/index.tsx",
-          "packages/registry/generated/tabs/solid/tabs.css"
+          "packages/registry/generated/tabs/solid/index.tsx"
         ],
         "svelte": [
           "packages/registry/generated/tabs/svelte/Tabs.svelte",
           "packages/registry/generated/tabs/svelte/TabsList.svelte",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte",
-          "packages/registry/generated/tabs/svelte/index.ts",
-          "packages/registry/generated/tabs/svelte/tabs.css"
+          "packages/registry/generated/tabs/svelte/index.ts"
         ],
         "vue": [
           "packages/registry/generated/tabs/vue/Tabs.vue",
           "packages/registry/generated/tabs/vue/TabsList.vue",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue",
           "packages/registry/generated/tabs/vue/TabsContent.vue",
-          "packages/registry/generated/tabs/vue/index.ts",
-          "packages/registry/generated/tabs/vue/tabs.css"
+          "packages/registry/generated/tabs/vue/index.ts"
         ]
       },
       "generator": {

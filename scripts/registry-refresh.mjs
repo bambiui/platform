@@ -150,15 +150,12 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
     process.stdout.write(`${shimChanged ? "generated" : "unchanged"} packages/registry/generated/${componentName}/bambi-helpers.ts (workspace shim)\n`);
   }
 
-  // Copy CSS from source to all framework output directories (before existence check).
-  for (const [, files] of Object.entries(component.generatedFiles ?? {})) {
-    const generatedCss = files.find((filePath) => filePath.endsWith(".css"));
-    if (component.style && generatedCss) {
-      const cssContent = await readFile(resolve(root, component.style), "utf8");
-      assertNoForbiddenStrings(cssContent, generatedCss, componentName);
-      const changed = await writeGeneratedFile(resolve(root, generatedCss), cssContent);
-      process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${generatedCss}\n`);
-    }
+  // Copy CSS from source to the single shared location (framework-agnostic).
+  if (component.style && component.generatedCss) {
+    const cssContent = await readFile(resolve(root, component.style), "utf8");
+    assertNoForbiddenStrings(cssContent, component.generatedCss, componentName);
+    const changed = await writeGeneratedFile(resolve(root, component.generatedCss), cssContent);
+    process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${component.generatedCss}\n`);
   }
 
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
@@ -183,6 +180,16 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
   }
   if (Object.keys(componentHashes).length > 0) {
     publicRegistry.components[componentName].hashes = componentHashes;
+  }
+
+  // Compute SHA-256 hash for the shared component CSS and write to registry.json.
+  if (component.generatedCss) {
+    const abs = resolve(root, component.generatedCss);
+    if (existsSync(abs)) {
+      const cssContent = await readFile(abs, "utf8");
+      publicRegistry.components[componentName].css = component.generatedCss;
+      publicRegistry.components[componentName].cssHash = createHash("sha256").update(cssContent).digest("hex");
+    }
   }
 }
 

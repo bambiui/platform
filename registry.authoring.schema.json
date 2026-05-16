@@ -25,6 +25,7 @@
         "primitiveFiles": { "$ref": "#/$defs/registryFileList" },
         "controller": { "$ref": "#/$defs/registryPath" },
         "style": { "$ref": "#/$defs/registryPath" },
+        "generatedCss": { "$ref": "#/$defs/registryPath" },
         "generatedFiles": {
           "type": "object",
           "additionalProperties": false,

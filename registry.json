@@ -14,30 +14,27 @@
   "components": {
     "tabs": {
       "name": "tabs",
+      "css": "packages/registry/generated/tabs/tabs.css",
       "files": {
         "react": [
-          "packages/registry/generated/tabs/react/index.tsx",
-          "packages/registry/generated/tabs/react/tabs.css"
+          "packages/registry/generated/tabs/react/index.tsx"
         ],
         "solid": [
-          "packages/registry/generated/tabs/solid/index.tsx",
-          "packages/registry/generated/tabs/solid/tabs.css"
+          "packages/registry/generated/tabs/solid/index.tsx"
         ],
         "svelte": [
           "packages/registry/generated/tabs/svelte/Tabs.svelte",
           "packages/registry/generated/tabs/svelte/TabsList.svelte",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte",
-          "packages/registry/generated/tabs/svelte/index.ts",
-          "packages/registry/generated/tabs/svelte/tabs.css"
+          "packages/registry/generated/tabs/svelte/index.ts"
         ],
         "vue": [
           "packages/registry/generated/tabs/vue/Tabs.vue",
           "packages/registry/generated/tabs/vue/TabsList.vue",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue",
           "packages/registry/generated/tabs/vue/TabsContent.vue",
-          "packages/registry/generated/tabs/vue/index.ts",
-          "packages/registry/generated/tabs/vue/tabs.css"
+          "packages/registry/generated/tabs/vue/index.ts"
         ]
       },
       "helpers": {
@@ -94,30 +91,27 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/tabs/react/index.tsx": "dbdbdf9d4048fd701aa741796bc6d4ea68c731b53877b516c7bd9a6ce95807f3",
-          "packages/registry/generated/tabs/react/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+          "packages/registry/generated/tabs/react/index.tsx": "dbdbdf9d4048fd701aa741796bc6d4ea68c731b53877b516c7bd9a6ce95807f3"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "67aa792a2854fb4f1383bd8aeb99e48251f480d7301c371c008243691483cbed",
-          "packages/registry/generated/tabs/solid/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+          "packages/registry/generated/tabs/solid/index.tsx": "67aa792a2854fb4f1383bd8aeb99e48251f480d7301c371c008243691483cbed"
         },
         "svelte": {
           "packages/registry/generated/tabs/svelte/Tabs.svelte": "dfd41b246983ba52282f656981f4161c2e691b34a99088df40fdec4b37063f34",
           "packages/registry/generated/tabs/svelte/TabsList.svelte": "48a0932b855a5f97a64c898c47d22551438d883dce86425cc55c572e783ef7d2",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "fcf5e9ce1e4ee80b8b605f10a10d1654dcaafbb97f6e839cc65c8b99fe00fdb7",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte": "582938a414f555e3a1bf6bc318ffdad56360701a2c4d61e879ef132a419c23dd",
-          "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b",
-          "packages/registry/generated/tabs/svelte/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+          "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b"
         },
         "vue": {
           "packages/registry/generated/tabs/vue/Tabs.vue": "f28f806d817480d41f36a095fe4169fe9d34f696a4f33520f40d66dfdd4ac99e",
           "packages/registry/generated/tabs/vue/TabsList.vue": "e3deccf4aaa53f73fcdff5dfe5b99c40eacbd45fa6092c5aea45cf67831d3491",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "9b93c1883d8e5a75dc574a873af79f32733b120192530b99c367d06f19e61772",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "57361601da98b9f3a51f2fbeac481456c975a7b42438d5a3f7b46abd113a58b0",
-          "packages/registry/generated/tabs/vue/index.ts": "91aa8722e76041dee2c447c4e876c40f7ae74aa047f195e2dd01d67cae469f2d",
-          "packages/registry/generated/tabs/vue/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+          "packages/registry/generated/tabs/vue/index.ts": "91aa8722e76041dee2c447c4e876c40f7ae74aa047f195e2dd01d67cae469f2d"
         }
-      }
+      },
+      "cssHash": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
     }
   },
   "sharedHashes": {

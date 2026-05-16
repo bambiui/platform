@@ -45,7 +45,7 @@ If a template has no installed dependencies yet, install them first:
 pnpm smoke:templates -- --install
 ```
 
-The smoke script detects whether a `package-lock.json` exists in each template directory: if it does, it runs `npm ci`; otherwise it falls back to `npm install`. Only `bambi-react` currently carries a committed lock file.
+The smoke script detects whether a `package-lock.json` exists in each template directory: if it does, it runs `npm ci`; otherwise it falls back to `npm install`. All four templates currently carry committed lock files, so `--install` runs `npm ci` for each.
 
 ## Notes
 

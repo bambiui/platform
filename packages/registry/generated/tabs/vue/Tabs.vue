@@ -425,6 +425,7 @@ onUpdated(() => {
 <template>
   <div
     ref="rootRef"
+    v-bind="$attrs"
     data-bambi-tabs=""
     :data-value="props.value"
     :data-default-value="props.defaultValue"
@@ -432,7 +433,6 @@ onUpdated(() => {
     :data-activation-mode="props.activationMode"
     :data-disabled="props.disabled ? 'true' : undefined"
     :data-controlled="controlled ? 'true' : undefined"
-    v-bind="$attrs"
   >
     <slot />
   </div>

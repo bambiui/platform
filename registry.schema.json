@@ -20,6 +20,9 @@
       "properties": {
         "global": {
           "$ref": "#/$defs/registryPath"
+        },
+        "globalHash": {
+          "$ref": "#/$defs/sha256Hex"
         }
       }
     },

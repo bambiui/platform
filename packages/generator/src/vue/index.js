@@ -38,10 +38,10 @@ function vuePartFile(part, options, contract) {
     ? `interface Props {\n${propTypeParts}\n}`
     : "";
 
-  const typeAttr = isButton ? '\n      type="button"' : "";
-  const valueAttribute = valueHandling ? `\n      :${valueAttr}="props.${valuePropName}"` : "";
+  const typeAttr = isButton ? '\n    type="button"' : "";
+  const valueAttribute = valueHandling ? `\n    :${valueAttr}="props.${valuePropName}"` : "";
   const disabledAttribute = disabledHandling
-    ? `\n      :disabled="props.${disabledPropName}"\n      :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
+    ? `\n    :disabled="props.${disabledPropName}"\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
     : "";
 
   const propsDecl = propTypeParts
@@ -54,9 +54,9 @@ ${propType}
 ${propsDecl}
 </script>
 <template>
-  <${tag}${typeAttr}${disabledAttribute}
+  <${tag}
+    v-bind="$attrs"${typeAttr}${disabledAttribute}
     ${part.attribute}=""${valueAttribute}
-    v-bind="$attrs"
   >
     <slot />
   </${tag}>
@@ -169,9 +169,9 @@ ${behaviorOptionLines}
 <template>
   <${root.element}
     ref="rootRef"
+    v-bind="$attrs"
     ${root.attribute}=""
 ${rootAttrLines}${controlledAttrLine}
-    v-bind="$attrs"
   >
     <slot />
   </${root.element}>

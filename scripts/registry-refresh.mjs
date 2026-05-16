@@ -185,6 +185,16 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
   }
 }
 
+// Compute SHA-256 hash for the global style file and write to registry.json.
+const globalStylePath = publicRegistry.styles?.global;
+if (globalStylePath) {
+  const abs = resolve(root, globalStylePath);
+  if (existsSync(abs)) {
+    const content = await readFile(abs, "utf8");
+    publicRegistry.styles.globalHash = createHash("sha256").update(content).digest("hex");
+  }
+}
+
 // Compute SHA-256 hashes for shared helper files and write to registry.json.
 if (publicRegistry.shared && typeof publicRegistry.shared === "object") {
   const sharedHashes = {};

@@ -54,6 +54,7 @@ export async function addComponent(componentName, flags) {
       getStylePath(manifest),
       path.join(cwd, config.styleFile),
       force,
+      { expectedHash: manifest.styles?.globalHash },
     ),
   );
 

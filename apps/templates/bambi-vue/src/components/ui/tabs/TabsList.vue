@@ -5,8 +5,8 @@ defineOptions({ inheritAttrs: false });
 </script>
 <template>
   <div
-    data-bambi-tabs-list=""
     v-bind="$attrs"
+    data-bambi-tabs-list=""
   >
     <slot />
   </div>

@@ -113,6 +113,71 @@ describe("createArtifact — tabs/vue", () => {
   });
 });
 
+describe("createArtifact — tabs/vue $attrs order guard", () => {
+  it("Tabs.vue: v-bind=\"$attrs\" appears before data-bambi-tabs protocol attr", () => {
+    const src = result.files["Tabs.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const protocolIdx = src.indexOf('data-bambi-tabs=""');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(protocolIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(protocolIdx);
+  });
+
+  it("TabsList.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-list protocol attr", () => {
+    const src = result.files["TabsList.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const protocolIdx = src.indexOf('data-bambi-tabs-list=""');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(protocolIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(protocolIdx);
+  });
+
+  it("TabsTrigger.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-trigger protocol attr", () => {
+    const src = result.files["TabsTrigger.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const protocolIdx = src.indexOf('data-bambi-tabs-trigger=""');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(protocolIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(protocolIdx);
+  });
+
+  it("TabsContent.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-content protocol attr", () => {
+    const src = result.files["TabsContent.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const protocolIdx = src.indexOf('data-bambi-tabs-content=""');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(protocolIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(protocolIdx);
+  });
+
+  it("Tabs.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+    const src = result.files["Tabs.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const valueIdx = src.indexOf(':data-value=');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(valueIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(valueIdx);
+  });
+
+  it("TabsTrigger.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+    const src = result.files["TabsTrigger.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const valueIdx = src.indexOf(':data-value=');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(valueIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(valueIdx);
+  });
+
+  it("TabsContent.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+    const src = result.files["TabsContent.vue"];
+    const attrsIdx = src.indexOf('v-bind="$attrs"');
+    const valueIdx = src.indexOf(':data-value=');
+    expect(attrsIdx).toBeGreaterThanOrEqual(0);
+    expect(valueIdx).toBeGreaterThanOrEqual(0);
+    expect(attrsIdx).toBeLessThan(valueIdx);
+  });
+});
+
 describe("createArtifact — tabs/vue fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/vue`;
   const fixtureFiles = ["Tabs.vue", "TabsList.vue", "TabsTrigger.vue", "TabsContent.vue", "index.ts"];

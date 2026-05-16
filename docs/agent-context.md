@@ -164,7 +164,7 @@ Templates:
 - `bambi-svelte` — Svelte 5 + Vite
 - `bambi-vue` — Vue 3 + Vite
 
-The smoke script (`scripts/smoke-templates.mjs`) runs `bambiui init` + `bambiui add tabs` against each template, verifies expected output files, and runs the framework's typecheck command. With `--install`, it installs dependencies first: `npm ci` when `package-lock.json` exists, otherwise `npm install`.
+The smoke script (`scripts/smoke-templates.mjs`) runs `bambiui init` + `bambiui add tabs` against each template, verifies expected output files, and runs the framework's typecheck command. With `--install`, it installs dependencies first: `npm ci` when `package-lock.json` exists, otherwise `npm install`. All four templates currently carry committed lock files, so `--install` runs `npm ci` for each.
 
 ## apps/www — Active Static Host
 

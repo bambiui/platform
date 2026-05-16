@@ -28,6 +28,20 @@ Each component has three layers:
 
 CLI output is **self-contained registry output**: copied files have no `@bambiui/*` runtime imports and do not include contract, controller, primitive, or generator files.
 
+## Svelte 5 — Dynamic Children Note
+
+The Svelte 5 Tabs wrapper re-syncs the behavior on prop changes via `$effect`. If you conditionally add or remove triggers/content at runtime (e.g. `{#each tabs as tab}`), Svelte 5 Snippets do not expose a reactive identity that `$effect` can subscribe to without rendering, so the behavior cannot auto-detect the structural change.
+
+Workaround: wrap `<Tabs>` in a `{#key}` block keyed to the structure:
+
+```svelte
+{#key tabs.length}
+  <Tabs ...>...</Tabs>
+{/key}
+```
+
+React, Solid, and Vue handle dynamic children more directly: React re-runs the effect when `children` changes, Solid uses `resolvedChildren` from the `children()` helper for fine-grained tracking, and Vue calls `onUpdated` after every DOM update.
+
 ## Frameworks
 
 Supported output targets: **React**, **Solid**, **Svelte 5**, **Vue 3**.

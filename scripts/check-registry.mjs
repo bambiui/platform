@@ -172,6 +172,22 @@ if (!registry.styles || typeof registry.styles.global !== "string") {
 } else {
   checkPathAndFile(registry.styles.global, "styles.global");
   ok(`styles.global: ${registry.styles.global}`);
+
+  if (registry.styles.globalHash !== undefined) {
+    if (!/^[a-f0-9]{64}$/.test(registry.styles.globalHash)) {
+      fail("styles.globalHash: invalid SHA-256 hex string");
+    } else {
+      const abs = resolve(root, registry.styles.global);
+      if (existsSync(abs)) {
+        const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
+        if (actual !== registry.styles.globalHash) {
+          fail(`styles.globalHash: hash mismatch for ${registry.styles.global}`);
+        } else {
+          ok("styles.globalHash: verified");
+        }
+      }
+    }
+  }
 }
 
 if (registry.shared !== undefined) {

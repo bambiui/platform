@@ -104,13 +104,19 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
     ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
     : undefined;
   const optionNames = optionsNames.filter((name) => name !== "controlled");
+  // Event callbacks come from contract.events; never from optionsNames
+  const eventCallbacks = contract.events ?? [];
+  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
 
-  // splitProps key list: all option names (excl. controlled) + children
-  const splitLocalKeys = [...optionNames, "children"].map((n) => `"${n}"`).join(", ");
+  // splitProps key list: all non-callback option names + event callback names + children
+  const splitLocalKeys = [
+    ...nonCallbackOptionNames,
+    ...eventCallbacks.map((ev) => ev.callbackName),
+    "children",
+  ].map((n) => `"${n}"`).join(", ");
 
-  // Build behaviorOptions using local.X (after splitProps)
-  const allOptionNames = [...optionNames, "controlled"];
-  const behaviorOptions = allOptionNames
+  // Build behaviorOptions using local.X (non-callback only)
+  const behaviorOptions = [...nonCallbackOptionNames, "controlled"]
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled(),`;
       return `      ${name}: local.${name},`;
@@ -146,8 +152,36 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   });
 ` : "";
 
+  // Event callback prop lines for interface
+  const eventCallbackPropLines = eventCallbacks.map((ev) => {
+    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+    return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
+  }).join("\n");
+
+  // Event listener setup in onMount
+  const listenerSetupLines = eventCallbacks.map((ev) => {
+    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+    return [
+      `    const ${ev.callbackName}Handler = (event: Event) => {`,
+      `      const e = event as CustomEvent<${detailType}>;`,
+      `      local.${ev.callbackName}?.(e.detail);`,
+      `    };`,
+      `    rootRef!.addEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`,
+    ].join("\n");
+  }).join("\n");
+
+  const listenerTeardownLines = eventCallbacks.map((ev) =>
+    `      rootRef!.removeEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`
+  ).join("\n");
+
+  const eventInterfaceExtra = eventCallbackPropLines ? `\n${eventCallbackPropLines}` : "";
+  const listenerSetupBlock = listenerSetupLines ? `${listenerSetupLines}\n` : "";
+  const cleanupBlock = listenerTeardownLines
+    ? `    onCleanup(() => {\n${listenerTeardownLines}\n      behavior?.destroy();\n    });`
+    : `    onCleanup(() => behavior?.destroy());`;
+
   return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${nativeAttrType}, keyof ${publicOptionsType}> {
-  children?: JSX.Element;
+  children?: JSX.Element;${eventInterfaceExtra}
 }
 
 ${solidPartPropsSource(contract, generatorOptions)}
@@ -159,11 +193,11 @@ export function ${contract.componentName}(props: ${contract.componentName}Props)
   const controlled = () => ${controlledExpression};
 ${controlledWarning}
   onMount(() => {
-    behavior = new ${behaviorClassName}(rootRef!, {
+${listenerSetupBlock}    behavior = new ${behaviorClassName}(rootRef!, {
 ${behaviorOptions}
     });
     behavior.sync();
-    onCleanup(() => behavior?.destroy());
+${cleanupBlock}
   });
 
   const resolvedChildren = children(() => local.children);

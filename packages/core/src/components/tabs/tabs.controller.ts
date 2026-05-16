@@ -34,7 +34,6 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 // ── Inlined DOM helpers ───────────────────────────────────────────────────
@@ -216,7 +215,7 @@ export class TabsController implements BambiController {
     }
   }
 
-  /** Apply a user-initiated value change. Dispatches events and calls onValueChange. */
+  /** Apply a user-initiated value change. Dispatches bambi:value-change on the root element. */
   private applyValue(newValue: string, source: "click" | "keyboard"): void {
     if (newValue === this.currentValue) return;
 
@@ -227,7 +226,6 @@ export class TabsController implements BambiController {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {

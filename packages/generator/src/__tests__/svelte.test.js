@@ -144,6 +144,38 @@ describe("createArtifact — tabs/svelte part components (children handling)", (
   }
 });
 
+describe("createArtifact — tabs/svelte event bridge", () => {
+  it("Tabs.svelte adds onValueChange to Props interface", () => {
+    expect(result.files["Tabs.svelte"]).toContain("onValueChange?: (detail: TabsValueChangeDetail) => void;");
+  });
+
+  it("Tabs.svelte explicitly destructures onValueChange (not left in ...props)", () => {
+    expect(result.files["Tabs.svelte"]).toContain("onValueChange,");
+  });
+
+  it("Tabs.svelte listens to TABS_EVENT_VALUE_CHANGE in onMount and forwards to callback", () => {
+    expect(result.files["Tabs.svelte"]).toContain("rootEl!.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+    expect(result.files["Tabs.svelte"]).toContain("onValueChange?.(e.detail)");
+  });
+
+  it("Tabs.svelte removes the event listener in the onMount return cleanup", () => {
+    expect(result.files["Tabs.svelte"]).toContain("rootEl!.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+    expect(result.files["Tabs.svelte"]).toContain("return () => {");
+  });
+
+  it("onValueChange is not passed to the behavior constructor or update", () => {
+    const src = result.files["Tabs.svelte"];
+    const constructorStart = src.indexOf("new TabsBehavior(rootEl!,");
+    const constructorEnd = src.indexOf("behavior.sync();");
+    const constructorBlock = src.slice(constructorStart, constructorEnd);
+    expect(constructorBlock).not.toContain("onValueChange");
+
+    const effectStart = src.indexOf("behavior?.update?.({");
+    const effectEnd = src.indexOf("});", effectStart);
+    expect(src.slice(effectStart, effectEnd)).not.toContain("onValueChange");
+  });
+});
+
 describe("createArtifact — tabs/svelte fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/svelte`;
   const fixtureFiles = ["Tabs.svelte", "TabsList.svelte", "TabsTrigger.svelte", "TabsContent.svelte", "index.ts"];

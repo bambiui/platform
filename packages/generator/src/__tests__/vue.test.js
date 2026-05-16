@@ -113,6 +113,40 @@ describe("createArtifact — tabs/vue", () => {
   });
 });
 
+describe("createArtifact — tabs/vue event bridge", () => {
+  it("Tabs.vue declares TabsProps interface with onValueChange", () => {
+    expect(result.files["Tabs.vue"]).toContain("interface TabsProps extends Omit<TabsOptions, \"controlled\">");
+    expect(result.files["Tabs.vue"]).toContain("onValueChange?: (detail: TabsValueChangeDetail) => void;");
+  });
+
+  it("Tabs.vue uses defineProps with TabsProps", () => {
+    expect(result.files["Tabs.vue"]).toContain("defineProps<TabsProps>()");
+  });
+
+  it("Tabs.vue uses AbortController for event listener cleanup", () => {
+    expect(result.files["Tabs.vue"]).toContain("const eventAbort = new AbortController()");
+    expect(result.files["Tabs.vue"]).toContain("eventAbort.abort()");
+  });
+
+  it("Tabs.vue listens to TABS_EVENT_VALUE_CHANGE and forwards to callback", () => {
+    expect(result.files["Tabs.vue"]).toContain("rootRef.value!.addEventListener(TABS_EVENT_VALUE_CHANGE");
+    expect(result.files["Tabs.vue"]).toContain("props.onValueChange?.(e.detail)");
+    expect(result.files["Tabs.vue"]).toContain("{ signal: eventAbort.signal }");
+  });
+
+  it("onValueChange is not passed to the behavior constructor or update", () => {
+    const src = result.files["Tabs.vue"];
+    const constructorStart = src.indexOf("new TabsBehavior(rootRef.value!,");
+    const constructorEnd = src.indexOf("behavior.sync();");
+    const constructorBlock = src.slice(constructorStart, constructorEnd);
+    expect(constructorBlock).not.toContain("onValueChange");
+
+    const watchStart = src.indexOf("behavior?.update?.({", src.indexOf("watch("));
+    const watchEnd = src.indexOf("});", watchStart);
+    expect(src.slice(watchStart, watchEnd)).not.toContain("onValueChange");
+  });
+});
+
 describe("createArtifact — tabs/vue $attrs order guard", () => {
   it("Tabs.vue: v-bind=\"$attrs\" appears before data-bambi-tabs protocol attr", () => {
     const src = result.files["Tabs.vue"];

@@ -146,6 +146,37 @@ describe("createArtifact — tabs/solid part components (prop leak guard)", () =
   });
 });
 
+describe("createArtifact — tabs/solid event bridge", () => {
+  it("output adds onValueChange to TabsProps interface", () => {
+    expect(result.files["index.tsx"]).toContain("onValueChange?: (detail: TabsValueChangeDetail) => void;");
+  });
+
+  it("onValueChange is included in splitProps keys to avoid DOM spread", () => {
+    expect(result.files["index.tsx"]).toContain('"onValueChange"');
+  });
+
+  it("output listens to TABS_EVENT_VALUE_CHANGE in onMount and forwards to callback", () => {
+    expect(result.files["index.tsx"]).toContain("rootRef!.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+    expect(result.files["index.tsx"]).toContain("local.onValueChange?.(e.detail)");
+  });
+
+  it("output removes the event listener in onCleanup", () => {
+    expect(result.files["index.tsx"]).toContain("rootRef!.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+  });
+
+  it("onValueChange is not passed to the behavior constructor or update", () => {
+    const src = result.files["index.tsx"];
+    const constructorStart = src.indexOf("new TabsBehavior(rootRef!,");
+    const constructorEnd = src.indexOf("behavior.sync();");
+    const constructorBlock = src.slice(constructorStart, constructorEnd);
+    expect(constructorBlock).not.toContain("onValueChange");
+
+    const updateStart = src.indexOf("behavior.update?.({");
+    const updateEnd = src.indexOf("});", updateStart);
+    expect(src.slice(updateStart, updateEnd)).not.toContain("onValueChange");
+  });
+});
+
 describe("createArtifact — tabs/solid fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/solid`;
   let committed;

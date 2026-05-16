@@ -125,7 +125,6 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
@@ -292,7 +291,6 @@ class TabsBehavior implements BambiBehavior {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {
@@ -360,7 +358,11 @@ class TabsBehavior implements BambiBehavior {
   }
 }
 
-const props = withDefaults(defineProps<Omit<TabsOptions, "controlled">>(), {
+interface TabsProps extends Omit<TabsOptions, "controlled"> {
+  onValueChange?: (detail: TabsValueChangeDetail) => void;
+}
+
+const props = withDefaults(defineProps<TabsProps>(), {
   orientation: "horizontal",
   activationMode: "automatic",
 });
@@ -368,6 +370,7 @@ const props = withDefaults(defineProps<Omit<TabsOptions, "controlled">>(), {
 const rootRef = ref<HTMLDivElement | null>(null);
 let behavior: TabsBehavior | undefined;
 const controlled = computed(() => props.value !== undefined);
+const eventAbort = new AbortController();
 
   watch([() => props.value, () => props.defaultValue], () => {
     if (props.value !== undefined && props.defaultValue !== undefined) {
@@ -378,24 +381,28 @@ const controlled = computed(() => props.value !== undefined);
   });
 
 onMounted(() => {
+  rootRef.value!.addEventListener(TABS_EVENT_VALUE_CHANGE, (event: Event) => {
+    const e = event as CustomEvent<TabsValueChangeDetail>;
+    props.onValueChange?.(e.detail);
+  }, { signal: eventAbort.signal });
   behavior = new TabsBehavior(rootRef.value!, {
       value: props.value,
       defaultValue: props.defaultValue,
       orientation: props.orientation,
       activationMode: props.activationMode,
       disabled: props.disabled,
-      onValueChange: props.onValueChange,
       controlled: controlled.value,
   });
   behavior.sync();
 });
 
 onUnmounted(() => {
+  eventAbort.abort();
   behavior?.destroy();
 });
 
 watch(
-  () => ({ value: props.value, defaultValue: props.defaultValue, orientation: props.orientation, activationMode: props.activationMode, disabled: props.disabled, onValueChange: props.onValueChange }),
+  () => ({ value: props.value, defaultValue: props.defaultValue, orientation: props.orientation, activationMode: props.activationMode, disabled: props.disabled }),
   () => {
     behavior?.update?.({
       value: props.value,
@@ -403,7 +410,6 @@ watch(
       orientation: props.orientation,
       activationMode: props.activationMode,
       disabled: props.disabled,
-      onValueChange: props.onValueChange,
       controlled: controlled.value,
     });
   },
@@ -417,7 +423,6 @@ onUpdated(() => {
       orientation: props.orientation,
       activationMode: props.activationMode,
       disabled: props.disabled,
-      onValueChange: props.onValueChange,
       controlled: controlled.value,
   });
 });

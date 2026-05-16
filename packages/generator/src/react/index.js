@@ -91,25 +91,23 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
     : undefined;
   const optionNames = optionsNames.filter((name) => name !== "controlled");
-  const callbackOptionNames = optionNames.filter((name) => name.startsWith("on"));
-  const propOptionNames = optionNames.filter((name) => !name.startsWith("on"));
+  // Event callbacks come from contract.events; never from optionsNames
+  const eventCallbacks = contract.events ?? [];
+  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
   const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const destructuredOptions = propOptionNames.map((name) => {
+  const destructuredOptions = nonCallbackOptionNames.map((name) => {
     const defaultValue = contractPropsByName.get(name)?.defaultValue;
     return defaultValue === undefined ? name : `${name} = "${defaultValue}"`;
   });
   const destructured = [
     ...destructuredOptions,
-    ...callbackOptionNames,
+    ...eventCallbacks.map((ev) => ev.callbackName),
     "children",
     "...props",
   ].join(",\n  ");
-  const effectDeps = [...propOptionNames, ...callbackOptionNames, "children"].join(", ");
-  const behaviorOptions = [
-    ...propOptionNames,
-    "controlled",
-    ...callbackOptionNames,
-  ].map((name) => `      ${name},`).join("\n");
+  const effectDeps = [...nonCallbackOptionNames, "children"].join(", ");
+  const behaviorOptions = [...nonCallbackOptionNames, "controlled"].map((name) => `      ${name},`).join("\n");
+
   const rootAttrs = contract.props
     .filter((prop) => prop.name !== "controlled")
     .map(reactAttributeLine)
@@ -131,9 +129,38 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     ? `Omit<${optionsTypeName}, "controlled">`
     : optionsTypeName;
 
+  const eventCallbackPropLines = eventCallbacks.map((ev) => {
+    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+    return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
+  }).join("\n");
+
+  const callbackRefLines = eventCallbacks.map((ev) =>
+    `  const ${ev.callbackName}Ref = React.useRef(${ev.callbackName});\n  ${ev.callbackName}Ref.current = ${ev.callbackName};`
+  ).join("\n");
+
+  const listenerSetupLines = eventCallbacks.map((ev) => {
+    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+    return [
+      `    const ${ev.callbackName}Handler = (event: Event) => {`,
+      `      const e = event as CustomEvent<${detailType}>;`,
+      `      ${ev.callbackName}Ref.current?.(e.detail);`,
+      `    };`,
+      `    root.addEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`,
+    ].join("\n");
+  }).join("\n");
+
+  const listenerTeardownLines = eventCallbacks.map((ev) =>
+    `      root.removeEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`
+  ).join("\n");
+
+  const eventInterfaceExtra = eventCallbackPropLines ? `\n${eventCallbackPropLines}` : "";
+  const callbackRefsBlock = callbackRefLines ? `${callbackRefLines}\n` : "";
+  const listenerSetupBlock = listenerSetupLines ? `\n${listenerSetupLines}\n` : "";
+  const listenerTeardownBlock = listenerTeardownLines ? `${listenerTeardownLines}\n` : "";
+
   return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<React.HTMLAttributes<HTMLDivElement>, keyof ${publicOptionsType}> {
   children?: React.ReactNode;
-  className?: string;
+  className?: string;${eventInterfaceExtra}
 }
 
 ${reactPartPropsSource(contract, generatorOptions)}
@@ -144,12 +171,11 @@ export function ${contract.componentName}({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const behaviorRef = React.useRef<${behaviorClassName} | null>(null);
   const controlled = ${controlledExpression};
-${controlledWarning}
-
+${callbackRefsBlock}${controlledWarning}
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-
+${listenerSetupBlock}
     const behavior = new ${behaviorClassName}(root, {
 ${behaviorOptions}
     });
@@ -157,7 +183,7 @@ ${behaviorOptions}
     behavior.sync();
 
     return () => {
-      behaviorRef.current = null;
+${listenerTeardownBlock}      behaviorRef.current = null;
       behavior.destroy();
     };
   }, []);

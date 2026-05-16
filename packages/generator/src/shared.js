@@ -162,9 +162,29 @@ export function parseContractSource(source, contractExportName) {
     props.push({ name: propName, attributeConst, attribute, type, controlled, defaultValue });
   }
 
+  const eventsProp = arg.getProperty("events");
+  const events = [];
+  if (eventsProp && eventsProp.getKind() === SyntaxKind.PropertyAssignment) {
+    const eventsObj = unwrapAs(eventsProp.getInitializer());
+    if (eventsObj.getKind() === SyntaxKind.ObjectLiteralExpression) {
+      for (const ep of eventsObj.getProperties()) {
+        if (ep.getKind() !== SyntaxKind.PropertyAssignment) continue;
+        const key = ep.getName();
+        const evObj = unwrapAs(ep.getInitializer());
+        if (evObj.getKind() !== SyntaxKind.ObjectLiteralExpression) continue;
+        const namePropNode = evObj.getProperty("name");
+        if (!namePropNode || namePropNode.getKind() !== SyntaxKind.PropertyAssignment) continue;
+        const { attribute: eventConstValue, attributeConst: eventConstName } = resolveAttrNode(namePropNode.getInitializer(), constMap);
+        if (!eventConstValue) continue;
+        const callbackName = `on${pascalCase(key)}`;
+        events.push({ key, callbackName, eventConstName, eventConstValue });
+      }
+    }
+  }
+
   return {
     publicContractSource,
-    contract: { name: nameStr, componentName: pascalCase(nameStr), parts, props },
+    contract: { name: nameStr, componentName: pascalCase(nameStr), parts, props, events },
   };
 }
 

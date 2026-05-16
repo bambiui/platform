@@ -123,7 +123,6 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
@@ -290,7 +289,6 @@ class TabsBehavior implements BambiBehavior {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {
@@ -360,6 +358,7 @@ class TabsBehavior implements BambiBehavior {
 
 export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<JSX.HTMLAttributes<HTMLDivElement>, keyof Omit<TabsOptions, "controlled">> {
   children?: JSX.Element;
+  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 export interface TabsListProps extends JSX.HTMLAttributes<HTMLDivElement> {
@@ -388,17 +387,24 @@ export function Tabs(props: TabsProps) {
   });
 
   onMount(() => {
+    const onValueChangeHandler = (event: Event) => {
+      const e = event as CustomEvent<TabsValueChangeDetail>;
+      local.onValueChange?.(e.detail);
+    };
+    rootRef!.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
     behavior = new TabsBehavior(rootRef!, {
       value: local.value,
       defaultValue: local.defaultValue,
       orientation: local.orientation,
       activationMode: local.activationMode,
       disabled: local.disabled,
-      onValueChange: local.onValueChange,
       controlled: controlled(),
     });
     behavior.sync();
-    onCleanup(() => behavior?.destroy());
+    onCleanup(() => {
+      rootRef!.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
+      behavior?.destroy();
+    });
   });
 
   const resolvedChildren = children(() => local.children);
@@ -412,7 +418,6 @@ export function Tabs(props: TabsProps) {
       orientation: local.orientation,
       activationMode: local.activationMode,
       disabled: local.disabled,
-      onValueChange: local.onValueChange,
       controlled: controlled(),
       });
     }

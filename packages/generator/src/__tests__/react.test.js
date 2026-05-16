@@ -101,6 +101,41 @@ describe("createArtifact — unknown framework", () => {
   });
 });
 
+describe("createArtifact — tabs/react event bridge", () => {
+  it("output adds onValueChange to TabsProps interface", () => {
+    expect(result.files["index.tsx"]).toContain("onValueChange?: (detail: TabsValueChangeDetail) => void;");
+  });
+
+  it("output adds useRef for onValueChange to prevent stale closures", () => {
+    expect(result.files["index.tsx"]).toContain("const onValueChangeRef = React.useRef(onValueChange);");
+    expect(result.files["index.tsx"]).toContain("onValueChangeRef.current = onValueChange;");
+  });
+
+  it("output listens to TABS_EVENT_VALUE_CHANGE and forwards to callback", () => {
+    expect(result.files["index.tsx"]).toContain("root.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+    expect(result.files["index.tsx"]).toContain("onValueChangeRef.current?.(e.detail)");
+  });
+
+  it("output removes the event listener on cleanup", () => {
+    expect(result.files["index.tsx"]).toContain("root.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler)");
+  });
+
+  it("onValueChange is not passed to the behavior constructor or update", () => {
+    const src = result.files["index.tsx"];
+    // Find the behavior constructor call range
+    const constructorStart = src.indexOf("new TabsBehavior(root,");
+    const constructorEnd = src.indexOf("behavior.sync();");
+    const constructorBlock = src.slice(constructorStart, constructorEnd);
+    expect(constructorBlock).not.toContain("onValueChange");
+
+    // Find the update call range
+    const updateStart = src.indexOf("behaviorRef.current?.update?.(");
+    const updateEnd = src.indexOf("}, [", updateStart);
+    const updateBlock = src.slice(updateStart, updateEnd);
+    expect(updateBlock).not.toContain("onValueChange");
+  });
+});
+
 describe("createArtifact — tabs/react fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/react`;
   let committed;

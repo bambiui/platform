@@ -44,6 +44,53 @@ const templates = [
       "src/components/ui/bambi-helpers.ts",
     ],
   },
+  {
+    name: "bambi-solid",
+    framework: "solid",
+    dir: "apps/templates/bambi-solid",
+    check: ["npm", "run", "typecheck"],
+    expectedFiles: [
+      "bambiui.config.json",
+      "src/styles/bambi.css",
+      "src/components/ui/tabs/tabs.css",
+      "src/components/ui/tabs/index.tsx",
+      "src/components/ui/bambi-helpers.ts",
+    ],
+  },
+  {
+    name: "bambi-svelte",
+    framework: "svelte",
+    dir: "apps/templates/bambi-svelte",
+    check: ["npm", "run", "typecheck"],
+    expectedFiles: [
+      "bambiui.config.json",
+      "src/styles/bambi.css",
+      "src/components/ui/tabs/tabs.css",
+      "src/components/ui/tabs/Tabs.svelte",
+      "src/components/ui/tabs/TabsList.svelte",
+      "src/components/ui/tabs/TabsTrigger.svelte",
+      "src/components/ui/tabs/TabsContent.svelte",
+      "src/components/ui/tabs/index.ts",
+      "src/components/ui/bambi-helpers.ts",
+    ],
+  },
+  {
+    name: "bambi-vue",
+    framework: "vue",
+    dir: "apps/templates/bambi-vue",
+    check: ["npm", "run", "typecheck"],
+    expectedFiles: [
+      "bambiui.config.json",
+      "src/styles/bambi.css",
+      "src/components/ui/tabs/tabs.css",
+      "src/components/ui/tabs/Tabs.vue",
+      "src/components/ui/tabs/TabsList.vue",
+      "src/components/ui/tabs/TabsTrigger.vue",
+      "src/components/ui/tabs/TabsContent.vue",
+      "src/components/ui/tabs/index.ts",
+      "src/components/ui/bambi-helpers.ts",
+    ],
+  },
 ];
 
 function getChildEnv() {
@@ -128,7 +175,7 @@ for (const template of templates) {
     "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
 
   assertFiles(templateDir, template.expectedFiles);
-  await assertNoForbiddenOutput(path.join(templateDir, "src/components/ui/tabs"));
+  await assertNoForbiddenOutput(path.join(templateDir, "src/components/ui"));
   await run(template.check, { cwd: templateDir });
 }
 

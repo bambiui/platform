@@ -6,6 +6,14 @@ import {
   pascalCase,
 } from "../shared.js";
 
+// ── Callback detail type resolver ─────────────────────────────────────────
+
+function getCallbackDetailType(callbackName, componentName) {
+  if (!callbackName.startsWith("on")) return "unknown";
+  const eventName = callbackName.slice(2); // e.g. "ValueChange"
+  return `${componentName}${eventName}Detail`; // e.g. "TabsValueChangeDetail"
+}
+
 // ── Svelte part components (TabsList, TabsTrigger, TabsContent) ────────────
 
 function sveltePartFile(part, options, contract) {
@@ -31,9 +39,10 @@ function sveltePartFile(part, options, contract) {
   const propDecls = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
+    isButton ? `  type?: "button" | "submit" | "reset";` : null,
   ].filter(Boolean).join("\n");
 
-  const typeAttr = isButton ? '\n    type={props.type ?? "button"}' : "";
+  const typeAttr = isButton ? "\n    type={type}" : "";
   const valueAttribute = valueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
   const disabledAttribute = disabledHandling
     ? `\n    disabled={${disabledPropName}}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
@@ -46,6 +55,7 @@ function sveltePartFile(part, options, contract) {
   const propDestructure = [
     valueHandling ? valuePropName : null,
     disabledHandling ? disabledPropName : null,
+    isButton ? 'type = "button"' : null,
     "...props",
   ].filter(Boolean).join(", ");
 
@@ -75,14 +85,15 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const optionNames = optionsNames.filter((name) => name !== "controlled");
   const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
 
-  const propDeclarations = optionNames
+  const destructureLines = optionNames
     .map((name) => {
       const contractProp = contractPropsByName.get(name);
       const defaultValue = contractProp?.defaultValue;
-      const isCallback = name.startsWith("on");
-      if (isCallback) return `  ${name}?: (detail: unknown) => void;`;
-      if (contractProp?.type === "boolean") return defaultValue !== undefined ? `  ${name}: boolean = ${defaultValue};` : `  ${name}?: boolean;`;
-      return defaultValue !== undefined ? `  ${name}: string = "${defaultValue}";` : `  ${name}?: string;`;
+      if (defaultValue !== undefined) {
+        if (contractProp?.type === "boolean") return `  ${name} = ${defaultValue},`;
+        return `  ${name} = "${defaultValue}",`;
+      }
+      return `  ${name},`;
     })
     .join("\n");
 
@@ -130,15 +141,14 @@ ${publicContractSource}
 ${primitivesBlock ? `\n${primitivesBlock}\n` : ""}
 ${behaviorSource}
 
-interface Props {
-${propDeclarations}
+interface Props extends Omit<${optionsTypeName}, "controlled"> {
   children?: Snippet;
   class?: string;
   [key: string]: unknown;
 }
 
 let {
-${optionNames.map((n) => `  ${n},`).join("\n")}
+${destructureLines}
   children,
   ...props
 }: Props = $props();

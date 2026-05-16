@@ -359,13 +359,7 @@ class TabsBehavior implements BambiBehavior {
   }
 }
 
-interface Props {
-  value?: string;
-  defaultValue?: string;
-  orientation: string = "horizontal";
-  activationMode: string = "automatic";
-  disabled?: boolean;
-  onValueChange?: (detail: unknown) => void;
+interface Props extends Omit<TabsOptions, "controlled"> {
   children?: Snippet;
   class?: string;
   [key: string]: unknown;
@@ -374,8 +368,8 @@ interface Props {
 let {
   value,
   defaultValue,
-  orientation,
-  activationMode,
+  orientation = "horizontal",
+  activationMode = "automatic",
   disabled,
   onValueChange,
   children,

@@ -63,19 +63,29 @@ function solidPartComponentSource(contract, options) {
       if (disabledHandling && (!disabledPropName || !disabledAttr)) {
         throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
       }
-      const typeAttr = tag === "button" ? "\n      type={props.type ?? \"button\"}" : "";
-      const valueAttribute = valueHandling ? `\n      ${valueAttr}={props.${valuePropName}}` : "";
+      // Split component-controlled props from DOM-safe spread props.
+      const splitKeys = [
+        valueHandling ? valuePropName : null,
+        disabledHandling ? disabledPropName : null,
+        tag === "button" ? "type" : null,
+        "children",
+      ].filter(Boolean);
+      const splitList = splitKeys.map((k) => `"${k}"`).join(", ");
+
+      const typeAttr = tag === "button" ? "\n      type={local.type ?? \"button\"}" : "";
+      const valueAttribute = valueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
       const disabledAttribute = disabledHandling
-        ? `\n      disabled={props.${disabledPropName}}\n      ${disabledAttr}={props.${disabledPropName} ? "true" : undefined}`
+        ? `\n      disabled={local.${disabledPropName}}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
         : "";
 
       return `export function ${componentName}(props: ${propsName}) {
+  const [local, rest] = splitProps(props, [${splitList}]);
   return (
     <${tag}
-      {...props}${typeAttr}${disabledAttribute}
+      {...rest}${typeAttr}${disabledAttribute}
       ${part.attribute}=""${valueAttribute}
     >
-      {props.children}
+      {local.children}
     </${tag}>
   );
 }`;

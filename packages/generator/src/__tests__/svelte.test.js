@@ -104,6 +104,10 @@ describe("createArtifact — tabs/svelte", () => {
     expect(result.files["Tabs.svelte"]).not.toContain("tabs.controller");
     expect(result.files["Tabs.svelte"]).not.toContain("tabs.contract");
   });
+
+  it("Tabs.svelte documents dynamic children limitation and {#key} workaround", () => {
+    expect(result.files["Tabs.svelte"]).toContain("{#key}");
+  });
 });
 
 describe("createArtifact — tabs/svelte part components (children handling)", () => {

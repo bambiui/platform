@@ -436,39 +436,42 @@ export function Tabs(props: TabsProps) {
 }
 
 export function TabsList(props: TabsListProps) {
+  const [local, rest] = splitProps(props, ["children"]);
   return (
     <div
-      {...props}
+      {...rest}
       data-bambi-tabs-list=""
     >
-      {props.children}
+      {local.children}
     </div>
   );
 }
 
 export function TabsTrigger(props: TabsTriggerProps) {
+  const [local, rest] = splitProps(props, ["value", "disabled", "type", "children"]);
   return (
     <button
-      {...props}
-      type={props.type ?? "button"}
-      disabled={props.disabled}
-      data-disabled={props.disabled ? "true" : undefined}
+      {...rest}
+      type={local.type ?? "button"}
+      disabled={local.disabled}
+      data-disabled={local.disabled ? "true" : undefined}
       data-bambi-tabs-trigger=""
-      data-value={props.value}
+      data-value={local.value}
     >
-      {props.children}
+      {local.children}
     </button>
   );
 }
 
 export function TabsContent(props: TabsContentProps) {
+  const [local, rest] = splitProps(props, ["value", "children"]);
   return (
     <div
-      {...props}
+      {...rest}
       data-bambi-tabs-content=""
-      data-value={props.value}
+      data-value={local.value}
     >
-      {props.children}
+      {local.children}
     </div>
   );
 }

@@ -403,6 +403,12 @@ onMount(() => {
   return () => behavior?.destroy();
 });
 
+// Svelte 5 (runes): prop changes drive controller re-sync via this $effect.
+// Dynamic children (conditional triggers/content from parent state) cannot be
+// tracked here — Svelte 5 Snippets do not expose a reactive identity that
+// $effect can subscribe to without calling the Snippet. If your tabs structure
+// changes at runtime (e.g. {#each tabs}), wrap <Tabs> in
+// a {#key} block keyed to the structure: {#key tabs.length}<Tabs ...>.
 $effect(() => {
   behavior?.update?.({
       value,

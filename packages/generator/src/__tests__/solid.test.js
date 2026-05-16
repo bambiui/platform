@@ -103,6 +103,49 @@ describe("createArtifact — tabs/solid", () => {
   });
 });
 
+describe("createArtifact — tabs/solid part components (prop leak guard)", () => {
+  it("TabsList uses splitProps — spreads rest, not props", () => {
+    const src = result.files["index.tsx"];
+    const tabsListFn = src.slice(src.indexOf("export function TabsList("));
+    expect(tabsListFn).toContain("splitProps(props");
+    expect(tabsListFn).toContain("{...rest}");
+    expect(tabsListFn).not.toContain("{...props}");
+  });
+
+  it("TabsList renders children from local, not from props spread", () => {
+    const src = result.files["index.tsx"];
+    const tabsListFn = src.slice(src.indexOf("export function TabsList("), src.indexOf("export function TabsTrigger("));
+    expect(tabsListFn).toContain("{local.children}");
+    expect(tabsListFn).not.toContain("{props.children}");
+  });
+
+  it("TabsTrigger uses splitProps — spreads rest, not props", () => {
+    const src = result.files["index.tsx"];
+    const triggerFn = src.slice(src.indexOf("export function TabsTrigger("), src.indexOf("export function TabsContent("));
+    expect(triggerFn).toContain("splitProps(props");
+    expect(triggerFn).toContain("{...rest}");
+    expect(triggerFn).not.toContain("{...props}");
+  });
+
+  it("TabsTrigger uses local.value/disabled — does not leak value to DOM spread", () => {
+    const src = result.files["index.tsx"];
+    const triggerFn = src.slice(src.indexOf("export function TabsTrigger("), src.indexOf("export function TabsContent("));
+    expect(triggerFn).toContain("local.value");
+    expect(triggerFn).toContain("local.disabled");
+    expect(triggerFn).toContain("{local.children}");
+  });
+
+  it("TabsContent uses splitProps — value not leaked to DOM as plain attribute", () => {
+    const src = result.files["index.tsx"];
+    const contentFn = src.slice(src.indexOf("export function TabsContent("));
+    expect(contentFn).toContain("splitProps(props");
+    expect(contentFn).toContain("{...rest}");
+    expect(contentFn).not.toContain("{...props}");
+    expect(contentFn).toContain("local.value");
+    expect(contentFn).toContain("{local.children}");
+  });
+});
+
 describe("createArtifact — tabs/solid fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/solid`;
   let committed;

@@ -10,6 +10,7 @@
         "packages/core/contract/define-contract.ts"
       ],
       "controller": "packages/core/src/components/tabs/tabs.controller.ts",
+      "primitiveFiles": ["packages/core/src/primitives/roving-focus.ts"],
       "style": "packages/registry/src/styles/tabs.css",
       "generatedFiles": {
         "react": [

@@ -42,7 +42,10 @@ await transpile("contract/define-contract.ts", "define-contract.ts");
 await transpile("src/components/tabs/tabs.contract.ts", "tabs.contract.ts", (source) =>
   source.replace("../../../contract/define-contract.js", "./define-contract.js"),
 );
-await transpile("src/components/tabs/tabs.controller.ts", "tabs.controller.ts");
+await transpile("src/primitives/roving-focus.ts", "roving-focus.ts");
+await transpile("src/components/tabs/tabs.controller.ts", "tabs.controller.ts", (source) =>
+  source.replace("@bambiui/core/primitives/roving-focus", "./roving-focus.js"),
+);
 
 class FakeEvent {
   constructor(type, init = {}) {

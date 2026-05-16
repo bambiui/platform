@@ -3,6 +3,7 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
@@ -81,10 +82,14 @@ async function generateFramework(componentName, component, framework, publicComp
 
   const contractSource = await readFile(resolve(root, component.contract), "utf8");
   const controllerSource = await readFile(resolve(root, component.controller), "utf8");
+  const primitiveFiles = await Promise.all(
+    (component.primitiveFiles ?? []).map((p) => readFile(resolve(root, p), "utf8")),
+  );
   const { content, usedHelpers } = createArtifact({
     framework,
     contractSource,
     controllerSource,
+    primitiveFiles,
     contractExportName: contractExportName(componentName),
     generatorOptions: component.generator?.[framework] ?? {},
   });
@@ -150,7 +155,23 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
       process.stdout.write(`${changed ? "refreshed" : "unchanged"} ${generatedCss}\n`);
     }
   }
+
+  // Compute SHA-256 hashes for all public component files and write to registry.json.
+  const componentHashes = {};
+  for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
+    componentHashes[framework] = {};
+    for (const filePath of files) {
+      const fileContent = await readFile(resolve(root, filePath), "utf8");
+      componentHashes[framework][filePath] = createHash("sha256").update(fileContent).digest("hex");
+    }
+  }
+  if (Object.keys(componentHashes).length > 0) {
+    publicRegistry.components[componentName].hashes = componentHashes;
+  }
 }
+
+await writeFile(registryPath, `${JSON.stringify(publicRegistry, null, 2)}\n`);
+process.stdout.write("Updated registry.json with file hashes.\n");
 
 await new Promise((resolvePromise, reject) => {
   const child = spawn(process.execPath, ["scripts/check-registry.mjs"], {

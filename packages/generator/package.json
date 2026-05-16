@@ -8,7 +8,13 @@
     ".": "./src/index.js",
     "./react": "./src/react/index.js"
   },
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
     "ts-morph": "^25.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.6"
   }
 }

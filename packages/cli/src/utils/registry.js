@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -96,16 +97,26 @@ export async function readRegistryManifest(registryUrl) {
  * @param {string} from
  * @param {string} to
  * @param {boolean} force
- * @param {(content: string) => string} [transform]
+ * @param {{ expectedHash?: string, transform?: (content: string) => string }} [options]
  */
-export async function copyRegistryFile(registryUrl, from, to, force, transform) {
+export async function copyRegistryFile(registryUrl, from, to, force, options = {}) {
   const existing = getExistingFileResult(to, force);
   if (existing) {
     return existing;
   }
 
   const content = await readRegistryFile(registryUrl, from);
-  return writeProjectFile(to, transform ? transform(content) : content, force);
+
+  if (options.expectedHash) {
+    const actual = createHash("sha256").update(content).digest("hex");
+    if (actual !== options.expectedHash) {
+      throw new Error(
+        `Integrity check failed for "${from}".\n  Expected: ${options.expectedHash}\n  Received: ${actual}`,
+      );
+    }
+  }
+
+  return writeProjectFile(to, options.transform ? options.transform(content) : content, force);
 }
 
 /**

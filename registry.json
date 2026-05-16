@@ -17,10 +17,26 @@
         ]
       },
       "helpers": {
-        "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"]
+        "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ]
       },
       "exports": {
-        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
+        "react": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ]
+      },
+      "hashes": {
+        "react": {
+          "packages/registry/generated/tabs/react/index.tsx": "e85b92b49519ac18d3308094e73c084a05e13bb46134d729d591189ae0f5d9ae",
+          "packages/registry/generated/tabs/react/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
+        }
       }
     }
   }

@@ -1,3 +1,4 @@
+import { createRovingFocus, type RovingFocus } from "@bambiui/core/primitives/roving-focus";
 import {
   TABS_TRIGGER,
   TABS_CONTENT,
@@ -76,6 +77,7 @@ export class TabsController implements BambiController {
   private readonly _id: string;
   private readonly destroyAbort: AbortController;
   private bindAbort: AbortController;
+  private rovingFocus: RovingFocus | null = null;
 
   constructor(root: Element, options: TabsOptions = {}) {
     this.root = root;
@@ -88,6 +90,7 @@ export class TabsController implements BambiController {
   sync(): void {
     // Abort previous event listeners to avoid duplicates on repeated sync() calls
     this.bindAbort.abort();
+    this.rovingFocus?.destroy();
     this.bindAbort = new AbortController();
 
     const orientation = (
@@ -140,6 +143,11 @@ export class TabsController implements BambiController {
       list.setAttribute("aria-orientation", orientation);
     }
 
+    if (options.orientation !== undefined && options.orientation !== prev.orientation) {
+      this.rovingFocus?.destroy();
+      this.rovingFocus = this.createRovingFocusInstance(orientation);
+    }
+
     if (options.value !== undefined && options.value !== prev.value && options.value) {
       // Prop update — apply state silently, no event dispatch
       this.applyState(options.value);
@@ -151,6 +159,7 @@ export class TabsController implements BambiController {
   destroy(): void {
     this.destroyAbort.abort();
     this.bindAbort.abort();
+    this.rovingFocus?.destroy();
   }
 
   private firstTriggerValue(): string | null {
@@ -228,23 +237,32 @@ export class TabsController implements BambiController {
     ) as TabsActivationMode;
   }
 
-  private focusTrigger(trigger: Element | undefined): void {
+  private focusTrigger(trigger: Element): void {
     if (trigger instanceof HTMLElement) trigger.focus();
   }
 
-  private activateFocusedTrigger(trigger: Element | undefined): void {
-    const value = trigger?.getAttribute(TABS_VALUE);
+  private activateFocusedTrigger(trigger: Element): void {
+    const value = trigger.getAttribute(TABS_VALUE);
     if (value) this.applyValue(value, "keyboard");
   }
 
-  // NOTE: This controller implements keyboard navigation inline rather than delegating to
-  // the `createRovingFocus` primitive. Migration is safe when the primitive is stable and
-  // when the following behaviors can be preserved end-to-end:
-  //   - automatic vs manual activation mode (auto-activates on focus; manual needs Enter/Space)
-  //   - ARIA sync path: applyValue → applyState must remain the trigger for aria-selected updates
-  //   - orientation-aware arrow keys (horizontal ↔ vertical)
-  //   - disabled item skipping via both data-disabled and aria-disabled
-  // Until then, keep navigation self-contained to avoid silent regressions.
+  private createRovingFocusInstance(orientation: TabsOrientation): RovingFocus {
+    return createRovingFocus(this.root, {
+      orientation,
+      getItems: () => {
+        if (this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED)) return [];
+        return this.triggers();
+      },
+      isDisabled: (el) =>
+        getBoolAttr(el, TABS_DISABLED) || el.getAttribute("aria-disabled") === "true",
+      onFocus: (el) => {
+        this.focusTrigger(el);
+        if (this.activationMode() === "automatic") this.activateFocusedTrigger(el);
+      },
+      onActivate: (el) => this.activateFocusedTrigger(el),
+    });
+  }
+
   private bindEvents(): void {
     const { signal } = this.bindAbort;
 
@@ -270,53 +288,9 @@ export class TabsController implements BambiController {
       { signal },
     );
 
-    this.root.addEventListener(
-      "keydown",
-      (event: Event) => {
-        const disabled = this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED);
-        if (disabled) return;
-
-        const e = event as KeyboardEvent;
-        const orientation = (
-          this.options.orientation ??
-          getAttr(this.root, TABS_ORIENTATION, "horizontal")
-        ) as TabsOrientation;
-
-        const activeTriggers = this.triggers().filter(
-          (t) => !getBoolAttr(t, TABS_DISABLED) && t.getAttribute("aria-disabled") !== "true",
-        );
-        const focused = activeTriggers.findIndex((t) => t === document.activeElement);
-        if (focused === -1) return;
-
-        const isHorizontal = orientation === "horizontal";
-        const prevKey = isHorizontal ? "ArrowLeft" : "ArrowUp";
-        const nextKey = isHorizontal ? "ArrowRight" : "ArrowDown";
-
-        let nextTrigger: Element | undefined;
-
-        if (e.key === nextKey) {
-          e.preventDefault();
-          nextTrigger = activeTriggers[(focused + 1) % activeTriggers.length];
-        } else if (e.key === prevKey) {
-          e.preventDefault();
-          nextTrigger = activeTriggers[(focused - 1 + activeTriggers.length) % activeTriggers.length];
-        } else if (e.key === "Home") {
-          e.preventDefault();
-          nextTrigger = activeTriggers[0];
-        } else if (e.key === "End") {
-          e.preventDefault();
-          nextTrigger = activeTriggers[activeTriggers.length - 1];
-        } else if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          this.activateFocusedTrigger(activeTriggers[focused]);
-          return;
-        }
-
-        if (!nextTrigger) return;
-        this.focusTrigger(nextTrigger);
-        if (this.activationMode() === "automatic") this.activateFocusedTrigger(nextTrigger);
-      },
-      { signal },
-    );
+    const orientation = (
+      this.options.orientation ?? getAttr(this.root, TABS_ORIENTATION, "horizontal")
+    ) as TabsOrientation;
+    this.rovingFocus = this.createRovingFocusInstance(orientation);
   }
 }

@@ -22,6 +22,7 @@ const globalForbiddenStrings = [
   "define-contract",
   "use-bambi-controller",
   "@bambiui/core",
+  "@bambiui/generator",
   "@bambiui/adapters",
 ];
 

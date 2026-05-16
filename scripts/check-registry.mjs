@@ -3,7 +3,7 @@
 
 import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv from "ajv/dist/2020.js";
 
@@ -31,6 +31,7 @@ const FORBIDDEN_STRINGS = [
   "define-contract",
   "use-bambi-controller",
   "@bambiui/core",
+  "@bambiui/generator",
   "@bambiui/adapters",
 ];
 
@@ -173,18 +174,18 @@ if (!registry.styles || typeof registry.styles.global !== "string") {
   checkPathAndFile(registry.styles.global, "styles.global");
   ok(`styles.global: ${registry.styles.global}`);
 
-  if (registry.styles.globalHash !== undefined) {
-    if (!/^[a-f0-9]{64}$/.test(registry.styles.globalHash)) {
-      fail("styles.globalHash: invalid SHA-256 hex string");
-    } else {
-      const abs = resolve(root, registry.styles.global);
-      if (existsSync(abs)) {
-        const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
-        if (actual !== registry.styles.globalHash) {
-          fail(`styles.globalHash: hash mismatch for ${registry.styles.global}`);
-        } else {
-          ok("styles.globalHash: verified");
-        }
+  if (registry.styles.globalHash === undefined) {
+    fail("styles.globalHash: missing (required for integrity verification)");
+  } else if (!/^[a-f0-9]{64}$/.test(registry.styles.globalHash)) {
+    fail("styles.globalHash: invalid SHA-256 hex string");
+  } else {
+    const abs = resolve(root, registry.styles.global);
+    if (existsSync(abs)) {
+      const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
+      if (actual !== registry.styles.globalHash) {
+        fail(`styles.globalHash: hash mismatch for ${registry.styles.global}`);
+      } else {
+        ok("styles.globalHash: verified");
       }
     }
   }
@@ -242,6 +243,15 @@ if (registry.sharedHashes !== undefined) {
   }
 }
 
+// Enforce: every shared[framework] must have a sharedHashes entry.
+if (registry.shared && typeof registry.shared === "object") {
+  for (const framework of Object.keys(registry.shared)) {
+    if (!registry.sharedHashes?.[framework]) {
+      fail(`sharedHashes.${framework}: missing (required when shared.${framework} is declared)`);
+    }
+  }
+}
+
 if (!registry.components || typeof registry.components !== "object") {
   fail("missing components object");
   process.exit(1);
@@ -271,6 +281,33 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
     checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true, componentName });
     ok(`files.${framework}: ${files.length} generated file(s)`);
+
+    // Enforce: every file must have a hash entry.
+    const frameworkHashes = component.hashes?.[framework];
+    if (!frameworkHashes || typeof frameworkHashes !== "object") {
+      fail(`${componentName}: hashes.${framework}: missing (required for all component files)`);
+    } else {
+      for (const filePath of files) {
+        const hash = frameworkHashes[filePath];
+        if (!hash) {
+          fail(`${componentName}: hashes.${framework}.${basename(filePath)}: missing hash`);
+          continue;
+        }
+        if (!/^[a-f0-9]{64}$/.test(hash)) {
+          fail(`${componentName}: hashes.${framework}.${basename(filePath)}: invalid SHA-256 hex string`);
+          continue;
+        }
+        const abs = resolve(root, filePath);
+        if (existsSync(abs)) {
+          const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
+          if (actual !== hash) {
+            fail(`${componentName}: hashes.${framework}.${basename(filePath)}: hash mismatch`);
+          } else {
+            ok(`${componentName}: hashes.${framework}.${basename(filePath)}: hash verified`);
+          }
+        }
+      }
+    }
   }
 
   if (component.helpers !== undefined) {

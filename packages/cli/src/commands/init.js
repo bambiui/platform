@@ -40,6 +40,7 @@ export async function initProject(flags) {
       getStylePath(manifest),
       path.join(cwd, config.styleFile),
       Boolean(flags.force),
+      { expectedHash: manifest.styles?.globalHash },
     ),
   ];
 }

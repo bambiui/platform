@@ -25,6 +25,7 @@ const forbiddenStrings = [
   "define-contract",
   "use-bambi-controller",
   "@bambiui/core",
+  "@bambiui/generator",
   "@bambiui/adapters",
   "tabs.contract",
   "tabs.controller",

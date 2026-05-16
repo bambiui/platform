@@ -46,7 +46,10 @@ Active data flow: `core → generator → registry → cli → user project`
 ```json
 {
   "version": 2,
-  "styles": { "global": "packages/registry/src/styles/bambi.css" },
+  "styles": {
+    "global": "packages/registry/src/styles/bambi.css",
+    "globalHash": "<sha256>"
+  },
   "shared": {
     "react": "packages/registry/generated/shared/react/bambi-helpers.ts",
     "solid": "packages/registry/generated/shared/solid/bambi-helpers.ts",
@@ -89,7 +92,13 @@ Active data flow: `core → generator → registry → cli → user project`
 
 Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
 
-`registry.json` also carries `sharedHashes` — SHA-256 hashes of each framework's `bambi-helpers.ts` shared artifact — and `components[name].hashes` — per-file hashes for all generated component artifacts. The CLI verifies these on install.
+`registry.json` carries three integrity hash fields, all verified at install time by the CLI and at check time by `check-registry.mjs`:
+
+- `styles.globalHash` — SHA-256 of the global `bambi.css` file. Required; `check-registry` fails if absent.
+- `sharedHashes[framework]` — SHA-256 of each framework's `bambi-helpers.ts` shared artifact. Required for every `shared[framework]` entry.
+- `components[name].hashes[framework][filePath]` — per-file SHA-256 for every generated component artifact. Required for every file in `components[name].files[framework]`.
+
+`pnpm registry:refresh` computes all three and writes them into `registry.json` before running `check-registry`.
 
 ## Canonical Component — Tabs
 

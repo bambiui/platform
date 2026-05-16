@@ -29,6 +29,12 @@
         "$ref": "#/$defs/registryPath"
       }
     },
+    "sharedHashes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/sha256Hex"
+      }
+    },
     "components": {
       "type": "object",
       "additionalProperties": {

@@ -161,7 +161,8 @@ for (const template of templates) {
   process.stdout.write(`\nSmoke testing ${template.name}...\n`);
 
   if (shouldInstall) {
-    await run(["npm", "ci"], { cwd: templateDir });
+    const hasLock = existsSync(path.join(templateDir, "package-lock.json"));
+    await run(hasLock ? ["npm", "ci"] : ["npm", "install"], { cwd: templateDir });
   } else if (!existsSync(path.join(templateDir, "node_modules"))) {
     throw new Error(
       `${template.name} has no node_modules. Run pnpm smoke:templates -- --install first.`,

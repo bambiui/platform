@@ -48,18 +48,18 @@ function sveltePartFile(part, options, contract) {
     ? `\n    disabled={${disabledPropName}}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
     : "";
 
-  const propsInterface = propDecls
-    ? `\ninterface Props {\n${propDecls}\n  [key: string]: unknown;\n}`
-    : `\ntype Props = Record<string, unknown>;`;
+  const propsInterface = `\ninterface Props {\n${propDecls ? propDecls + "\n" : ""}  children?: Snippet;\n  [key: string]: unknown;\n}`;
 
   const propDestructure = [
     valueHandling ? valuePropName : null,
     disabledHandling ? disabledPropName : null,
     isButton ? 'type = "button"' : null,
+    "children",
     "...props",
   ].filter(Boolean).join(", ");
 
   return `<script lang="ts">
+import { type Snippet } from "svelte";
 ${propsInterface}
 let { ${propDestructure} }: Props = $props();
 </script>
@@ -67,7 +67,7 @@ let { ${propDestructure} }: Props = $props();
   {...props}${typeAttr}${disabledAttribute}
   ${part.attribute}=""${valueAttribute}
 >
-  {@render (props as { children?: import("svelte").Snippet }).children?.()}
+  {@render children?.()}
 </${tag}>
 `;
 }

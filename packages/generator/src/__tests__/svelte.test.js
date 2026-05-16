@@ -105,3 +105,55 @@ describe("createArtifact — tabs/svelte", () => {
     expect(result.files["Tabs.svelte"]).not.toContain("tabs.contract");
   });
 });
+
+describe("createArtifact — tabs/svelte part components (children handling)", () => {
+  const parts = ["TabsList.svelte", "TabsTrigger.svelte", "TabsContent.svelte"];
+
+  for (const filename of parts) {
+    it(`${filename}: imports Snippet from svelte`, () => {
+      expect(result.files[filename]).toContain('from "svelte"');
+    });
+
+    it(`${filename}: children declared in Props interface`, () => {
+      expect(result.files[filename]).toContain("children?: Snippet");
+    });
+
+    it(`${filename}: children explicitly destructured before ...props`, () => {
+      const src = result.files[filename];
+      const match = src.match(/let \{([^}]+)\}/);
+      expect(match).not.toBeNull();
+      const destructure = match[1];
+      const childrenIdx = destructure.indexOf("children");
+      const propsIdx = destructure.indexOf("...props");
+      expect(childrenIdx).toBeGreaterThanOrEqual(0);
+      expect(propsIdx).toBeGreaterThan(childrenIdx);
+    });
+
+    it(`${filename}: renders via {@render children?.()}`, () => {
+      expect(result.files[filename]).toContain("{@render children?.()}");
+    });
+
+    it(`${filename}: does not use props-as-cast for children`, () => {
+      expect(result.files[filename]).not.toContain("props as { children");
+      expect(result.files[filename]).not.toContain('import("svelte").Snippet');
+    });
+  }
+});
+
+describe("createArtifact — tabs/svelte fixture match", () => {
+  const registryDir = `${root}/packages/registry/generated/tabs/svelte`;
+  const fixtureFiles = ["Tabs.svelte", "TabsList.svelte", "TabsTrigger.svelte", "TabsContent.svelte", "index.ts"];
+  const fixtures = {};
+
+  beforeAll(async () => {
+    for (const filename of fixtureFiles) {
+      fixtures[filename] = await readFile(`${registryDir}/${filename}`, "utf8");
+    }
+  });
+
+  for (const filename of fixtureFiles) {
+    it(`${filename} matches committed registry fixture`, () => {
+      expect(result.files[filename]).toBe(fixtures[filename]);
+    });
+  }
+});

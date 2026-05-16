@@ -100,3 +100,16 @@ describe("createArtifact — unknown framework", () => {
     ).toThrow(/No generator registered for framework/);
   });
 });
+
+describe("createArtifact — tabs/react fixture match", () => {
+  const registryDir = `${root}/packages/registry/generated/tabs/react`;
+  let committed;
+
+  beforeAll(async () => {
+    committed = await readFile(`${registryDir}/index.tsx`, "utf8");
+  });
+
+  it("index.tsx matches committed registry fixture", () => {
+    expect(result.files["index.tsx"]).toBe(committed);
+  });
+});

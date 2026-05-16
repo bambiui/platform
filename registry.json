@@ -97,19 +97,19 @@
           "packages/registry/generated/tabs/react/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "f16bf2587e449f69bb320ac4618576c24fdc4aba439b28467088d8c39e560efc",
+          "packages/registry/generated/tabs/solid/index.tsx": "e2ad6b3f4a329aa2565ee20ad6f1796414f7d3dc30ab4e8a86adebd46ea88851",
           "packages/registry/generated/tabs/solid/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
         },
         "svelte": {
           "packages/registry/generated/tabs/svelte/Tabs.svelte": "93b2e8111415b3d9f80953d24092a4e808cff13cd924cf57749b234540d10b61",
-          "packages/registry/generated/tabs/svelte/TabsList.svelte": "5bc930a3c1436c0e206e4e0e5bf51d45faf0d6c6a39c9760f7b1c0dfd2f1a2fc",
-          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "2b325c9283d303e12307ee4b4e7291986fe65440b89440760ab9e5a0af02deed",
-          "packages/registry/generated/tabs/svelte/TabsContent.svelte": "5c175ea58337f12121b7b45cbf2218e97b1563edbb31995362fe44262e53c765",
+          "packages/registry/generated/tabs/svelte/TabsList.svelte": "48a0932b855a5f97a64c898c47d22551438d883dce86425cc55c572e783ef7d2",
+          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "fcf5e9ce1e4ee80b8b605f10a10d1654dcaafbb97f6e839cc65c8b99fe00fdb7",
+          "packages/registry/generated/tabs/svelte/TabsContent.svelte": "582938a414f555e3a1bf6bc318ffdad56360701a2c4d61e879ef132a419c23dd",
           "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b",
           "packages/registry/generated/tabs/svelte/tabs.css": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
         },
         "vue": {
-          "packages/registry/generated/tabs/vue/Tabs.vue": "841d9b3d2f33d212c9745a836afd324eec48faa263ac80490f657dfdf1392833",
+          "packages/registry/generated/tabs/vue/Tabs.vue": "c9d888206694b3b0bdb45b32ce219e6b4549034cdef4ee4e1a0c78e878e74b90",
           "packages/registry/generated/tabs/vue/TabsList.vue": "8a7880c63d1c715361dcc4df12cb78bd33ab35dd8674cafb6ddff4b79b55093a",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "b43f75bbafe36cbf19e86ceb32e0c481a98d991546b7d9e048c657525625bedd",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "9bc6bfd49eb8de9670856de0949c0fea3729b2e8410648a9b865ae111d647c13",
@@ -118,5 +118,11 @@
         }
       }
     }
+  },
+  "sharedHashes": {
+    "react": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
+    "solid": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
+    "svelte": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
+    "vue": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21"
   }
 }

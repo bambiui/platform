@@ -64,6 +64,10 @@ describe("createArtifact — tabs/vue", () => {
     expect(result.files["Tabs.vue"]).toContain("computed(");
   });
 
+  it("Tabs.vue uses onUpdated for dynamic slot/child tracking", () => {
+    expect(result.files["Tabs.vue"]).toContain("onUpdated(");
+  });
+
   it("Tabs.vue uses script setup syntax", () => {
     expect(result.files["Tabs.vue"]).toContain("<script setup");
     expect(result.files["Tabs.vue"]).toContain("<template>");
@@ -107,4 +111,22 @@ describe("createArtifact — tabs/vue", () => {
     expect(result.files["Tabs.vue"]).not.toContain("tabs.controller");
     expect(result.files["Tabs.vue"]).not.toContain("tabs.contract");
   });
+});
+
+describe("createArtifact — tabs/vue fixture match", () => {
+  const registryDir = `${root}/packages/registry/generated/tabs/vue`;
+  const fixtureFiles = ["Tabs.vue", "TabsList.vue", "TabsTrigger.vue", "TabsContent.vue", "index.ts"];
+  const fixtures = {};
+
+  beforeAll(async () => {
+    for (const filename of fixtureFiles) {
+      fixtures[filename] = await readFile(`${registryDir}/${filename}`, "utf8");
+    }
+  });
+
+  for (const filename of fixtureFiles) {
+    it(`${filename} matches committed registry fixture`, () => {
+      expect(result.files[filename]).toBe(fixtures[filename]);
+    });
+  }
 });

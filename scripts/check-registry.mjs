@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Validates the public CLI registry and the internal authoring manifest.
 
+import { createHash } from "node:crypto";
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -190,6 +191,37 @@ if (registry.shared !== undefined) {
         }
       }
       ok(`shared.${framework}: ${filePath}`);
+    }
+  }
+}
+
+if (registry.sharedHashes !== undefined) {
+  if (!registry.sharedHashes || typeof registry.sharedHashes !== "object") {
+    fail("sharedHashes must be an object when present");
+  } else {
+    for (const [framework, hash] of Object.entries(registry.sharedHashes)) {
+      if (!KNOWN_FRAMEWORKS.includes(framework)) {
+        fail(`sharedHashes has unknown framework "${framework}"`);
+        continue;
+      }
+      if (!/^[a-f0-9]{64}$/.test(hash)) {
+        fail(`sharedHashes.${framework}: invalid SHA-256 hex string`);
+        continue;
+      }
+      const sharedPath = registry.shared?.[framework];
+      if (!sharedPath) {
+        fail(`sharedHashes.${framework}: no corresponding shared.${framework} path`);
+        continue;
+      }
+      const abs = resolve(root, sharedPath);
+      if (existsSync(abs)) {
+        const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
+        if (actual !== hash) {
+          fail(`sharedHashes.${framework}: hash mismatch for ${sharedPath}`);
+        } else {
+          ok(`sharedHashes.${framework}: hash verified`);
+        }
+      }
     }
   }
 }

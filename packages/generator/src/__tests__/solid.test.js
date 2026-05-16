@@ -58,6 +58,11 @@ describe("createArtifact — tabs/solid", () => {
     expect(result.files["index.tsx"]).toContain('from "solid-js"');
   });
 
+  it("output imports children helper for dynamic slot tracking", () => {
+    expect(result.files["index.tsx"]).toContain("children");
+    expect(result.files["index.tsx"]).toContain("resolvedChildren");
+  });
+
   it("output does not use React hooks", () => {
     expect(result.files["index.tsx"]).not.toContain("useRef");
     expect(result.files["index.tsx"]).not.toContain("useEffect");
@@ -95,5 +100,18 @@ describe("createArtifact — tabs/solid", () => {
 
   it("output imports helpers from ../bambi-helpers", () => {
     expect(result.files["index.tsx"]).toContain('from "../bambi-helpers"');
+  });
+});
+
+describe("createArtifact — tabs/solid fixture match", () => {
+  const registryDir = `${root}/packages/registry/generated/tabs/solid`;
+  let committed;
+
+  beforeAll(async () => {
+    committed = await readFile(`${registryDir}/index.tsx`, "utf8");
+  });
+
+  it("index.tsx matches committed registry fixture", () => {
+    expect(result.files["index.tsx"]).toBe(committed);
   });
 });

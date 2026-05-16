@@ -185,6 +185,21 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
   }
 }
 
+// Compute SHA-256 hashes for shared helper files and write to registry.json.
+if (publicRegistry.shared && typeof publicRegistry.shared === "object") {
+  const sharedHashes = {};
+  for (const [framework, sharedPath] of Object.entries(publicRegistry.shared)) {
+    const abs = resolve(root, sharedPath);
+    if (existsSync(abs)) {
+      const content = await readFile(abs, "utf8");
+      sharedHashes[framework] = createHash("sha256").update(content).digest("hex");
+    }
+  }
+  if (Object.keys(sharedHashes).length > 0) {
+    publicRegistry.sharedHashes = sharedHashes;
+  }
+}
+
 await writeFile(registryPath, `${JSON.stringify(publicRegistry, null, 2)}\n`);
 process.stdout.write("Updated registry.json with file hashes.\n");
 

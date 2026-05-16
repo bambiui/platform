@@ -1,12 +1,14 @@
 <script lang="ts">
+import { type Snippet } from "svelte";
 
 interface Props {
   value: string;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
+  children?: Snippet;
   [key: string]: unknown;
 }
-let { value, disabled, type = "button", ...props }: Props = $props();
+let { value, disabled, type = "button", children, ...props }: Props = $props();
 </script>
 <button
   {...props}
@@ -16,5 +18,5 @@ let { value, disabled, type = "button", ...props }: Props = $props();
   data-bambi-tabs-trigger=""
     data-value={value}
 >
-  {@render (props as { children?: import("svelte").Snippet }).children?.()}
+  {@render children?.()}
 </button>

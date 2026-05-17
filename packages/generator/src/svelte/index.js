@@ -177,16 +177,19 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
 const isNativeButton = $derived(Component === "button");
 const effectiveDisabled = $derived(Boolean(${effectiveDisabledExpression}));
 const nativeType = $derived(isNativeButton ? (typeof props.type === "string" ? props.type : "button") : undefined);
+const polymorphicAttrs = $derived({
+  type: nativeType,
+  disabled: isNativeButton ? effectiveDisabled : undefined,
+  "aria-disabled": !isNativeButton && effectiveDisabled ? true : undefined,
+  "aria-busy": ${hasLoadingOption ? "loading ? true : undefined" : "undefined"},
+});
 ` : "";
   const rootMarkup = polymorphicRootPropName ? `<svelte:element
   this={Component}
   bind:this={rootEl}
   {...props}
+  {...polymorphicAttrs}
   ${root.attribute}=""
-  type={nativeType}
-  disabled={isNativeButton ? effectiveDisabled : undefined}
-  aria-disabled={!isNativeButton && effectiveDisabled ? "true" : undefined}
-  aria-busy={${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"}}
 ${rootAttrLines}${controlledAttrLine}
 >
   {@render children?.()}

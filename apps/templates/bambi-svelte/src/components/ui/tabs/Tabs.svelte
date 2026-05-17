@@ -124,7 +124,6 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
@@ -291,7 +290,6 @@ class TabsBehavior implements BambiBehavior {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {
@@ -363,6 +361,7 @@ interface Props extends Omit<TabsOptions, "controlled"> {
   children?: Snippet;
   class?: string;
   [key: string]: unknown;
+  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 let {
@@ -390,25 +389,32 @@ let rootEl: HTMLDivElement | undefined = $state();
 let behavior: TabsBehavior | undefined;
 
 onMount(() => {
+  const onValueChangeHandler = (event: Event) => {
+    const e = event as CustomEvent<TabsValueChangeDetail>;
+    onValueChange?.(e.detail);
+  };
+  rootEl!.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
   behavior = new TabsBehavior(rootEl!, {
       value,
       defaultValue,
       orientation,
       activationMode,
       disabled,
-      onValueChange,
       controlled,
   });
   behavior.sync();
-  return () => behavior?.destroy();
+  return () => {
+    rootEl!.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
+    behavior?.destroy();
+  };
 });
 
 // Svelte 5 (runes): prop changes drive controller re-sync via this $effect.
 // Dynamic children (conditional triggers/content from parent state) cannot be
 // tracked here — Svelte 5 Snippets do not expose a reactive identity that
-// $effect can subscribe to without calling the Snippet. If your tabs structure
-// changes at runtime (e.g. {#each tabs}), wrap <Tabs> in
-// a {#key} block keyed to the structure: {#key tabs.length}<Tabs ...>.
+// $effect can subscribe to without calling the Snippet. If the child structure
+// changes at runtime, wrap <Tabs> in a {#key} block keyed
+// to the structure.
 $effect(() => {
   behavior?.update?.({
       value,
@@ -416,7 +422,6 @@ $effect(() => {
       orientation,
       activationMode,
       disabled,
-      onValueChange,
       controlled,
   });
 });

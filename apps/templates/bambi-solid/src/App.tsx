@@ -1,9 +1,11 @@
+import { Button } from "./components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 
 export default function App() {
   return (
     <div>
       bambiui-solid
+      <Button variant="secondary">Button</Button>
       <Tabs defaultValue="account">
         <TabsList>
           <TabsTrigger value="account">Account</TabsTrigger>

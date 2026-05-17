@@ -123,7 +123,6 @@ export interface TabsOptions {
   orientation?: TabsOrientation;
   activationMode?: TabsActivationMode;
   disabled?: boolean;
-  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
@@ -290,7 +289,6 @@ class TabsBehavior implements BambiBehavior {
     if (!isControlled) this.applyState(newValue);
 
     dispatchTabsEvent(this.root, { value: newValue, previousValue, source });
-    this.options.onValueChange?.({ value: newValue, previousValue, source });
   }
 
   private activationMode(): TabsActivationMode {
@@ -361,6 +359,7 @@ class TabsBehavior implements BambiBehavior {
 export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.HTMLAttributes<HTMLDivElement>, keyof Omit<TabsOptions, "controlled">> {
   children?: React.ReactNode;
   className?: string;
+  onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
 export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -387,6 +386,8 @@ export function Tabs({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const behaviorRef = React.useRef<TabsBehavior | null>(null);
   const controlled = value !== undefined;
+  const onValueChangeRef = React.useRef(onValueChange);
+  onValueChangeRef.current = onValueChange;
 
   React.useEffect(() => {
     if (value !== undefined && defaultValue !== undefined) {
@@ -396,10 +397,15 @@ export function Tabs({
     }
   }, [defaultValue, value]);
 
-
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
+
+    const onValueChangeHandler = (event: Event) => {
+      const e = event as CustomEvent<TabsValueChangeDetail>;
+      onValueChangeRef.current?.(e.detail);
+    };
+    root.addEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
 
     const behavior = new TabsBehavior(root, {
       value,
@@ -408,12 +414,12 @@ export function Tabs({
       activationMode,
       disabled,
       controlled,
-      onValueChange,
     });
     behaviorRef.current = behavior;
     behavior.sync();
 
     return () => {
+      root.removeEventListener(TABS_EVENT_VALUE_CHANGE, onValueChangeHandler);
       behaviorRef.current = null;
       behavior.destroy();
     };
@@ -427,9 +433,8 @@ export function Tabs({
       activationMode,
       disabled,
       controlled,
-      onValueChange,
     });
-  }, [value, defaultValue, orientation, activationMode, disabled, onValueChange, children]);
+  }, [value, defaultValue, orientation, activationMode, disabled, children]);
 
   return (
     <div

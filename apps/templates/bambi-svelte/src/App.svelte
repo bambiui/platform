@@ -1,9 +1,11 @@
 <script lang="ts">
+import { Button } from "./components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 </script>
 
 <div>
   bambiui-svelte
+  <Button variant="secondary">Button</Button>
   <Tabs defaultValue="account">
     <TabsList>
       <TabsTrigger value="account">Account</TabsTrigger>

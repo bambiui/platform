@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/src/components/ui/button";
 import {
   Tabs,
   TabsContent,
@@ -9,6 +10,7 @@ export default function Home() {
   return (
     <div>
       bambiui-next
+      <Button variant="secondary">Button</Button>
       <Tabs defaultValue="account">
         <TabsList>
           <TabsTrigger value="account">Account</TabsTrigger>

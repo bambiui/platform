@@ -208,7 +208,7 @@ describe("createArtifact — polymorphic single-root button", () => {
     expect(outputs.solid.files["index.tsx"]).toContain("disabled={isNativeButton() ? effectiveDisabled() : undefined}");
     expect(outputs.solid.files["index.tsx"]).toContain('aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}');
     expect(outputs.svelte.files["Button.svelte"]).toContain("const effectiveDisabled = $derived(Boolean(disabled || loading))");
-    expect(outputs.svelte.files["Button.svelte"]).toContain('aria-disabled={!isNativeButton && effectiveDisabled ? "true" : undefined}');
+    expect(outputs.svelte.files["Button.svelte"]).toContain('"aria-disabled": !isNativeButton && effectiveDisabled ? true : undefined');
     expect(outputs.vue.files["Button.vue"]).toContain("const effectiveDisabled = computed(() => Boolean(props.disabled || props.loading))");
     expect(outputs.vue.files["Button.vue"]).toContain(":aria-disabled=\"!isNativeButton && effectiveDisabled ? 'true' : undefined\"");
   });

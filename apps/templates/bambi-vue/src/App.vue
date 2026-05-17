@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { Button } from "./components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 </script>
 
 <template>
   <div>
     bambiui-vue
+    <Button variant="secondary">Button</Button>
     <Tabs default-value="account">
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>

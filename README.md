@@ -90,6 +90,14 @@ pnpm check:full              # pnpm check + template install/compile smoke
 pnpm build:static            # build apps/www and inject registry assets
 ```
 
+## New Component Checklist
+
+- Define serializable DOM Protocol state in `packages/core`; do not put callbacks, objects, or functions in `data-*`.
+- Add generator metadata for every framework in `registry.authoring.json`.
+- If controller mount mutates visible selected/open/active state, add `ssrSelectedState` metadata so SSR and first client render match before hydration.
+- Run `pnpm registry:refresh` and keep generated registry artifacts in sync with template fixtures.
+- Verify with the narrowest relevant checks, then use `pnpm check:full` for install or compile behavior changes.
+
 ## Svelte 5 Dynamic Children
 
 Svelte 5 snippets do not expose a reactive identity for structural child changes. If triggers/content are added or removed dynamically, key the `<Tabs>` wrapper to the structure:

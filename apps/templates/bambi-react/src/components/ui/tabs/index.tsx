@@ -357,6 +357,8 @@ class TabsBehavior implements BambiBehavior {
   }
 }
 
+
+const SsrSelectedValueContext = React.createContext<string | undefined>(undefined);
 export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.HTMLAttributes<HTMLDivElement>, keyof Omit<TabsOptions, "controlled">> {
   children?: React.ReactNode;
   className?: string;
@@ -387,6 +389,7 @@ export function Tabs({
   const rootRef = React.useRef<HTMLDivElement>(null);
   const behaviorRef = React.useRef<TabsBehavior | null>(null);
   const controlled = value !== undefined;
+  const selectedValue = value ?? defaultValue;
   const onValueChangeRef = React.useRef(onValueChange);
   onValueChangeRef.current = onValueChange;
 
@@ -437,7 +440,7 @@ export function Tabs({
     });
   }, [value, defaultValue, orientation, activationMode, disabled, children]);
 
-  return (
+  const rootElement = (
     <div
       {...props}
       ref={rootRef}
@@ -452,9 +455,12 @@ export function Tabs({
       {children}
     </div>
   );
+
+  return <SsrSelectedValueContext.Provider value={selectedValue}>{rootElement}</SsrSelectedValueContext.Provider>;
 }
 
 export function TabsList({ children, ...props }: TabsListProps) {
+
   return (
     <div
       {...props}
@@ -466,6 +472,10 @@ export function TabsList({ children, ...props }: TabsListProps) {
 }
 
 export function TabsTrigger({ value, disabled, children, ...props }: TabsTriggerProps) {
+
+  const selectedValue = React.useContext(SsrSelectedValueContext);
+  const hasSelectedValue = selectedValue !== undefined;
+  const isSelected = selectedValue === value;
   return (
     <button
       {...props}
@@ -474,6 +484,10 @@ export function TabsTrigger({ value, disabled, children, ...props }: TabsTrigger
       data-disabled={disabled ? "true" : undefined}
       data-bambi-tabs-trigger=""
       data-value={value}
+      role={"tab"}
+      data-state={hasSelectedValue ? (isSelected ? "active" : "inactive") : undefined}
+      aria-selected={hasSelectedValue ? (isSelected ? true : false) : undefined}
+      tabIndex={hasSelectedValue ? (isSelected ? 0 : -1) : undefined}
     >
       {children}
     </button>
@@ -481,11 +495,18 @@ export function TabsTrigger({ value, disabled, children, ...props }: TabsTrigger
 }
 
 export function TabsContent({ value, children, ...props }: TabsContentProps) {
+
+  const selectedValue = React.useContext(SsrSelectedValueContext);
+  const hasSelectedValue = selectedValue !== undefined;
+  const isSelected = selectedValue === value;
   return (
     <div
       {...props}
       data-bambi-tabs-content=""
       data-value={value}
+      role={"tabpanel"}
+      data-state={hasSelectedValue ? (isSelected ? "active" : "inactive") : undefined}
+      hidden={hasSelectedValue ? (isSelected ? false : true) : undefined}
     >
       {children}
     </div>

@@ -28,6 +28,28 @@ beforeAll(async () => {
       valuePropParts: ["trigger", "content"],
       disabledPropName: "disabled",
       disabledPropParts: ["trigger"],
+      ssrSelectedState: {
+        selectedPropNames: ["value", "defaultValue"],
+        valuePropName: "value",
+        contextName: "bambi-tabs-value",
+        parts: {
+          trigger: {
+            attributes: [
+              { name: "role", value: "tab" },
+              { name: "data-state", active: "active", inactive: "inactive" },
+              { name: "aria-selected", active: true, inactive: false },
+              { name: "tabIndex", svelteName: "tabindex", vueName: "tabindex", active: 0, inactive: -1 },
+            ],
+          },
+          content: {
+            attributes: [
+              { name: "role", value: "tabpanel" },
+              { name: "data-state", active: "active", inactive: "inactive" },
+              { name: "hidden", active: false, inactive: true },
+            ],
+          },
+        },
+      },
     },
   });
 });

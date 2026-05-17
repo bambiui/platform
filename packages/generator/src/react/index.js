@@ -20,7 +20,10 @@ function reactAttributeLine(prop) {
 }
 
 function reactPartPropsSource(contract, options) {
-  const valuePropParts = new Set(options.valuePropParts ?? []);
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
   const valuePropName = options.valuePropName;
 
   return contract.parts
@@ -36,8 +39,22 @@ function reactPartPropsSource(contract, options) {
     .join("\n\n");
 }
 
+function reactLiteral(value) {
+  return typeof value === "string" ? `"${value}"` : String(value);
+}
+
+function reactSsrAttributeLine(attribute) {
+  const name = attribute.reactName ?? attribute.name;
+  if (attribute.value !== undefined) return `\n      ${name}={${reactLiteral(attribute.value)}}`;
+  return `\n      ${name}={hasSelectedValue ? (isSelected ? ${reactLiteral(attribute.active)} : ${reactLiteral(attribute.inactive)}) : undefined}`;
+}
+
 function reactPartComponentSource(contract, options) {
-  const valuePropParts = new Set(options.valuePropParts ?? []);
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
+  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
@@ -52,6 +69,7 @@ function reactPartComponentSource(contract, options) {
       const propsName = `${componentName}Props`;
       const tag = part.element;
       const valueHandling = valuePropParts.has(part.name);
+      const protocolValueHandling = protocolValuePropParts.has(part.name);
       const disabledHandling = disabledPropParts.has(part.name);
       if (valueHandling && (!valuePropName || !valueAttr)) {
         throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
@@ -66,14 +84,24 @@ function reactPartComponentSource(contract, options) {
         "...props",
       ].filter(Boolean).join(", ");
       const typeAttr = tag === "button" ? "\n      type={props.type ?? \"button\"}" : "";
-      const valueAttribute = valueHandling ? `\n      ${valueAttr}={${valuePropName}}` : "";
+      const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={${valuePropName}}` : "";
       const disabledAttribute = disabledHandling ? `\n      disabled={${disabledPropName}}\n      ${disabledAttr}={${disabledPropName} ? "true" : undefined}` : "";
+      const ssrState = options.ssrSelectedState;
+      const ssrPart = ssrState?.parts?.[part.name];
+      const ssrStateSetup = ssrPart && valueHandling ? `
+  const selectedValue = React.useContext(SsrSelectedValueContext);
+  const hasSelectedValue = selectedValue !== undefined;
+  const isSelected = selectedValue === ${ssrState.valuePropName};` : "";
+      const ssrAttrs = ssrPart && valueHandling
+        ? ssrPart.attributes.map((attribute) => reactSsrAttributeLine(attribute)).join("")
+        : "";
 
       return `export function ${componentName}({ ${destructured} }: ${propsName}) {
+${ssrStateSetup}
   return (
     <${tag}
       {...props}${typeAttr}${disabledAttribute}
-      ${part.attribute}=""${valueAttribute}
+      ${part.attribute}=""${valueAttribute}${ssrAttrs}
     >
       {children}
     </${tag}>
@@ -162,6 +190,10 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   const rootPropsType = polymorphicRootPropName
     ? `Omit<React.HTMLAttributes<HTMLElement>, keyof ${publicOptionsType}>`
     : `Omit<${nativePropsType}, keyof ${publicOptionsType}>`;
+  const ssrState = generatorOptions.ssrSelectedState;
+  const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
+  const ssrContextDecl = ssrState ? "\nconst SsrSelectedValueContext = React.createContext<string | undefined>(undefined);\n" : "";
+  const ssrSelectedValueLine = ssrState ? `  const selectedValue = ${ssrSelectedExpression};\n` : "";
 
   const eventCallbackPropLines = eventCallbacks.map((ev) => {
     const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
@@ -192,7 +224,34 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   const callbackRefsBlock = callbackRefLines ? `${callbackRefLines}\n` : "";
   const listenerSetupBlock = listenerSetupLines ? `\n${listenerSetupLines}\n` : "";
   const listenerTeardownBlock = listenerTeardownLines ? `${listenerTeardownLines}\n` : "";
-  const rootReturn = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
+  const rootElementSource = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
+  const isNativeButton = Component === "button";
+  const effectiveDisabled = Boolean(${effectiveDisabledExpression});
+
+  const rootElement = React.createElement(
+    Component,
+    {
+      ...props,
+      ref: rootRef,
+      "${root.attribute}": "",
+      type: isNativeButton ? ((props as React.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button") : undefined,
+      disabled: isNativeButton ? effectiveDisabled : undefined,
+      "aria-disabled": !isNativeButton && effectiveDisabled ? "true" : undefined,
+      "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
+${rootObjectAttrs}${controlledObjectLine}
+    },
+    children,
+  );` : `  const rootElement = (
+    <${root.element}
+      {...props}
+      ref={rootRef}
+      ${root.attribute}=""
+${rootAttrs}${controlledLine}
+    >
+      {children}
+    </${root.element}>
+  );`;
+  const originalRootReturn = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
   const isNativeButton = Component === "button";
   const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
@@ -219,8 +278,13 @@ ${rootAttrs}${controlledLine}
       {children}
     </${root.element}>
   );`;
+  const rootReturn = ssrState
+    ? `${rootElementSource}
 
-  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, ${rootPropsType} {
+  return <SsrSelectedValueContext.Provider value={selectedValue}>{rootElement}</SsrSelectedValueContext.Provider>;`
+    : originalRootReturn;
+
+  return `${ssrContextDecl}export interface ${contract.componentName}Props extends ${publicOptionsType}, ${rootPropsType} {
   children?: React.ReactNode;
   className?: string;${eventInterfaceExtra}${polymorphicInterfaceExtra}
 }
@@ -233,7 +297,7 @@ export function ${contract.componentName}({
   const rootRef = React.useRef<${rootRefType}>(null);
   const behaviorRef = React.useRef<${behaviorClassName} | null>(null);
   const controlled = ${controlledExpression};
-${callbackRefsBlock}${controlledWarning}
+${ssrSelectedValueLine}${callbackRefsBlock}${controlledWarning}
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return;

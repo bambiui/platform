@@ -86,6 +86,43 @@ describe("createArtifact — generic uncontrolled component", () => {
     });
   }
 
+  for (const framework of KNOWN_FRAMEWORKS) {
+    it(`${framework}: supports declarative SSR selected state without component-specific branching`, () => {
+      const result = createArtifact({
+        framework,
+        contractSource,
+        controllerSource,
+        contractExportName: "noticeContract",
+        generatorOptions: {
+          valuePropName: "tone",
+          valuePropParts: ["title"],
+          ssrSelectedState: {
+            selectedPropNames: ["tone"],
+            valuePropName: "tone",
+            contextName: "notice-selected-tone",
+            parts: {
+              title: {
+                attributes: [
+                  { name: "data-open", active: "yes", inactive: "no" },
+                ],
+              },
+            },
+          },
+        },
+      });
+
+      const output = Object.values(result.files).join("\n");
+      expect(output).toContain("data-open");
+      if (framework === "svelte" || framework === "vue") {
+        expect(output).toContain("notice-selected-tone");
+      } else {
+        expect(output).toContain("SsrSelectedValueContext");
+      }
+      expect(output).not.toContain("bambi-tabs-value");
+      expect(output).not.toContain("TabsValueContext");
+    });
+  }
+
   it("throws a clear error when valuePropName references an unknown prop", () => {
     expect(() =>
       createArtifact({

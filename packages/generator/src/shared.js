@@ -233,6 +233,23 @@ export function validateGeneratorOptions(contract, options = {}) {
   if (options.polymorphicRootPropName !== undefined && typeof options.polymorphicRootPropName !== "string") {
     throw new Error(`${contract.name}: generator option polymorphicRootPropName must be a string.`);
   }
+
+  const ssrState = options.ssrSelectedState;
+  if (ssrState !== undefined) {
+    for (const propName of ssrState.selectedPropNames ?? []) {
+      if (!propNames.has(propName)) {
+        throw new Error(`${contract.name}: generator option ssrSelectedState.selectedPropNames references unknown prop "${propName}".`);
+      }
+    }
+    if (!propNames.has(ssrState.valuePropName)) {
+      throw new Error(`${contract.name}: generator option ssrSelectedState.valuePropName references unknown prop "${ssrState.valuePropName}".`);
+    }
+    for (const partName of Object.keys(ssrState.parts ?? {})) {
+      if (!partNames.has(partName)) {
+        throw new Error(`${contract.name}: generator option ssrSelectedState.parts references unknown part "${partName}".`);
+      }
+    }
+  }
 }
 
 // ── Primitive inlining ────────────────────────────────────────────────────

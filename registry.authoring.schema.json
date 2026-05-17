@@ -95,6 +95,63 @@
         "polymorphicRootPropName": {
           "type": "string",
           "minLength": 1
+        },
+        "ssrSelectedState": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["selectedPropNames", "valuePropName", "contextName", "parts"],
+          "properties": {
+            "selectedPropNames": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 },
+              "minItems": 1
+            },
+            "valuePropName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contextName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["attributes"],
+                "properties": {
+                  "attributes": {
+                    "type": "array",
+                    "items": { "$ref": "#/$defs/ssrSelectedAttribute" },
+                    "minItems": 1
+                  }
+                }
+              },
+              "minProperties": 1
+            }
+          }
+        }
+      }
+    },
+    "ssrSelectedAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "reactName": { "type": "string", "minLength": 1 },
+        "solidName": { "type": "string", "minLength": 1 },
+        "svelteName": { "type": "string", "minLength": 1 },
+        "vueName": { "type": "string", "minLength": 1 },
+        "value": {
+          "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
+        },
+        "active": {
+          "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
+        },
+        "inactive": {
+          "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
         }
       }
     },

@@ -22,7 +22,10 @@ function solidAttributeLine(prop, accessor = "props.") {
 // ── Part interfaces and components ────────────────────────────────────────
 
 function solidPartPropsSource(contract, options) {
-  const valuePropParts = new Set(options.valuePropParts ?? []);
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
   const valuePropName = options.valuePropName;
 
   return contract.parts
@@ -41,8 +44,22 @@ function solidPartPropsSource(contract, options) {
     .join("\n\n");
 }
 
+function solidLiteral(value) {
+  return typeof value === "string" ? `"${value}"` : String(value);
+}
+
+function solidSsrAttributeLine(attribute) {
+  const name = attribute.solidName ?? attribute.name;
+  if (attribute.value !== undefined) return `\n      ${name}={${solidLiteral(attribute.value)}}`;
+  return `\n      ${name}={hasSelectedValue() ? (isSelected() ? ${solidLiteral(attribute.active)} : ${solidLiteral(attribute.inactive)}) : undefined}`;
+}
+
 function solidPartComponentSource(contract, options) {
-  const valuePropParts = new Set(options.valuePropParts ?? []);
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
+  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
@@ -57,6 +74,7 @@ function solidPartComponentSource(contract, options) {
       const propsName = `${componentName}Props`;
       const tag = part.element;
       const valueHandling = valuePropParts.has(part.name);
+      const protocolValueHandling = protocolValuePropParts.has(part.name);
       const disabledHandling = disabledPropParts.has(part.name);
       if (valueHandling && (!valuePropName || !valueAttr)) {
         throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
@@ -74,17 +92,27 @@ function solidPartComponentSource(contract, options) {
       const splitList = splitKeys.map((k) => `"${k}"`).join(", ");
 
       const typeAttr = tag === "button" ? "\n      type={local.type ?? \"button\"}" : "";
-      const valueAttribute = valueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
+      const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
       const disabledAttribute = disabledHandling
         ? `\n      disabled={local.${disabledPropName}}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
+        : "";
+      const ssrState = options.ssrSelectedState;
+      const ssrPart = ssrState?.parts?.[part.name];
+      const ssrStateSetup = ssrPart && valueHandling ? `
+  const selectedValue = useContext(SsrSelectedValueContext);
+  const hasSelectedValue = () => selectedValue?.() !== undefined;
+  const isSelected = () => selectedValue?.() === local.${ssrState.valuePropName};` : "";
+      const ssrAttrs = ssrPart && valueHandling
+        ? ssrPart.attributes.map((attribute) => solidSsrAttributeLine(attribute)).join("")
         : "";
 
       return `export function ${componentName}(props: ${propsName}) {
   const [local, rest] = splitProps(props, [${splitList}]);
+${ssrStateSetup}
   return (
     <${tag}
       {...rest}${typeAttr}${disabledAttribute}
-      ${part.attribute}=""${valueAttribute}
+      ${part.attribute}=""${valueAttribute}${ssrAttrs}
     >
       {local.children}
     </${tag}>
@@ -153,16 +181,20 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
     ? `Omit<${optionsTypeName}, "controlled">`
     : optionsTypeName;
 
-  const rootElement = root.element;
-  const nativeAttrType = rootElement === "button"
+  const rootTag = root.element;
+  const nativeAttrType = rootTag === "button"
     ? "JSX.ButtonHTMLAttributes<HTMLButtonElement>"
     : "JSX.HTMLAttributes<HTMLDivElement>";
   const rootRefType = polymorphicRootPropName
     ? "HTMLElement"
-    : rootElement === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+    : rootTag === "button" ? "HTMLButtonElement" : "HTMLDivElement";
   const rootPropsType = polymorphicRootPropName
     ? "JSX.HTMLAttributes<HTMLElement>"
     : nativeAttrType;
+  const ssrState = generatorOptions.ssrSelectedState;
+  const ssrSelectedExpression = ssrState?.selectedPropNames?.map((name) => `local.${name}`).join(" ?? ");
+  const ssrContextDecl = ssrState ? "\nconst SsrSelectedValueContext = createContext<(() => string | undefined) | undefined>();\n" : "";
+  const ssrSelectedValueLine = ssrState ? `  const selectedValue = () => ${ssrSelectedExpression};\n` : "";
 
   const controlledWarning = controlledProp && defaultProp ? `
   createEffect(() => {
@@ -202,11 +234,35 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const cleanupBlock = listenerTeardownLines
     ? `    onCleanup(() => {\n${listenerTeardownLines}\n      behavior?.destroy();\n    });`
     : `    onCleanup(() => behavior?.destroy());`;
-  const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootElement}";
+  const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootTag}";
   const isNativeButton = () => Component() === "button";
   const effectiveDisabled = () => Boolean(${effectiveDisabledExpression});
 ` : "";
-  const rootReturn = polymorphicRootPropName ? `  return (
+  const rootElementSource = polymorphicRootPropName ? `  const rootElement = (
+    <Dynamic
+      component={Component()}
+      ref={rootRef}
+      {...rest}
+      ${root.attribute}=""
+      type={isNativeButton() ? (rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button" : undefined}
+      disabled={isNativeButton() ? effectiveDisabled() : undefined}
+      aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}
+      aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+${rootAttrs}${controlledLine}
+    >
+      {local.children}
+    </Dynamic>
+  );` : `  const rootElement = (
+    <${rootTag}
+      ref={rootRef}
+      {...rest}
+      ${root.attribute}=""
+${rootAttrs}${controlledLine}
+    >
+      {local.children}
+    </${rootTag}>
+  );`;
+  const originalRootReturn = polymorphicRootPropName ? `  return (
     <Dynamic
       component={Component()}
       ref={rootRef}
@@ -221,17 +277,22 @@ ${rootAttrs}${controlledLine}
       {local.children}
     </Dynamic>
   );` : `  return (
-    <${rootElement}
+    <${rootTag}
       ref={rootRef}
       {...rest}
       ${root.attribute}=""
 ${rootAttrs}${controlledLine}
     >
       {local.children}
-    </${rootElement}>
+    </${rootTag}>
   );`;
+  const rootReturn = ssrState
+    ? `${rootElementSource}
 
-  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${rootPropsType}, keyof ${publicOptionsType}> {
+  return <SsrSelectedValueContext.Provider value={selectedValue}>{rootElement}</SsrSelectedValueContext.Provider>;`
+    : originalRootReturn;
+
+  return `${ssrContextDecl}export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${rootPropsType}, keyof ${publicOptionsType}> {
   children?: JSX.Element;${eventInterfaceExtra}${polymorphicInterfaceExtra}
 }
 
@@ -242,7 +303,7 @@ export function ${contract.componentName}(props: ${contract.componentName}Props)
   let rootRef: ${rootRefType} | undefined;
   let behavior: ${behaviorClassName} | undefined;
   const controlled = () => ${controlledExpression};
-${polymorphicSetup}${controlledWarning}
+${ssrSelectedValueLine}${polymorphicSetup}${controlledWarning}
   onMount(() => {
 ${listenerSetupBlock}    behavior = new ${behaviorClassName}(rootRef!, {
 ${behaviorOptions}
@@ -254,7 +315,7 @@ ${cleanupBlock}
   const resolvedChildren = children(() => local.children);
 
   createEffect(() => {
-    resolvedChildren(); // re-sync aria/state when triggers or content are conditionally rendered
+    resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered
     if (behavior) {
       behavior.update?.({
 ${behaviorOptions}
@@ -289,9 +350,19 @@ export function createSolidArtifact({ contractSource, controllerSource, primitiv
     .join("\n\n");
 
   const dynamicImportLine = generatorOptions.polymorphicRootPropName ? 'import { Dynamic } from "solid-js/web";\n' : "";
+  const solidImports = [
+    generatorOptions.ssrSelectedState ? "createContext" : null,
+    "createEffect",
+    "onMount",
+    "onCleanup",
+    "splitProps",
+    "children",
+    generatorOptions.ssrSelectedState ? "useContext" : null,
+    "type JSX",
+  ].filter(Boolean).join(", ");
 
   const content = `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
-import { createEffect, onMount, onCleanup, splitProps, children, type JSX } from "solid-js";
+import { ${solidImports} } from "solid-js";
 ${dynamicImportLine}import "./${contract.name}.css";
 ${helperImportLine}
 ${publicContractSource}

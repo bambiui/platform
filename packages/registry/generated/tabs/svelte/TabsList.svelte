@@ -6,6 +6,7 @@ interface Props {
   [key: string]: unknown;
 }
 let { children, ...props }: Props = $props();
+
 </script>
 <div
   {...props}

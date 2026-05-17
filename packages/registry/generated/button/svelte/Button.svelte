@@ -124,7 +124,7 @@ onMount(() => {
 });
 
 // Svelte 5 (runes): prop changes drive controller re-sync via this $effect.
-// Dynamic children (conditional triggers/content from parent state) cannot be
+// Dynamic children (conditional child parts from parent state) cannot be
 // tracked here — Svelte 5 Snippets do not expose a reactive identity that
 // $effect can subscribe to without calling the Snippet. If the child structure
 // changes at runtime, wrap <Button> in a {#key} block keyed

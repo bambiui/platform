@@ -2,7 +2,7 @@
 
 DOM Protocol based, CLI-first UI kit.
 
-> **Status:** Architecture reset in progress. docs/studio temporarily suspended.
+> Status: architecture reset in progress. The old docs/studio/marketing apps are archived; `apps/www` is the active minimal static host.
 
 ## Quick Start
 
@@ -18,21 +18,81 @@ If framework auto-detection is inconclusive, the CLI uses React defaults.
 
 ## Architecture
 
-bambiui uses a DOM Protocol model. Internal component contracts and controllers are transformed by the build-time generator into public generated artifacts. The CLI copies those artifacts into user projects; users do not install runtime bambiui packages.
+bambiui uses a DOM Protocol model:
 
-Each component has three layers:
+```txt
+packages/core -> packages/generator -> packages/registry -> packages/cli -> user project
+```
 
-- **Controller** — vanilla TypeScript, manages DOM state via `data-*` attributes. No framework dependency.
-- **CSS** — driven entirely by `data-*` attribute selectors. No JavaScript class toggling.
-- **Framework wrapper** — generated framework output source (React, Solid, Svelte, Vue) that translates props → DOM attributes, mounts/destroys the controller behavior, calls `controller.sync()` on prop changes, and contains zero independent behavior logic.
+- `packages/core` defines internal contracts, controllers, and primitives.
+- `packages/generator` turns internal authoring inputs into framework-ready source artifacts.
+- `packages/registry` stores generated public artifacts and CSS.
+- `packages/cli` copies those public artifacts into user projects.
 
-CLI output is **self-contained registry output**: copied files have no `@bambiui/*` runtime imports and do not include contract, controller, primitive, or generator files.
+Installed component output is self-contained. It must not import runtime `@bambiui/*` packages and must not include contracts, controllers, internal primitives, or generator files.
 
-## Svelte 5 — Dynamic Children Note
+## Supported Frameworks
 
-The Svelte 5 Tabs wrapper re-syncs the behavior on prop changes via `$effect`. If you conditionally add or remove triggers/content at runtime (e.g. `{#each tabs as tab}`), Svelte 5 Snippets do not expose a reactive identity that `$effect` can subscribe to without rendering, so the behavior cannot auto-detect the structural change.
+- React
+- Solid
+- Svelte 5
+- Vue 3
 
-Workaround: wrap `<Tabs>` in a `{#key}` block keyed to the structure:
+## Install Output
+
+`bambiui add tabs --framework react` writes:
+
+```txt
+src/styles/bambi.css
+src/components/ui/bambi-helpers.ts
+src/components/ui/tabs/index.tsx
+src/components/ui/tabs/tabs.css
+```
+
+Solid uses the same file shape as React. Svelte and Vue install per-part component files plus `index.ts` and `tabs.css`.
+
+The shared helper is declared once at `registry.json.shared`, currently `packages/registry/generated/shared/bambi-helpers.ts`. The CLI copies it only when the selected component declares helper usage for the selected framework.
+
+## Controlled And Uncontrolled Tabs
+
+```tsx
+// Uncontrolled: controller manages state internally.
+<Tabs defaultValue="one">...</Tabs>
+
+// Controlled: host framework owns state; controller fires bambi:value-change.
+<Tabs value={tab} onValueChange={(detail) => setTab(detail.value)}>...</Tabs>
+```
+
+`onValueChange` receives `{ value, previousValue, source }`.
+
+## Workspace
+
+| Path | Purpose |
+| --- | --- |
+| `packages/cli` | Published `bambiui` executable: `init`, `add`, registry copying |
+| `packages/core` | Internal DOM Protocol contracts, controllers, primitives |
+| `packages/generator` | Internal framework artifact generators |
+| `packages/registry` | Generated public artifacts and CSS |
+| `apps/templates` | CLI smoke-test fixtures |
+| `apps/www` | Active static host for registry assets |
+| `apps/_archived` | Suspended docs/studio/old www |
+
+## Commands
+
+```sh
+pnpm install
+pnpm registry:refresh        # regenerate public artifacts and refresh hashes
+pnpm check-registry          # validate registry.json and authoring manifest
+pnpm check-types             # TypeScript checks across workspace tasks
+pnpm --filter bambiui smoke  # CLI smoke tests
+pnpm check                   # registry refresh + types + registry + core/generator/CLI tests
+pnpm check:full              # pnpm check + template install/compile smoke
+pnpm build:static            # build apps/www and inject registry assets
+```
+
+## Svelte 5 Dynamic Children
+
+Svelte 5 snippets do not expose a reactive identity for structural child changes. If triggers/content are added or removed dynamically, key the `<Tabs>` wrapper to the structure:
 
 ```svelte
 {#key tabs.length}
@@ -40,74 +100,4 @@ Workaround: wrap `<Tabs>` in a `{#key}` block keyed to the structure:
 {/key}
 ```
 
-React, Solid, and Vue handle dynamic children more directly: React re-runs the effect when `children` changes, Solid uses `resolvedChildren` from the `children()` helper for fine-grained tracking, and Vue calls `onUpdated` after every DOM update.
-
-## Frameworks
-
-Supported output targets: **React**, **Solid**, **Svelte 5**, **Vue 3**.
-
-## Usage
-
-### Init
-
-```sh
-npx bambiui init
-# Creates bambiui.config.json and copies src/styles/bambi.css
-```
-
-### Add a component
-
-```sh
-# React
-npx bambiui add tabs --framework react
-# → src/components/ui/tabs/index.tsx + tabs.css
-
-# Solid
-npx bambiui add tabs --framework solid
-# → src/components/ui/tabs/index.tsx + tabs.css
-
-# Svelte 5
-npx bambiui add tabs --framework svelte
-# → src/components/ui/tabs/{Tabs,TabsList,TabsTrigger,TabsContent}.svelte + index.ts + tabs.css
-
-# Vue 3
-npx bambiui add tabs --framework vue
-# → src/components/ui/tabs/{Tabs,TabsList,TabsTrigger,TabsContent}.vue + index.ts + tabs.css
-
-# All frameworks also copy once to src/components/ui/ (when helpers are used):
-#   bambi-helpers.ts
-# And ensure the global style file exists at src/styles/bambi.css
-```
-
-## Controlled / Uncontrolled
-
-```tsx
-// Uncontrolled — controller manages state internally
-<Tabs defaultValue="one">...</Tabs>
-
-// Controlled — you manage state, controller fires bambi:value-change
-<Tabs value={tab} onValueChange={(detail) => setTab(detail.value)}>...</Tabs>
-```
-
-`onValueChange` receives `{ value, previousValue, source }`. Use `value` for controlled state updates. `source` is `"click"` or `"keyboard"`.
-
-## Workspace
-
-| Package                       | Description                                          |
-| ----------------------------- | ---------------------------------------------------- |
-| `packages/cli`                | bambiui CLI — init, add                              |
-| `packages/core`               | DOM protocol interfaces, utilities, tab controller   |
-| `packages/generator`          | Contract parsers and framework artifact generators   |
-| `packages/registry`           | Generated public artifacts and component CSS         |
-| `apps/templates`              | Template projects for CLI smoke tests (react, solid, svelte, vue) |
-| `apps/www`                    | Active minimal static host for registry assets       |
-| `apps/_archived/`             | docs, studio, old www — suspended                    |
-
-## Commands
-
-```sh
-pnpm install
-pnpm check           # check-types + check-registry + CLI smoke tests
-pnpm check-registry  # validate registry.json v2 schema
-pnpm check-types     # TypeScript across all packages
-```
+React, Solid, and Vue handle dynamic children through their normal update lifecycles.

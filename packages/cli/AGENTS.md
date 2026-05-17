@@ -1,58 +1,33 @@
 # bambiui CLI Agent Rules
 
-## Responsibility
+`packages/cli` owns the published `bambiui` executable, `init`, `add`, registry fetching, public artifact copying, and CLI smoke tests. Treat `registry.json` as external public input.
 
-- Owns the `bambiui` executable, `init`, `add`, registry fetching, public artifact copying, and CLI smoke tests.
-- Treats `registry.json` as public external input.
+## Current Behavior
 
-## What `add` Does (v2 public artifact model)
+For `bambiui add <component> --framework <framework>`:
 
-For `bambiui add <component> --framework <fw>`:
-1. Reads `bambiui.config.json`.
-2. Reads public `registry.json` (must be version 2).
-3. Copies `styles.global` to the configured global style file.
-4. Copies only `components[component].files[framework][]` into `componentDir/<name>/`.
-5. If `components[component].helpers[framework]` is non-empty, copies `manifest.shared[framework]` to `componentDir/bambi-helpers.ts` (one level above the component directory).
+1. Read `bambiui.config.json` and flags.
+2. Fetch/read public `registry.json` and require `version: 2`.
+3. Copy `styles.global` to the configured global style file.
+4. Copy `components[component].files[framework][]` into `componentDir/<name>/`.
+5. Copy `components[component].css` into the component directory when declared.
+6. If `components[component].helpers[framework]` is non-empty, copy `manifest.shared` to `componentDir/bambi-helpers.ts`.
 
-The CLI does not copy contracts, controllers, internal primitives, runtime package helpers, or generator inputs. It does not run the internal DOM Protocol pipeline or rewrite `@bambiui/*` imports. Public registry files must already be framework-ready and self-contained. `bambi-helpers.ts` is a generated public artifact and is safe to distribute.
-
-Maintainers produce those public files with `pnpm registry:refresh`; it calls internal `@bambiui/generator` framework dispatch, parses internal contracts, emits framework parts from contract metadata, inlines controller behavior, and syncs CSS.
-
-## Frameworks
-
-Supported: `react`, `solid`, `svelte`, `vue`
-
-## Config Shape (bambiui.config.json)
-
-```json
-{ "framework": "react", "componentDir": "src/components/ui", "styleFile": "src/styles/bambi.css" }
-```
-
-Note: `tokensFile` is the old key name. CLI reads both for backwards compat via `mergeConfig`.
+The CLI does not run the generator, parse contracts, rewrite internal imports, or copy authoring inputs.
 
 ## Boundaries
 
-- CLI runtime must NOT import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/registry`.
-- Installed output must be self-contained and must not contain `@bambiui/*` runtime imports, including `@bambiui/core`, `@bambiui/generator`, or `@bambiui/adapters`.
-- CLI only copies registry artifacts and the generated shared helper file declared by `registry.json`.
-- Registry version check: reject manifests where `version !== 2`.
-- Preserve `--registry-url` flow for local development.
-
-## Forbidden
-
-- Do not add component package dependencies to `packages/cli/package.json`.
-- Do not hardcode local workspace paths into installed output.
-- Do not generate or copy `types.ts`, `define-contract.ts`, controller files, internal helper files, primitive files, or generator files into user projects.
-- Do not add import rewrite logic for internal package imports; fix the generated public artifact instead.
-- Do not use adapter terminology for active architecture; use generator, framework wrapper, or output target.
-- Do not add Astro framework support without an explicit plan.
+- CLI runtime must not import `@bambiui/core`, `@bambiui/generator`, or `@bambiui/registry`.
+- Installed output must be self-contained: no runtime `@bambiui/*` imports, contracts, controllers, internal primitives, or generator files.
+- Preserve `--registry-url` for local registry testing.
+- Keep framework support limited to `react`, `solid`, `svelte`, and `vue`.
 - Do not change registry semantics without updating `scripts/check-registry.mjs`.
 
-## Golden References
+## Useful Files
 
-- Registry fetch/copy: `src/utils/registry.js`
-- Framework options / import hint helpers: `src/utils/framework.js`
 - Command behavior: `src/commands/init.js`, `src/commands/add.js`
+- Registry fetch/copy: `src/utils/registry.js`
+- Framework detection/config: `src/utils/framework.js`
 - Smoke coverage: `scripts/smoke.js`
 
 ## Verify
@@ -61,6 +36,6 @@ Note: `tokensFile` is the old key name. CLI reads both for backwards compat via 
 pnpm --filter bambiui check-types
 pnpm --filter bambiui smoke
 pnpm --filter bambiui check
-pnpm registry:refresh
-pnpm check-registry
 ```
+
+Run `pnpm registry:refresh && pnpm check-registry` if registry assumptions or artifact paths change.

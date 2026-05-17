@@ -200,6 +200,37 @@ export function parseOptionsNames(source, optionsTypeName) {
     .map((m) => m.getName());
 }
 
+// ── Generator option validation ───────────────────────────────────────────
+
+export function validateGeneratorOptions(contract, options = {}) {
+  const propNames = new Set(contract.props.map((prop) => prop.name));
+  const partNames = new Set(contract.parts.map((part) => part.name));
+
+  for (const [partsField, propField] of [
+    ["valuePropParts", "valuePropName"],
+    ["disabledPropParts", "disabledPropName"],
+  ]) {
+    if (options[partsField] !== undefined && options[propField] === undefined) {
+      throw new Error(`${contract.name}: generator option ${partsField} requires ${propField}.`);
+    }
+  }
+
+  for (const field of ["valuePropName", "disabledPropName"]) {
+    const propName = options[field];
+    if (propName !== undefined && !propNames.has(propName)) {
+      throw new Error(`${contract.name}: generator option ${field} references unknown prop "${propName}".`);
+    }
+  }
+
+  for (const field of ["valuePropParts", "disabledPropParts"]) {
+    for (const partName of options[field] ?? []) {
+      if (!partNames.has(partName)) {
+        throw new Error(`${contract.name}: generator option ${field} references unknown part "${partName}".`);
+      }
+    }
+  }
+}
+
 // ── Primitive inlining ────────────────────────────────────────────────────
 
 export function inlinePrimitiveSource(source) {

@@ -4,8 +4,9 @@
   "scripts": {
     "build": "turbo run build",
     "build:static": "pnpm registry:refresh && node scripts/build-static.mjs",
-    "check": "pnpm registry:refresh && pnpm check-types && pnpm check-registry && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter @bambiui/generator test && pnpm --filter bambiui smoke",
+    "check": "pnpm registry:refresh && pnpm check-types && pnpm check-registry && pnpm check-boundaries && pnpm --filter @bambiui/core test:tabs && pnpm --filter @bambiui/core test:roving-focus && pnpm --filter @bambiui/generator test && pnpm --filter bambiui smoke",
     "check:full": "pnpm check && pnpm smoke:templates -- --install",
+    "check-boundaries": "node scripts/check-package-boundaries.mjs",
     "check-registry": "node scripts/check-registry.mjs",
     "registry:refresh": "node scripts/registry-refresh.mjs",
     "dev": "turbo run dev",

@@ -3,6 +3,7 @@ import {
   parseOptionsNames,
   inlinePrimitiveSource,
   extractControllerBehavior,
+  validateGeneratorOptions,
   pascalCase,
 } from "../shared.js";
 
@@ -216,6 +217,7 @@ ${reactPartComponentSource(contract, generatorOptions)}`;
 
 export function createReactArtifact({ contractSource, controllerSource, primitiveFiles = [], contractExportName, generatorOptions = {} }) {
   const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
+  validateGeneratorOptions(contract, generatorOptions);
   const behaviorClassName = `${contract.componentName}Behavior`;
   const optionsTypeName = `${contract.componentName}Options`;
   const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);

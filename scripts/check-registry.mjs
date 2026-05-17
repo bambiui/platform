@@ -6,6 +6,8 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import Ajv from "ajv/dist/2020.js";
+import { parseContractSource } from "../packages/generator/src/shared.js";
+import { KNOWN_FRAMEWORKS, KNOWN_FRAMEWORK_SET } from "./frameworks.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const registryPath = resolve(root, "registry.json");
@@ -16,7 +18,6 @@ const corePackagePath = resolve(root, "packages/core/package.json");
 
 let errors = 0;
 
-const KNOWN_FRAMEWORKS = ["react", "solid", "svelte", "vue"];
 const PUBLIC_FORBIDDEN_FIELDS = [
   "contract",
   "contractFiles",
@@ -56,7 +57,7 @@ function readJson(filePath, label) {
 
 function validateWithSchema(data, schemaPath, label) {
   const schema = readJson(schemaPath, `${label} schema`);
-  if (!schema) return;
+  if (!schema) return undefined;
   const ajv = new Ajv({ allErrors: true });
   const validate = ajv.compile(schema);
   if (!validate(data)) {
@@ -66,6 +67,7 @@ function validateWithSchema(data, schemaPath, label) {
   } else {
     ok(`${label}: passes JSON Schema validation`);
   }
+  return schema;
 }
 
 function checkRegistryPath(filePath, context) {
@@ -131,6 +133,34 @@ function checkFileList(files, context, { generatedOnly = false, scanForbidden = 
   }
 }
 
+function checkGeneratedComponentFilePath(filePath, componentName, framework, context) {
+  const expectedPrefix = `packages/registry/generated/${componentName}/${framework}/`;
+  if (!filePath.startsWith(expectedPrefix)) {
+    fail(`${context}: must live under ${expectedPrefix} — ${filePath}`);
+  }
+  if (filePath.endsWith(".css")) {
+    fail(`${context}: CSS must be declared via component.css/generatedCss, not framework files — ${filePath}`);
+  }
+  if (basename(filePath) === "bambi-helpers.ts") {
+    fail(`${context}: workspace helper shim must not be a public framework file — ${filePath}`);
+  }
+}
+
+function checkGeneratedCssPath(filePath, componentName, context) {
+  const expectedPrefix = `packages/registry/generated/${componentName}/`;
+  if (!filePath.startsWith(expectedPrefix)) {
+    fail(`${context}: CSS must live under ${expectedPrefix} — ${filePath}`);
+  }
+  if (!filePath.endsWith(".css")) {
+    fail(`${context}: CSS path must end in .css — ${filePath}`);
+  }
+  for (const framework of KNOWN_FRAMEWORKS) {
+    if (filePath.startsWith(`${expectedPrefix}${framework}/`)) {
+      fail(`${context}: shared component CSS must not live in a framework subdirectory — ${filePath}`);
+    }
+  }
+}
+
 function checkExports(exports, files, context) {
   if (!exports || typeof exports !== "object") {
     fail(`${context}: missing exports object`);
@@ -189,10 +219,93 @@ function checkRequiredFrameworks(record, context) {
   }
 }
 
+function contractExportName(componentName) {
+  return `${componentName.replace(/-([a-z0-9])/gu, (_match, char) => char.toUpperCase())}Contract`;
+}
+
+function checkGeneratorOptions(componentName, component, contract) {
+  const propNames = new Set(contract.props.map((prop) => prop.name));
+  const partNames = new Set(contract.parts.map((part) => part.name));
+
+  for (const [framework, options] of Object.entries(component.generator ?? {})) {
+    if (!KNOWN_FRAMEWORK_SET.has(framework) || !options || typeof options !== "object") continue;
+
+    for (const field of ["valuePropName", "disabledPropName"]) {
+      if (options[field] !== undefined && !propNames.has(options[field])) {
+        fail(`${componentName}: generator.${framework}.${field} references unknown contract prop "${options[field]}"`);
+      }
+    }
+
+    const propForParts = {
+      valuePropParts: "valuePropName",
+      disabledPropParts: "disabledPropName",
+    };
+    for (const [partsField, propField] of Object.entries(propForParts)) {
+      if (options[partsField] !== undefined && options[propField] === undefined) {
+        fail(`${componentName}: generator.${framework}.${partsField} requires ${propField}`);
+      }
+      for (const partName of options[partsField] ?? []) {
+        if (!partNames.has(partName)) {
+          fail(`${componentName}: generator.${framework}.${partsField} references unknown contract part "${partName}"`);
+        }
+      }
+    }
+  }
+}
+
+function helpersUsedByFiles(files) {
+  const used = new Set();
+  for (const filePath of files ?? []) {
+    const abs = resolve(root, filePath);
+    if (!existsSync(abs)) continue;
+    const content = readFileSync(abs, "utf-8");
+    for (const match of content.matchAll(/import\s*\{([^}]+)\}\s*from\s*["']\.\.\/bambi-helpers["']/gu)) {
+      for (const helper of match[1].split(",")) {
+        const name = helper.trim().replace(/^type\s+/u, "").split(/\s+as\s+/u)[0]?.trim();
+        if (name) used.add(name);
+      }
+    }
+  }
+  return [...used].sort();
+}
+
+function checkHelpersMatchFiles(componentName, framework, component) {
+  const declared = sorted(component.helpers?.[framework]);
+  const detected = helpersUsedByFiles(component.files?.[framework]);
+  if (declared.join("\n") !== detected.join("\n")) {
+    fail(
+      `${componentName}: helpers.${framework} must match imports from ../bambi-helpers\n` +
+      `    Declared: ${declared.join(", ") || "(none)"}\n` +
+      `    Detected: ${detected.join(", ") || "(none)"}`,
+    );
+  }
+}
+
+function checkSchemaFrameworkKeys(schema, label) {
+  const componentDef = schema?.$defs?.component;
+  const frameworkObjects = [
+    ["files", componentDef?.properties?.files],
+    ["exports", componentDef?.properties?.exports],
+    ["hashes", componentDef?.properties?.hashes],
+    ["helpers", componentDef?.properties?.helpers],
+    ["generatedFiles", componentDef?.properties?.generatedFiles],
+    ["generator", componentDef?.properties?.generator],
+  ];
+
+  for (const [field, schemaNode] of frameworkObjects) {
+    if (!schemaNode?.properties) continue;
+    assertSameList(Object.keys(schemaNode.properties), KNOWN_FRAMEWORKS, `${label}: ${field} framework keys`);
+    if (schemaNode.required) {
+      assertSameList(schemaNode.required, KNOWN_FRAMEWORKS, `${label}: ${field} required frameworks`);
+    }
+  }
+}
+
 console.log("Checking registry.json...\n");
 const registry = readJson(registryPath, "registry.json");
 if (!registry) process.exit(1);
-validateWithSchema(registry, registrySchemaPath, "registry.json");
+const registrySchema = validateWithSchema(registry, registrySchemaPath, "registry.json");
+checkSchemaFrameworkKeys(registrySchema, "registry.schema.json");
 
 if (registry.version !== 2) fail(`version must be 2, got ${registry.version}`);
 else ok("version: 2");
@@ -285,6 +398,9 @@ for (const [componentName, component] of Object.entries(registry.components)) {
       continue;
     }
     checkFileList(files, `files.${framework}`, { generatedOnly: true, scanForbidden: true, componentName });
+    for (const filePath of files) {
+      checkGeneratedComponentFilePath(filePath, componentName, framework, `files.${framework}`);
+    }
     ok(`files.${framework}: ${files.length} generated file(s)`);
 
     // Enforce: every file must have a hash entry.
@@ -317,6 +433,7 @@ for (const [componentName, component] of Object.entries(registry.components)) {
 
   if (component.css !== undefined) {
     if (checkPathAndFile(component.css, `${componentName}.css`)) {
+      checkGeneratedCssPath(component.css, componentName, `${componentName}.css`);
       if (!component.css.startsWith("packages/registry/generated/")) {
         fail(`${componentName}.css: must live under packages/registry/generated/ — ${component.css}`);
       }
@@ -358,13 +475,20 @@ for (const [componentName, component] of Object.entries(registry.components)) {
     }
   }
 
+  for (const framework of Object.keys(component.files ?? {})) {
+    if (KNOWN_FRAMEWORK_SET.has(framework)) {
+      checkHelpersMatchFiles(componentName, framework, component);
+    }
+  }
+
   checkExports(component.exports, component.files, componentName);
 }
 
 console.log("\nChecking registry.authoring.json...\n");
 const authoring = readJson(authoringPath, "registry.authoring.json");
 if (!authoring) process.exit(1);
-validateWithSchema(authoring, authoringSchemaPath, "registry.authoring.json");
+const authoringSchema = validateWithSchema(authoring, authoringSchemaPath, "registry.authoring.json");
+checkSchemaFrameworkKeys(authoringSchema, "registry.authoring.schema.json");
 const corePackage = readJson(corePackagePath, "packages/core/package.json");
 
 if (authoring.version !== 1) fail(`authoring version must be 1, got ${authoring.version}`);
@@ -390,6 +514,20 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
     if (typeof component[field] !== "string") fail(`missing authoring field "${field}"`);
     else checkPathAndFile(component[field], field);
   }
+  if (typeof component.generatedCss === "string") {
+    checkGeneratedCssPath(component.generatedCss, componentName, "generatedCss");
+  }
+
+  let parsedContract;
+  if (typeof component.contract === "string" && existsSync(resolve(root, component.contract))) {
+    try {
+      const contractSource = readFileSync(resolve(root, component.contract), "utf-8");
+      parsedContract = parseContractSource(contractSource, contractExportName(componentName)).contract;
+      ok(`${componentName}: contract parsed for authoring validation`);
+    } catch (error) {
+      fail(`${componentName}: unable to parse contract for authoring validation — ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
 
   if (corePackage?.exports && typeof corePackage.exports === "object") {
     const exportKey = `./components/${componentName}`;
@@ -410,7 +548,12 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
   checkRequiredFrameworks(component.generatedFiles, `authoring ${componentName}.generatedFiles`);
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`generatedFiles has unknown framework "${framework}"`);
-    else checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });
+    else {
+      checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });
+      for (const filePath of files) {
+        checkGeneratedComponentFilePath(filePath, componentName, framework, `generatedFiles.${framework}`);
+      }
+    }
   }
 
   if (component.generator !== undefined) {
@@ -447,6 +590,9 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
         ok(`generator.${framework}: configured`);
       }
     }
+  }
+  if (parsedContract) {
+    checkGeneratorOptions(componentName, component, parsedContract);
   }
 
   checkExports(component.exports, component.generatedFiles, `authoring ${componentName}`);

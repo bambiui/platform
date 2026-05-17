@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { KNOWN_FRAMEWORKS } from "../../../scripts/frameworks.mjs";
+import { frameworkOptions } from "../src/utils/framework.js";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const cliRoot = path.resolve(scriptDir, "..");
@@ -12,7 +14,15 @@ const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
 const registry = JSON.parse(await readFile(path.join(repoRoot, "registry.json"), "utf8"));
 
-const frameworks = ["react", "solid", "svelte", "vue"];
+const frameworks = KNOWN_FRAMEWORKS;
+
+if (frameworkOptions.join("\n") !== frameworks.join("\n")) {
+  throw new Error(
+    `CLI frameworkOptions must match scripts/frameworks.mjs.\n` +
+    `Expected: ${frameworks.join(", ")}\n` +
+    `Actual:   ${frameworkOptions.join(", ")}`,
+  );
+}
 
 const forbiddenFileNames = new Set([
   "define-contract.ts",
@@ -140,6 +150,8 @@ for (const [componentName, component] of Object.entries(registry.components)) {
 
       if ((component.helpers?.[framework] ?? []).length > 0) {
         assertExists(path.join(cwd, "src/components/ui/bambi-helpers.ts"));
+      } else if (existsSync(path.join(cwd, "src/components/ui/bambi-helpers.ts"))) {
+        throw new Error(`Did not expect helper file for ${componentName}/${framework}.`);
       }
 
       const cssFile = cssBasenameFor(component);

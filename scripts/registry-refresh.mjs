@@ -8,6 +8,7 @@ import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { createArtifact } from "@bambiui/generator";
+import { KNOWN_FRAMEWORKS, KNOWN_FRAMEWORK_SET } from "./frameworks.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const authoringPath = resolve(root, "registry.authoring.json");
@@ -160,12 +161,19 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
     throw new Error(`Missing public registry component for "${componentName}".`);
   }
 
+  for (const framework of Object.keys(component.generatedFiles ?? {})) {
+    if (!KNOWN_FRAMEWORK_SET.has(framework)) {
+      throw new Error(`${componentName}: unknown framework "${framework}". Expected one of: ${KNOWN_FRAMEWORKS.join(", ")}`);
+    }
+  }
+
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     assertSameFiles(files, publicComponent.files?.[framework], `${componentName}/${framework}`);
   }
 
   const componentUsedHelpers = new Set();
-  for (const framework of Object.keys(component.generatedFiles ?? {})) {
+  for (const framework of KNOWN_FRAMEWORKS) {
+    if (!component.generatedFiles?.[framework]) continue;
     const usedHelpers = await generateFramework(componentName, component, framework, publicComponent);
     for (const h of usedHelpers) componentUsedHelpers.add(h);
   }

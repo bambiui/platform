@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createArtifact } from "../index.js";
+import { KNOWN_FRAMEWORKS } from "../../../../scripts/frameworks.mjs";
 
 const contractSource = `import { defineContract } from "../../../contract/define-contract.js";
 
@@ -59,7 +60,11 @@ const expectedFiles = {
 };
 
 describe("createArtifact — generic uncontrolled component", () => {
-  for (const framework of Object.keys(expectedFiles)) {
+  it("test fixture covers every known framework", () => {
+    expect(Object.keys(expectedFiles).sort()).toEqual([...KNOWN_FRAMEWORKS].sort());
+  });
+
+  for (const framework of KNOWN_FRAMEWORKS) {
     it(`${framework}: generates tabs-independent output without helpers or controlled option`, () => {
       const result = createArtifact({
         framework,
@@ -80,4 +85,34 @@ describe("createArtifact — generic uncontrolled component", () => {
       }
     });
   }
+
+  it("throws a clear error when valuePropName references an unknown prop", () => {
+    expect(() =>
+      createArtifact({
+        framework: "react",
+        contractSource,
+        controllerSource,
+        contractExportName: "noticeContract",
+        generatorOptions: {
+          valuePropName: "missing",
+          valuePropParts: ["title"],
+        },
+      }),
+    ).toThrow(/valuePropName references unknown prop "missing"/);
+  });
+
+  it("throws a clear error when disabledPropParts references an unknown part", () => {
+    expect(() =>
+      createArtifact({
+        framework: "react",
+        contractSource,
+        controllerSource,
+        contractExportName: "noticeContract",
+        generatorOptions: {
+          disabledPropName: "tone",
+          disabledPropParts: ["missing"],
+        },
+      }),
+    ).toThrow(/disabledPropParts references unknown part "missing"/);
+  });
 });

@@ -1,7 +1,5 @@
 import { mount, StartClient } from "@solidjs/start/client";
 
-export default function Client() {
-  return <StartClient />;
-}
+export default StartClient;
 
-mount(() => <Client />, document.getElementById("app")!);
+mount(() => <StartClient />, document.getElementById("app")!);

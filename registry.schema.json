@@ -9,37 +9,22 @@
     "shared": ["sharedHash"]
   },
   "properties": {
-    "$schema": {
-      "type": "string"
-    },
-    "version": {
-      "type": "integer",
-      "const": 2
-    },
+    "$schema": { "type": "string" },
+    "version": { "type": "integer", "const": 2 },
     "styles": {
       "type": "object",
       "additionalProperties": false,
       "required": ["global", "globalHash"],
       "properties": {
-        "global": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "globalHash": {
-          "$ref": "#/$defs/sha256Hex"
-        }
+        "global": { "$ref": "#/$defs/registryPath" },
+        "globalHash": { "$ref": "#/$defs/sha256Hex" }
       }
     },
-    "shared": {
-      "$ref": "#/$defs/registryPath"
-    },
-    "sharedHash": {
-      "$ref": "#/$defs/sha256Hex"
-    },
+    "shared": { "$ref": "#/$defs/registryPath" },
+    "sharedHash": { "$ref": "#/$defs/sha256Hex" },
     "components": {
       "type": "object",
-      "additionalProperties": {
-        "$ref": "#/$defs/component"
-      }
+      "additionalProperties": { "$ref": "#/$defs/component" }
     }
   },
   "$defs": {
@@ -51,19 +36,13 @@
         "css": ["cssHash"]
       },
       "properties": {
-        "name": {
-          "type": "string",
-          "pattern": "^[a-z][a-z0-9-]*$"
-        },
-        "css": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "cssHash": {
-          "$ref": "#/$defs/sha256Hex"
-        },
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "css": { "$ref": "#/$defs/registryPath" },
+        "cssHash": { "$ref": "#/$defs/sha256Hex" },
         "files": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["react", "solid", "svelte", "vue"],
           "properties": {
             "react": { "$ref": "#/$defs/registryFileList" },
             "solid": { "$ref": "#/$defs/registryFileList" },
@@ -83,14 +62,19 @@
         },
         "hashes": {
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": { "$ref": "#/$defs/sha256Hex" }
+          "additionalProperties": false,
+          "required": ["react", "solid", "svelte", "vue"],
+          "properties": {
+            "react": { "$ref": "#/$defs/frameworkHashes" },
+            "solid": { "$ref": "#/$defs/frameworkHashes" },
+            "svelte": { "$ref": "#/$defs/frameworkHashes" },
+            "vue": { "$ref": "#/$defs/frameworkHashes" }
           }
         },
         "exports": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["react", "solid", "svelte", "vue"],
           "properties": {
             "react": { "$ref": "#/$defs/exportNames" },
             "solid": { "$ref": "#/$defs/exportNames" },
@@ -100,18 +84,18 @@
         }
       }
     },
+    "frameworkHashes": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/sha256Hex" }
+    },
     "registryFileList": {
       "type": "array",
-      "items": {
-        "$ref": "#/$defs/registryPath"
-      }
+      "items": { "$ref": "#/$defs/registryPath" },
+      "minItems": 1
     },
     "exportNames": {
       "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
+      "items": { "type": "string", "minLength": 1 },
       "minItems": 1
     },
     "registryPath": {

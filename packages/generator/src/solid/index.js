@@ -116,7 +116,10 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   ].map((n) => `"${n}"`).join(", ");
 
   // Build behaviorOptions using local.X (non-callback only)
-  const behaviorOptions = [...nonCallbackOptionNames, "controlled"]
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const behaviorOptions = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled(),`;
       return `      ${name}: local.${name},`;

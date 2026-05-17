@@ -98,7 +98,10 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
 
   const controlledExpression = controlledProp ? `${controlledProp.name} !== undefined` : "false";
 
-  const behaviorOptionLines = [...nonCallbackOptionNames, "controlled"]
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled,`;
       return `      ${name},`;
@@ -134,6 +137,10 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
     return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
   }).join("\n");
 
+  const publicOptionsType = controlledProp
+    ? `Omit<${optionsTypeName}, "controlled">`
+    : optionsTypeName;
+
   // Event listener setup in onMount
   const listenerSetupLines = eventCallbacks.map((ev) => {
     const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
@@ -166,7 +173,7 @@ ${publicContractSource}
 ${primitivesBlock ? `\n${primitivesBlock}\n` : ""}
 ${behaviorSource}
 
-interface Props extends Omit<${optionsTypeName}, "controlled"> {
+interface Props extends ${publicOptionsType} {
   children?: Snippet;
   class?: string;
   [key: string]: unknown;${eventInterfaceExtra}
@@ -194,9 +201,9 @@ ${cleanupReturn}
 // Svelte 5 (runes): prop changes drive controller re-sync via this $effect.
 // Dynamic children (conditional triggers/content from parent state) cannot be
 // tracked here — Svelte 5 Snippets do not expose a reactive identity that
-// $effect can subscribe to without calling the Snippet. If your tabs structure
-// changes at runtime (e.g. {#each tabs}), wrap <${contract.componentName}> in
-// a {#key} block keyed to the structure: {#key tabs.length}<${contract.componentName} ...>.
+// $effect can subscribe to without calling the Snippet. If the child structure
+// changes at runtime, wrap <${contract.componentName}> in a {#key} block keyed
+// to the structure.
 $effect(() => {
   behavior?.update?.({
 ${behaviorOptionLines}

@@ -12,6 +12,7 @@ const registryPath = resolve(root, "registry.json");
 const authoringPath = resolve(root, "registry.authoring.json");
 const registrySchemaPath = resolve(root, "registry.schema.json");
 const authoringSchemaPath = resolve(root, "registry.authoring.schema.json");
+const corePackagePath = resolve(root, "packages/core/package.json");
 
 let errors = 0;
 
@@ -156,6 +157,34 @@ function checkExports(exports, files, context) {
   for (const framework of Object.keys(files ?? {})) {
     if (!(framework in exports)) {
       fail(`${context}: exports missing entry for framework "${framework}"`);
+    }
+  }
+}
+
+function sorted(value) {
+  return [...(value ?? [])].sort();
+}
+
+function assertSameList(actual, expected, context) {
+  const sortedActual = sorted(actual);
+  const sortedExpected = sorted(expected);
+  if (sortedActual.join("\n") !== sortedExpected.join("\n")) {
+    fail(
+      `${context}: mismatch\n` +
+      `    Expected: ${sortedExpected.join(", ") || "(none)"}\n` +
+      `    Actual:   ${sortedActual.join(", ") || "(none)"}`,
+    );
+  }
+}
+
+function checkRequiredFrameworks(record, context) {
+  if (!record || typeof record !== "object") {
+    fail(`${context}: missing framework map`);
+    return;
+  }
+  for (const framework of KNOWN_FRAMEWORKS) {
+    if (!(framework in record)) {
+      fail(`${context}: missing framework "${framework}"`);
     }
   }
 }
@@ -336,6 +365,7 @@ console.log("\nChecking registry.authoring.json...\n");
 const authoring = readJson(authoringPath, "registry.authoring.json");
 if (!authoring) process.exit(1);
 validateWithSchema(authoring, authoringSchemaPath, "registry.authoring.json");
+const corePackage = readJson(corePackagePath, "packages/core/package.json");
 
 if (authoring.version !== 1) fail(`authoring version must be 1, got ${authoring.version}`);
 else ok("authoring version: 1");
@@ -351,9 +381,23 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
   if (component.name !== componentName) fail(`name field "${component.name}" does not match key "${componentName}"`);
   else ok(`name: ${componentName}`);
 
-  for (const field of ["contract", "controller", "style"]) {
+  const publicComponent = registry.components?.[componentName];
+  if (!publicComponent) {
+    fail(`authoring ${componentName}: missing public registry component`);
+  }
+
+  for (const field of ["contract", "controller", "style", "generatedCss"]) {
     if (typeof component[field] !== "string") fail(`missing authoring field "${field}"`);
     else checkPathAndFile(component[field], field);
+  }
+
+  if (corePackage?.exports && typeof corePackage.exports === "object") {
+    const exportKey = `./components/${componentName}`;
+    if (!Object.hasOwn(corePackage.exports, exportKey)) {
+      fail(`@bambiui/core exports missing "${exportKey}"`);
+    } else {
+      ok(`@bambiui/core exports ${exportKey}`);
+    }
   }
 
   if (component.contractFiles !== undefined) {
@@ -363,6 +407,7 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
     checkFileList(component.primitiveFiles, "primitiveFiles");
   }
 
+  checkRequiredFrameworks(component.generatedFiles, `authoring ${componentName}.generatedFiles`);
   for (const [framework, files] of Object.entries(component.generatedFiles ?? {})) {
     if (!KNOWN_FRAMEWORKS.includes(framework)) fail(`generatedFiles has unknown framework "${framework}"`);
     else checkFileList(files, `generatedFiles.${framework}`, { generatedOnly: true });
@@ -405,6 +450,23 @@ for (const [componentName, component] of Object.entries(authoring.components)) {
   }
 
   checkExports(component.exports, component.generatedFiles, `authoring ${componentName}`);
+
+  if (publicComponent) {
+    checkRequiredFrameworks(publicComponent.files, `${componentName}.files`);
+    checkRequiredFrameworks(publicComponent.exports, `${componentName}.exports`);
+    for (const framework of KNOWN_FRAMEWORKS) {
+      assertSameList(
+        publicComponent.files?.[framework],
+        component.generatedFiles?.[framework],
+        `${componentName}/${framework}: public files must match authoring generatedFiles`,
+      );
+      assertSameList(
+        publicComponent.exports?.[framework],
+        component.exports?.[framework],
+        `${componentName}/${framework}: public exports must match authoring exports`,
+      );
+    }
+  }
 }
 
 console.log("");

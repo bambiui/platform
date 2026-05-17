@@ -37,6 +37,22 @@ function assertSameFiles(actual, expected, context) {
   }
 }
 
+function assertNoDuplicateBasenames(files, context) {
+  const seen = new Map();
+  for (const filePath of files) {
+    const name = basename(filePath);
+    const existing = seen.get(name);
+    if (existing) {
+      throw new Error(
+        `${context}: duplicate generated basename "${name}".\n` +
+        `  First:  ${existing}\n` +
+        `  Second: ${filePath}`,
+      );
+    }
+    seen.set(name, filePath);
+  }
+}
+
 function forbiddenStringsFor(componentName) {
   return [
     ...globalForbiddenStrings,
@@ -81,6 +97,7 @@ async function generateFramework(componentName, component, framework, publicComp
   if (nonCssFiles.length === 0) {
     throw new Error(`${componentName}/${framework} requires at least one non-CSS generated artifact.`);
   }
+  assertNoDuplicateBasenames(nonCssFiles, `${componentName}/${framework}`);
 
   const contractSource = await readFile(resolve(root, component.contract), "utf8");
   const controllerSource = await readFile(resolve(root, component.controller), "utf8");
@@ -96,6 +113,16 @@ async function generateFramework(componentName, component, framework, publicComp
     contractExportName: contractExportName(componentName),
     generatorOptions: component.generator?.[framework] ?? {},
   });
+
+  const generatedNames = Object.keys(files).sort();
+  const expectedNames = nonCssFiles.map((p) => basename(p)).sort();
+  if (generatedNames.join("\n") !== expectedNames.join("\n")) {
+    throw new Error(
+      `${componentName}/${framework}: generator output must exactly match generatedFiles.\n` +
+      `  Expected from manifest: ${expectedNames.join(", ")}\n` +
+      `  Generated:              ${generatedNames.join(", ")}`,
+    );
+  }
 
   // Match each generated filename (key) to its full repo-relative path.
   for (const [fileName, content] of Object.entries(files)) {

@@ -106,7 +106,10 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     "...props",
   ].join(",\n  ");
   const effectDeps = [...nonCallbackOptionNames, "children"].join(", ");
-  const behaviorOptions = [...nonCallbackOptionNames, "controlled"].map((name) => `      ${name},`).join("\n");
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const behaviorOptions = behaviorOptionNames.map((name) => `      ${name},`).join("\n");
 
   const rootAttrs = contract.props
     .filter((prop) => prop.name !== "controlled")

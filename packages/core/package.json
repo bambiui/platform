@@ -58,7 +58,7 @@
     }
   },
   "scripts": {
-    "check-types": "tsc --noEmit --strict --moduleResolution bundler --module ESNext --target ES2022 src/index.ts contract/index.ts runtime/index.ts src/primitives/index.ts",
+    "check-types": "tsc -p tsconfig.json",
     "test:tabs": "node scripts/test-tabs-controller.mjs",
     "test:roving-focus": "node scripts/test-roving-focus.mjs"
   }

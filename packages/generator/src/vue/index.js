@@ -98,10 +98,13 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
   }).join("\n");
 
   const hasEventCallbacks = eventCallbacks.length > 0;
-  const propsTypeName = hasEventCallbacks ? `${contract.componentName}Props` : `Omit<${optionsTypeName}, "controlled">`;
+  const publicOptionsType = controlledProp
+    ? `Omit<${optionsTypeName}, "controlled">`
+    : optionsTypeName;
+  const propsTypeName = hasEventCallbacks ? `${contract.componentName}Props` : publicOptionsType;
 
   const propsInterfaceBlock = hasEventCallbacks
-    ? `interface ${contract.componentName}Props extends Omit<${optionsTypeName}, "controlled"> {\n${eventCallbackPropLines}\n}`
+    ? `interface ${contract.componentName}Props extends ${publicOptionsType} {\n${eventCallbackPropLines}\n}`
     : "";
 
   const propsDecl = withDefaultsLines
@@ -110,7 +113,10 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
 
   const controlledExpression = controlledProp ? `props.${controlledProp.name} !== undefined` : "false";
 
-  const behaviorOptionLines = [...nonCallbackOptionNames, "controlled"]
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled.value,`;
       return `      ${name}: props.${name},`;

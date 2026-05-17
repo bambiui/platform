@@ -10,27 +10,13 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const cliRoot = path.resolve(scriptDir, "..");
 const repoRoot = path.resolve(cliRoot, "../..");
 const cliEntry = path.join(cliRoot, "src/index.js");
+const registry = JSON.parse(await readFile(path.join(repoRoot, "registry.json"), "utf8"));
 
-const expectedFiles = {
-  react: ["index.tsx", "tabs.css"],
-  solid: ["index.tsx", "tabs.css"],
-  svelte: ["index.ts", "Tabs.svelte", "TabsList.svelte", "TabsTrigger.svelte", "TabsContent.svelte", "tabs.css"],
-  vue: ["index.ts", "Tabs.vue", "TabsList.vue", "TabsTrigger.vue", "TabsContent.vue", "tabs.css"],
-};
-
-// Per-framework: which file should import ./tabs.css
-const cssImportFile = {
-  react: "index.tsx",
-  solid: "index.tsx",
-  svelte: "Tabs.svelte",
-  vue: "Tabs.vue",
-};
+const frameworks = ["react", "solid", "svelte", "vue"];
 
 const forbiddenFileNames = new Set([
   "define-contract.ts",
   "types.ts",
-  "tabs.contract.ts",
-  "tabs.controller.ts",
   "create-react-adapter.ts",
   "create-react-part.tsx",
   "use-bambi-controller.ts",
@@ -44,9 +30,17 @@ const forbiddenStrings = [
   "@bambiui/core",
   "@bambiui/generator",
   "@bambiui/adapters",
-  "tabs.contract",
-  "tabs.controller",
 ];
+
+function expectedFilesFor(component, framework) {
+  const files = new Set((component.files?.[framework] ?? []).map((filePath) => path.basename(filePath)));
+  if (component.css) files.add(path.basename(component.css));
+  return [...files].sort();
+}
+
+function cssBasenameFor(component) {
+  return component.css ? path.basename(component.css) : undefined;
+}
 
 async function runCli(args, options = {}) {
   const child = spawn(process.execPath, [cliEntry, ...args], {
@@ -92,14 +86,25 @@ async function walkFiles(dir) {
   return files;
 }
 
-async function assertNoForbiddenOutput(dir) {
+async function assertNoForbiddenOutput(dir, componentName) {
+  const componentForbiddenFileNames = new Set([
+    ...forbiddenFileNames,
+    `${componentName}.contract.ts`,
+    `${componentName}.controller.ts`,
+  ]);
+  const componentForbiddenStrings = [
+    ...forbiddenStrings,
+    `${componentName}.contract`,
+    `${componentName}.controller`,
+  ];
+
   for (const filePath of await walkFiles(dir)) {
-    if (forbiddenFileNames.has(path.basename(filePath))) {
+    if (componentForbiddenFileNames.has(path.basename(filePath))) {
       throw new Error(`Generated output contains forbidden file: ${filePath}`);
     }
 
     const content = await readFile(filePath, "utf8");
-    for (const forbidden of forbiddenStrings) {
+    for (const forbidden of componentForbiddenStrings) {
       if (content.includes(forbidden)) {
         throw new Error(`Generated output contains forbidden string "${forbidden}": ${filePath}`);
       }
@@ -115,47 +120,59 @@ async function assertOnlyExpectedFiles(dir, expected) {
   }
 }
 
-for (const [framework, files] of Object.entries(expectedFiles)) {
-  const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${framework}-`));
+for (const [componentName, component] of Object.entries(registry.components)) {
+  for (const framework of frameworks) {
+    const files = expectedFilesFor(component, framework);
+    const cwd = await mkdtemp(path.join(tmpdir(), `bambiui-${componentName}-${framework}-`));
 
-  try {
-    await runCli(["init", "--yes", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
+    try {
+      await runCli(["init", "--yes", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
-    assertExists(path.join(cwd, "bambiui.config.json"));
-    assertExists(path.join(cwd, "src/styles/bambi.css"));
+      assertExists(path.join(cwd, "bambiui.config.json"));
+      assertExists(path.join(cwd, "src/styles/bambi.css"));
 
-    await runCli(["add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
+      await runCli(["add", componentName, "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot]);
 
-    const componentDir = path.join(cwd, "src/components/ui/tabs");
-    for (const file of files) assertExists(path.join(componentDir, file));
-    await assertOnlyExpectedFiles(componentDir, files);
-    await assertNoForbiddenOutput(componentDir);
+      const componentDir = path.join(cwd, "src/components/ui", componentName);
+      for (const file of files) assertExists(path.join(componentDir, file));
+      await assertOnlyExpectedFiles(componentDir, files);
+      await assertNoForbiddenOutput(componentDir, componentName);
 
-    assertExists(path.join(cwd, "src/components/ui/bambi-helpers.ts"));
+      if ((component.helpers?.[framework] ?? []).length > 0) {
+        assertExists(path.join(cwd, "src/components/ui/bambi-helpers.ts"));
+      }
 
-    const cssFile = cssImportFile[framework] ?? "index.tsx";
-    const wrapper = await readFile(path.join(componentDir, cssFile), "utf8");
-    if (!wrapper.includes(`"./tabs.css"`)) {
-      throw new Error(`Expected ${cssFile} to import ./tabs.css`);
+      const cssFile = cssBasenameFor(component);
+      if (cssFile) {
+        const componentFiles = await walkFiles(componentDir);
+        const importsCss = await Promise.all(
+          componentFiles
+            .filter((filePath) => !filePath.endsWith(".css"))
+            .map((filePath) => readFile(filePath, "utf8")),
+        );
+        if (!importsCss.some((content) => content.includes(`"./${cssFile}"`))) {
+          throw new Error(`Expected ${componentName}/${framework} output to import ./${cssFile}`);
+        }
+      }
+
+      const secondAdd = await runCli([
+        "add", componentName, "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot,
+      ]);
+      if (!secondAdd.stdout.includes("skipped")) {
+        throw new Error(`Expected second add to skip existing ${componentName}/${framework} files.`);
+      }
+
+      const forcedAdd = await runCli([
+        "add", componentName, "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot, "--force",
+      ]);
+      if (!forcedAdd.stdout.includes("updated")) {
+        throw new Error(`Expected forced add to update existing ${componentName}/${framework} files.`);
+      }
+
+      process.stdout.write(`  ✓ ${componentName}/${framework}\n`);
+    } finally {
+      await rm(cwd, { force: true, recursive: true });
     }
-
-    const secondAdd = await runCli([
-      "add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot,
-    ]);
-    if (!secondAdd.stdout.includes("skipped")) {
-      throw new Error(`Expected second add to skip existing ${framework} files.`);
-    }
-
-    const forcedAdd = await runCli([
-      "add", "tabs", "--framework", framework, "--cwd", cwd, "--registry-url", repoRoot, "--force",
-    ]);
-    if (!forcedAdd.stdout.includes("updated")) {
-      throw new Error(`Expected forced add to update existing ${framework} files.`);
-    }
-
-    process.stdout.write(`  ✓ ${framework}\n`);
-  } finally {
-    await rm(cwd, { force: true, recursive: true });
   }
 }
 
@@ -180,8 +197,8 @@ const addOnlyDir = await mkdtemp(path.join(tmpdir(), "bambiui-add-only-"));
 try {
   await runCli(["add", "tabs", "--cwd", addOnlyDir, "--registry-url", repoRoot]);
   assertExists(path.join(addOnlyDir, "src/styles/bambi.css"));
-  await assertOnlyExpectedFiles(path.join(addOnlyDir, "src/components/ui/tabs"), expectedFiles.react);
-  await assertNoForbiddenOutput(path.join(addOnlyDir, "src/components/ui/tabs"));
+  await assertOnlyExpectedFiles(path.join(addOnlyDir, "src/components/ui/tabs"), expectedFilesFor(registry.components.tabs, "react"));
+  await assertNoForbiddenOutput(path.join(addOnlyDir, "src/components/ui/tabs"), "tabs");
 } finally {
   await rm(addOnlyDir, { force: true, recursive: true });
 }
@@ -236,7 +253,7 @@ try {
 
   const demoDir = path.join(mockProjectDir, "src/components/ui/demo");
   await assertOnlyExpectedFiles(demoDir, ["index.tsx", "demo.css"]);
-  await assertNoForbiddenOutput(demoDir);
+  await assertNoForbiddenOutput(demoDir, "demo");
   process.stdout.write("  ✓ public registry artifact copy\n");
 } finally {
   await rm(mockRegistryDir, { force: true, recursive: true });

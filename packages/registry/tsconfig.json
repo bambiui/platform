@@ -11,8 +11,8 @@
   },
   "include": ["src", "generated"],
   "exclude": [
-    "generated/tabs/solid",
-    "generated/tabs/svelte",
-    "generated/tabs/vue"
+    "generated/*/solid",
+    "generated/*/svelte",
+    "generated/*/vue"
   ]
 }

@@ -17,7 +17,7 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "contract", "controller", "style", "generatedFiles", "exports"],
+      "required": ["name", "contract", "controller", "style", "generatedCss", "generatedFiles", "exports"],
       "properties": {
         "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
         "contract": { "$ref": "#/$defs/registryPath" },
@@ -29,6 +29,7 @@
         "generatedFiles": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["react", "solid", "svelte", "vue"],
           "properties": {
             "react": { "$ref": "#/$defs/registryFileList" },
             "solid": { "$ref": "#/$defs/registryFileList" },
@@ -38,7 +39,7 @@
         },
         "generator": {
           "type": "object",
-          "additionalProperties": { "$ref": "#/$defs/generatorOptions" },
+          "additionalProperties": false,
           "properties": {
             "react": { "$ref": "#/$defs/generatorOptions" },
             "solid": { "$ref": "#/$defs/generatorOptions" },
@@ -49,6 +50,7 @@
         "exports": {
           "type": "object",
           "additionalProperties": false,
+          "required": ["react", "solid", "svelte", "vue"],
           "properties": {
             "react": { "$ref": "#/$defs/exportNames" },
             "solid": { "$ref": "#/$defs/exportNames" },
@@ -60,7 +62,8 @@
     },
     "registryFileList": {
       "type": "array",
-      "items": { "$ref": "#/$defs/registryPath" }
+      "items": { "$ref": "#/$defs/registryPath" },
+      "minItems": 1
     },
     "exportNames": {
       "type": "array",
@@ -77,7 +80,8 @@
         },
         "valuePropParts": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
         },
         "disabledPropName": {
           "type": "string",
@@ -85,7 +89,8 @@
         },
         "disabledPropParts": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
         }
       }
     },

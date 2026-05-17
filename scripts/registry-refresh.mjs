@@ -145,7 +145,7 @@ for (const [componentName, component] of Object.entries(authoring.components ?? 
 
   if (componentUsedHelpers.size > 0) {
     const shimPath = resolve(root, `packages/registry/generated/${componentName}/bambi-helpers.ts`);
-    const shimContent = `// Workspace-only shim — not distributed. Satisfies the ../bambi-helpers import in all generated/${componentName}/{framework}/ files.\nexport * from "../shared/react/bambi-helpers";\n`;
+    const shimContent = `// Workspace-only shim — not distributed. Satisfies the ../bambi-helpers import in all generated/${componentName}/{framework}/ files.\nexport * from "../shared/bambi-helpers";\n`;
     const shimChanged = await writeGeneratedFile(shimPath, shimContent);
     process.stdout.write(`${shimChanged ? "generated" : "unchanged"} packages/registry/generated/${componentName}/bambi-helpers.ts (workspace shim)\n`);
   }
@@ -203,18 +203,12 @@ if (globalStylePath) {
   }
 }
 
-// Compute SHA-256 hashes for shared helper files and write to registry.json.
-if (publicRegistry.shared && typeof publicRegistry.shared === "object") {
-  const sharedHashes = {};
-  for (const [framework, sharedPath] of Object.entries(publicRegistry.shared)) {
-    const abs = resolve(root, sharedPath);
-    if (existsSync(abs)) {
-      const content = await readFile(abs, "utf8");
-      sharedHashes[framework] = createHash("sha256").update(content).digest("hex");
-    }
-  }
-  if (Object.keys(sharedHashes).length > 0) {
-    publicRegistry.sharedHashes = sharedHashes;
+// Compute SHA-256 hash for the shared helper file and write to registry.json.
+if (publicRegistry.shared && typeof publicRegistry.shared === "string") {
+  const abs = resolve(root, publicRegistry.shared);
+  if (existsSync(abs)) {
+    const content = await readFile(abs, "utf8");
+    publicRegistry.sharedHash = createHash("sha256").update(content).digest("hex");
   }
 }
 

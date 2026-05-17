@@ -192,64 +192,40 @@ if (!registry.styles || typeof registry.styles.global !== "string") {
 }
 
 if (registry.shared !== undefined) {
-  if (!registry.shared || typeof registry.shared !== "object") {
-    fail("shared must be an object when present");
-  } else {
-    for (const [framework, filePath] of Object.entries(registry.shared)) {
-      if (!KNOWN_FRAMEWORKS.includes(framework)) {
-        fail(`shared has unknown framework "${framework}"`);
-        continue;
+  if (typeof registry.shared !== "string" || registry.shared.length === 0) {
+    fail("shared must be a non-empty string when present");
+  } else if (checkPathAndFile(registry.shared, "shared")) {
+    const content = readFileSync(resolve(root, registry.shared), "utf-8");
+    for (const forbidden of FORBIDDEN_STRINGS) {
+      if (content.includes(forbidden)) {
+        fail(`shared: file contains forbidden string "${forbidden}"`);
       }
-      if (!checkPathAndFile(filePath, `shared.${framework}`)) continue;
-      const content = readFileSync(resolve(root, filePath), "utf-8");
-      for (const forbidden of FORBIDDEN_STRINGS) {
-        if (content.includes(forbidden)) {
-          fail(`shared.${framework}: file contains forbidden string "${forbidden}"`);
-        }
-      }
-      ok(`shared.${framework}: ${filePath}`);
     }
+    ok(`shared: ${registry.shared}`);
   }
 }
 
-if (registry.sharedHashes !== undefined) {
-  if (!registry.sharedHashes || typeof registry.sharedHashes !== "object") {
-    fail("sharedHashes must be an object when present");
+if (registry.sharedHash !== undefined) {
+  if (!/^[a-f0-9]{64}$/.test(registry.sharedHash)) {
+    fail("sharedHash: invalid SHA-256 hex string");
+  } else if (!registry.shared) {
+    fail("sharedHash: no corresponding shared path");
   } else {
-    for (const [framework, hash] of Object.entries(registry.sharedHashes)) {
-      if (!KNOWN_FRAMEWORKS.includes(framework)) {
-        fail(`sharedHashes has unknown framework "${framework}"`);
-        continue;
-      }
-      if (!/^[a-f0-9]{64}$/.test(hash)) {
-        fail(`sharedHashes.${framework}: invalid SHA-256 hex string`);
-        continue;
-      }
-      const sharedPath = registry.shared?.[framework];
-      if (!sharedPath) {
-        fail(`sharedHashes.${framework}: no corresponding shared.${framework} path`);
-        continue;
-      }
-      const abs = resolve(root, sharedPath);
-      if (existsSync(abs)) {
-        const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
-        if (actual !== hash) {
-          fail(`sharedHashes.${framework}: hash mismatch for ${sharedPath}`);
-        } else {
-          ok(`sharedHashes.${framework}: hash verified`);
-        }
+    const abs = resolve(root, registry.shared);
+    if (existsSync(abs)) {
+      const actual = createHash("sha256").update(readFileSync(abs, "utf-8")).digest("hex");
+      if (actual !== registry.sharedHash) {
+        fail("sharedHash: hash mismatch");
+      } else {
+        ok("sharedHash: verified");
       }
     }
   }
 }
 
-// Enforce: every shared[framework] must have a sharedHashes entry.
-if (registry.shared && typeof registry.shared === "object") {
-  for (const framework of Object.keys(registry.shared)) {
-    if (!registry.sharedHashes?.[framework]) {
-      fail(`sharedHashes.${framework}: missing (required when shared.${framework} is declared)`);
-    }
-  }
+// Enforce: sharedHash must be present when shared is declared.
+if (registry.shared && !registry.sharedHash) {
+  fail("sharedHash: missing (required when shared is declared)");
 }
 
 if (!registry.components || typeof registry.components !== "object") {

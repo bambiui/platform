@@ -82,7 +82,7 @@ export async function addComponent(componentName, flags) {
     );
   }
 
-  const sharedSrc = manifest.shared?.[framework];
+  const sharedSrc = manifest.shared;
   const needsHelper = (component.helpers?.[framework] ?? []).length > 0;
   if (sharedSrc && needsHelper) {
     results.push(
@@ -91,7 +91,7 @@ export async function addComponent(componentName, flags) {
         sharedSrc,
         path.join(cwd, componentDir, "bambi-helpers.ts"),
         force,
-        { expectedHash: manifest.sharedHashes?.[framework] },
+        { expectedHash: manifest.sharedHash },
       ),
     );
   }

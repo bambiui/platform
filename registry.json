@@ -5,12 +5,7 @@
     "global": "packages/registry/src/styles/bambi.css",
     "globalHash": "b5335dc7a79fbf589067295616a767aae87b5d9eee601476ad835acc0b306740"
   },
-  "shared": {
-    "react": "packages/registry/generated/shared/react/bambi-helpers.ts",
-    "solid": "packages/registry/generated/shared/solid/bambi-helpers.ts",
-    "svelte": "packages/registry/generated/shared/svelte/bambi-helpers.ts",
-    "vue": "packages/registry/generated/shared/vue/bambi-helpers.ts"
-  },
+  "shared": "packages/registry/generated/shared/bambi-helpers.ts",
   "components": {
     "tabs": {
       "name": "tabs",
@@ -114,10 +109,5 @@
       "cssHash": "68e8b9710278ba5d389276c3d3eab7a1f37eeb9c1c1365374bd083cb532ad4ff"
     }
   },
-  "sharedHashes": {
-    "react": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
-    "solid": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
-    "svelte": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21",
-    "vue": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21"
-  }
+  "sharedHash": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21"
 }

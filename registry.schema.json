@@ -27,16 +27,10 @@
       }
     },
     "shared": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/$defs/registryPath"
-      }
+      "$ref": "#/$defs/registryPath"
     },
-    "sharedHashes": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "#/$defs/sha256Hex"
-      }
+    "sharedHash": {
+      "$ref": "#/$defs/sha256Hex"
     },
     "components": {
       "type": "object",

@@ -1,19 +1,428 @@
 ---
+const title = "bambiui - CLI-first UI components";
+const description =
+  "Source-distributed UI components for React, Solid, Svelte, and Vue, generated from DOM Protocol contracts and installed with the bambiui CLI.";
+const canonicalUrl = "https://bambiui.com/";
+const ogImageUrl = "https://bambiui.com/og.svg";
+const ogImageAlt = "bambiui CLI-first UI components copied into your app as source.";
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "bambiui",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  description,
+  url: canonicalUrl,
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+};
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>bambiui</title>
-    <meta name="description" content="DOM Protocol based, CLI-first UI kit." />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="bambiui" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="bambiui home">bambiui</a>
+      <nav aria-label="Primary navigation">
+        <a href="#install">Install</a>
+        <a href="#components">Components</a>
+        <a href="https://www.npmjs.com/package/bambiui">npm</a>
+      </nav>
+    </header>
+
     <main>
-      <h1>bambiui</h1>
-      <p>DOM Protocol based, CLI-first UI kit.</p>
-      <pre><code>npx bambiui init
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">CLI-first UI components</p>
+          <h1 id="hero-title">Install component source, not a runtime dependency.</h1>
+          <p class="lede">
+            bambiui generates framework-ready components from internal DOM Protocol
+            contracts, then copies safe public artifacts into your app.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="#install">Get started</a>
+            <a class="button secondary" href="#components">View components</a>
+          </div>
+        </div>
+
+        <div class="terminal" id="install" aria-label="Installation commands">
+          <div class="terminal-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <pre><code>npx bambiui init
+npx bambiui add button --framework react
 npx bambiui add tabs --framework react</code></pre>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="why-title">
+        <div>
+          <p class="eyebrow">Why it exists</p>
+          <h2 id="why-title">Portable UI with explicit generated output.</h2>
+        </div>
+        <div class="grid">
+          <article>
+            <h3>Source distributed</h3>
+            <p>Components are copied into your project so you can inspect, style, and own the final code.</p>
+          </article>
+          <article>
+            <h3>Framework ready</h3>
+            <p>Public artifacts target React, Solid, Svelte 5, and Vue 3 without runtime bambiui imports.</p>
+          </article>
+          <article>
+            <h3>DOM Protocol driven</h3>
+            <p>Contracts and controllers stay internal while generated files expose stable data attributes.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section split" id="components" aria-labelledby="components-title">
+        <div>
+          <p class="eyebrow">Available now</p>
+          <h2 id="components-title">Start with Button and Tabs.</h2>
+          <p>
+            Use the CLI to add only the components you need. Each component ships with its local CSS and shared helpers when required.
+          </p>
+        </div>
+        <ul class="component-list" aria-label="Available components">
+          <li>
+            <span>Button</span>
+            <small>variants, sizes, loading, polymorphic root</small>
+          </li>
+          <li>
+            <span>Tabs</span>
+            <small>controlled state, keyboard navigation, ARIA relationships</small>
+          </li>
+        </ul>
+      </section>
     </main>
   </body>
 </html>
+
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-muted: #eef2f7;
+    --text: #111827;
+    --muted: #5b6472;
+    --border: #d9e0ea;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-soft: #eef2ff;
+    --radius: 8px;
+    font-family:
+      Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  a {
+    color: inherit;
+  }
+
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .brand {
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    gap: 20px;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  nav a {
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--text);
+  }
+
+  main {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    gap: 40px;
+    align-items: center;
+  }
+
+  .hero-copy {
+    max-width: 640px;
+  }
+
+  .eyebrow {
+    margin: 0 0 12px;
+    color: var(--primary);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    overflow-wrap: anywhere;
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 11ch;
+    font-size: clamp(3rem, 8vw, 5.75rem);
+    line-height: 0.95;
+    letter-spacing: 0;
+  }
+
+  h2 {
+    margin: 0;
+    max-width: 780px;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    letter-spacing: 0;
+  }
+
+  .lede {
+    max-width: 650px;
+    margin: 24px 0 0;
+    color: var(--muted);
+    font-size: 1.125rem;
+    line-height: 1.65;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .button.primary {
+    color: #ffffff;
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+
+  .button.primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+
+  .button.secondary {
+    background: var(--surface);
+  }
+
+  .terminal {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #111827;
+    box-shadow: 0 24px 60px rgb(15 23 42 / 0.16);
+  }
+
+  .terminal-bar {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    background: #0b1220;
+  }
+
+  .terminal-bar span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #94a3b8;
+  }
+
+  pre {
+    margin: 0;
+    padding: 24px;
+    overflow-x: auto;
+    color: #e5e7eb;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+
+  .section {
+    display: grid;
+    gap: 28px;
+    margin-top: 88px;
+    padding-top: 56px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section > div > p:not(.eyebrow) {
+    max-width: 620px;
+    color: var(--muted);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  article,
+  .component-list li {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  article {
+    padding: 22px;
+  }
+
+  article p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .split {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+    align-items: start;
+  }
+
+  .component-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .component-list li {
+    display: grid;
+    gap: 6px;
+    padding: 18px;
+  }
+
+  .component-list span {
+    font-weight: 700;
+  }
+
+  .component-list small {
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 800px) {
+    .site-header,
+    nav,
+    .actions {
+      align-items: flex-start;
+    }
+
+    .site-header,
+    .hero,
+    .split {
+      grid-template-columns: 1fr;
+    }
+
+    .site-header {
+      display: grid;
+      gap: 16px;
+    }
+
+    nav {
+      flex-wrap: wrap;
+    }
+
+    main {
+      padding-top: 32px;
+    }
+
+    h1 {
+      max-width: 12ch;
+      font-size: 3rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

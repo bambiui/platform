@@ -109,7 +109,6 @@ export function Button(props: ButtonProps) {
   });
 
   const resolvedChildren = children(() => local.children);
-
   createEffect(() => {
     resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered
     if (behavior) {

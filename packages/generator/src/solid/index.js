@@ -324,10 +324,31 @@ ${rootAttrs}${controlledLine}
       {resolvedChildren()}
     </${rootTag}>
   );`;
+  const rootAttrsSsr = contract.props
+    .filter((prop) => prop.name !== "controlled")
+    .map((prop) => `        ${prop.attribute}={${solidAttributeValue(prop, "local.")}}`)
+    .join("\n");
+  const controlledLineSsr = controlledAttr ? `\n        ${controlledAttr.attribute}={controlled() ? "true" : undefined}` : "";
+
   const rootReturn = ssrState
-    ? `${rootElementSource}
+    ? polymorphicRootPropName
+      ? `${rootElementSource}
 
   return <SsrSelectedValueContext.Provider value={selectedValue}>{rootElement}</SsrSelectedValueContext.Provider>;`
+      : `  return (
+    <SsrSelectedValueContext.Provider value={selectedValue}>
+      <${rootTag}
+        {...rest}
+        ref={(el: ${htmlElementType(rootTag)}) => {
+          rootRef = el;
+        }}
+        ${root.attribute}=""
+${rootAttrsSsr}${controlledLineSsr}
+      >
+        {local.children}
+      </${rootTag}>
+    </SsrSelectedValueContext.Provider>
+  );`
     : originalRootReturn;
 
   return `${ssrContextDecl}export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${rootPropsType}, keyof ${publicOptionsType}> {
@@ -350,11 +371,8 @@ ${behaviorOptions}
 ${cleanupBlock}
   });
 
-  const resolvedChildren = children(() => local.children);
-
-  createEffect(() => {
-    resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered
-    if (behavior) {
+${ssrState ? "" : "  const resolvedChildren = children(() => local.children);\n"}  createEffect(() => {
+${ssrState ? "" : "    resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered\n"}    if (behavior) {
       behavior.update?.({
 ${behaviorOptions}
       });
@@ -394,7 +412,7 @@ export function createSolidArtifact({ contractSource, controllerSource, primitiv
     "onMount",
     "onCleanup",
     "splitProps",
-    "children",
+    generatorOptions.ssrSelectedState ? null : "children",
     generatorOptions.ssrSelectedState ? "useContext" : null,
     "type JSX",
   ].filter(Boolean).join(", ");

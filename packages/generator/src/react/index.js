@@ -19,6 +19,10 @@ function reactAttributeLine(prop) {
   return `      ${prop.attribute}={${reactAttributeValue(prop)}}`;
 }
 
+function htmlElementType(element) {
+  return `HTML${pascalCase(element)}Element`;
+}
+
 function reactPartPropsSource(contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -30,10 +34,9 @@ function reactPartPropsSource(contract, options) {
     .filter((part) => part.name !== "root")
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
-      const elementType = part.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
       const valueProp = valuePropParts.has(part.name) ? `\n  ${valuePropName}: string;` : "";
 
-      return `export interface ${componentName}Props extends React.${elementType === "HTMLButtonElement" ? "ButtonHTMLAttributes" : "HTMLAttributes"}<${elementType}> {${valueProp}
+      return `export interface ${componentName}Props extends React.ComponentPropsWithoutRef<"${part.element}"> {${valueProp}
 }`;
     })
     .join("\n\n");
@@ -56,6 +59,7 @@ function reactPartComponentSource(contract, options) {
   ]);
   const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
@@ -83,7 +87,7 @@ function reactPartComponentSource(contract, options) {
         "children",
         "...props",
       ].filter(Boolean).join(", ");
-      const typeAttr = tag === "button" ? "\n      type={props.type ?? \"button\"}" : "";
+      const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={props.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={${valuePropName}}` : "";
       const disabledAttribute = disabledHandling ? `\n      disabled={${disabledPropName}}\n      ${disabledAttr}={${disabledPropName} ? "true" : undefined}` : "";
       const ssrState = options.ssrSelectedState;
@@ -182,14 +186,11 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   const publicOptionsType = controlledProp
     ? `Omit<${optionsTypeName}, "controlled">`
     : optionsTypeName;
-  const rootElementType = root.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+  const rootElementType = polymorphicRootPropName ? "HTMLElement" : htmlElementType(root.element);
   const rootRefType = polymorphicRootPropName ? "HTMLElement" : rootElementType;
-  const nativePropsType = root.element === "button"
-    ? "React.ButtonHTMLAttributes<HTMLButtonElement>"
-    : "React.HTMLAttributes<HTMLDivElement>";
   const rootPropsType = polymorphicRootPropName
     ? `Omit<React.HTMLAttributes<HTMLElement>, keyof ${publicOptionsType}>`
-    : `Omit<${nativePropsType}, keyof ${publicOptionsType}>`;
+    : `Omit<React.ComponentPropsWithoutRef<"${root.element}">, keyof ${publicOptionsType}>`;
   const ssrState = generatorOptions.ssrSelectedState;
   const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
   const ssrContextDecl = ssrState ? "\nconst SsrSelectedValueContext = React.createContext<string | undefined>(undefined);\n" : "";
@@ -224,8 +225,10 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   const callbackRefsBlock = callbackRefLines ? `${callbackRefLines}\n` : "";
   const listenerSetupBlock = listenerSetupLines ? `\n${listenerSetupLines}\n` : "";
   const listenerTeardownBlock = listenerTeardownLines ? `${listenerTeardownLines}\n` : "";
+  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const rootElementSource = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
-  const isNativeButton = Component === "button";
+  const isNativeElement = Component === "${polymorphicNativeElement}";
   const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
   const rootElement = React.createElement(
@@ -234,9 +237,9 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
       ...props,
       ref: rootRef,
       "${root.attribute}": "",
-      type: isNativeButton ? ((props as React.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button") : undefined,
-      disabled: isNativeButton ? effectiveDisabled : undefined,
-      "aria-disabled": !isNativeButton && effectiveDisabled ? "true" : undefined,
+      type: isNativeElement ? ((props as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}) : undefined,
+      disabled: isNativeElement ? effectiveDisabled : undefined,
+      "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
       "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
 ${rootObjectAttrs}${controlledObjectLine}
     },
@@ -252,7 +255,7 @@ ${rootAttrs}${controlledLine}
     </${root.element}>
   );`;
   const originalRootReturn = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
-  const isNativeButton = Component === "button";
+  const isNativeElement = Component === "${polymorphicNativeElement}";
   const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
   return React.createElement(
@@ -261,9 +264,9 @@ ${rootAttrs}${controlledLine}
       ...props,
       ref: rootRef,
       "${root.attribute}": "",
-      type: isNativeButton ? ((props as React.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button") : undefined,
-      disabled: isNativeButton ? effectiveDisabled : undefined,
-      "aria-disabled": !isNativeButton && effectiveDisabled ? "true" : undefined,
+      type: isNativeElement ? ((props as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}) : undefined,
+      disabled: isNativeElement ? effectiveDisabled : undefined,
+      "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
       "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
 ${rootObjectAttrs}${controlledObjectLine}
     },

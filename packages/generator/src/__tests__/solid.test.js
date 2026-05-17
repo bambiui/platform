@@ -28,6 +28,9 @@ beforeAll(async () => {
       valuePropParts: ["trigger", "content"],
       disabledPropName: "disabled",
       disabledPropParts: ["trigger"],
+      defaultTypeParts: ["trigger"],
+      defaultTypeValue: "button",
+      defaultTypeValues: ["button", "submit", "reset"],
       ssrSelectedState: {
         selectedPropNames: ["value", "defaultValue"],
         valuePropName: "value",

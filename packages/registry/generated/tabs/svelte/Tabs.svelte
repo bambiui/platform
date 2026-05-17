@@ -387,7 +387,7 @@ setContext("bambi-tabs-value", () => value ?? defaultValue);
     }
   });
 
-let rootEl: HTMLDivElement | undefined = $state();
+let rootEl: HTMLElement | undefined = $state();
 let behavior: TabsBehavior | undefined;
 
 onMount(() => {

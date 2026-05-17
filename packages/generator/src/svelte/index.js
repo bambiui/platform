@@ -26,6 +26,7 @@ function sveltePartFile(part, options, contract) {
   ]);
   const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
@@ -43,14 +44,15 @@ function sveltePartFile(part, options, contract) {
   }
 
   const tag = part.element;
-  const isButton = tag === "button";
   const propDecls = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
-    isButton ? `  type?: "button" | "submit" | "reset";` : null,
+    defaultTypeParts.has(part.name)
+      ? `  type?: ${(options.defaultTypeValues ?? [options.defaultTypeValue]).map((value) => `"${value}"`).join(" | ")};`
+      : null,
   ].filter(Boolean).join("\n");
 
-  const typeAttr = isButton ? "\n    type={type}" : "";
+  const typeAttr = defaultTypeParts.has(part.name) ? "\n    type={type}" : "";
   const valueAttribute = protocolValueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
   const disabledAttribute = disabledHandling
     ? `\n    disabled={${disabledPropName}}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
@@ -70,7 +72,7 @@ const isSelected = $derived(selectedValue?.() === ${ssrState.valuePropName});` :
   const propDestructure = [
     valueHandling ? valuePropName : null,
     disabledHandling ? disabledPropName : null,
-    isButton ? 'type = "button"' : null,
+    defaultTypeParts.has(part.name) ? `type = "${options.defaultTypeValue}"` : null,
     "children",
     "...props",
   ].filter(Boolean).join(", ");
@@ -200,15 +202,17 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
     hasDisabledOption ? "disabled" : null,
     hasLoadingOption ? "loading" : null,
   ].filter(Boolean).join(" || ") || "false";
-  const rootElementType = polymorphicRootPropName ? "HTMLElement" : root.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+  const rootElementType = "HTMLElement";
+  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const Component = $derived(${polymorphicRootPropName} ?? "${root.element}");
-const isNativeButton = $derived(Component === "button");
+const isNativeElement = $derived(Component === "${polymorphicNativeElement}");
 const effectiveDisabled = $derived(Boolean(${effectiveDisabledExpression}));
-const nativeType = $derived(isNativeButton ? (typeof props.type === "string" ? props.type : "button") : undefined);
+const nativeType = $derived(isNativeElement ? (typeof props.type === "string" ? props.type : ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}) : undefined);
 const polymorphicAttrs = $derived({
   type: nativeType,
-  disabled: isNativeButton ? effectiveDisabled : undefined,
-  "aria-disabled": !isNativeButton && effectiveDisabled ? true : undefined,
+  disabled: isNativeElement ? effectiveDisabled : undefined,
+  "aria-disabled": !isNativeElement && effectiveDisabled ? true : undefined,
   "aria-busy": ${hasLoadingOption ? "loading ? true : undefined" : "undefined"},
 });
 ` : "";

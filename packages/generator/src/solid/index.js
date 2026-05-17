@@ -19,6 +19,10 @@ function solidAttributeLine(prop, accessor = "props.") {
   return `      ${prop.attribute}={${solidAttributeValue(prop, accessor)}}`;
 }
 
+function htmlElementType(element) {
+  return `HTML${pascalCase(element)}Element`;
+}
+
 // ── Part interfaces and components ────────────────────────────────────────
 
 function solidPartPropsSource(contract, options) {
@@ -32,14 +36,10 @@ function solidPartPropsSource(contract, options) {
     .filter((part) => part.name !== "root")
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
-      const elementType = part.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
-      const baseType = elementType === "HTMLButtonElement"
-        ? "JSX.ButtonHTMLAttributes<HTMLButtonElement>"
-        : "JSX.HTMLAttributes<HTMLDivElement>";
       const valueProp = valuePropParts.has(part.name) ? `\n  ${valuePropName}: string;` : "";
 
-      return `export interface ${componentName}Props extends ${baseType} {${valueProp}
-}`;
+      return `export type ${componentName}Props = JSX.IntrinsicElements["${part.element}"] & {${valueProp}
+};`;
     })
     .join("\n\n");
 }
@@ -61,6 +61,7 @@ function solidPartComponentSource(contract, options) {
   ]);
   const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
@@ -86,12 +87,12 @@ function solidPartComponentSource(contract, options) {
       const splitKeys = [
         valueHandling ? valuePropName : null,
         disabledHandling ? disabledPropName : null,
-        tag === "button" ? "type" : null,
+        defaultTypeParts.has(part.name) ? "type" : null,
         "children",
       ].filter(Boolean);
       const splitList = splitKeys.map((k) => `"${k}"`).join(", ");
 
-      const typeAttr = tag === "button" ? "\n      type={local.type ?? \"button\"}" : "";
+      const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={local.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
       const disabledAttribute = disabledHandling
         ? `\n      disabled={local.${disabledPropName}}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
@@ -182,12 +183,10 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
     : optionsTypeName;
 
   const rootTag = root.element;
-  const nativeAttrType = rootTag === "button"
-    ? "JSX.ButtonHTMLAttributes<HTMLButtonElement>"
-    : "JSX.HTMLAttributes<HTMLDivElement>";
+  const nativeAttrType = `JSX.IntrinsicElements["${rootTag}"]`;
   const rootRefType = polymorphicRootPropName
     ? "HTMLElement"
-    : rootTag === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+    : htmlElementType(rootTag);
   const rootPropsType = polymorphicRootPropName
     ? "JSX.HTMLAttributes<HTMLElement>"
     : nativeAttrType;
@@ -234,8 +233,10 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const cleanupBlock = listenerTeardownLines
     ? `    onCleanup(() => {\n${listenerTeardownLines}\n      behavior?.destroy();\n    });`
     : `    onCleanup(() => behavior?.destroy());`;
+  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? rootTag;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootTag}";
-  const isNativeButton = () => Component() === "button";
+  const isNativeElement = () => Component() === "${polymorphicNativeElement}";
   const effectiveDisabled = () => Boolean(${effectiveDisabledExpression});
 ` : "";
   const rootElementSource = polymorphicRootPropName ? `  const rootElement = (
@@ -244,9 +245,9 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
       ref={rootRef}
       {...rest}
       ${root.attribute}=""
-      type={isNativeButton() ? (rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button" : undefined}
-      disabled={isNativeButton() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}
+      type={isNativeElement() ? (rest as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"} : undefined}
+      disabled={isNativeElement() ? effectiveDisabled() : undefined}
+      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
       aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
 ${rootAttrs}${controlledLine}
     >
@@ -268,9 +269,9 @@ ${rootAttrs}${controlledLine}
       ref={rootRef}
       {...rest}
       ${root.attribute}=""
-      type={isNativeButton() ? (rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button" : undefined}
-      disabled={isNativeButton() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}
+      type={isNativeElement() ? (rest as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"} : undefined}
+      disabled={isNativeElement() ? effectiveDisabled() : undefined}
+      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
       aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
 ${rootAttrs}${controlledLine}
     >

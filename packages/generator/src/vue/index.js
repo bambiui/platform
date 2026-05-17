@@ -19,6 +19,10 @@ function vueSsrAttributeLine(attribute) {
   return `\n    :${name}="hasSelectedValue ? (isSelected ? ${vueLiteral(attribute.active)} : ${vueLiteral(attribute.inactive)}) : undefined"`;
 }
 
+function htmlElementType(element) {
+  return `HTML${pascalCase(element)}Element`;
+}
+
 function vuePartFile(part, options, contract) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -26,6 +30,7 @@ function vuePartFile(part, options, contract) {
   ]);
   const protocolValuePropParts = new Set(options.valuePropParts ?? []);
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
@@ -43,7 +48,6 @@ function vuePartFile(part, options, contract) {
   }
 
   const tag = part.element;
-  const isButton = tag === "button";
 
   const propTypeParts = [
     valueHandling ? `  ${valuePropName}: string;` : null,
@@ -54,7 +58,7 @@ function vuePartFile(part, options, contract) {
     ? `interface Props {\n${propTypeParts}\n}`
     : "";
 
-  const typeAttr = isButton ? '\n    type="button"' : "";
+  const typeAttr = defaultTypeParts.has(part.name) ? `\n    type="${options.defaultTypeValue}"` : "";
   const valueAttribute = protocolValueHandling ? `\n    :${valueAttr}="props.${valuePropName}"` : "";
   const disabledAttribute = disabledHandling
     ? `\n    :disabled="props.${disabledPropName}"\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
@@ -201,9 +205,11 @@ provide("${ssrState.contextName}", selectedValue);
     hasDisabledOption ? "props.disabled" : null,
     hasLoadingOption ? "props.loading" : null,
   ].filter(Boolean).join(" || ") || "false";
-  const rootElementType = polymorphicRootPropName ? "HTMLElement" : root.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+  const rootElementType = polymorphicRootPropName ? "HTMLElement" : htmlElementType(root.element);
+  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const componentTag = computed(() => props.${polymorphicRootPropName} ?? "${root.element}");
-const isNativeButton = computed(() => componentTag.value === "button");
+const isNativeElement = computed(() => componentTag.value === "${polymorphicNativeElement}");
 const effectiveDisabled = computed(() => Boolean(${effectiveDisabledExpression}));
 ` : "";
   const rootTemplate = polymorphicRootPropName ? `<component
@@ -211,9 +217,9 @@ const effectiveDisabled = computed(() => Boolean(${effectiveDisabledExpression})
     ref="rootRef"
     v-bind="$attrs"
     ${root.attribute}=""
-    :type="isNativeButton ? ($attrs.type || 'button') : undefined"
-    :disabled="isNativeButton ? effectiveDisabled : undefined"
-    :aria-disabled="!isNativeButton && effectiveDisabled ? 'true' : undefined"
+    :type="isNativeElement ? ($attrs.type || ${polymorphicTypeDefault ? `'${polymorphicTypeDefault}'` : "undefined"}) : undefined"
+    :disabled="isNativeElement ? effectiveDisabled : undefined"
+    :aria-disabled="!isNativeElement && effectiveDisabled ? 'true' : undefined"
     :aria-busy="${hasLoadingOption ? "props.loading ? 'true' : undefined" : "undefined"}"
 ${rootAttrLines}${controlledAttrLine}
   >

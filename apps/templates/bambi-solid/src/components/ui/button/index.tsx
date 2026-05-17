@@ -93,7 +93,7 @@ export function Button(props: ButtonProps) {
   let behavior: ButtonBehavior | undefined;
   const controlled = () => false;
   const Component = () => local.as ?? "button";
-  const isNativeButton = () => Component() === "button";
+  const isNativeElement = () => Component() === "button";
   const effectiveDisabled = () => Boolean(local.disabled || local.loading);
 
   onMount(() => {
@@ -129,9 +129,9 @@ export function Button(props: ButtonProps) {
       ref={rootRef}
       {...rest}
       data-bambi-button=""
-      type={isNativeButton() ? (rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button" : undefined}
-      disabled={isNativeButton() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}
+      type={isNativeElement() ? (rest as { type?: string }).type ?? "button" : undefined}
+      disabled={isNativeElement() ? effectiveDisabled() : undefined}
+      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
       aria-busy={local.loading ? "true" : undefined}
       data-variant={local.variant}
       data-size={local.size}

@@ -233,6 +233,14 @@ export function validateGeneratorOptions(contract, options = {}) {
   if (options.polymorphicRootPropName !== undefined && typeof options.polymorphicRootPropName !== "string") {
     throw new Error(`${contract.name}: generator option polymorphicRootPropName must be a string.`);
   }
+  if (options.defaultTypeParts !== undefined && options.defaultTypeValue === undefined) {
+    throw new Error(`${contract.name}: generator option defaultTypeParts requires defaultTypeValue.`);
+  }
+  for (const partName of options.defaultTypeParts ?? []) {
+    if (!partNames.has(partName)) {
+      throw new Error(`${contract.name}: generator option defaultTypeParts references unknown part "${partName}".`);
+    }
+  }
 
   const ssrState = options.ssrSelectedState;
   if (ssrState !== undefined) {

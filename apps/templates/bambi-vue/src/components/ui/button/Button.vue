@@ -90,7 +90,7 @@ const rootRef = ref<HTMLElement | null>(null);
 let behavior: ButtonBehavior | undefined;
 const controlled = computed(() => false);
 const componentTag = computed(() => props.as ?? "button");
-const isNativeButton = computed(() => componentTag.value === "button");
+const isNativeElement = computed(() => componentTag.value === "button");
 const effectiveDisabled = computed(() => Boolean(props.disabled || props.loading));
 
 onMounted(() => {
@@ -138,9 +138,9 @@ onUpdated(() => {
     ref="rootRef"
     v-bind="$attrs"
     data-bambi-button=""
-    :type="isNativeButton ? ($attrs.type || 'button') : undefined"
-    :disabled="isNativeButton ? effectiveDisabled : undefined"
-    :aria-disabled="!isNativeButton && effectiveDisabled ? 'true' : undefined"
+    :type="isNativeElement ? ($attrs.type || 'button') : undefined"
+    :disabled="isNativeElement ? effectiveDisabled : undefined"
+    :aria-disabled="!isNativeElement && effectiveDisabled ? 'true' : undefined"
     :aria-busy="props.loading ? 'true' : undefined"
     :data-variant="props.variant"
     :data-size="props.size"

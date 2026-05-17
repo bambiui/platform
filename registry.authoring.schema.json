@@ -96,6 +96,28 @@
           "type": "string",
           "minLength": 1
         },
+        "polymorphicNativeElement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "polymorphicTypeDefault": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defaultTypeParts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "defaultTypeValue": {
+          "type": "string",
+          "minLength": 1
+        },
+        "defaultTypeValues": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
         "ssrSelectedState": {
           "type": "object",
           "additionalProperties": false,

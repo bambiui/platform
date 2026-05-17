@@ -131,7 +131,7 @@ export function Button({
   }, [as, variant, size, disabled, loading, children]);
 
   const Component = (as ?? "button") as keyof React.JSX.IntrinsicElements;
-  const isNativeButton = Component === "button";
+  const isNativeElement = Component === "button";
   const effectiveDisabled = Boolean(disabled || loading);
 
   return React.createElement(
@@ -140,9 +140,9 @@ export function Button({
       ...props,
       ref: rootRef,
       "data-bambi-button": "",
-      type: isNativeButton ? ((props as React.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button") : undefined,
-      disabled: isNativeButton ? effectiveDisabled : undefined,
-      "aria-disabled": !isNativeButton && effectiveDisabled ? "true" : undefined,
+      type: isNativeElement ? ((props as { type?: string }).type ?? "button") : undefined,
+      disabled: isNativeElement ? effectiveDisabled : undefined,
+      "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
       "aria-busy": loading ? "true" : undefined,
       "data-variant": variant,
       "data-size": size,

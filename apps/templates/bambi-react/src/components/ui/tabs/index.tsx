@@ -359,20 +359,20 @@ class TabsBehavior implements BambiBehavior {
 
 
 const SsrSelectedValueContext = React.createContext<string | undefined>(undefined);
-export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.HTMLAttributes<HTMLDivElement>, keyof Omit<TabsOptions, "controlled">> {
+export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.ComponentPropsWithoutRef<"div">, keyof Omit<TabsOptions, "controlled">> {
   children?: React.ReactNode;
   className?: string;
   onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
-export interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TabsListProps extends React.ComponentPropsWithoutRef<"div"> {
 }
 
-export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface TabsTriggerProps extends React.ComponentPropsWithoutRef<"button"> {
   value: string;
 }
 
-export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface TabsContentProps extends React.ComponentPropsWithoutRef<"div"> {
   value: string;
 }
 

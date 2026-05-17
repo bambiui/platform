@@ -30,16 +30,24 @@
       },
       "generator": {
         "react": {
-          "polymorphicRootPropName": "as"
+          "polymorphicRootPropName": "as",
+          "polymorphicNativeElement": "button",
+          "polymorphicTypeDefault": "button"
         },
         "solid": {
-          "polymorphicRootPropName": "as"
+          "polymorphicRootPropName": "as",
+          "polymorphicNativeElement": "button",
+          "polymorphicTypeDefault": "button"
         },
         "svelte": {
-          "polymorphicRootPropName": "as"
+          "polymorphicRootPropName": "as",
+          "polymorphicNativeElement": "button",
+          "polymorphicTypeDefault": "button"
         },
         "vue": {
-          "polymorphicRootPropName": "as"
+          "polymorphicRootPropName": "as",
+          "polymorphicNativeElement": "button",
+          "polymorphicTypeDefault": "button"
         }
       },
       "exports": {
@@ -88,6 +96,9 @@
           "valuePropParts": ["trigger", "content"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["trigger"],
+          "defaultTypeParts": ["trigger"],
+          "defaultTypeValue": "button",
+          "defaultTypeValues": ["button", "submit", "reset"],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -116,6 +127,9 @@
           "valuePropParts": ["trigger", "content"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["trigger"],
+          "defaultTypeParts": ["trigger"],
+          "defaultTypeValue": "button",
+          "defaultTypeValues": ["button", "submit", "reset"],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -144,6 +158,9 @@
           "valuePropParts": ["trigger", "content"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["trigger"],
+          "defaultTypeParts": ["trigger"],
+          "defaultTypeValue": "button",
+          "defaultTypeValues": ["button", "submit", "reset"],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -172,6 +189,9 @@
           "valuePropParts": ["trigger", "content"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["trigger"],
+          "defaultTypeParts": ["trigger"],
+          "defaultTypeValue": "button",
+          "defaultTypeValues": ["button", "submit", "reset"],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",

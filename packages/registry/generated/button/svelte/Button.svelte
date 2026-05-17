@@ -98,13 +98,13 @@ let {
 
 const controlled = $derived(false);
 const Component = $derived(as ?? "button");
-const isNativeButton = $derived(Component === "button");
+const isNativeElement = $derived(Component === "button");
 const effectiveDisabled = $derived(Boolean(disabled || loading));
-const nativeType = $derived(isNativeButton ? (typeof props.type === "string" ? props.type : "button") : undefined);
+const nativeType = $derived(isNativeElement ? (typeof props.type === "string" ? props.type : "button") : undefined);
 const polymorphicAttrs = $derived({
   type: nativeType,
-  disabled: isNativeButton ? effectiveDisabled : undefined,
-  "aria-disabled": !isNativeButton && effectiveDisabled ? true : undefined,
+  disabled: isNativeElement ? effectiveDisabled : undefined,
+  "aria-disabled": !isNativeElement && effectiveDisabled ? true : undefined,
   "aria-busy": loading ? true : undefined,
 });
 

@@ -68,6 +68,73 @@ export async function readRegistryFile(registryUrl, registryPath) {
   }
 }
 
+const SHA256_RE = /^[a-f0-9]{64}$/;
+
+/**
+ * Minimal runtime validation of a parsed registry manifest.
+ * Hash fields are format-checked when present but not required, to preserve
+ * compatibility with external registries that may omit them. The production
+ * bambiui registry always includes all hash fields.
+ * @param {unknown} manifest
+ */
+function validateManifest(manifest) {
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) {
+    throw new Error("Invalid registry manifest: expected a JSON object.");
+  }
+
+  const m = /** @type {Record<string, unknown>} */ (manifest);
+
+  if (!m.styles || typeof m.styles !== "object" || Array.isArray(m.styles)) {
+    throw new Error("Invalid registry manifest: missing or invalid 'styles' object.");
+  }
+  const styles = /** @type {Record<string, unknown>} */ (m.styles);
+  if (typeof styles.global !== "string" || styles.global.length === 0) {
+    throw new Error("Invalid registry manifest: 'styles.global' must be a non-empty string.");
+  }
+  if (styles.globalHash !== undefined && !SHA256_RE.test(String(styles.globalHash))) {
+    throw new Error("Invalid registry manifest: 'styles.globalHash' must be a 64-character lowercase hex string.");
+  }
+
+  if (m.sharedHash !== undefined && !SHA256_RE.test(String(m.sharedHash))) {
+    throw new Error("Invalid registry manifest: 'sharedHash' must be a 64-character lowercase hex string.");
+  }
+
+  if (!m.components || typeof m.components !== "object" || Array.isArray(m.components)) {
+    throw new Error("Invalid registry manifest: missing or invalid 'components' object.");
+  }
+
+  for (const [name, component] of Object.entries(/** @type {Record<string, unknown>} */ (m.components))) {
+    if (!component || typeof component !== "object" || Array.isArray(component)) {
+      throw new Error(`Invalid registry manifest: component "${name}" must be an object.`);
+    }
+    const c = /** @type {Record<string, unknown>} */ (component);
+
+    if (!c.files || typeof c.files !== "object" || Array.isArray(c.files)) {
+      throw new Error(`Invalid registry manifest: component "${name}" missing or invalid 'files' object.`);
+    }
+
+    if (c.cssHash !== undefined && !SHA256_RE.test(String(c.cssHash))) {
+      throw new Error(`Invalid registry manifest: component "${name}.cssHash" must be a 64-character lowercase hex string.`);
+    }
+
+    if (c.hashes !== undefined) {
+      if (typeof c.hashes !== "object" || Array.isArray(c.hashes)) {
+        throw new Error(`Invalid registry manifest: component "${name}.hashes" must be an object.`);
+      }
+      for (const [framework, frameworkHashes] of Object.entries(/** @type {Record<string, unknown>} */ (c.hashes))) {
+        if (!frameworkHashes || typeof frameworkHashes !== "object" || Array.isArray(frameworkHashes)) {
+          throw new Error(`Invalid registry manifest: component "${name}.hashes.${framework}" must be an object.`);
+        }
+        for (const [filePath, hash] of Object.entries(/** @type {Record<string, unknown>} */ (frameworkHashes))) {
+          if (!SHA256_RE.test(String(hash))) {
+            throw new Error(`Invalid registry manifest: hash for "${name}/${framework}/${filePath}" must be a 64-character lowercase hex string.`);
+          }
+        }
+      }
+    }
+  }
+}
+
 /**
  * @param {string} registryUrl
  */
@@ -88,6 +155,8 @@ export async function readRegistryManifest(registryUrl) {
       `Unsupported registry version ${manifest.version}. Expected version 2.`,
     );
   }
+
+  validateManifest(manifest);
 
   return manifest;
 }

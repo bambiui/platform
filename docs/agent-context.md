@@ -50,26 +50,30 @@ Active data flow: `core → generator → registry → cli → user project`
     "global": "packages/registry/src/styles/bambi.css",
     "globalHash": "<sha256>"
   },
-  "shared": {
-    "react": "packages/registry/generated/shared/react/bambi-helpers.ts",
-    "solid": "packages/registry/generated/shared/solid/bambi-helpers.ts",
-    "svelte": "packages/registry/generated/shared/svelte/bambi-helpers.ts",
-    "vue": "packages/registry/generated/shared/vue/bambi-helpers.ts"
-  },
-  "sharedHashes": {
-    "react": "<sha256>",
-    "solid": "<sha256>",
-    "svelte": "<sha256>",
-    "vue": "<sha256>"
-  },
+  "shared": "packages/registry/generated/shared/bambi-helpers.ts",
+  "sharedHash": "<sha256>",
   "components": {
     "tabs": {
       "name": "tabs",
+      "css": "packages/registry/generated/tabs/tabs.css",
+      "cssHash": "<sha256>",
       "files": {
-        "react": ["packages/registry/generated/tabs/react/index.tsx", "packages/registry/generated/tabs/react/tabs.css"],
-        "solid": ["packages/registry/generated/tabs/solid/index.tsx", "packages/registry/generated/tabs/solid/tabs.css"],
-        "svelte": ["packages/registry/generated/tabs/svelte/Tabs.svelte", "...TabsList.svelte", "...index.ts", "...tabs.css"],
-        "vue": ["packages/registry/generated/tabs/vue/Tabs.vue", "...TabsList.vue", "...index.ts", "...tabs.css"]
+        "react": ["packages/registry/generated/tabs/react/index.tsx"],
+        "solid": ["packages/registry/generated/tabs/solid/index.tsx"],
+        "svelte": [
+          "packages/registry/generated/tabs/svelte/Tabs.svelte",
+          "packages/registry/generated/tabs/svelte/TabsList.svelte",
+          "packages/registry/generated/tabs/svelte/TabsTrigger.svelte",
+          "packages/registry/generated/tabs/svelte/TabsContent.svelte",
+          "packages/registry/generated/tabs/svelte/index.ts"
+        ],
+        "vue": [
+          "packages/registry/generated/tabs/vue/Tabs.vue",
+          "packages/registry/generated/tabs/vue/TabsList.vue",
+          "packages/registry/generated/tabs/vue/TabsTrigger.vue",
+          "packages/registry/generated/tabs/vue/TabsContent.vue",
+          "packages/registry/generated/tabs/vue/index.ts"
+        ]
       },
       "helpers": {
         "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
@@ -82,6 +86,14 @@ Active data flow: `core → generator → registry → cli → user project`
         "solid": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
         "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
         "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
+      },
+      "hashes": {
+        "react": {
+          "packages/registry/generated/tabs/react/index.tsx": "<sha256>"
+        },
+        "solid": { "...": "..." },
+        "svelte": { "...": "..." },
+        "vue": { "...": "..." }
       }
     }
   }
@@ -92,13 +104,41 @@ Active data flow: `core → generator → registry → cli → user project`
 
 Schema is validated by `registry.schema.json`. Run `node scripts/check-registry.mjs` or `pnpm check-registry`.
 
-`registry.json` carries three integrity hash fields, all verified at install time by the CLI and at check time by `check-registry.mjs`:
+`registry.json` carries four integrity hash fields, all verified at install time by the CLI and at check time by `check-registry.mjs`:
 
 - `styles.globalHash` — SHA-256 of the global `bambi.css` file. Required; `check-registry` fails if absent.
-- `sharedHashes[framework]` — SHA-256 of each framework's `bambi-helpers.ts` shared artifact. Required for every `shared[framework]` entry.
+- `sharedHash` — SHA-256 of `bambi-helpers.ts`. Required when `shared` is declared.
+- `components[name].cssHash` — SHA-256 of the component's shared CSS file. Required when `components[name].css` is declared.
 - `components[name].hashes[framework][filePath]` — per-file SHA-256 for every generated component artifact. Required for every file in `components[name].files[framework]`.
 
-`pnpm registry:refresh` computes all three and writes them into `registry.json` before running `check-registry`.
+`pnpm registry:refresh` computes all four and writes them into `registry.json` before running `check-registry`.
+
+## CustomEvent Convention
+
+All components follow this naming pattern. Tabs is the reference:
+
+| Concept | Tabs example |
+|---------|-------------|
+| Contract event key | `valueChange` |
+| CustomEvent const (in controller) | `TABS_EVENT_VALUE_CHANGE` |
+| CustomEvent name (DOM) | `bambi:value-change` |
+| Callback prop (framework wrappers) | `onValueChange` |
+| Event detail type | `TabsValueChangeDetail` |
+
+**Rules (must not be violated):**
+
+- Controllers dispatch `bambi:<event-name>` via `CustomEvent`. They must NOT call callbacks directly or accept `onValueChange` (or any callback) as a constructor/update option.
+- Framework wrappers listen to the `bambi:<event-name>` event on the root element and forward the detail to the framework callback prop (`onValueChange`, `on:valueChange`, `@value-change`, etc.).
+- New components follow the same pattern: contract event key in camelCase → DOM event name in kebab-case with `bambi:` prefix → callback prop in `on<PascalCase>`.
+
+Example detail type for `bambi:value-change`:
+```ts
+export interface TabsValueChangeDetail {
+  value: string;
+  previousValue: string;
+  source: "click" | "keyboard";
+}
+```
 
 ## Canonical Component — Tabs
 
@@ -112,7 +152,8 @@ Tabs is the reference implementation for all DOM Protocol patterns:
 ## CSS Delivery
 
 - Global style file: `packages/registry/src/styles/bambi.css`. CLI writes this to `src/styles/bambi.css` on `init`.
-- Component CSS source: `packages/registry/src/styles/<name>.css`. Generated public CSS is copied beside the public framework artifact.
+- Component CSS source: `packages/registry/src/styles/<name>.css`.
+- Generated component CSS is a **framework-agnostic shared artifact** at `packages/registry/generated/<name>/<name>.css`. It is referenced in `registry.json` via `components[name].css` (not inside `files.<framework>`), verified via `components[name].cssHash`, and copied to `outputDir/<name>.css` by the CLI alongside the framework files.
 - CSS is driven by `data-*` attribute state written by the controller.
 
 ## CLI Output Layout

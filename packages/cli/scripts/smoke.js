@@ -1,4 +1,5 @@
 import { mkdtemp, rm, readdir, readFile, writeFile, mkdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -240,6 +241,100 @@ try {
 } finally {
   await rm(mockRegistryDir, { force: true, recursive: true });
   await rm(mockProjectDir, { force: true, recursive: true });
+}
+
+// Test: mock registry with correct SHA-256 hashes passes integrity check
+const hashCheckRegistryDir = await mkdtemp(path.join(tmpdir(), "bambiui-hash-ok-registry-"));
+const hashCheckProjectDir = await mkdtemp(path.join(tmpdir(), "bambiui-hash-ok-project-"));
+try {
+  await mkdir(path.join(hashCheckRegistryDir, "generated", "demo", "react"), { recursive: true });
+  await mkdir(path.join(hashCheckRegistryDir, "styles"), { recursive: true });
+
+  const globalCssContent = "/* hash-ok global */\n";
+  const componentContent = `import "./demo.css";\nexport function Demo() { return <div data-demo="" />; }\n`;
+  const componentCssContent = "[data-demo-hash-ok] {}\n";
+
+  await writeFile(path.join(hashCheckRegistryDir, "styles", "bambi.css"), globalCssContent);
+  await writeFile(path.join(hashCheckRegistryDir, "generated", "demo", "react", "index.tsx"), componentContent);
+  await writeFile(path.join(hashCheckRegistryDir, "generated", "demo", "react", "demo.css"), componentCssContent);
+
+  const globalHash = createHash("sha256").update(globalCssContent).digest("hex");
+  const componentHash = createHash("sha256").update(componentContent).digest("hex");
+  const componentCssHash = createHash("sha256").update(componentCssContent).digest("hex");
+
+  await writeFile(
+    path.join(hashCheckRegistryDir, "registry.json"),
+    JSON.stringify({
+      version: 2,
+      styles: { global: "styles/bambi.css", globalHash },
+      components: {
+        demo: {
+          name: "demo",
+          css: "generated/demo/react/demo.css",
+          cssHash: componentCssHash,
+          files: { react: ["generated/demo/react/index.tsx"] },
+          exports: { react: ["Demo"] },
+          hashes: { react: { "generated/demo/react/index.tsx": componentHash } },
+        },
+      },
+    }, null, 2),
+  );
+
+  await runCli(["add", "demo", "--framework", "react", "--cwd", hashCheckProjectDir, "--registry-url", hashCheckRegistryDir]);
+  process.stdout.write("  ✓ hash integrity check (correct hashes accepted)\n");
+} finally {
+  await rm(hashCheckRegistryDir, { force: true, recursive: true });
+  await rm(hashCheckProjectDir, { force: true, recursive: true });
+}
+
+// Test: mock registry with wrong globalHash is rejected
+const badHashRegistryDir = await mkdtemp(path.join(tmpdir(), "bambiui-bad-hash-registry-"));
+const badHashProjectDir = await mkdtemp(path.join(tmpdir(), "bambiui-bad-hash-project-"));
+try {
+  await mkdir(path.join(badHashRegistryDir, "generated", "demo", "react"), { recursive: true });
+  await mkdir(path.join(badHashRegistryDir, "styles"), { recursive: true });
+
+  const globalCssContent = "/* bad-hash global */\n";
+  const componentContent = `import "./demo.css";\nexport function Demo() { return <div data-demo="" />; }\n`;
+  const componentCssContent = "[data-demo-bad] {}\n";
+  const wrongHash = "a".repeat(64);
+
+  await writeFile(path.join(badHashRegistryDir, "styles", "bambi.css"), globalCssContent);
+  await writeFile(path.join(badHashRegistryDir, "generated", "demo", "react", "index.tsx"), componentContent);
+  await writeFile(path.join(badHashRegistryDir, "generated", "demo", "react", "demo.css"), componentCssContent);
+
+  const componentHash = createHash("sha256").update(componentContent).digest("hex");
+  const componentCssHash = createHash("sha256").update(componentCssContent).digest("hex");
+
+  await writeFile(
+    path.join(badHashRegistryDir, "registry.json"),
+    JSON.stringify({
+      version: 2,
+      styles: { global: "styles/bambi.css", globalHash: wrongHash },
+      components: {
+        demo: {
+          name: "demo",
+          css: "generated/demo/react/demo.css",
+          cssHash: componentCssHash,
+          files: { react: ["generated/demo/react/index.tsx"] },
+          exports: { react: ["Demo"] },
+          hashes: { react: { "generated/demo/react/index.tsx": componentHash } },
+        },
+      },
+    }, null, 2),
+  );
+
+  const result = await runCli(
+    ["add", "demo", "--framework", "react", "--cwd", badHashProjectDir, "--registry-url", badHashRegistryDir],
+    { expectFailure: true },
+  );
+  if (!result.stderr.includes("Integrity check failed")) {
+    throw new Error(`Expected integrity failure for wrong globalHash, got: ${result.stderr}`);
+  }
+  process.stdout.write("  ✓ hash integrity check (wrong hash rejected)\n");
+} finally {
+  await rm(badHashRegistryDir, { force: true, recursive: true });
+  await rm(badHashProjectDir, { force: true, recursive: true });
 }
 
 // Test: config file custom paths are respected (no CLI path flags)

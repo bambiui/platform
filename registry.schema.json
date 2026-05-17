@@ -5,6 +5,9 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "styles", "components"],
+  "dependentRequired": {
+    "shared": ["sharedHash"]
+  },
   "properties": {
     "$schema": {
       "type": "string"
@@ -16,7 +19,7 @@
     "styles": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["global"],
+      "required": ["global", "globalHash"],
       "properties": {
         "global": {
           "$ref": "#/$defs/registryPath"
@@ -43,11 +46,20 @@
     "component": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "files", "exports"],
+      "required": ["name", "files", "exports", "hashes"],
+      "dependentRequired": {
+        "css": ["cssHash"]
+      },
       "properties": {
         "name": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "css": {
+          "$ref": "#/$defs/registryPath"
+        },
+        "cssHash": {
+          "$ref": "#/$defs/sha256Hex"
         },
         "files": {
           "type": "object",
@@ -68,12 +80,6 @@
             "svelte": { "$ref": "#/$defs/exportNames" },
             "vue": { "$ref": "#/$defs/exportNames" }
           }
-        },
-        "css": {
-          "$ref": "#/$defs/registryPath"
-        },
-        "cssHash": {
-          "$ref": "#/$defs/sha256Hex"
         },
         "hashes": {
           "type": "object",

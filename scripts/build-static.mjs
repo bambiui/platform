@@ -32,9 +32,10 @@ for (const component of Object.values(manifest.components ?? {})) {
   for (const files of Object.values(component.files ?? {})) {
     for (const file of files) filePaths.add(file);
   }
+  if (typeof component.css === "string") filePaths.add(component.css);
 }
-for (const filePath of Object.values(manifest.shared ?? {})) {
-  filePaths.add(filePath);
+if (typeof manifest.shared === "string") {
+  filePaths.add(manifest.shared);
 }
 
 for (const filePath of filePaths) {

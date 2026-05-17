@@ -93,6 +93,7 @@ export function Button(props: ButtonProps) {
   const controlled = () => false;
   const Component = () => local.as ?? "button";
   const isNativeElement = () => Component() === "button";
+  const shouldRenderPolymorphic = () => Boolean(local.as && !isNativeElement());
   const effectiveDisabled = () => Boolean(local.disabled || local.loading);
 
   onMount(() => {
@@ -123,21 +124,40 @@ export function Button(props: ButtonProps) {
   });
 
   return (
-    <Dynamic
-      component={Component()}
-      ref={rootRef}
-      {...rest}
-      data-bambi-button=""
-      type={isNativeElement() ? (rest as { type?: string }).type ?? "button" : undefined}
-      disabled={isNativeElement() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
-      aria-busy={local.loading ? "true" : undefined}
+    shouldRenderPolymorphic() ? (
+      <Dynamic
+        component={Component()}
+        {...rest}
+        ref={(el: HTMLElement) => {
+          rootRef = el;
+        }}
+        data-bambi-button=""
+        aria-disabled={effectiveDisabled() ? "true" : undefined}
+        aria-busy={local.loading ? "true" : undefined}
       data-variant={local.variant}
       data-size={local.size}
       data-disabled={effectiveDisabled() ? "true" : undefined}
       data-loading={local.loading ? "true" : undefined}
-    >
-      {resolvedChildren()}
-    </Dynamic>
+      >
+        {resolvedChildren()}
+      </Dynamic>
+    ) : (
+      <button
+        {...rest}
+        ref={(el: HTMLButtonElement) => {
+          rootRef = el;
+        }}
+        data-bambi-button=""
+        type={(rest as { type?: JSX.IntrinsicElements["button"]["type"] }).type ?? "button"}
+        disabled={effectiveDisabled()}
+        aria-busy={local.loading ? "true" : undefined}
+      data-variant={local.variant}
+      data-size={local.size}
+      data-disabled={effectiveDisabled() ? "true" : undefined}
+      data-loading={local.loading ? "true" : undefined}
+      >
+        {resolvedChildren()}
+      </button>
+    )
   );
 }

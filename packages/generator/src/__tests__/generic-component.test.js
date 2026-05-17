@@ -234,7 +234,8 @@ describe("createArtifact — polymorphic single-root button", () => {
 
   it("applies type=button only through the native button branch", () => {
     expect(outputs.react.files["index.tsx"]).toContain('type: isNativeElement ? ((props as { type?: string }).type ?? "button") : undefined');
-    expect(outputs.solid.files["index.tsx"]).toContain('type={isNativeElement() ? (rest as { type?: string }).type ?? "button" : undefined}');
+    expect(outputs.solid.files["index.tsx"]).toContain('type={(rest as { type?: JSX.IntrinsicElements["button"]["type"] }).type ?? "button"}');
+    expect(outputs.solid.files["index.tsx"]).not.toContain('type={isNativeElement() ?');
     expect(outputs.svelte.files["Button.svelte"]).toContain('const nativeType = $derived(isNativeElement ? (typeof props.type === "string" ? props.type : "button") : undefined)');
     expect(outputs.vue.files["Button.vue"]).toContain(':type="isNativeElement ? ($attrs.type || \'button\') : undefined"');
   });
@@ -244,8 +245,8 @@ describe("createArtifact — polymorphic single-root button", () => {
     expect(outputs.react.files["index.tsx"]).toContain("disabled: isNativeElement ? effectiveDisabled : undefined");
     expect(outputs.react.files["index.tsx"]).toContain('"aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined');
     expect(outputs.solid.files["index.tsx"]).toContain("const effectiveDisabled = () => Boolean(local.disabled || local.loading)");
-    expect(outputs.solid.files["index.tsx"]).toContain("disabled={isNativeElement() ? effectiveDisabled() : undefined}");
-    expect(outputs.solid.files["index.tsx"]).toContain('aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}');
+    expect(outputs.solid.files["index.tsx"]).toContain("disabled={effectiveDisabled()}");
+    expect(outputs.solid.files["index.tsx"]).toContain('aria-disabled={effectiveDisabled() ? "true" : undefined}');
     expect(outputs.svelte.files["Button.svelte"]).toContain("const effectiveDisabled = $derived(Boolean(disabled || loading))");
     expect(outputs.svelte.files["Button.svelte"]).toContain('"aria-disabled": !isNativeElement && effectiveDisabled ? true : undefined');
     expect(outputs.vue.files["Button.vue"]).toContain("const effectiveDisabled = computed(() => Boolean(props.disabled || props.loading))");

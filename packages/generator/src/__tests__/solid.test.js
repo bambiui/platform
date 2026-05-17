@@ -6,12 +6,14 @@ import { createArtifact } from "../index.js";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../../..");
 const tabsDir = `${root}/packages/core/src/components/tabs`;
+const buttonDir = `${root}/packages/core/src/components/button`;
 const primitivesDir = `${root}/packages/core/src/primitives`;
 
 let contractSource;
 let controllerSource;
 let rovingFocusSource;
 let result;
+let buttonResult;
 
 beforeAll(async () => {
   contractSource = await readFile(`${tabsDir}/tabs.contract.ts`, "utf8");
@@ -53,6 +55,17 @@ beforeAll(async () => {
           },
         },
       },
+    },
+  });
+  buttonResult = createArtifact({
+    framework: "solid",
+    contractSource: await readFile(`${buttonDir}/button.contract.ts`, "utf8"),
+    controllerSource: await readFile(`${buttonDir}/button.controller.ts`, "utf8"),
+    contractExportName: "buttonContract",
+    generatorOptions: {
+      polymorphicRootPropName: "as",
+      polymorphicNativeElement: "button",
+      polymorphicTypeDefault: "button",
     },
   });
 });
@@ -223,5 +236,23 @@ describe("createArtifact — tabs/solid fixture match", () => {
 
   it("index.tsx matches committed registry fixture", () => {
     expect(result.files["index.tsx"]).toBe(committed);
+  });
+});
+
+describe("createArtifact — button/solid polymorphic root", () => {
+  const registryDir = `${root}/packages/registry/generated/button/solid`;
+  let committed;
+
+  beforeAll(async () => {
+    committed = await readFile(`${registryDir}/index.tsx`, "utf8");
+  });
+
+  it("uses a callback ref for Dynamic roots", () => {
+    expect(buttonResult.files["index.tsx"]).toContain("ref={(el: HTMLElement) => {");
+    expect(buttonResult.files["index.tsx"]).toContain("rootRef = el;");
+  });
+
+  it("index.tsx matches committed registry fixture", () => {
+    expect(buttonResult.files["index.tsx"]).toBe(committed);
   });
 });

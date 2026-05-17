@@ -428,8 +428,10 @@ export function Tabs(props: TabsProps) {
 
   const rootElement = (
     <div
-      ref={rootRef}
       {...rest}
+      ref={(el: HTMLDivElement) => {
+        rootRef = el;
+      }}
       data-bambi-tabs=""
       data-value={local.value}
       data-default-value={local.defaultValue}

@@ -237,26 +237,45 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootTag}";
   const isNativeElement = () => Component() === "${polymorphicNativeElement}";
+  const shouldRenderPolymorphic = () => Boolean(local.${polymorphicRootPropName} && !isNativeElement());
   const effectiveDisabled = () => Boolean(${effectiveDisabledExpression});
 ` : "";
   const rootElementSource = polymorphicRootPropName ? `  const rootElement = (
-    <Dynamic
-      component={Component()}
-      ref={rootRef}
-      {...rest}
-      ${root.attribute}=""
-      type={isNativeElement() ? (rest as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"} : undefined}
-      disabled={isNativeElement() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
-      aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+    shouldRenderPolymorphic() ? (
+      <Dynamic
+        component={Component()}
+        {...rest}
+        ref={(el: HTMLElement) => {
+          rootRef = el;
+        }}
+        ${root.attribute}=""
+        aria-disabled={effectiveDisabled() ? "true" : undefined}
+        aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
 ${rootAttrs}${controlledLine}
-    >
-      {resolvedChildren()}
-    </Dynamic>
+      >
+        {resolvedChildren()}
+      </Dynamic>
+    ) : (
+      <${rootTag}
+        {...rest}
+        ref={(el: ${htmlElementType(rootTag)}) => {
+          rootRef = el;
+        }}
+        ${root.attribute}=""
+        type={(rest as { type?: JSX.IntrinsicElements["${rootTag}"]["type"] }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}}
+        disabled={effectiveDisabled()}
+        aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+${rootAttrs}${controlledLine}
+      >
+        {resolvedChildren()}
+      </${rootTag}>
+    )
   );` : `  const rootElement = (
     <${rootTag}
-      ref={rootRef}
       {...rest}
+      ref={(el: ${htmlElementType(rootTag)}) => {
+        rootRef = el;
+      }}
       ${root.attribute}=""
 ${rootAttrs}${controlledLine}
     >
@@ -264,23 +283,41 @@ ${rootAttrs}${controlledLine}
     </${rootTag}>
   );`;
   const originalRootReturn = polymorphicRootPropName ? `  return (
-    <Dynamic
-      component={Component()}
-      ref={rootRef}
-      {...rest}
-      ${root.attribute}=""
-      type={isNativeElement() ? (rest as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"} : undefined}
-      disabled={isNativeElement() ? effectiveDisabled() : undefined}
-      aria-disabled={!isNativeElement() && effectiveDisabled() ? "true" : undefined}
-      aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+    shouldRenderPolymorphic() ? (
+      <Dynamic
+        component={Component()}
+        {...rest}
+        ref={(el: HTMLElement) => {
+          rootRef = el;
+        }}
+        ${root.attribute}=""
+        aria-disabled={effectiveDisabled() ? "true" : undefined}
+        aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
 ${rootAttrs}${controlledLine}
-    >
-      {resolvedChildren()}
-    </Dynamic>
+      >
+        {resolvedChildren()}
+      </Dynamic>
+    ) : (
+      <${rootTag}
+        {...rest}
+        ref={(el: ${htmlElementType(rootTag)}) => {
+          rootRef = el;
+        }}
+        ${root.attribute}=""
+        type={(rest as { type?: JSX.IntrinsicElements["${rootTag}"]["type"] }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}}
+        disabled={effectiveDisabled()}
+        aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+${rootAttrs}${controlledLine}
+      >
+        {resolvedChildren()}
+      </${rootTag}>
+    )
   );` : `  return (
     <${rootTag}
-      ref={rootRef}
       {...rest}
+      ref={(el: ${htmlElementType(rootTag)}) => {
+        rootRef = el;
+      }}
       ${root.attribute}=""
 ${rootAttrs}${controlledLine}
     >

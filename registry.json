@@ -7,6 +7,83 @@
   },
   "shared": "packages/registry/generated/shared/bambi-helpers.ts",
   "components": {
+    "button": {
+      "name": "button",
+      "files": {
+        "react": [
+          "packages/registry/generated/button/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/button/solid/index.tsx"
+        ],
+        "svelte": [
+          "packages/registry/generated/button/svelte/Button.svelte",
+          "packages/registry/generated/button/svelte/index.ts"
+        ],
+        "vue": [
+          "packages/registry/generated/button/vue/Button.vue",
+          "packages/registry/generated/button/vue/index.ts"
+        ]
+      },
+      "exports": {
+        "react": [
+          "Button"
+        ],
+        "solid": [
+          "Button"
+        ],
+        "svelte": [
+          "Button"
+        ],
+        "vue": [
+          "Button"
+        ]
+      },
+      "helpers": {
+        "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "solid": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "svelte": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "vue": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ]
+      },
+      "hashes": {
+        "react": {
+          "packages/registry/generated/button/react/index.tsx": "406de32ba19bbeea1d4a86f0c28a75db129aa531aef3f56b3f032136c4a094cd"
+        },
+        "solid": {
+          "packages/registry/generated/button/solid/index.tsx": "4fc009c48060ac387f6775bc93824bbf1bb6d3cb2691173c3f2d3a91dd53ab75"
+        },
+        "svelte": {
+          "packages/registry/generated/button/svelte/Button.svelte": "cfd7445e5de340c32a92b9fda943fa3ddee661e82ef719755cf2d5e31894926f",
+          "packages/registry/generated/button/svelte/index.ts": "2e8425a79679aecfbf60510f9633eaeea3806fabbc68025059025e174ec44330"
+        },
+        "vue": {
+          "packages/registry/generated/button/vue/Button.vue": "e9b934ef9cdb7d6d69bc5cd1d3a2b6023f89d4826f82cbb3c00c9092ad7b0d85",
+          "packages/registry/generated/button/vue/index.ts": "86da55d26a89154dea3c0407efb395970055394d36bcf0e48a1ed606b2318c80"
+        }
+      },
+      "css": "packages/registry/generated/button/button.css",
+      "cssHash": "de9af05397d7a4baeccbd2a3100c3c30c3da6629039ec56bcdba32c096ad0234"
+    },
     "tabs": {
       "name": "tabs",
       "css": "packages/registry/generated/tabs/tabs.css",

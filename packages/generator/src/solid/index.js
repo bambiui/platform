@@ -99,6 +99,7 @@ function solidPartComponentSource(contract, options) {
 function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
   const root = contract.parts.find((part) => part.name === "root");
   if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
+  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
 
   const controlledProp = contract.props.find((prop) => prop.controlled);
   const defaultProp = controlledProp
@@ -126,11 +127,22 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
       return `      ${name}: local.${name},`;
     })
     .join("\n");
+  const hasDisabledOption = optionNames.includes("disabled");
+  const hasLoadingOption = optionNames.includes("loading");
+  const effectiveDisabledExpression = [
+    hasDisabledOption ? "local.disabled" : null,
+    hasLoadingOption ? "local.loading" : null,
+  ].filter(Boolean).join(" || ") || "false";
 
   // Root element data attributes use local.X
   const rootAttrs = contract.props
     .filter((prop) => prop.name !== "controlled")
-    .map((prop) => solidAttributeLine(prop, "local."))
+    .map((prop) => {
+      if (polymorphicRootPropName && prop.name === "disabled") {
+        return `      ${prop.attribute}={effectiveDisabled() ? "true" : undefined}`;
+      }
+      return solidAttributeLine(prop, "local.");
+    })
     .join("\n");
 
   const controlledAttr = contract.props.find((prop) => prop.name === "controlled");
@@ -145,6 +157,12 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const nativeAttrType = rootElement === "button"
     ? "JSX.ButtonHTMLAttributes<HTMLButtonElement>"
     : "JSX.HTMLAttributes<HTMLDivElement>";
+  const rootRefType = polymorphicRootPropName
+    ? "HTMLElement"
+    : rootElement === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+  const rootPropsType = polymorphicRootPropName
+    ? "JSX.HTMLAttributes<HTMLElement>"
+    : nativeAttrType;
 
   const controlledWarning = controlledProp && defaultProp ? `
   createEffect(() => {
@@ -179,23 +197,52 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   ).join("\n");
 
   const eventInterfaceExtra = eventCallbackPropLines ? `\n${eventCallbackPropLines}` : "";
+  const polymorphicInterfaceExtra = polymorphicRootPropName ? "\n  [key: string]: unknown;" : "";
   const listenerSetupBlock = listenerSetupLines ? `${listenerSetupLines}\n` : "";
   const cleanupBlock = listenerTeardownLines
     ? `    onCleanup(() => {\n${listenerTeardownLines}\n      behavior?.destroy();\n    });`
     : `    onCleanup(() => behavior?.destroy());`;
+  const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootElement}";
+  const isNativeButton = () => Component() === "button";
+  const effectiveDisabled = () => Boolean(${effectiveDisabledExpression});
+` : "";
+  const rootReturn = polymorphicRootPropName ? `  return (
+    <Dynamic
+      component={Component()}
+      ref={rootRef}
+      {...rest}
+      ${root.attribute}=""
+      type={isNativeButton() ? (rest as JSX.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button" : undefined}
+      disabled={isNativeButton() ? effectiveDisabled() : undefined}
+      aria-disabled={!isNativeButton() && effectiveDisabled() ? "true" : undefined}
+      aria-busy={${hasLoadingOption ? "local.loading ? \"true\" : undefined" : "undefined"}}
+${rootAttrs}${controlledLine}
+    >
+      {local.children}
+    </Dynamic>
+  );` : `  return (
+    <${rootElement}
+      ref={rootRef}
+      {...rest}
+      ${root.attribute}=""
+${rootAttrs}${controlledLine}
+    >
+      {local.children}
+    </${rootElement}>
+  );`;
 
-  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${nativeAttrType}, keyof ${publicOptionsType}> {
-  children?: JSX.Element;${eventInterfaceExtra}
+  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<${rootPropsType}, keyof ${publicOptionsType}> {
+  children?: JSX.Element;${eventInterfaceExtra}${polymorphicInterfaceExtra}
 }
 
 ${solidPartPropsSource(contract, generatorOptions)}
 
 export function ${contract.componentName}(props: ${contract.componentName}Props) {
   const [local, rest] = splitProps(props, [${splitLocalKeys}]);
-  let rootRef: ${rootElement === "button" ? "HTMLButtonElement" : "HTMLDivElement"} | undefined;
+  let rootRef: ${rootRefType} | undefined;
   let behavior: ${behaviorClassName} | undefined;
   const controlled = () => ${controlledExpression};
-${controlledWarning}
+${polymorphicSetup}${controlledWarning}
   onMount(() => {
 ${listenerSetupBlock}    behavior = new ${behaviorClassName}(rootRef!, {
 ${behaviorOptions}
@@ -215,16 +262,7 @@ ${behaviorOptions}
     }
   });
 
-  return (
-    <${rootElement}
-      ref={rootRef}
-      {...rest}
-      ${root.attribute}=""
-${rootAttrs}${controlledLine}
-    >
-      {local.children}
-    </${rootElement}>
-  );
+${rootReturn}
 }
 
 ${solidPartComponentSource(contract, generatorOptions)}`;
@@ -250,9 +288,11 @@ export function createSolidArtifact({ contractSource, controllerSource, primitiv
     .filter(Boolean)
     .join("\n\n");
 
+  const dynamicImportLine = generatorOptions.polymorphicRootPropName ? 'import { Dynamic } from "solid-js/web";\n' : "";
+
   const content = `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
 import { createEffect, onMount, onCleanup, splitProps, children, type JSX } from "solid-js";
-import "./${contract.name}.css";
+${dynamicImportLine}import "./${contract.name}.css";
 ${helperImportLine}
 ${publicContractSource}
 ${primitivesBlock ? `\n${primitivesBlock}\n` : ""}

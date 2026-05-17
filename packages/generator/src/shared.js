@@ -229,6 +229,10 @@ export function validateGeneratorOptions(contract, options = {}) {
       }
     }
   }
+
+  if (options.polymorphicRootPropName !== undefined && typeof options.polymorphicRootPropName !== "string") {
+    throw new Error(`${contract.name}: generator option polymorphicRootPropName must be a string.`);
+  }
 }
 
 // ── Primitive inlining ────────────────────────────────────────────────────

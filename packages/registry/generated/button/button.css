@@ -1,0 +1,131 @@
+[data-bambi-button] {
+  --bambi-button-height-sm: 2rem;
+  --bambi-button-height-md: 2.5rem;
+  --bambi-button-height-lg: 3rem;
+  --bambi-button-padding-x-sm: var(--bambi-space-3, 0.75rem);
+  --bambi-button-padding-x-md: var(--bambi-space-4, 1rem);
+  --bambi-button-padding-x-lg: var(--bambi-space-5, 1.25rem);
+  --bambi-button-gap: var(--bambi-space-2, 0.5rem);
+  --bambi-button-radius: var(--bambi-radius-md, 0.5rem);
+  --bambi-button-font-size-sm: var(--bambi-text-sm, 0.875rem);
+  --bambi-button-font-size-md: var(--bambi-text-sm, 0.875rem);
+  --bambi-button-font-size-lg: var(--bambi-text-base, 1rem);
+  --bambi-button-font-weight: var(--bambi-font-weight-medium, 500);
+  --bambi-button-border-width: 1px;
+  --bambi-button-focus-ring: var(--bambi-state-focus-ring, var(--bambi-ring, oklch(49% 0.23 271)));
+  --bambi-button-focus-ring-width: var(--bambi-state-focus-ring-width, 2px);
+  --bambi-button-focus-ring-offset: var(--bambi-state-focus-ring-offset, 2px);
+  --bambi-button-disabled-opacity: var(--bambi-state-disabled-opacity, 0.5);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bambi-button-gap);
+  height: var(--bambi-button-height-md);
+  padding: 0 var(--bambi-button-padding-x-md);
+  border: var(--bambi-button-border-width) solid transparent;
+  border-radius: var(--bambi-button-radius);
+  font: inherit;
+  font-size: var(--bambi-button-font-size-md);
+  font-weight: var(--bambi-button-font-weight);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+[data-bambi-button]:focus-visible {
+  outline: var(--bambi-button-focus-ring-width) solid var(--bambi-button-focus-ring);
+  outline-offset: var(--bambi-button-focus-ring-offset);
+}
+
+[data-bambi-button][data-size="sm"] {
+  height: var(--bambi-button-height-sm);
+  padding-inline: var(--bambi-button-padding-x-sm);
+  font-size: var(--bambi-button-font-size-sm);
+}
+
+[data-bambi-button][data-size="lg"] {
+  height: var(--bambi-button-height-lg);
+  padding-inline: var(--bambi-button-padding-x-lg);
+  font-size: var(--bambi-button-font-size-lg);
+}
+
+[data-bambi-button][data-size="icon"] {
+  width: var(--bambi-button-height-md);
+  padding-inline: 0;
+}
+
+[data-bambi-button][data-variant="primary"] {
+  color: var(--bambi-intent-primary-fg, var(--bambi-primary-foreground, white));
+  background: var(--bambi-intent-primary-bg, var(--bambi-primary, oklch(55% 0.22 271)));
+}
+
+[data-bambi-button][data-variant="primary"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-intent-primary-hover-bg, var(--bambi-primary-600, oklch(49% 0.23 271)));
+}
+
+[data-bambi-button][data-variant="secondary"] {
+  color: var(--bambi-intent-secondary-fg, var(--bambi-secondary-foreground, oklch(9% 0 0)));
+  background: var(--bambi-intent-secondary-bg, var(--bambi-secondary, oklch(95% 0.008 271)));
+}
+
+[data-bambi-button][data-variant="secondary"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-intent-secondary-hover-bg, var(--bambi-accent, oklch(95% 0.008 271)));
+}
+
+[data-bambi-button][data-variant="outline"] {
+  color: var(--bambi-foreground, oklch(9% 0 0));
+  background: transparent;
+  border-color: var(--bambi-border, oklch(90% 0.01 271));
+}
+
+[data-bambi-button][data-variant="outline"]:hover:not([data-disabled="true"]),
+[data-bambi-button][data-variant="ghost"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-accent, oklch(95% 0.008 271));
+  color: var(--bambi-accent-foreground, oklch(9% 0 0));
+}
+
+[data-bambi-button][data-variant="ghost"] {
+  color: var(--bambi-foreground, oklch(9% 0 0));
+  background: transparent;
+}
+
+[data-bambi-button][data-variant="danger"] {
+  color: var(--bambi-intent-danger-fg, var(--bambi-danger-foreground, white));
+  background: var(--bambi-intent-danger-bg, var(--bambi-danger, oklch(65% 0.233 28)));
+}
+
+[data-bambi-button][data-variant="danger"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-intent-danger-hover-bg, var(--bambi-danger-600, oklch(58% 0.22 28)));
+}
+
+[data-bambi-button][data-variant="success"] {
+  color: var(--bambi-intent-success-fg, var(--bambi-success-foreground, oklch(9% 0 0)));
+  background: var(--bambi-intent-success-bg, var(--bambi-success, oklch(73% 0.194 153)));
+}
+
+[data-bambi-button][data-variant="success"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-intent-success-hover-bg, var(--bambi-success-600, oklch(64% 0.18 153)));
+}
+
+[data-bambi-button][data-variant="warning"] {
+  color: var(--bambi-intent-warning-fg, var(--bambi-warning-foreground, oklch(9% 0 0)));
+  background: var(--bambi-intent-warning-bg, var(--bambi-warning, oklch(78% 0.159 74)));
+}
+
+[data-bambi-button][data-variant="warning"]:hover:not([data-disabled="true"]) {
+  background: var(--bambi-intent-warning-hover-bg, var(--bambi-warning-600, oklch(69% 0.15 74)));
+}
+
+[data-bambi-button][data-disabled="true"],
+[data-bambi-button][data-loading="true"] {
+  opacity: var(--bambi-button-disabled-opacity);
+  cursor: not-allowed;
+  pointer-events: none;
+}

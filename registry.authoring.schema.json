@@ -91,6 +91,10 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
           "minItems": 1
+        },
+        "polymorphicRootPropName": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },

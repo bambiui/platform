@@ -2,6 +2,53 @@
   "$schema": "./registry.authoring.schema.json",
   "version": 1,
   "components": {
+    "button": {
+      "name": "button",
+      "contract": "packages/core/src/components/button/button.contract.ts",
+      "contractFiles": [
+        "packages/core/contract/types.ts",
+        "packages/core/contract/define-contract.ts"
+      ],
+      "controller": "packages/core/src/components/button/button.controller.ts",
+      "style": "packages/registry/src/styles/button.css",
+      "generatedCss": "packages/registry/generated/button/button.css",
+      "generatedFiles": {
+        "react": [
+          "packages/registry/generated/button/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/button/solid/index.tsx"
+        ],
+        "svelte": [
+          "packages/registry/generated/button/svelte/Button.svelte",
+          "packages/registry/generated/button/svelte/index.ts"
+        ],
+        "vue": [
+          "packages/registry/generated/button/vue/Button.vue",
+          "packages/registry/generated/button/vue/index.ts"
+        ]
+      },
+      "generator": {
+        "react": {
+          "polymorphicRootPropName": "as"
+        },
+        "solid": {
+          "polymorphicRootPropName": "as"
+        },
+        "svelte": {
+          "polymorphicRootPropName": "as"
+        },
+        "vue": {
+          "polymorphicRootPropName": "as"
+        }
+      },
+      "exports": {
+        "react": ["Button"],
+        "solid": ["Button"],
+        "svelte": ["Button"],
+        "vue": ["Button"]
+      }
+    },
     "tabs": {
       "name": "tabs",
       "contract": "packages/core/src/components/tabs/tabs.contract.ts",

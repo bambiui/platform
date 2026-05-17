@@ -86,6 +86,7 @@ function reactPartComponentSource(contract, options) {
 function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
   const root = contract.parts.find((part) => part.name === "root");
   if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
+  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
 
   const controlledProp = contract.props.find((prop) => prop.controlled);
   const defaultProp = controlledProp
@@ -111,13 +112,34 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     ? [...nonCallbackOptionNames, "controlled"]
     : nonCallbackOptionNames;
   const behaviorOptions = behaviorOptionNames.map((name) => `      ${name},`).join("\n");
+  const hasDisabledOption = optionNames.includes("disabled");
+  const hasLoadingOption = optionNames.includes("loading");
+  const effectiveDisabledExpression = [
+    hasDisabledOption ? "disabled" : null,
+    hasLoadingOption ? "loading" : null,
+  ].filter(Boolean).join(" || ") || "false";
 
   const rootAttrs = contract.props
     .filter((prop) => prop.name !== "controlled")
-    .map(reactAttributeLine)
+    .map((prop) => {
+      if (polymorphicRootPropName && prop.name === "disabled") {
+        return `      ${prop.attribute}={effectiveDisabled ? "true" : undefined}`;
+      }
+      return reactAttributeLine(prop);
+    })
+    .join("\n");
+  const rootObjectAttrs = contract.props
+    .filter((prop) => prop.name !== "controlled")
+    .map((prop) => {
+      if (polymorphicRootPropName && prop.name === "disabled") {
+        return `      "${prop.attribute}": effectiveDisabled ? "true" : undefined,`;
+      }
+      return `      "${prop.attribute}": ${reactAttributeValue(prop)},`;
+    })
     .join("\n");
   const controlledAttr = contract.props.find((prop) => prop.name === "controlled");
   const controlledLine = controlledAttr ? `\n      ${controlledAttr.attribute}={controlled ? "true" : undefined}` : "";
+  const controlledObjectLine = controlledAttr ? `\n      "${controlledAttr.attribute}": controlled ? "true" : undefined,` : "";
   const controlledExpression = controlledProp ? `${controlledProp.name} !== undefined` : "false";
   const controlledWarning = controlledProp && defaultProp ? `
   React.useEffect(() => {
@@ -132,6 +154,14 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   const publicOptionsType = controlledProp
     ? `Omit<${optionsTypeName}, "controlled">`
     : optionsTypeName;
+  const rootElementType = root.element === "button" ? "HTMLButtonElement" : "HTMLDivElement";
+  const rootRefType = polymorphicRootPropName ? "HTMLElement" : rootElementType;
+  const nativePropsType = root.element === "button"
+    ? "React.ButtonHTMLAttributes<HTMLButtonElement>"
+    : "React.HTMLAttributes<HTMLDivElement>";
+  const rootPropsType = polymorphicRootPropName
+    ? `Omit<React.HTMLAttributes<HTMLElement>, keyof ${publicOptionsType}>`
+    : `Omit<${nativePropsType}, keyof ${publicOptionsType}>`;
 
   const eventCallbackPropLines = eventCallbacks.map((ev) => {
     const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
@@ -158,13 +188,41 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
   ).join("\n");
 
   const eventInterfaceExtra = eventCallbackPropLines ? `\n${eventCallbackPropLines}` : "";
+  const polymorphicInterfaceExtra = polymorphicRootPropName ? "\n  [key: string]: unknown;" : "";
   const callbackRefsBlock = callbackRefLines ? `${callbackRefLines}\n` : "";
   const listenerSetupBlock = listenerSetupLines ? `\n${listenerSetupLines}\n` : "";
   const listenerTeardownBlock = listenerTeardownLines ? `${listenerTeardownLines}\n` : "";
+  const rootReturn = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
+  const isNativeButton = Component === "button";
+  const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
-  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, Omit<React.HTMLAttributes<HTMLDivElement>, keyof ${publicOptionsType}> {
+  return React.createElement(
+    Component,
+    {
+      ...props,
+      ref: rootRef,
+      "${root.attribute}": "",
+      type: isNativeButton ? ((props as React.ButtonHTMLAttributes<HTMLButtonElement>).type ?? "button") : undefined,
+      disabled: isNativeButton ? effectiveDisabled : undefined,
+      "aria-disabled": !isNativeButton && effectiveDisabled ? "true" : undefined,
+      "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
+${rootObjectAttrs}${controlledObjectLine}
+    },
+    children,
+  );` : `  return (
+    <${root.element}
+      {...props}
+      ref={rootRef}
+      ${root.attribute}=""
+${rootAttrs}${controlledLine}
+    >
+      {children}
+    </${root.element}>
+  );`;
+
+  return `export interface ${contract.componentName}Props extends ${publicOptionsType}, ${rootPropsType} {
   children?: React.ReactNode;
-  className?: string;${eventInterfaceExtra}
+  className?: string;${eventInterfaceExtra}${polymorphicInterfaceExtra}
 }
 
 ${reactPartPropsSource(contract, generatorOptions)}
@@ -172,7 +230,7 @@ ${reactPartPropsSource(contract, generatorOptions)}
 export function ${contract.componentName}({
   ${destructured}
 }: ${contract.componentName}Props) {
-  const rootRef = React.useRef<HTMLDivElement>(null);
+  const rootRef = React.useRef<${rootRefType}>(null);
   const behaviorRef = React.useRef<${behaviorClassName} | null>(null);
   const controlled = ${controlledExpression};
 ${callbackRefsBlock}${controlledWarning}
@@ -198,16 +256,7 @@ ${behaviorOptions}
     });
   }, [${effectDeps}]);
 
-  return (
-    <${root.element}
-      {...props}
-      ref={rootRef}
-      ${root.attribute}=""
-${rootAttrs}${controlledLine}
-    >
-      {children}
-    </${root.element}>
-  );
+${rootReturn}
 }
 
 ${reactPartComponentSource(contract, generatorOptions)}`;

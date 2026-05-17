@@ -46,6 +46,11 @@
       "import": "./src/components/tabs/index.ts",
       "default": "./src/components/tabs/index.ts"
     },
+    "./components/button": {
+      "types": "./src/components/button/index.ts",
+      "import": "./src/components/button/index.ts",
+      "default": "./src/components/button/index.ts"
+    },
     "./primitives": {
       "types": "./src/primitives/index.ts",
       "import": "./src/primitives/index.ts",

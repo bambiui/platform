@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Button } from "./components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { Button } from "./src/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./src/components/ui/tabs";
 </script>
 
 <template>

@@ -23,6 +23,10 @@ coverage
 
 # Build Outputs
 .next/
+.nuxt/
+.output/
+.svelte-kit/
+.vinxi/
 out/
 build
 dist

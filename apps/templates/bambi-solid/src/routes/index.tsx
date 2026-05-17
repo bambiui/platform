@@ -1,7 +1,7 @@
-import { Button } from "./components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { Button } from "../components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
-export default function App() {
+export default function Home() {
   return (
     <div>
       bambiui-solid

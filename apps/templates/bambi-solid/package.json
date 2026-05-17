@@ -2,17 +2,21 @@
   "name": "bambi-solid",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@solidjs/router": "^0.15.3",
+    "@solidjs/start": "^1.1.0",
     "solid-js": "^1.9.7"
   },
   "devDependencies": {
     "typescript": "^5",
-    "vite": "^6",
-    "vite-plugin-solid": "^2.11.6"
+    "vinxi": "^0.5.8",
+    "vite": "^7.2.7"
   }
 }

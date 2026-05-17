@@ -7,9 +7,9 @@ They are not part of the public product surface. Keep them small, framework-spec
 ## Templates
 
 - `bambi-react`: React/Next.js fixture.
-- `bambi-solid`: Solid + Vite fixture.
-- `bambi-svelte`: Svelte 5 + Vite fixture.
-- `bambi-vue`: Vue 3 + Vite fixture.
+- `bambi-solid`: SolidStart SSR fixture.
+- `bambi-svelte`: SvelteKit SSR fixture.
+- `bambi-vue`: Nuxt SSR fixture.
 
 ## Smoke Test
 
@@ -53,4 +53,4 @@ The smoke script detects whether a `package-lock.json` exists in each template d
 - Generated bambiui component files may be committed when they intentionally represent the current fixture state.
 - Internal contract, controller, primitive, generator, or runtime package files must not appear in template output.
 - Template output must stay self-contained: no `@bambiui/*` runtime imports.
-- These fixtures should stay boring: one page, one imported component, enough framework config to catch integration regressions.
+- These fixtures should stay boring: one SSR-rendered page, one imported component, enough framework config to catch integration regressions.

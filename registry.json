@@ -163,20 +163,20 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/tabs/react/index.tsx": "dbdbdf9d4048fd701aa741796bc6d4ea68c731b53877b516c7bd9a6ce95807f3"
+          "packages/registry/generated/tabs/react/index.tsx": "72b06c1ae2a3e3af792ba7fcd11dcd22f08a5c567fceb71bb7d73967743a2b82"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "67aa792a2854fb4f1383bd8aeb99e48251f480d7301c371c008243691483cbed"
+          "packages/registry/generated/tabs/solid/index.tsx": "178b5b12f4f8586cd240ad05ad7b6ae01a7150565e576980916e6ebeb1d04ab7"
         },
         "svelte": {
-          "packages/registry/generated/tabs/svelte/Tabs.svelte": "3feba42f43fdca222ecb2656e921e8b17e24a0c6f464004805eda92a873a3a4b",
+          "packages/registry/generated/tabs/svelte/Tabs.svelte": "5834086da5d3df683190c2a64fa2ca481d00ef20b65f4b6f40bf8bc189660850",
           "packages/registry/generated/tabs/svelte/TabsList.svelte": "48a0932b855a5f97a64c898c47d22551438d883dce86425cc55c572e783ef7d2",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "fcf5e9ce1e4ee80b8b605f10a10d1654dcaafbb97f6e839cc65c8b99fe00fdb7",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte": "582938a414f555e3a1bf6bc318ffdad56360701a2c4d61e879ef132a419c23dd",
           "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b"
         },
         "vue": {
-          "packages/registry/generated/tabs/vue/Tabs.vue": "f28f806d817480d41f36a095fe4169fe9d34f696a4f33520f40d66dfdd4ac99e",
+          "packages/registry/generated/tabs/vue/Tabs.vue": "79011c05fb9b8c395a49de4c4af4f19752370b20caa34f5a7c7df5aa9c12ceab",
           "packages/registry/generated/tabs/vue/TabsList.vue": "e3deccf4aaa53f73fcdff5dfe5b99c40eacbd45fa6092c5aea45cf67831d3491",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "9b93c1883d8e5a75dc574a873af79f32733b120192530b99c367d06f19e61772",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "57361601da98b9f3a51f2fbeac481456c975a7b42438d5a3f7b46abd113a58b0",

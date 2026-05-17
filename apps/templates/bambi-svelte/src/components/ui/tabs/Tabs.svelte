@@ -100,7 +100,8 @@ function createRovingFocus(
         next = items[items.length - 1];
       } else if ((e.key === "Enter" || e.key === " ") && options.onActivate) {
         e.preventDefault();
-        options.onActivate(items[focused]);
+        const item = items[focused];
+        if (item) options.onActivate(item);
         return;
       }
 

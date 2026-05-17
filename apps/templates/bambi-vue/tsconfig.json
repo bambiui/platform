@@ -1,12 +1,7 @@
 {
+  "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
     "strict": true,
-    "noEmit": true,
-    "skipLibCheck": true,
-    "jsx": "preserve"
-  },
-  "include": ["src/**/*.ts", "src/**/*.vue"]
+    "skipLibCheck": true
+  }
 }

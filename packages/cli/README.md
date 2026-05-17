@@ -53,7 +53,7 @@ Default config:
 
 - `styles.global` to the configured style file.
 - `components.<name>.files.<framework>[]` into `componentDir/<name>/`.
-- `components.<name>.css` into the component directory when declared.
+- `components.<name>.css` into the configured style file directory when declared, and imports it from the configured style file.
 - `registry.json.shared` to `componentDir/bambi-helpers.ts` only when `components.<name>.helpers.<framework>` is non-empty.
 
 Tabs output:
@@ -62,7 +62,7 @@ Tabs output:
 # react / solid
 src/components/ui/bambi-helpers.ts
 src/components/ui/tabs/index.tsx
-src/components/ui/tabs/tabs.css
+src/styles/tabs.css
 
 # svelte
 src/components/ui/bambi-helpers.ts
@@ -71,7 +71,7 @@ src/components/ui/tabs/TabsList.svelte
 src/components/ui/tabs/TabsTrigger.svelte
 src/components/ui/tabs/TabsContent.svelte
 src/components/ui/tabs/index.ts
-src/components/ui/tabs/tabs.css
+src/styles/tabs.css
 
 # vue
 src/components/ui/bambi-helpers.ts
@@ -80,7 +80,7 @@ src/components/ui/tabs/TabsList.vue
 src/components/ui/tabs/TabsTrigger.vue
 src/components/ui/tabs/TabsContent.vue
 src/components/ui/tabs/index.ts
-src/components/ui/tabs/tabs.css
+src/styles/tabs.css
 ```
 
 Generated output must stay self-contained: no runtime `@bambiui/*` imports, contracts, controllers, internal primitives, or generator files.

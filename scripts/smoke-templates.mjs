@@ -40,7 +40,7 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/tabs/tabs.css",
+      "src/styles/tabs.css",
       "src/components/ui/tabs/index.tsx",
       "src/components/ui/bambi-helpers.ts",
     ],
@@ -53,7 +53,7 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/tabs/tabs.css",
+      "src/styles/tabs.css",
       "src/components/ui/tabs/index.tsx",
       "src/components/ui/bambi-helpers.ts",
     ],
@@ -66,7 +66,7 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/tabs/tabs.css",
+      "src/styles/tabs.css",
       "src/components/ui/tabs/Tabs.svelte",
       "src/components/ui/tabs/TabsList.svelte",
       "src/components/ui/tabs/TabsTrigger.svelte",
@@ -83,7 +83,7 @@ const templates = [
     expectedFiles: [
       "bambiui.config.json",
       "src/styles/bambi.css",
-      "src/components/ui/tabs/tabs.css",
+      "src/styles/tabs.css",
       "src/components/ui/tabs/Tabs.vue",
       "src/components/ui/tabs/TabsList.vue",
       "src/components/ui/tabs/TabsTrigger.vue",

@@ -102,6 +102,10 @@ describe("createArtifact — tabs/vue", () => {
     expect(result.files["Tabs.vue"]).toContain('from "vue"');
   });
 
+  it("Tabs.vue leaves CSS wiring to the CLI global stylesheet", () => {
+    expect(result.files["Tabs.vue"]).not.toContain('import "./tabs.css"');
+  });
+
   it("Tabs.vue does not use React or Solid APIs", () => {
     expect(result.files["Tabs.vue"]).not.toContain('from "react"');
     expect(result.files["Tabs.vue"]).not.toContain('from "solid-js"');

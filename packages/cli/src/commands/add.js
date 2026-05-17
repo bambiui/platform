@@ -1,4 +1,5 @@
 import path from "node:path";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { getConfig, assertSupportedFramework } from "../utils/framework.js";
 import {
   copyRegistryFile,
@@ -7,6 +8,49 @@ import {
   getStylePath,
   readRegistryManifest,
 } from "../utils/registry.js";
+
+/**
+ * @param {string} styleFile
+ * @param {string} cssFile
+ */
+async function ensureCssImport(styleFile, cssFile) {
+  const relative = path
+    .relative(path.dirname(styleFile), cssFile)
+    .replaceAll(path.sep, "/");
+  const specifier = relative.startsWith(".") ? relative : `./${relative}`;
+  const importLine = `@import "${specifier}";`;
+  const content = await readFile(styleFile, "utf8");
+
+  if (content.includes(importLine)) {
+    return {
+      path: styleFile,
+      reason: "exists",
+      skipped: true,
+      status: "skipped",
+    };
+  }
+
+  await mkdir(path.dirname(styleFile), { recursive: true });
+  await writeFile(styleFile, `${importLine}\n${content}`);
+
+  return {
+    path: styleFile,
+    skipped: false,
+    status: "updated",
+  };
+}
+
+/**
+ * @param {string} styleFile
+ */
+async function readExistingCssImports(styleFile) {
+  try {
+    const content = await readFile(styleFile, "utf8");
+    return content.match(/^@import\s+"[^"]+\.css";\n?/gm) ?? [];
+  } catch {
+    return [];
+  }
+}
 
 /**
  * @param {string | undefined} componentName
@@ -45,16 +89,24 @@ export async function addComponent(componentName, flags) {
 
   const results = [];
   const force = Boolean(flags.force);
+  const styleFile = path.join(cwd, config.styleFile);
+  const existingCssImports = await readExistingCssImports(styleFile);
 
-  // Keep `add` usable even when `init` has not been run yet: component CSS is local to
-  // the component, while global design tokens live at config.styleFile.
+  // Keep `add` usable even when `init` has not been run yet: global design
+  // tokens and component CSS are both anchored from config.styleFile.
   results.push(
     await copyRegistryFile(
       registryUrl,
       getStylePath(manifest),
-      path.join(cwd, config.styleFile),
+      styleFile,
       force,
-      { expectedHash: manifest.styles?.globalHash },
+      {
+        expectedHash: manifest.styles?.globalHash,
+        transform: (content) => {
+          const preserved = existingCssImports.filter((line) => !content.includes(line.trim()));
+          return preserved.length > 0 ? `${preserved.join("")}${content}` : content;
+        },
+      },
     ),
   );
 
@@ -71,14 +123,19 @@ export async function addComponent(componentName, flags) {
   }
 
   if (component.css) {
+    const cssDestination = path.join(path.dirname(styleFile), path.basename(component.css));
     results.push(
       await copyRegistryFile(
         registryUrl,
         component.css,
-        path.join(outputDir, path.basename(component.css)),
+        cssDestination,
         force,
         { expectedHash: component.cssHash },
       ),
+    );
+
+    results.push(
+      await ensureCssImport(styleFile, cssDestination),
     );
   }
 

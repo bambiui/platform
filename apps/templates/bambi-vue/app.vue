@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./src/components/ui/ta
   <div>
     bambiui-vue
     <Button variant="secondary">Button</Button>
-    <Tabs default-value="account">
+    <Tabs default-value="password">
       <TabsList>
         <TabsTrigger value="account">Account</TabsTrigger>
         <TabsTrigger value="password">Password</TabsTrigger>

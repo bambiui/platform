@@ -32,9 +32,9 @@ Expected generated output varies by framework. Example for `react`:
 
 ```
 src/styles/bambi.css
+src/styles/tabs.css
 src/components/ui/bambi-helpers.ts
 src/components/ui/tabs/index.tsx
-src/components/ui/tabs/tabs.css
 ```
 
 Example for `svelte` / `vue`, the `tabs/` directory contains per-part component files instead of a single `index.tsx`.

@@ -44,7 +44,6 @@ const forbiddenStrings = [
 
 function expectedFilesFor(component, framework) {
   const files = new Set((component.files?.[framework] ?? []).map((filePath) => path.basename(filePath)));
-  if (component.css) files.add(path.basename(component.css));
   return [...files].sort();
 }
 
@@ -162,8 +161,15 @@ for (const [componentName, component] of Object.entries(registry.components)) {
             .filter((filePath) => !filePath.endsWith(".css"))
             .map((filePath) => readFile(filePath, "utf8")),
         );
-        if (!importsCss.some((content) => content.includes(`"./${cssFile}"`))) {
-          throw new Error(`Expected ${componentName}/${framework} output to import ./${cssFile}`);
+        const componentImportsCss = importsCss.some((content) => content.includes(`"./${cssFile}"`));
+        const globalCss = await readFile(path.join(cwd, "src/styles/bambi.css"), "utf8");
+        const expectedImport = `@import "./${cssFile}";`;
+        if (!globalCss.includes(expectedImport)) {
+          throw new Error(`Expected ${componentName}/${framework} global stylesheet to import ${expectedImport}`);
+        }
+        assertExists(path.join(cwd, "src/styles", cssFile));
+        if (componentImportsCss) {
+          throw new Error(`Did not expect ${componentName}/${framework} component output to import ./${cssFile}`);
         }
       }
 
@@ -213,6 +219,23 @@ try {
   await assertNoForbiddenOutput(path.join(addOnlyDir, "src/components/ui/tabs"), "tabs");
 } finally {
   await rm(addOnlyDir, { force: true, recursive: true });
+}
+
+const preserveImportsDir = await mkdtemp(path.join(tmpdir(), "bambiui-preserve-imports-"));
+try {
+  await runCli(["init", "--yes", "--framework", "react", "--cwd", preserveImportsDir, "--registry-url", repoRoot]);
+  await runCli(["add", "button", "--framework", "react", "--cwd", preserveImportsDir, "--registry-url", repoRoot]);
+  await runCli(["add", "tabs", "--framework", "react", "--cwd", preserveImportsDir, "--registry-url", repoRoot, "--force"]);
+
+  const globalCss = await readFile(path.join(preserveImportsDir, "src/styles/bambi.css"), "utf8");
+  for (const importLine of ['@import "./button.css";', '@import "./tabs.css";']) {
+    if (!globalCss.includes(importLine)) {
+      throw new Error(`Expected force add to preserve ${importLine}`);
+    }
+  }
+  process.stdout.write("  ✓ force add preserves existing component CSS imports\n");
+} finally {
+  await rm(preserveImportsDir, { force: true, recursive: true });
 }
 
 const mockRegistryDir = await mkdtemp(path.join(tmpdir(), "bambiui-public-registry-"));
@@ -377,8 +400,11 @@ try {
   await runCli(["add", "tabs", "--cwd", customConfigDir, "--registry-url", repoRoot]);
 
   assertExists(path.join(customConfigDir, "custom/ui/tabs/index.tsx"));
-  assertExists(path.join(customConfigDir, "custom/ui/tabs/tabs.css"));
+  assertExists(path.join(customConfigDir, "custom/tabs.css"));
   assertExists(path.join(customConfigDir, "custom/bambi.css"));
+  if (!((await readFile(path.join(customConfigDir, "custom/bambi.css"), "utf8")).includes('@import "./tabs.css";'))) {
+    throw new Error("Custom style path should import installed component CSS.");
+  }
 
   if (existsSync(path.join(customConfigDir, "src/components/ui/tabs"))) {
     throw new Error("Default component path should not be used when config overrides it.");

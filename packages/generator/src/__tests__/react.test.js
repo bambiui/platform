@@ -78,6 +78,10 @@ describe("createArtifact — tabs/react", () => {
     expect(result.files["index.tsx"]).toContain("useEffect");
   });
 
+  it("output leaves CSS wiring to the CLI global stylesheet", () => {
+    expect(result.files["index.tsx"]).not.toContain('import "./tabs.css"');
+  });
+
   it("output exports expected component names", () => {
     expect(result.files["index.tsx"]).toContain("export function Tabs(");
     expect(result.files["index.tsx"]).toContain("export function TabsList(");

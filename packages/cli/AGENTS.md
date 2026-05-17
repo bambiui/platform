@@ -10,7 +10,7 @@ For `bambiui add <component> --framework <framework>`:
 2. Fetch/read public `registry.json` and require `version: 2`.
 3. Copy `styles.global` to the configured global style file.
 4. Copy `components[component].files[framework][]` into `componentDir/<name>/`.
-5. Copy `components[component].css` into the component directory when declared.
+5. Copy `components[component].css` into the configured style file directory when declared and import it from the configured style file.
 6. If `components[component].helpers[framework]` is non-empty, copy `manifest.shared` to `componentDir/bambi-helpers.ts`.
 
 The CLI does not run the generator, parse contracts, rewrite internal imports, or copy authoring inputs.

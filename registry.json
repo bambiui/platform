@@ -67,17 +67,17 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/button/react/index.tsx": "0f05031c56567f357159ab94d761e12109c07dafbc95070b5a445c412f8da4ea"
+          "packages/registry/generated/button/react/index.tsx": "5eeb2933c84c8abacb6174d79e03cd5b72cbdae049b4b2c6287ad2621c329d1a"
         },
         "solid": {
-          "packages/registry/generated/button/solid/index.tsx": "693a9042476c6cb2c54098d87648236500d59b047a2cbff1003bcf6bdaf376ae"
+          "packages/registry/generated/button/solid/index.tsx": "40f23db34ea778643c81691092d2d9d49704697def2968e071d95790ffd66257"
         },
         "svelte": {
-          "packages/registry/generated/button/svelte/Button.svelte": "11dffaeb4d80f7524a5e0160d43cc421820788afa084991895cc08ce38be9554",
+          "packages/registry/generated/button/svelte/Button.svelte": "cdb16d9dc1988c16227ef3121bbc1b6d57994e6cc6e7db7675df9e537482d3e9",
           "packages/registry/generated/button/svelte/index.ts": "2e8425a79679aecfbf60510f9633eaeea3806fabbc68025059025e174ec44330"
         },
         "vue": {
-          "packages/registry/generated/button/vue/Button.vue": "cfe8a3258c9e1e780891f751da34d3727715da2d7a90295da0e2f8f54d4603be",
+          "packages/registry/generated/button/vue/Button.vue": "a304c8a47edc9bf2adff92ecaa622269b778f9795caef839920360853049b7e0",
           "packages/registry/generated/button/vue/index.ts": "86da55d26a89154dea3c0407efb395970055394d36bcf0e48a1ed606b2318c80"
         }
       },
@@ -163,20 +163,20 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/tabs/react/index.tsx": "77f3cab911be877fa54706c987bc1ef73feb5ad08aa1d7aebc07426213b7fafe"
+          "packages/registry/generated/tabs/react/index.tsx": "34e86ce0dec70d2fe773ffb160b43a2bd279dfa792fcac82c4a3a17b95276e6c"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "74146ecc832a1d5cf625e397c61f6e27988ac07a1080a8e0173f4db468ffd428"
+          "packages/registry/generated/tabs/solid/index.tsx": "80c54181dcaed02b6164921e5b4e002d682cb3ab03ca314ec4bcede5695df03d"
         },
         "svelte": {
-          "packages/registry/generated/tabs/svelte/Tabs.svelte": "98402505dc7f7e4fdc3d6a7c4d1947f7df740345abfac61e35c15ec64439cad7",
+          "packages/registry/generated/tabs/svelte/Tabs.svelte": "6e9672be561580c9e0ade064b0a5fe0e799f08a86a47b93f4d51bdd5388b18a9",
           "packages/registry/generated/tabs/svelte/TabsList.svelte": "4351fde3dc125167324adcefbcdc7936cb4936c76b57137eb4498c0bada21aff",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "af09f38deec5767fae9b1a4bffe696da76b4c0c2e23fbfbe8b2cf02509376f4a",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte": "f2052ebeb397089708a45dc8e9ce1e4e45fff14941c0877a4903503cbd8a6e79",
           "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b"
         },
         "vue": {
-          "packages/registry/generated/tabs/vue/Tabs.vue": "731df286440428c299630910f1592748806d3fb63c237992731bad6bf0f36132",
+          "packages/registry/generated/tabs/vue/Tabs.vue": "7b232314d633b864ca7f9ad80bad47b9695fa8922259fcd52212477bdccb5328",
           "packages/registry/generated/tabs/vue/TabsList.vue": "26ba16e1aeae8de6e80041555d4e0ebf79497113fd46c0ce9ab5154efd9225d2",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "91b38fd105bcc63400990e5e3f57dad6d26233cc4650361eb9d2cb6638cd5145",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "e8b06de53d027bb11a38ab00c1fd8cd3989046916ab89eb864b02e0bfb7e092d",

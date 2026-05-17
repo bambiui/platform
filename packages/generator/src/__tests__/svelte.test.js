@@ -95,6 +95,10 @@ describe("createArtifact — tabs/svelte", () => {
     expect(result.files["Tabs.svelte"]).toContain('from "svelte"');
   });
 
+  it("Tabs.svelte leaves CSS wiring to the CLI global stylesheet", () => {
+    expect(result.files["Tabs.svelte"]).not.toContain('import "./tabs.css"');
+  });
+
   it("Tabs.svelte does not use React or Solid APIs", () => {
     expect(result.files["Tabs.svelte"]).not.toContain('from "react"');
     expect(result.files["Tabs.svelte"]).not.toContain('from "solid-js"');

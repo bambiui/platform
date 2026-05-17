@@ -83,9 +83,20 @@ describe("createArtifact — tabs/solid", () => {
     expect(result.files["index.tsx"]).toContain('from "solid-js"');
   });
 
+  it("output leaves CSS wiring to the CLI global stylesheet", () => {
+    expect(result.files["index.tsx"]).not.toContain('import "./tabs.css"');
+  });
+
   it("output imports children helper for dynamic slot tracking", () => {
     expect(result.files["index.tsx"]).toContain("children");
     expect(result.files["index.tsx"]).toContain("resolvedChildren");
+  });
+
+  it("root renders resolved children to avoid Solid SSR child re-evaluation", () => {
+    const src = result.files["index.tsx"];
+    const rootFn = src.slice(src.indexOf("export function Tabs("), src.indexOf("export function TabsList("));
+    expect(rootFn).toContain("{resolvedChildren()}");
+    expect(rootFn).not.toContain("{local.children}");
   });
 
   it("output does not use React hooks", () => {

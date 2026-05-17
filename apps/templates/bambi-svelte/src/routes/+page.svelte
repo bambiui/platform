@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 <div>
   bambiui-svelte
   <Button variant="secondary">Button</Button>
-  <Tabs defaultValue="account">
+  <Tabs defaultValue="password">
     <TabsList>
       <TabsTrigger value="account">Account</TabsTrigger>
       <TabsTrigger value="password">Password</TabsTrigger>

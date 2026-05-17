@@ -6,7 +6,7 @@ export default function Home() {
     <div>
       bambiui-solid
       <Button variant="secondary">Button</Button>
-      <Tabs defaultValue="account">
+      <Tabs defaultValue="password">
         <TabsList>
           <TabsTrigger value="account">Account</TabsTrigger>
           <TabsTrigger value="password">Password</TabsTrigger>

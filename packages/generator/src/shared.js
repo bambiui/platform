@@ -26,6 +26,10 @@ export function supportsDisabledAttribute(element) {
   ].includes(element);
 }
 
+export function literalValue(value, quote = '"') {
+  return typeof value === "string" ? `${quote}${value}${quote}` : String(value);
+}
+
 export function getOmittedEmbeddedPartNames(options) {
   return new Set(
     (options.embeddedParts ?? [])

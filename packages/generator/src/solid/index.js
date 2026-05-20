@@ -4,6 +4,7 @@ import {
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
+  literalValue,
   pascalCase,
   prepareArtifactGeneration,
   supportsDisabledAttribute,
@@ -45,21 +46,17 @@ function solidPartPropsSource(contract, options) {
     .join("\n\n");
 }
 
-function solidLiteral(value) {
-  return typeof value === "string" ? `"${value}"` : String(value);
-}
-
 function solidSsrAttributeLine(attribute) {
   const name = attribute.solidName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n      ${name}={${solidLiteral(attribute.value)}}`;
-  return `\n      ${name}={hasSelectedValue() ? (isSelected() ? ${solidLiteral(attribute.active)} : ${solidLiteral(attribute.inactive)}) : undefined}`;
+  if (attribute.value !== undefined) return `\n      ${name}={${literalValue(attribute.value)}}`;
+  return `\n      ${name}={hasSelectedValue() ? (isSelected() ? ${literalValue(attribute.active)} : ${literalValue(attribute.inactive)}) : undefined}`;
 }
 
 function solidEmbeddedAttributeLine(attribute) {
   const name = attribute.solidName ?? attribute.name;
   if (attribute.selected) return `\n        ${name}={hasSelectedValue() ? isSelected() : undefined}`;
   if (attribute.propName) return `\n        ${name}={local.${attribute.propName}}`;
-  if (attribute.value !== undefined) return `\n        ${name}={${solidLiteral(attribute.value)}}`;
+  if (attribute.value !== undefined) return `\n        ${name}={${literalValue(attribute.value)}}`;
   return `\n        ${name}=""`;
 }
 

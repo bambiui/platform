@@ -4,6 +4,7 @@ import {
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
+  literalValue,
   pascalCase,
   prepareArtifactGeneration,
   supportsDisabledAttribute,
@@ -65,15 +66,11 @@ function reactPartPropsSource(contract, options) {
     .join("\n\n");
 }
 
-function reactLiteral(value) {
-  return typeof value === "string" ? `"${value}"` : String(value);
-}
-
 function reactSsrAttributeLine(attribute) {
   const name = attribute.reactName ?? attribute.name;
   if (attribute.value !== undefined)
-    return `\n      ${name}={${reactLiteral(attribute.value)}}`;
-  return `\n      ${name}={hasSelectedValue ? (isSelected ? ${reactLiteral(attribute.active)} : ${reactLiteral(attribute.inactive)}) : undefined}`;
+    return `\n      ${name}={${literalValue(attribute.value)}}`;
+  return `\n      ${name}={hasSelectedValue ? (isSelected ? ${literalValue(attribute.active)} : ${literalValue(attribute.inactive)}) : undefined}`;
 }
 
 function reactEmbeddedAttributeLine(attribute) {
@@ -82,7 +79,7 @@ function reactEmbeddedAttributeLine(attribute) {
     return `\n        ${name}={hasSelectedValue ? isSelected : undefined}`;
   if (attribute.propName) return `\n        ${name}={${attribute.propName}}`;
   if (attribute.value !== undefined)
-    return `\n        ${name}={${reactLiteral(attribute.value)}}`;
+    return `\n        ${name}={${literalValue(attribute.value)}}`;
   return `\n        ${name}=""`;
 }
 

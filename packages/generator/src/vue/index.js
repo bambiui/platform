@@ -5,6 +5,7 @@ import {
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
+  literalValue,
   pascalCase,
   prepareArtifactGeneration,
   supportsDisabledAttribute,
@@ -12,14 +13,10 @@ import {
 
 // ── Vue part components (TabsList, TabsTrigger, TabsContent) ──────────────
 
-function vueLiteral(value) {
-  return typeof value === "string" ? `'${value}'` : String(value);
-}
-
 function vueSsrAttributeLine(attribute) {
   const name = attribute.vueName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n    :${name}="${vueLiteral(attribute.value)}"`;
-  return `\n    :${name}="hasSelectedValue ? (isSelected ? ${vueLiteral(attribute.active)} : ${vueLiteral(attribute.inactive)}) : undefined"`;
+  if (attribute.value !== undefined) return `\n    :${name}="${literalValue(attribute.value, "'")}"`;
+  return `\n    :${name}="hasSelectedValue ? (isSelected ? ${literalValue(attribute.active, "'")} : ${literalValue(attribute.inactive, "'")}) : undefined"`;
 }
 
 
@@ -27,7 +24,7 @@ function vueEmbeddedAttributeLine(attribute) {
   const name = attribute.vueName ?? attribute.name;
   if (attribute.selected) return `\n      :${name}="hasSelectedValue ? isSelected : undefined"`;
   if (attribute.propName) return `\n      :${name}="props.${attribute.propName}"`;
-  if (attribute.value !== undefined) return `\n      :${name}="${vueLiteral(attribute.value)}"`;
+  if (attribute.value !== undefined) return `\n      :${name}="${literalValue(attribute.value, "'")}"`;
   return `\n      ${name}=""`;
 }
 

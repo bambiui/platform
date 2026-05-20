@@ -4,6 +4,7 @@ import {
   createRootGenerationContext,
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
+  literalValue,
   pascalCase,
   prepareArtifactGeneration,
   supportsDisabledAttribute,
@@ -11,14 +12,10 @@ import {
 
 // ── Svelte part components (TabsList, TabsTrigger, TabsContent) ────────────
 
-function svelteLiteral(value) {
-  return typeof value === "string" ? `"${value}"` : String(value);
-}
-
 function svelteSsrAttributeLine(attribute) {
   const name = attribute.svelteName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n    ${name}={${svelteLiteral(attribute.value)}}`;
-  return `\n    ${name}={hasSelectedValue ? (isSelected ? ${svelteLiteral(attribute.active)} : ${svelteLiteral(attribute.inactive)}) : undefined}`;
+  if (attribute.value !== undefined) return `\n    ${name}={${literalValue(attribute.value)}}`;
+  return `\n    ${name}={hasSelectedValue ? (isSelected ? ${literalValue(attribute.active)} : ${literalValue(attribute.inactive)}) : undefined}`;
 }
 
 
@@ -26,7 +23,7 @@ function svelteEmbeddedAttributeLine(attribute) {
   const name = attribute.svelteName ?? attribute.name;
   if (attribute.selected) return `\n    ${name}={hasSelectedValue ? isSelected : undefined}`;
   if (attribute.propName) return `\n    ${name}={${attribute.propName}}`;
-  if (attribute.value !== undefined) return `\n    ${name}={${svelteLiteral(attribute.value)}}`;
+  if (attribute.value !== undefined) return `\n    ${name}={${literalValue(attribute.value)}}`;
   return `\n    ${name}=""`;
 }
 

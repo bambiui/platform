@@ -1,4 +1,5 @@
 import {
+  createPartGenerationContext,
   getOmittedEmbeddedPartNames,
   htmlElementType,
   pascalCase,
@@ -76,18 +77,6 @@ function solidEmbeddedChildrenSource(part, contract, options) {
 }
 
 function solidPartComponentSource(contract, options) {
-  const valuePropParts = new Set([
-    ...(options.valuePropParts ?? []),
-    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
-  ]);
-  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
-  const disabledPropParts = new Set(options.disabledPropParts ?? []);
-  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
-  const valuePropName = options.valuePropName;
-  const disabledPropName = options.disabledPropName;
-  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
-  const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
   const omittedParts = getOmittedEmbeddedPartNames(options);
 
   return contract.parts
@@ -95,33 +84,34 @@ function solidPartComponentSource(contract, options) {
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const propsName = `${componentName}Props`;
-      const tag = part.element;
-      const valueHandling = valuePropParts.has(part.name);
-      const protocolValueHandling = protocolValuePropParts.has(part.name);
-      const disabledHandling = disabledPropParts.has(part.name);
-      if (valueHandling && (!valuePropName || !valueAttr)) {
-        throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
-      }
-      if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-        throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
-      }
+      const {
+        tag,
+        valuePropName,
+        disabledPropName,
+        valueAttr,
+        disabledAttr,
+        valueHandling,
+        protocolValueHandling,
+        disabledHandling,
+        defaultTypeHandling,
+        ssrState,
+        ssrPart,
+      } = createPartGenerationContext(part, contract, options);
       // Split component-controlled props from DOM-safe spread props.
       const splitKeys = [
         valueHandling ? valuePropName : null,
         disabledHandling ? disabledPropName : null,
-        defaultTypeParts.has(part.name) ? "type" : null,
+        defaultTypeHandling ? "type" : null,
         "children",
       ].filter(Boolean);
       const splitList = splitKeys.map((k) => `"${k}"`).join(", ");
 
-      const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={local.type ?? "${options.defaultTypeValue}"}` : "";
+      const typeAttr = defaultTypeHandling ? `\n      type={local.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
       const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n      disabled={local.${disabledPropName}}` : "";
       const disabledAttribute = disabledHandling
         ? `${nativeDisabledAttribute}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
         : "";
-      const ssrState = options.ssrSelectedState;
-      const ssrPart = ssrState?.parts?.[part.name];
       const ssrStateSetup = ssrPart && valueHandling ? `
   const selectedValue = useContext(SsrSelectedValueContext);
   const hasSelectedValue = () => selectedValue?.() !== undefined;

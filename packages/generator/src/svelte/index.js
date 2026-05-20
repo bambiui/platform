@@ -1,5 +1,6 @@
 import {
   componentIndexFile,
+  createPartGenerationContext,
   getOmittedEmbeddedPartNames,
   pascalCase,
   prepareArtifactGeneration,
@@ -43,45 +44,34 @@ function svelteEmbeddedChildrenSource(part, contract, options) {
 }
 
 function sveltePartFile(part, options, contract) {
-  const valuePropParts = new Set([
-    ...(options.valuePropParts ?? []),
-    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
-  ]);
-  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
-  const disabledPropParts = new Set(options.disabledPropParts ?? []);
-  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
-  const valuePropName = options.valuePropName;
-  const disabledPropName = options.disabledPropName;
-  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
-  const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-  const valueHandling = valuePropParts.has(part.name);
-  const protocolValueHandling = protocolValuePropParts.has(part.name);
-  const disabledHandling = disabledPropParts.has(part.name);
-  if (valueHandling && (!valuePropName || !valueAttr)) {
-    throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
-  }
-  if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-    throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
-  }
+  const {
+    tag,
+    valuePropName,
+    disabledPropName,
+    valueAttr,
+    disabledAttr,
+    valueHandling,
+    protocolValueHandling,
+    disabledHandling,
+    defaultTypeHandling,
+    ssrState,
+    ssrPart,
+  } = createPartGenerationContext(part, contract, options);
 
-  const tag = part.element;
   const propDecls = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
-    defaultTypeParts.has(part.name)
+    defaultTypeHandling
       ? `  type?: ${(options.defaultTypeValues ?? [options.defaultTypeValue]).map((value) => `"${value}"`).join(" | ")};`
       : null,
   ].filter(Boolean).join("\n");
 
-  const typeAttr = defaultTypeParts.has(part.name) ? "\n    type={type}" : "";
+  const typeAttr = defaultTypeHandling ? "\n    type={type}" : "";
   const valueAttribute = protocolValueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
   const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
   const disabledAttribute = disabledHandling
     ? `${nativeDisabledAttribute}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
     : "";
-  const ssrState = options.ssrSelectedState;
-  const ssrPart = ssrState?.parts?.[part.name];
   const ssrStateSetup = ssrPart && valueHandling ? `
 const selectedValue = getContext<(() => string | undefined) | undefined>("${ssrState.contextName}");
 const hasSelectedValue = $derived(selectedValue?.() !== undefined);
@@ -97,7 +87,7 @@ const isSelected = $derived(selectedValue?.() === ${ssrState.valuePropName});` :
   const propDestructure = [
     valueHandling ? valuePropName : null,
     disabledHandling ? disabledPropName : null,
-    defaultTypeParts.has(part.name) ? `type = "${options.defaultTypeValue}"` : null,
+    defaultTypeHandling ? `type = "${options.defaultTypeValue}"` : null,
     "children",
     "...props",
   ].filter(Boolean).join(", ");

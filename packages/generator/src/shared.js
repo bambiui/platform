@@ -492,6 +492,63 @@ export function prepareArtifactGeneration({
   };
 }
 
+export function createPartGenerationContext(part, contract, options) {
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
+  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
+  const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
+  const valuePropName = options.valuePropName;
+  const disabledPropName = options.disabledPropName;
+  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const valueAttr = valuePropName
+    ? propsByName.get(valuePropName)?.attribute
+    : undefined;
+  const disabledAttr = disabledPropName
+    ? propsByName.get(disabledPropName)?.attribute
+    : undefined;
+  const tag = part.element;
+  const valueHandling = valuePropParts.has(part.name);
+  const protocolValueHandling = protocolValuePropParts.has(part.name);
+  const disabledHandling = disabledPropParts.has(part.name);
+  const defaultTypeHandling = defaultTypeParts.has(part.name);
+
+  if (valueHandling && (!valuePropName || !valueAttr)) {
+    throw new Error(
+      `${contract.name}/${part.name}: valuePropName must reference a contract prop.`,
+    );
+  }
+  if (disabledHandling && (!disabledPropName || !disabledAttr)) {
+    throw new Error(
+      `${contract.name}/${part.name}: disabledPropName must reference a contract prop.`,
+    );
+  }
+
+  const ssrState = options.ssrSelectedState;
+  const ssrPart = ssrState?.parts?.[part.name];
+
+  return {
+    tag,
+    valuePropParts,
+    protocolValuePropParts,
+    disabledPropParts,
+    defaultTypeParts,
+    valuePropName,
+    disabledPropName,
+    propsByName,
+    valueAttr,
+    disabledAttr,
+    valueHandling,
+    protocolValueHandling,
+    disabledHandling,
+    defaultTypeHandling,
+    ssrState,
+    ssrPart,
+  };
+}
+
 export function componentIndexFile(contract, extension) {
   const parts = contract.parts.filter((part) => part.name !== "root");
   const rootExport = `export { default as ${contract.componentName} } from "./${contract.componentName}.${extension}";`;

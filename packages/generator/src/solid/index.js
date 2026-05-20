@@ -1,10 +1,9 @@
 import {
-  parseContractSource,
-  parseOptionsNames,
-  inlinePrimitiveSource,
-  extractControllerBehavior,
-  validateGeneratorOptions,
+  getOmittedEmbeddedPartNames,
+  htmlElementType,
   pascalCase,
+  prepareArtifactGeneration,
+  supportsDisabledAttribute,
 } from "../shared.js";
 
 // ── Solid attribute helpers ────────────────────────────────────────────────
@@ -19,17 +18,6 @@ function solidAttributeLine(prop, accessor = "props.") {
   return `      ${prop.attribute}={${solidAttributeValue(prop, accessor)}}`;
 }
 
-function htmlElementType(element) {
-  return `HTML${pascalCase(element)}Element`;
-}
-
-function supportsDisabledAttribute(element) {
-  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
-}
-
-function omittedEmbeddedPartNames(options) {
-  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
-}
 
 // ── Part interfaces and components ────────────────────────────────────────
 
@@ -40,7 +28,7 @@ function solidPartPropsSource(contract, options) {
   ]);
   const valuePropName = options.valuePropName;
 
-  const omittedParts = omittedEmbeddedPartNames(options);
+  const omittedParts = getOmittedEmbeddedPartNames(options);
 
   return contract.parts
     .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
@@ -100,7 +88,7 @@ function solidPartComponentSource(contract, options) {
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
   const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
   const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-  const omittedParts = omittedEmbeddedPartNames(options);
+  const omittedParts = getOmittedEmbeddedPartNames(options);
 
   return contract.parts
     .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
@@ -426,23 +414,19 @@ ${solidPartComponentSource(contract, generatorOptions)}`;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function createSolidArtifact({ contractSource, controllerSource, primitiveFiles = [], contractExportName, generatorOptions = {} }) {
-  const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
-  validateGeneratorOptions(contract, generatorOptions);
-  const behaviorClassName = `${contract.componentName}Behavior`;
-  const optionsTypeName = `${contract.componentName}Options`;
-  const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
-  const { behaviorSource, usedHelpers } = extractControllerBehavior(controllerSource, contract.componentName);
-
-  const helperImports = usedHelpers.map((h) => (h === "BambiBehavior" ? "type BambiBehavior" : h));
-  const helperImportLine = helperImports.length > 0
-    ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
-    : "";
-
-  const primitivesBlock = primitiveFiles
-    .map((src) => inlinePrimitiveSource(src))
-    .filter(Boolean)
-    .join("\n\n");
+export function createSolidArtifact(options) {
+  const {
+    publicContractSource,
+    contract,
+    behaviorClassName,
+    optionsTypeName,
+    optionsNames,
+    behaviorSource,
+    usedHelpers,
+    helperImportLine,
+    primitivesBlock,
+  } = prepareArtifactGeneration(options);
+  const { generatorOptions = {} } = options;
 
   const dynamicImportLine = generatorOptions.polymorphicRootPropName ? 'import { Dynamic } from "solid-js/web";\n' : "";
   const solidImports = [

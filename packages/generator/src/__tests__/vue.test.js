@@ -34,6 +34,7 @@ beforeAll(async () => {
       defaultTypeParts: ["trigger"],
       defaultTypeValue: "button",
       defaultTypeValues: ["button", "submit", "reset"],
+      sharePrimitiveHelpers: true,
       ssrSelectedState: {
         selectedPropNames: ["value", "defaultValue"],
         valuePropName: "value",
@@ -122,7 +123,7 @@ describe("createArtifact — tabs/vue", () => {
     expect(result.files["Tabs.vue"]).not.toContain("useEffect");
   });
 
-  it("Tabs.vue contains inlined roving-focus primitive", () => {
+  it("Tabs.vue references shared roving-focus primitive", () => {
     expect(result.files["Tabs.vue"]).toContain("createRovingFocus");
     expect(result.files["Tabs.vue"]).toContain("RovingFocusOptions");
   });

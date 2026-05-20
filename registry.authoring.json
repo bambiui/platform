@@ -99,6 +99,7 @@
           "defaultTypeParts": ["trigger"],
           "defaultTypeValue": "button",
           "defaultTypeValues": ["button", "submit", "reset"],
+          "sharePrimitiveHelpers": true,
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -130,6 +131,7 @@
           "defaultTypeParts": ["trigger"],
           "defaultTypeValue": "button",
           "defaultTypeValues": ["button", "submit", "reset"],
+          "sharePrimitiveHelpers": true,
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -161,6 +163,7 @@
           "defaultTypeParts": ["trigger"],
           "defaultTypeValue": "button",
           "defaultTypeValues": ["button", "submit", "reset"],
+          "sharePrimitiveHelpers": true,
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -192,6 +195,7 @@
           "defaultTypeParts": ["trigger"],
           "defaultTypeValue": "button",
           "defaultTypeValues": ["button", "submit", "reset"],
+          "sharePrimitiveHelpers": true,
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
             "valuePropName": "value",
@@ -262,6 +266,7 @@
           "valuePropParts": ["item"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["item"],
+          "sharePrimitiveHelpers": true,
           "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
@@ -281,6 +286,7 @@
           "valuePropParts": ["item"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["item"],
+          "sharePrimitiveHelpers": true,
           "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
@@ -300,6 +306,7 @@
           "valuePropParts": ["item"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["item"],
+          "sharePrimitiveHelpers": true,
           "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],
@@ -319,6 +326,7 @@
           "valuePropParts": ["item"],
           "disabledPropName": "disabled",
           "disabledPropParts": ["item"],
+          "sharePrimitiveHelpers": true,
           "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
           "ssrSelectedState": {
             "selectedPropNames": ["value", "defaultValue"],

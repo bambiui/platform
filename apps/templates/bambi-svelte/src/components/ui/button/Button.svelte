@@ -95,7 +95,6 @@ let {
   ...props
 }: Props = $props();
 
-const controlled = $derived(false);
 const Component = $derived(as ?? "button");
 const isNativeElement = $derived(Component === "button");
 const effectiveDisabled = $derived(Boolean(disabled || loading));

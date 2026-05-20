@@ -33,6 +33,7 @@ beforeAll(async () => {
       defaultTypeParts: ["trigger"],
       defaultTypeValue: "button",
       defaultTypeValues: ["button", "submit", "reset"],
+      sharePrimitiveHelpers: true,
       ssrSelectedState: {
         selectedPropNames: ["value", "defaultValue"],
         valuePropName: "value",
@@ -125,12 +126,12 @@ describe("createArtifact — tabs/solid", () => {
     expect(result.files["index.tsx"]).toContain("export function TabsContent(");
   });
 
-  it("output contains inlined roving-focus primitive", () => {
+  it("output references shared roving-focus primitive", () => {
     expect(result.files["index.tsx"]).toContain("createRovingFocus");
     expect(result.files["index.tsx"]).toContain("RovingFocusOptions");
   });
 
-  it("inlined primitive has no export keywords on its own declarations", () => {
+  it("shared primitive is not redeclared as exported local declarations", () => {
     expect(result.files["index.tsx"]).not.toContain("export interface RovingFocusOptions");
     expect(result.files["index.tsx"]).not.toContain("export function createRovingFocus");
   });

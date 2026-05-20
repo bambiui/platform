@@ -189,7 +189,9 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const controlledAttr = contract.props.find((prop) => prop.name === "controlled");
   const controlledLine = controlledAttr ? `\n      ${controlledAttr.attribute}={controlled() ? "true" : undefined}` : "";
   const controlledExpression = controlledProp ? `local.${controlledProp.name} !== undefined` : "false";
-
+  const controlledDeclaration = controlledProp
+    ? `  const controlled = () => ${controlledExpression};\n`
+    : "";
 
   const rootTag = root.element;
   const nativeAttrType = `JSX.IntrinsicElements["${rootTag}"]`;
@@ -368,8 +370,7 @@ export function ${contract.componentName}(props: ${contract.componentName}Props)
   const [local, rest] = splitProps(props, [${splitLocalKeys}]);
   let rootRef: ${rootRefType} | undefined;
   let behavior: ${behaviorClassName} | undefined;
-  const controlled = () => ${controlledExpression};
-${ssrSelectedValueLine}${polymorphicSetup}${controlledWarning}
+${controlledDeclaration}${ssrSelectedValueLine}${polymorphicSetup}${controlledWarning}
   onMount(() => {
 ${listenerSetupBlock}    behavior = new ${behaviorClassName}(rootRef!, {
 ${behaviorOptions}

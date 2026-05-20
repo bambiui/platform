@@ -70,14 +70,14 @@
           "packages/registry/generated/button/react/index.tsx": "e4205825c91fcb02af823802b4b74118dd5c0e7e4c4e6f79572839a02f2dd38f"
         },
         "solid": {
-          "packages/registry/generated/button/solid/index.tsx": "a2bd31821736cf0314eab71a3065fdce8611019a1adc9d148b7e88d2693e2b73"
+          "packages/registry/generated/button/solid/index.tsx": "d4978860ae396b4edf0a66ec4e029bc2bdf7fd2a86a02805c7d26a9e8a8d9ffe"
         },
         "svelte": {
-          "packages/registry/generated/button/svelte/Button.svelte": "cdb16d9dc1988c16227ef3121bbc1b6d57994e6cc6e7db7675df9e537482d3e9",
+          "packages/registry/generated/button/svelte/Button.svelte": "73471f97694adcc758d864ec2997bfb39aa2f23676851cbe1ab118083388a9e6",
           "packages/registry/generated/button/svelte/index.ts": "2e8425a79679aecfbf60510f9633eaeea3806fabbc68025059025e174ec44330"
         },
         "vue": {
-          "packages/registry/generated/button/vue/Button.vue": "358034f5d57f07a18a2569504f364bddc9543c54d29bc8fd17048d1d12210c1f",
+          "packages/registry/generated/button/vue/Button.vue": "ee349dd9b9ea1ea1e03067b5e569ddd342eeec38dc98b34770d4ff54876f183c",
           "packages/registry/generated/button/vue/index.ts": "86da55d26a89154dea3c0407efb395970055394d36bcf0e48a1ed606b2318c80"
         }
       },
@@ -114,25 +114,37 @@
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "solid": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "svelte": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "vue": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ]
       },
       "exports": {
@@ -163,20 +175,20 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/tabs/react/index.tsx": "659acee4fc7346b206df55c653870dd94a3cc9f2ae92a582b29d7791047b882c"
+          "packages/registry/generated/tabs/react/index.tsx": "f6ac40901efe8153006e28ab614dd961a20a89d7f84db74d29040d2630a8da59"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "ff556c37c40dd8bd8d9d3dc96d98171e866e21687ca9ae5acfae76499a06a8b8"
+          "packages/registry/generated/tabs/solid/index.tsx": "cc438d103340e12edf6cbf7a014b29fdbfbc39d4c3ad1239ad434aaf054ef7c8"
         },
         "svelte": {
-          "packages/registry/generated/tabs/svelte/Tabs.svelte": "cccd2ee0de92386f59556067a756c05eb6a73b7caec4028a9082e379fad88bf0",
+          "packages/registry/generated/tabs/svelte/Tabs.svelte": "beef004342b23afcf7a81610ab03f8c275f90ce95d9cb8bad6cf15e0bd80adb4",
           "packages/registry/generated/tabs/svelte/TabsList.svelte": "4351fde3dc125167324adcefbcdc7936cb4936c76b57137eb4498c0bada21aff",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "af09f38deec5767fae9b1a4bffe696da76b4c0c2e23fbfbe8b2cf02509376f4a",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte": "f2052ebeb397089708a45dc8e9ce1e4e45fff14941c0877a4903503cbd8a6e79",
           "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b"
         },
         "vue": {
-          "packages/registry/generated/tabs/vue/Tabs.vue": "b1f134e072149531b62263321ca4821b00f8a37fecab1d379177b5bf70599708",
+          "packages/registry/generated/tabs/vue/Tabs.vue": "a67c38bb3f80273b4f66c3a42572227b949bf6878be8e2819f47d511147788cc",
           "packages/registry/generated/tabs/vue/TabsList.vue": "b3f33f468bb90639ba26c413023c82671dad19a22ac6dc083731e210b9114c8a",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "1c9c127c36a79e0e4f579d0636d5e50ea3f9739d0c8ec8e0f27db1f1e055470e",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "e1e82b00139aca4c015b15044aefea4b58ea97e4f05f9d947509eb90de760a5e",
@@ -215,25 +227,37 @@
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "solid": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "svelte": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ],
         "vue": [
           "BambiBehavior",
           "getAttr",
           "setAttr",
-          "getBoolAttr"
+          "getBoolAttr",
+          "RovingFocusOptions",
+          "RovingFocus",
+          "createRovingFocus"
         ]
       },
       "exports": {
@@ -264,20 +288,20 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/radio-group/react/index.tsx": "fd32cbcd0fd3c87f5a09261b5c32c57b59ae65d49e3d898208318f5590542711"
+          "packages/registry/generated/radio-group/react/index.tsx": "d3906233f8a63491220221f75ecc401337c2544010c31bbd66dc29d3868652e0"
         },
         "solid": {
-          "packages/registry/generated/radio-group/solid/index.tsx": "ee95941fa2bf77940abf77d38b3bf0bc9401614fb27d6d36c230c3784e8df78d"
+          "packages/registry/generated/radio-group/solid/index.tsx": "36eecee47154be44ff7d536ec8bd665af5e10e5aaf666e46f4b77a8942d72247"
         },
         "svelte": {
-          "packages/registry/generated/radio-group/svelte/RadioGroup.svelte": "f269ac47b31350dacd5f099eaff4adeb2120f234420118b7735cc819c0ea65a1",
+          "packages/registry/generated/radio-group/svelte/RadioGroup.svelte": "07d835b82aa6e5b8e2f4b81bc662b4ef19f7405fc84b13bd513609ad1ac9a3c7",
           "packages/registry/generated/radio-group/svelte/RadioGroupItem.svelte": "ae3bc50df15f39ff072a6da65d685b2b27594cbb44313b39765dbd1fece61c61",
           "packages/registry/generated/radio-group/svelte/RadioGroupIndicator.svelte": "5b9f7ccfa4ad2b63b0ad5f65fbf8e529d55536c05cb8263c08bb57d5c5e48cdf",
           "packages/registry/generated/radio-group/svelte/RadioGroupLabel.svelte": "adfb6d04ca7dba3550412c477a957dc7ba66145f5e431e5413f0c3e12544cc57",
           "packages/registry/generated/radio-group/svelte/index.ts": "6230c50c9d5da5058fc3e6d594825df5b80e96bfd128a654255832ab9b820720"
         },
         "vue": {
-          "packages/registry/generated/radio-group/vue/RadioGroup.vue": "fefe0e11fac3e46d061bc6b6a185043633c3fcc55402ebce5db70ca72d8ab77e",
+          "packages/registry/generated/radio-group/vue/RadioGroup.vue": "591fee88e023cb1072e8d3a9d119e3d9aebcc0c3c91fcb068f48130887a8d57d",
           "packages/registry/generated/radio-group/vue/RadioGroupItem.vue": "a7be1804c6fbabd91c404c7f4202aedc1d55b74ce5e213f60d39af5929444bb4",
           "packages/registry/generated/radio-group/vue/RadioGroupIndicator.vue": "ee3f1815ec9e4957909eb27ee8eadf76914a5897dbe01c1bc67f247c78578f86",
           "packages/registry/generated/radio-group/vue/RadioGroupLabel.vue": "edc58d856414fc07997a1658c735931edab036a3aa4a596b27ec0d0b692f5fc8",
@@ -287,5 +311,5 @@
       "cssHash": "5837683c4f2d5a95d6badb4c672a03ea4101fc3a2b319e2615fa9c6236231e32"
     }
   },
-  "sharedHash": "c0f3f542cc077b83821badbae506b973cf299554fd01f2b799151e2cf3ee3c21"
+  "sharedHash": "d842fea47087c7fcb1b911f962f65fd5e33fed3582765b796c83ea7b1caf02f5"
 }

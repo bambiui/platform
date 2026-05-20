@@ -190,6 +190,9 @@ function vueRootFile({
   const controlledExpression = controlledProp
     ? `props.${controlledProp.name} !== undefined`
     : "false";
+  const controlledDeclaration = controlledProp
+    ? `const controlled = computed(() => ${controlledExpression});\n`
+    : "";
   const ssrState = generatorOptions.ssrSelectedState;
   const ssrSelectedExpression = ssrState?.selectedPropNames
     ?.map((name) => `props.${name}`)
@@ -315,8 +318,7 @@ ${propsDecl}
 
 const rootRef = ref<${rootElementType} | null>(null);
 let behavior: ${behaviorClassName} | undefined;
-const controlled = computed(() => ${controlledExpression});
-${ssrSelectedValueLine}${polymorphicState}${eventAbortBlock}${controlledWarning}
+${controlledDeclaration}${ssrSelectedValueLine}${polymorphicState}${eventAbortBlock}${controlledWarning}
 onMounted(() => {
 ${listenerSetupBlock}  behavior = new ${behaviorClassName}(rootRef.value!, {
 ${behaviorOptionLines}

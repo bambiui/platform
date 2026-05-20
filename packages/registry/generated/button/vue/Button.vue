@@ -87,7 +87,6 @@ const props = withDefaults(defineProps<ButtonOptions>(), {
 
 const rootRef = ref<HTMLElement | null>(null);
 let behavior: ButtonBehavior | undefined;
-const controlled = computed(() => false);
 const componentTag = computed(() => props.as ?? "button");
 const isNativeElement = computed(() => componentTag.value === "button");
 const effectiveDisabled = computed(() => Boolean(props.disabled || props.loading));

@@ -115,7 +115,7 @@ export function Button({
       behaviorRef.current = null;
       behavior.destroy();
     };
-  }, [as, variant, size, disabled, loading]);
+  }, [as]);
 
   React.useEffect(() => {
     behaviorRef.current?.update?.({

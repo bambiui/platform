@@ -31,6 +31,7 @@ beforeAll(async () => {
       defaultTypeParts: ["trigger"],
       defaultTypeValue: "button",
       defaultTypeValues: ["button", "submit", "reset"],
+      sharePrimitiveHelpers: true,
       ssrSelectedState: {
         selectedPropNames: ["value", "defaultValue"],
         valuePropName: "value",
@@ -106,7 +107,7 @@ describe("createArtifact — tabs/svelte", () => {
     expect(result.files["Tabs.svelte"]).not.toContain("useEffect");
   });
 
-  it("Tabs.svelte contains inlined roving-focus primitive", () => {
+  it("Tabs.svelte references shared roving-focus primitive", () => {
     expect(result.files["Tabs.svelte"]).toContain("createRovingFocus");
     expect(result.files["Tabs.svelte"]).toContain("RovingFocusOptions");
   });

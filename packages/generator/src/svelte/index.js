@@ -143,6 +143,9 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const eventCallbackDestructureLines = eventCallbacks.map((ev) => `  ${ev.callbackName},`).join("\n");
 
   const controlledExpression = controlledProp ? `${controlledProp.name} !== undefined` : "false";
+  const controlledDeclaration = controlledProp
+    ? `const controlled = $derived(${controlledExpression});\n`
+    : "";
   const ssrState = generatorOptions.ssrSelectedState;
   const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
   const ssrContextLine = ssrState ? `setContext("${ssrState.contextName}", () => ${ssrSelectedExpression});\n` : "";
@@ -261,8 +264,7 @@ ${eventCallbackDestructureBlock}  children,
   ...props
 }: Props = $props();
 
-const controlled = $derived(${controlledExpression});
-${ssrContextLine}${polymorphicState}${controlledWarning}
+${controlledDeclaration}${ssrContextLine}${polymorphicState}${controlledWarning}
 let rootEl: ${rootElementType} | undefined = $state();
 let behavior: ${behaviorClassName} | undefined;
 

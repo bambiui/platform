@@ -373,6 +373,15 @@ export function validateGeneratorOptions(contract, options = {}) {
     }
   }
 
+  if (
+    options.sharePrimitiveHelpers !== undefined &&
+    typeof options.sharePrimitiveHelpers !== "boolean"
+  ) {
+    throw new Error(
+      `${contract.name}: generator option sharePrimitiveHelpers must be a boolean.`,
+    );
+  }
+
   for (const embedded of options.embeddedParts ?? []) {
     for (const field of ["parentPartName", "childPartName"]) {
       if (!partNames.has(embedded[field])) {
@@ -410,6 +419,34 @@ export function inlinePrimitiveSource(source) {
     .replace(/^\s*\/\/.*\n/gmu, "")
     .replace(/[ \t]+$/gmu, "")
     .trim();
+}
+
+export function exportedPrimitiveHelpers(source) {
+  const sf = makeProject().createSourceFile("primitive.ts", source);
+  const helpers = [];
+
+  for (const iface of sf.getInterfaces()) {
+    if (iface.isExported())
+      helpers.push({ name: iface.getName(), typeOnly: true });
+  }
+  for (const ta of sf.getTypeAliases()) {
+    if (ta.isExported()) helpers.push({ name: ta.getName(), typeOnly: true });
+  }
+  for (const fn of sf.getFunctions()) {
+    if (fn.isExported()) helpers.push({ name: fn.getName(), typeOnly: false });
+  }
+  for (const cls of sf.getClasses()) {
+    if (cls.isExported())
+      helpers.push({ name: cls.getName(), typeOnly: false });
+  }
+  for (const vs of sf.getVariableStatements()) {
+    if (!vs.isExported()) continue;
+    for (const decl of vs.getDeclarationList().getDeclarations()) {
+      helpers.push({ name: decl.getName(), typeOnly: false });
+    }
+  }
+
+  return helpers;
 }
 
 // ── Controller behavior extraction ────────────────────────────────────────
@@ -473,18 +510,37 @@ export function prepareArtifactGeneration({
     contract.componentName,
   );
 
-  const helperImports = usedHelpers.map((helper) =>
-    helper === "BambiBehavior" ? "type BambiBehavior" : helper,
-  );
+  const sharedPrimitiveHelpers = generatorOptions.sharePrimitiveHelpers
+    ? primitiveFiles.flatMap((src) => exportedPrimitiveHelpers(src))
+    : [];
+  for (const helper of sharedPrimitiveHelpers) usedHelpers.push(helper.name);
+
+  const helperImports = [
+    ...usedHelpers
+      .filter(
+        (helper) =>
+          !sharedPrimitiveHelpers.some(
+            (primitive) => primitive.name === helper,
+          ),
+      )
+      .map((helper) =>
+        helper === "BambiBehavior" ? "type BambiBehavior" : helper,
+      ),
+    ...sharedPrimitiveHelpers.map((helper) =>
+      helper.typeOnly ? `type ${helper.name}` : helper.name,
+    ),
+  ];
   const helperImportLine =
     helperImports.length > 0
       ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
       : "";
 
-  const primitivesBlock = primitiveFiles
-    .map((src) => inlinePrimitiveSource(src))
-    .filter(Boolean)
-    .join("\n\n");
+  const primitivesBlock = generatorOptions.sharePrimitiveHelpers
+    ? ""
+    : primitiveFiles
+        .map((src) => inlinePrimitiveSource(src))
+        .filter(Boolean)
+        .join("\n\n");
 
   return {
     publicContractSource,

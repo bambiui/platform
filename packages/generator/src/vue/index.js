@@ -1,6 +1,7 @@
 import {
   componentIndexFile,
   createPartGenerationContext,
+  createRootGenerationContext,
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
@@ -107,19 +108,25 @@ ${embeddedChildrenBlock}
 // ── Root Tabs.vue ──────────────────────────────────────────────────────────
 
 function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions, publicContractSource, primitivesBlock, behaviorSource, helperImportLine }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
-  const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const {
+    root,
+    polymorphicRootPropName,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+    hasEventCallbacks,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
 
   const withDefaultsLines = nonCallbackOptionNames
     .map((name) => {
@@ -138,10 +145,6 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
     return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
   }).join("\n");
 
-  const hasEventCallbacks = eventCallbacks.length > 0;
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
   const propsTypeName = hasEventCallbacks ? `${contract.componentName}Props` : publicOptionsType;
 
   const propsInterfaceBlock = hasEventCallbacks
@@ -159,9 +162,6 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
 provide("${ssrState.contextName}", selectedValue);
 ` : "";
 
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled.value,`;
@@ -208,8 +208,6 @@ provide("${ssrState.contextName}", selectedValue);
   const eventAbortCleanup = hasEventCallbacks ? `  eventAbort.abort();\n` : "";
 
   const propsInterfaceSection = propsInterfaceBlock ? `\n${propsInterfaceBlock}\n` : "";
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression = [
     hasDisabledOption ? "props.disabled" : null,
     hasLoadingOption ? "props.loading" : null,

@@ -1,6 +1,7 @@
 import {
   componentIndexFile,
   createPartGenerationContext,
+  createRootGenerationContext,
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   pascalCase,
@@ -107,19 +108,24 @@ ${embeddedChildrenBlock}  {@render children?.()}
 // ── Root Tabs.svelte ──────────────────────────────────────────────────────
 
 function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions, publicContractSource, primitivesBlock, behaviorSource, helperImportLine }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
-  const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const {
+    root,
+    polymorphicRootPropName,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
 
   // Destructure lines: non-callback options with defaults
   const destructureLines = nonCallbackOptionNames
@@ -142,9 +148,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
   const ssrContextLine = ssrState ? `setContext("${ssrState.contextName}", () => ${ssrSelectedExpression});\n` : "";
 
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled,`;
@@ -182,9 +185,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
     return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
   }).join("\n");
 
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
 
   // Event listener setup in onMount
   const listenerSetupLines = eventCallbacks.map((ev) => {
@@ -208,8 +208,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const cleanupReturn = listenerTeardownLines
     ? `  return () => {\n${listenerTeardownLines}\n    behavior?.destroy();\n  };`
     : `  return () => behavior?.destroy();`;
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression = [
     hasDisabledOption ? "disabled" : null,
     hasLoadingOption ? "loading" : null,

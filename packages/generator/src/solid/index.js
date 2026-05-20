@@ -1,5 +1,6 @@
 import {
   createPartGenerationContext,
+  createRootGenerationContext,
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
@@ -138,18 +139,23 @@ ${embeddedChildrenBlock}      {local.children}
 // ── Root wrapper ───────────────────────────────────────────────────────────
 
 function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
+  const {
+    root,
+    polymorphicRootPropName,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
 
   // splitProps key list: all non-callback option names + event callback names + children
   const splitLocalKeys = [
@@ -159,17 +165,12 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   ].map((n) => `"${n}"`).join(", ");
 
   // Build behaviorOptions using local.X (non-callback only)
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const behaviorOptions = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled(),`;
       return `      ${name}: local.${name},`;
     })
     .join("\n");
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression = [
     hasDisabledOption ? "local.disabled" : null,
     hasLoadingOption ? "local.loading" : null,
@@ -190,9 +191,6 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const controlledLine = controlledAttr ? `\n      ${controlledAttr.attribute}={controlled() ? "true" : undefined}` : "";
   const controlledExpression = controlledProp ? `local.${controlledProp.name} !== undefined` : "false";
 
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
 
   const rootTag = root.element;
   const nativeAttrType = `JSX.IntrinsicElements["${rootTag}"]`;

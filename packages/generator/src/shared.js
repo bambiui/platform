@@ -561,6 +561,58 @@ export function createPartGenerationContext(part, contract, options) {
   };
 }
 
+export function createRootGenerationContext({
+  contract,
+  optionsTypeName,
+  optionsNames,
+  generatorOptions,
+}) {
+  const root = contract.parts.find((part) => part.name === "root");
+  if (!root)
+    throw new Error(`${contract.name}: missing root part in contract.`);
+
+  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
+  const controlledProp = contract.props.find((prop) => prop.controlled);
+  const defaultProp = controlledProp
+    ? contract.props.find(
+        (prop) => prop.name === `default${pascalCase(controlledProp.name)}`,
+      )
+    : undefined;
+  const optionNames = optionsNames.filter((name) => name !== "controlled");
+  const eventCallbacks = contract.events ?? [];
+  const nonCallbackOptionNames = optionNames.filter(
+    (name) => !name.startsWith("on"),
+  );
+  const contractPropsByName = new Map(
+    contract.props.map((prop) => [prop.name, prop]),
+  );
+  const publicOptionsType = controlledProp
+    ? `Omit<${optionsTypeName}, "controlled">`
+    : optionsTypeName;
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const hasDisabledOption = optionNames.includes("disabled");
+  const hasLoadingOption = optionNames.includes("loading");
+  const hasEventCallbacks = eventCallbacks.length > 0;
+
+  return {
+    root,
+    polymorphicRootPropName,
+    controlledProp,
+    defaultProp,
+    optionNames,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+    hasEventCallbacks,
+  };
+}
+
 export function componentIndexFile(contract, extension) {
   const parts = contract.parts.filter((part) => part.name !== "root");
   const rootExport = `export { default as ${contract.componentName} } from "./${contract.componentName}.${extension}";`;

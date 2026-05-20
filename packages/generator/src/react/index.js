@@ -1,5 +1,6 @@
 import {
   createPartGenerationContext,
+  createRootGenerationContext,
   getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
@@ -185,26 +186,24 @@ function createReactWrapperSource({
   optionsNames,
   generatorOptions,
 }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root)
-    throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find(
-        (prop) => prop.name === `default${pascalCase(controlledProp.name)}`,
-      )
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter(
-    (name) => !name.startsWith("on"),
-  );
-  const contractPropsByName = new Map(
-    contract.props.map((prop) => [prop.name, prop]),
-  );
+  const {
+    root,
+    polymorphicRootPropName,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
   const destructuredOptions = nonCallbackOptionNames.map((name) => {
     const defaultValue = contractPropsByName.get(name)?.defaultValue;
     return defaultValue === undefined ? name : `${name} = "${defaultValue}"`;
@@ -215,15 +214,10 @@ function createReactWrapperSource({
     "children",
     "...props",
   ].join(",\n  ");
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const effectDeps = behaviorOptionNames.join(", ");
   const behaviorOptions = behaviorOptionNames
     .map((name) => `      ${name},`)
     .join("\n");
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression =
     [hasDisabledOption ? "disabled" : null, hasLoadingOption ? "loading" : null]
       .filter(Boolean)
@@ -275,9 +269,6 @@ function createReactWrapperSource({
 `
       : "";
 
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
   const rootElementType = polymorphicRootPropName
     ? "HTMLElement"
     : htmlElementType(root.element);

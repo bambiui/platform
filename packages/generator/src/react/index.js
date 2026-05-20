@@ -7,7 +7,7 @@ import {
   literalValue,
   pascalCase,
   prepareArtifactGeneration,
-  supportsDisabledAttribute,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── React attribute helpers ────────────────────────────────────────────────
@@ -133,7 +133,7 @@ function reactPartComponentSource(contract, options) {
         ? `\n${reactDataAttributeLine({ attribute: valueAttr, attributeConst: propsByName.get(valuePropName)?.attributeConst }, valuePropName)}`
         : "";
       const nativeDisabledAttribute =
-        disabledHandling && supportsDisabledAttribute(tag)
+        disabledHandling && supportsNativeDisabledAttribute(tag)
           ? `\n      disabled={${disabledPropName}}`
           : "";
       const disabledAttribute = disabledHandling
@@ -186,6 +186,8 @@ function createReactWrapperSource({
   const {
     root,
     polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
     controlledProp,
     defaultProp,
     eventCallbacks,
@@ -339,9 +341,6 @@ function createReactWrapperSource({
   const listenerTeardownBlock = listenerTeardownLines
     ? `${listenerTeardownLines}\n`
     : "";
-  const polymorphicNativeElement =
-    generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const rootElementSource = polymorphicRootPropName
     ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
   const isNativeElement = Component === "${polymorphicNativeElement}";

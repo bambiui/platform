@@ -7,7 +7,7 @@ import {
   literalValue,
   pascalCase,
   prepareArtifactGeneration,
-  supportsDisabledAttribute,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── Solid attribute helpers ────────────────────────────────────────────────
@@ -103,7 +103,7 @@ function solidPartComponentSource(contract, options) {
 
       const typeAttr = defaultTypeHandling ? `\n      type={local.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
-      const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n      disabled={local.${disabledPropName}}` : "";
+      const nativeDisabledAttribute = disabledHandling && supportsNativeDisabledAttribute(tag) ? `\n      disabled={local.${disabledPropName}}` : "";
       const disabledAttribute = disabledHandling
         ? `${nativeDisabledAttribute}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
         : "";
@@ -139,6 +139,8 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const {
     root,
     polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
     controlledProp,
     defaultProp,
     eventCallbacks,
@@ -240,8 +242,6 @@ function createSolidWrapperSource({ contract, behaviorClassName, optionsTypeName
   const cleanupBlock = listenerTeardownLines
     ? `    onCleanup(() => {\n${listenerTeardownLines}\n      behavior?.destroy();\n    });`
     : `    onCleanup(() => behavior?.destroy());`;
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? rootTag;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicSetup = polymorphicRootPropName ? `  const Component = () => local.${polymorphicRootPropName} ?? "${rootTag}";
   const isNativeElement = () => Component() === "${polymorphicNativeElement}";
   const shouldRenderPolymorphic = () => Boolean(local.${polymorphicRootPropName} && !isNativeElement());

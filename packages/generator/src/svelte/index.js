@@ -7,7 +7,7 @@ import {
   literalValue,
   pascalCase,
   prepareArtifactGeneration,
-  supportsDisabledAttribute,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── Svelte part components (TabsList, TabsTrigger, TabsContent) ────────────
@@ -63,7 +63,7 @@ function sveltePartFile(part, options, contract) {
 
   const typeAttr = defaultTypeHandling ? "\n    type={type}" : "";
   const valueAttribute = protocolValueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
-  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsNativeDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
   const disabledAttribute = disabledHandling
     ? `${nativeDisabledAttribute}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
     : "";
@@ -108,6 +108,8 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const {
     root,
     polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
     controlledProp,
     defaultProp,
     eventCallbacks,
@@ -210,8 +212,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
     hasLoadingOption ? "loading" : null,
   ].filter(Boolean).join(" || ") || "false";
   const rootElementType = "HTMLElement";
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const Component = $derived(${polymorphicRootPropName} ?? "${root.element}");
 const isNativeElement = $derived(Component === "${polymorphicNativeElement}");
 const effectiveDisabled = $derived(Boolean(${effectiveDisabledExpression}));

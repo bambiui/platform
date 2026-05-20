@@ -8,7 +8,7 @@ import {
   literalValue,
   pascalCase,
   prepareArtifactGeneration,
-  supportsDisabledAttribute,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── Vue part components (TabsList, TabsTrigger, TabsContent) ──────────────
@@ -65,7 +65,7 @@ function vuePartFile(part, options, contract) {
 
   const typeAttr = defaultTypeHandling ? `\n    type="${options.defaultTypeValue}"` : "";
   const valueAttribute = protocolValueHandling ? `\n    :${valueAttr}="props.${valuePropName}"` : "";
-  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    :disabled="props.${disabledPropName}"` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsNativeDisabledAttribute(tag) ? `\n    :disabled="props.${disabledPropName}"` : "";
   const disabledAttribute = disabledHandling
     ? `${nativeDisabledAttribute}\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
     : "";
@@ -108,6 +108,8 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
   const {
     root,
     polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
     controlledProp,
     defaultProp,
     eventCallbacks,
@@ -210,8 +212,6 @@ provide("${ssrState.contextName}", selectedValue);
     hasLoadingOption ? "props.loading" : null,
   ].filter(Boolean).join(" || ") || "false";
   const rootElementType = polymorphicRootPropName ? "HTMLElement" : htmlElementType(root.element);
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const componentTag = computed(() => props.${polymorphicRootPropName} ?? "${root.element}");
 const isNativeElement = computed(() => componentTag.value === "${polymorphicNativeElement}");
 const effectiveDisabled = computed(() => Boolean(${effectiveDisabledExpression}));

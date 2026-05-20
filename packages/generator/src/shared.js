@@ -14,7 +14,10 @@ export function htmlElementType(element) {
   return `HTML${pascalCase(element)}Element`;
 }
 
-export function supportsDisabledAttribute(element) {
+// HTML platform semantics used by generated wrappers. Keep these generic and
+// element-based; component-specific behavior belongs in contracts/controllers
+// or explicit generator metadata.
+export function supportsNativeDisabledAttribute(element) {
   return [
     "button",
     "fieldset",
@@ -576,6 +579,9 @@ export function createRootGenerationContext({
     throw new Error(`${contract.name}: missing root part in contract.`);
 
   const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
+  const polymorphicNativeElement =
+    generatorOptions.polymorphicNativeElement ?? root.element;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const controlledProp = contract.props.find((prop) => prop.controlled);
   const defaultProp = controlledProp
     ? contract.props.find(
@@ -603,6 +609,8 @@ export function createRootGenerationContext({
   return {
     root,
     polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
     controlledProp,
     defaultProp,
     optionNames,

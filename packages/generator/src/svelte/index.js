@@ -1,95 +1,72 @@
 import {
-  parseContractSource,
-  parseOptionsNames,
-  inlinePrimitiveSource,
-  extractControllerBehavior,
-  validateGeneratorOptions,
+  componentIndexFile,
+  createPartGenerationContext,
+  createRootGenerationContext,
+  getEmbeddedChildrenForPart,
+  getOmittedEmbeddedPartNames,
+  literalValue,
   pascalCase,
+  prepareArtifactGeneration,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── Svelte part components (TabsList, TabsTrigger, TabsContent) ────────────
 
-function svelteLiteral(value) {
-  return typeof value === "string" ? `"${value}"` : String(value);
-}
-
 function svelteSsrAttributeLine(attribute) {
   const name = attribute.svelteName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n    ${name}={${svelteLiteral(attribute.value)}}`;
-  return `\n    ${name}={hasSelectedValue ? (isSelected ? ${svelteLiteral(attribute.active)} : ${svelteLiteral(attribute.inactive)}) : undefined}`;
+  if (attribute.value !== undefined) return `\n    ${name}={${literalValue(attribute.value)}}`;
+  return `\n    ${name}={hasSelectedValue ? (isSelected ? ${literalValue(attribute.active)} : ${literalValue(attribute.inactive)}) : undefined}`;
 }
 
-function supportsDisabledAttribute(element) {
-  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
-}
-
-function omittedEmbeddedPartNames(options) {
-  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
-}
 
 function svelteEmbeddedAttributeLine(attribute) {
   const name = attribute.svelteName ?? attribute.name;
   if (attribute.selected) return `\n    ${name}={hasSelectedValue ? isSelected : undefined}`;
   if (attribute.propName) return `\n    ${name}={${attribute.propName}}`;
-  if (attribute.value !== undefined) return `\n    ${name}={${svelteLiteral(attribute.value)}}`;
+  if (attribute.value !== undefined) return `\n    ${name}={${literalValue(attribute.value)}}`;
   return `\n    ${name}=""`;
 }
 
 function svelteEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? []).map((attribute) => svelteEmbeddedAttributeLine(attribute)).join("");
       return `  <${child.element}
     ${child.attribute}=""${attrs}
   />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 
 function sveltePartFile(part, options, contract) {
-  const valuePropParts = new Set([
-    ...(options.valuePropParts ?? []),
-    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
-  ]);
-  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
-  const disabledPropParts = new Set(options.disabledPropParts ?? []);
-  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
-  const valuePropName = options.valuePropName;
-  const disabledPropName = options.disabledPropName;
-  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
-  const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-  const valueHandling = valuePropParts.has(part.name);
-  const protocolValueHandling = protocolValuePropParts.has(part.name);
-  const disabledHandling = disabledPropParts.has(part.name);
-  if (valueHandling && (!valuePropName || !valueAttr)) {
-    throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
-  }
-  if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-    throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
-  }
+  const {
+    tag,
+    valuePropName,
+    disabledPropName,
+    valueAttr,
+    disabledAttr,
+    valueHandling,
+    protocolValueHandling,
+    disabledHandling,
+    defaultTypeHandling,
+    ssrState,
+    ssrPart,
+  } = createPartGenerationContext(part, contract, options);
 
-  const tag = part.element;
   const propDecls = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
-    defaultTypeParts.has(part.name)
+    defaultTypeHandling
       ? `  type?: ${(options.defaultTypeValues ?? [options.defaultTypeValue]).map((value) => `"${value}"`).join(" | ")};`
       : null,
   ].filter(Boolean).join("\n");
 
-  const typeAttr = defaultTypeParts.has(part.name) ? "\n    type={type}" : "";
+  const typeAttr = defaultTypeHandling ? "\n    type={type}" : "";
   const valueAttribute = protocolValueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
-  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsNativeDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
   const disabledAttribute = disabledHandling
     ? `${nativeDisabledAttribute}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
     : "";
-  const ssrState = options.ssrSelectedState;
-  const ssrPart = ssrState?.parts?.[part.name];
   const ssrStateSetup = ssrPart && valueHandling ? `
 const selectedValue = getContext<(() => string | undefined) | undefined>("${ssrState.contextName}");
 const hasSelectedValue = $derived(selectedValue?.() !== undefined);
@@ -105,7 +82,7 @@ const isSelected = $derived(selectedValue?.() === ${ssrState.valuePropName});` :
   const propDestructure = [
     valueHandling ? valuePropName : null,
     disabledHandling ? disabledPropName : null,
-    defaultTypeParts.has(part.name) ? `type = "${options.defaultTypeValue}"` : null,
+    defaultTypeHandling ? `type = "${options.defaultTypeValue}"` : null,
     "children",
     "...props",
   ].filter(Boolean).join(", ");
@@ -128,19 +105,26 @@ ${embeddedChildrenBlock}  {@render children?.()}
 // ── Root Tabs.svelte ──────────────────────────────────────────────────────
 
 function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions, publicContractSource, primitivesBlock, behaviorSource, helperImportLine }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
-  const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const {
+    root,
+    polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
 
   // Destructure lines: non-callback options with defaults
   const destructureLines = nonCallbackOptionNames
@@ -163,9 +147,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
   const ssrContextLine = ssrState ? `setContext("${ssrState.contextName}", () => ${ssrSelectedExpression});\n` : "";
 
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled,`;
@@ -203,9 +184,6 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
     return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
   }).join("\n");
 
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
 
   // Event listener setup in onMount
   const listenerSetupLines = eventCallbacks.map((ev) => {
@@ -229,15 +207,11 @@ function svelteRootFile({ contract, behaviorClassName, optionsTypeName, optionsN
   const cleanupReturn = listenerTeardownLines
     ? `  return () => {\n${listenerTeardownLines}\n    behavior?.destroy();\n  };`
     : `  return () => behavior?.destroy();`;
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression = [
     hasDisabledOption ? "disabled" : null,
     hasLoadingOption ? "loading" : null,
   ].filter(Boolean).join(" || ") || "false";
   const rootElementType = "HTMLElement";
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const Component = $derived(${polymorphicRootPropName} ?? "${root.element}");
 const isNativeElement = $derived(Component === "${polymorphicNativeElement}");
 const effectiveDisabled = $derived(Boolean(${effectiveDisabledExpression}));
@@ -318,37 +292,21 @@ ${rootMarkup}
 
 // ── index.ts re-export ────────────────────────────────────────────────────
 
-function svelteIndexFile(contract) {
-  const parts = contract.parts.filter((p) => p.name !== "root");
-  const rootExport = `export { default as ${contract.componentName} } from "./${contract.componentName}.svelte";`;
-  const partExports = parts
-    .map((p) => `export { default as ${contract.componentName}${pascalCase(p.name)} } from "./${contract.componentName}${pascalCase(p.name)}.svelte";`)
-    .join("\n");
-  return `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
-${rootExport}
-${partExports}
-`;
-}
-
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function createSvelteArtifact({ contractSource, controllerSource, primitiveFiles = [], contractExportName, generatorOptions = {} }) {
-  const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
-  validateGeneratorOptions(contract, generatorOptions);
-  const behaviorClassName = `${contract.componentName}Behavior`;
-  const optionsTypeName = `${contract.componentName}Options`;
-  const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
-  const { behaviorSource, usedHelpers } = extractControllerBehavior(controllerSource, contract.componentName);
-
-  const helperImports = usedHelpers.map((h) => (h === "BambiBehavior" ? "type BambiBehavior" : h));
-  const helperImportLine = helperImports.length > 0
-    ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
-    : "";
-
-  const primitivesBlock = primitiveFiles
-    .map((src) => inlinePrimitiveSource(src))
-    .filter(Boolean)
-    .join("\n\n");
+export function createSvelteArtifact(options) {
+  const {
+    publicContractSource,
+    contract,
+    behaviorClassName,
+    optionsTypeName,
+    optionsNames,
+    behaviorSource,
+    usedHelpers,
+    helperImportLine,
+    primitivesBlock,
+  } = prepareArtifactGeneration(options);
+  const { generatorOptions = {} } = options;
 
   const files = {};
 
@@ -359,17 +317,17 @@ export function createSvelteArtifact({ contractSource, controllerSource, primiti
   });
 
   // Part components
-  const omittedParts = omittedEmbeddedPartNames(generatorOptions);
+  const omittedParts = getOmittedEmbeddedPartNames(generatorOptions);
   for (const part of contract.parts.filter((p) => p.name !== "root" && !omittedParts.has(p.name))) {
     const fileName = `${contract.componentName}${pascalCase(part.name)}.svelte`;
     files[fileName] = sveltePartFile(part, generatorOptions, contract);
   }
 
   // Re-export index
-  files["index.ts"] = svelteIndexFile({
+  files["index.ts"] = componentIndexFile({
     ...contract,
     parts: contract.parts.filter((p) => !omittedParts.has(p.name)),
-  });
+  }, "svelte");
 
   return { files, usedHelpers };
 }

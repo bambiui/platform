@@ -1,83 +1,59 @@
 import {
-  parseContractSource,
-  parseOptionsNames,
-  inlinePrimitiveSource,
-  extractControllerBehavior,
-  validateGeneratorOptions,
+  componentIndexFile,
+  createPartGenerationContext,
+  createRootGenerationContext,
+  getEmbeddedChildrenForPart,
+  getOmittedEmbeddedPartNames,
+  htmlElementType,
+  literalValue,
   pascalCase,
+  prepareArtifactGeneration,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── Vue part components (TabsList, TabsTrigger, TabsContent) ──────────────
 
-function vueLiteral(value) {
-  return typeof value === "string" ? `'${value}'` : String(value);
-}
-
 function vueSsrAttributeLine(attribute) {
   const name = attribute.vueName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n    :${name}="${vueLiteral(attribute.value)}"`;
-  return `\n    :${name}="hasSelectedValue ? (isSelected ? ${vueLiteral(attribute.active)} : ${vueLiteral(attribute.inactive)}) : undefined"`;
+  if (attribute.value !== undefined) return `\n    :${name}="${literalValue(attribute.value, "'")}"`;
+  return `\n    :${name}="hasSelectedValue ? (isSelected ? ${literalValue(attribute.active, "'")} : ${literalValue(attribute.inactive, "'")}) : undefined"`;
 }
 
-function htmlElementType(element) {
-  return `HTML${pascalCase(element)}Element`;
-}
-
-function supportsDisabledAttribute(element) {
-  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
-}
-
-function omittedEmbeddedPartNames(options) {
-  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
-}
 
 function vueEmbeddedAttributeLine(attribute) {
   const name = attribute.vueName ?? attribute.name;
   if (attribute.selected) return `\n      :${name}="hasSelectedValue ? isSelected : undefined"`;
   if (attribute.propName) return `\n      :${name}="props.${attribute.propName}"`;
-  if (attribute.value !== undefined) return `\n      :${name}="${vueLiteral(attribute.value)}"`;
+  if (attribute.value !== undefined) return `\n      :${name}="${literalValue(attribute.value, "'")}"`;
   return `\n      ${name}=""`;
 }
 
 function vueEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? []).map((attribute) => vueEmbeddedAttributeLine(attribute)).join("");
       return `    <${child.element}
       ${child.attribute}=""${attrs}
     />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 
 function vuePartFile(part, options, contract) {
-  const valuePropParts = new Set([
-    ...(options.valuePropParts ?? []),
-    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
-  ]);
-  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
-  const disabledPropParts = new Set(options.disabledPropParts ?? []);
-  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
-  const valuePropName = options.valuePropName;
-  const disabledPropName = options.disabledPropName;
-  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
-  const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-  const valueHandling = valuePropParts.has(part.name);
-  const protocolValueHandling = protocolValuePropParts.has(part.name);
-  const disabledHandling = disabledPropParts.has(part.name);
-  if (valueHandling && (!valuePropName || !valueAttr)) {
-    throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
-  }
-  if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-    throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
-  }
+  const {
+    tag,
+    valuePropName,
+    disabledPropName,
+    valueAttr,
+    disabledAttr,
+    valueHandling,
+    protocolValueHandling,
+    disabledHandling,
+    defaultTypeHandling,
+    ssrState,
+    ssrPart,
+  } = createPartGenerationContext(part, contract, options);
 
-  const tag = part.element;
   const propTypeParts = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
@@ -87,14 +63,12 @@ function vuePartFile(part, options, contract) {
     ? `interface Props {\n${propTypeParts}\n}`
     : "";
 
-  const typeAttr = defaultTypeParts.has(part.name) ? `\n    type="${options.defaultTypeValue}"` : "";
+  const typeAttr = defaultTypeHandling ? `\n    type="${options.defaultTypeValue}"` : "";
   const valueAttribute = protocolValueHandling ? `\n    :${valueAttr}="props.${valuePropName}"` : "";
-  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    :disabled="props.${disabledPropName}"` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsNativeDisabledAttribute(tag) ? `\n    :disabled="props.${disabledPropName}"` : "";
   const disabledAttribute = disabledHandling
     ? `${nativeDisabledAttribute}\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
     : "";
-  const ssrState = options.ssrSelectedState;
-  const ssrPart = ssrState?.parts?.[part.name];
   const ssrStateSetup = ssrPart && valueHandling ? `
 const selectedValue = inject<ComputedRef<string | undefined>>("${ssrState.contextName}");
 const hasSelectedValue = computed(() => selectedValue?.value !== undefined);
@@ -131,19 +105,27 @@ ${embeddedChildrenBlock}
 // ── Root Tabs.vue ──────────────────────────────────────────────────────────
 
 function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions, publicContractSource, primitivesBlock, behaviorSource, helperImportLine }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
-  const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const {
+    root,
+    polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+    hasEventCallbacks,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
 
   const withDefaultsLines = nonCallbackOptionNames
     .map((name) => {
@@ -162,10 +144,6 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
     return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
   }).join("\n");
 
-  const hasEventCallbacks = eventCallbacks.length > 0;
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
   const propsTypeName = hasEventCallbacks ? `${contract.componentName}Props` : publicOptionsType;
 
   const propsInterfaceBlock = hasEventCallbacks
@@ -183,9 +161,6 @@ function vueRootFile({ contract, behaviorClassName, optionsTypeName, optionsName
 provide("${ssrState.contextName}", selectedValue);
 ` : "";
 
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const behaviorOptionLines = behaviorOptionNames
     .map((name) => {
       if (name === "controlled") return `      controlled: controlled.value,`;
@@ -232,15 +207,11 @@ provide("${ssrState.contextName}", selectedValue);
   const eventAbortCleanup = hasEventCallbacks ? `  eventAbort.abort();\n` : "";
 
   const propsInterfaceSection = propsInterfaceBlock ? `\n${propsInterfaceBlock}\n` : "";
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression = [
     hasDisabledOption ? "props.disabled" : null,
     hasLoadingOption ? "props.loading" : null,
   ].filter(Boolean).join(" || ") || "false";
   const rootElementType = polymorphicRootPropName ? "HTMLElement" : htmlElementType(root.element);
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const polymorphicState = polymorphicRootPropName ? `const componentTag = computed(() => props.${polymorphicRootPropName} ?? "${root.element}");
 const isNativeElement = computed(() => componentTag.value === "${polymorphicNativeElement}");
 const effectiveDisabled = computed(() => Boolean(${effectiveDisabledExpression}));
@@ -316,37 +287,21 @@ ${behaviorOptionLines}
 
 // ── index.ts re-export ────────────────────────────────────────────────────
 
-function vueIndexFile(contract) {
-  const parts = contract.parts.filter((p) => p.name !== "root");
-  const rootExport = `export { default as ${contract.componentName} } from "./${contract.componentName}.vue";`;
-  const partExports = parts
-    .map((p) => `export { default as ${contract.componentName}${pascalCase(p.name)} } from "./${contract.componentName}${pascalCase(p.name)}.vue";`)
-    .join("\n");
-  return `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
-${rootExport}
-${partExports}
-`;
-}
-
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function createVueArtifact({ contractSource, controllerSource, primitiveFiles = [], contractExportName, generatorOptions = {} }) {
-  const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
-  validateGeneratorOptions(contract, generatorOptions);
-  const behaviorClassName = `${contract.componentName}Behavior`;
-  const optionsTypeName = `${contract.componentName}Options`;
-  const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
-  const { behaviorSource, usedHelpers } = extractControllerBehavior(controllerSource, contract.componentName);
-
-  const helperImports = usedHelpers.map((h) => (h === "BambiBehavior" ? "type BambiBehavior" : h));
-  const helperImportLine = helperImports.length > 0
-    ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
-    : "";
-
-  const primitivesBlock = primitiveFiles
-    .map((src) => inlinePrimitiveSource(src))
-    .filter(Boolean)
-    .join("\n\n");
+export function createVueArtifact(options) {
+  const {
+    publicContractSource,
+    contract,
+    behaviorClassName,
+    optionsTypeName,
+    optionsNames,
+    behaviorSource,
+    usedHelpers,
+    helperImportLine,
+    primitivesBlock,
+  } = prepareArtifactGeneration(options);
+  const { generatorOptions = {} } = options;
 
   const files = {};
 
@@ -357,17 +312,17 @@ export function createVueArtifact({ contractSource, controllerSource, primitiveF
   });
 
   // Part components
-  const omittedParts = omittedEmbeddedPartNames(generatorOptions);
+  const omittedParts = getOmittedEmbeddedPartNames(generatorOptions);
   for (const part of contract.parts.filter((p) => p.name !== "root" && !omittedParts.has(p.name))) {
     const fileName = `${contract.componentName}${pascalCase(part.name)}.vue`;
     files[fileName] = vuePartFile(part, generatorOptions, contract);
   }
 
   // Re-export index
-  files["index.ts"] = vueIndexFile({
+  files["index.ts"] = componentIndexFile({
     ...contract,
     parts: contract.parts.filter((p) => !omittedParts.has(p.name)),
-  });
+  }, "vue");
 
   return { files, usedHelpers };
 }

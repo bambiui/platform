@@ -1,10 +1,13 @@
 import {
-  parseContractSource,
-  parseOptionsNames,
-  inlinePrimitiveSource,
-  extractControllerBehavior,
-  validateGeneratorOptions,
+  createPartGenerationContext,
+  createRootGenerationContext,
+  getEmbeddedChildrenForPart,
+  getOmittedEmbeddedPartNames,
+  htmlElementType,
+  literalValue,
   pascalCase,
+  prepareArtifactGeneration,
+  supportsNativeDisabledAttribute,
 } from "../shared.js";
 
 // ── React attribute helpers ────────────────────────────────────────────────
@@ -13,22 +16,6 @@ function reactAttributeValue(prop) {
   if (prop.name === "controlled") return 'controlled ? "true" : undefined';
   if (prop.type === "boolean") return `${prop.name} ? "true" : undefined`;
   return prop.name;
-}
-
-function htmlElementType(element) {
-  return `HTML${pascalCase(element)}Element`;
-}
-
-function supportsDisabledAttribute(element) {
-  return [
-    "button",
-    "fieldset",
-    "input",
-    "optgroup",
-    "option",
-    "select",
-    "textarea",
-  ].includes(element);
 }
 
 function reactDataAttributeLine(attribute, expression, indent = "      ") {
@@ -47,14 +34,6 @@ function reactObjectAttributeLine(attribute, expression, indent = "      ") {
     : `${indent}"${attribute.attribute}": ${expression},`;
 }
 
-function omittedEmbeddedPartNames(options) {
-  return new Set(
-    (options.embeddedParts ?? [])
-      .filter((part) => part.omitChildComponent)
-      .map((part) => part.childPartName),
-  );
-}
-
 function reactPartPropsSource(contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -64,7 +43,7 @@ function reactPartPropsSource(contract, options) {
   const disabledPropParts = new Set(options.disabledPropParts ?? []);
   const disabledPropName = options.disabledPropName;
 
-  const omittedParts = omittedEmbeddedPartNames(options);
+  const omittedParts = getOmittedEmbeddedPartNames(options);
 
   return contract.parts
     .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
@@ -87,15 +66,11 @@ function reactPartPropsSource(contract, options) {
     .join("\n\n");
 }
 
-function reactLiteral(value) {
-  return typeof value === "string" ? `"${value}"` : String(value);
-}
-
 function reactSsrAttributeLine(attribute) {
   const name = attribute.reactName ?? attribute.name;
   if (attribute.value !== undefined)
-    return `\n      ${name}={${reactLiteral(attribute.value)}}`;
-  return `\n      ${name}={hasSelectedValue ? (isSelected ? ${reactLiteral(attribute.active)} : ${reactLiteral(attribute.inactive)}) : undefined}`;
+    return `\n      ${name}={${literalValue(attribute.value)}}`;
+  return `\n      ${name}={hasSelectedValue ? (isSelected ? ${literalValue(attribute.active)} : ${literalValue(attribute.inactive)}) : undefined}`;
 }
 
 function reactEmbeddedAttributeLine(attribute) {
@@ -104,18 +79,13 @@ function reactEmbeddedAttributeLine(attribute) {
     return `\n        ${name}={hasSelectedValue ? isSelected : undefined}`;
   if (attribute.propName) return `\n        ${name}={${attribute.propName}}`;
   if (attribute.value !== undefined)
-    return `\n        ${name}={${reactLiteral(attribute.value)}}`;
+    return `\n        ${name}={${literalValue(attribute.value)}}`;
   return `\n        ${name}=""`;
 }
 
 function reactEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find(
-        (candidate) => candidate.name === embedded.childPartName,
-      );
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? [])
         .map((attribute) => reactEmbeddedAttributeLine(attribute))
         .join("");
@@ -123,48 +93,31 @@ function reactEmbeddedChildrenSource(part, contract, options) {
 ${reactMarkerAttributeLine(child, "        ")}${attrs}
       />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 
 function reactPartComponentSource(contract, options) {
-  const valuePropParts = new Set([
-    ...(options.valuePropParts ?? []),
-    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
-  ]);
-  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
-  const disabledPropParts = new Set(options.disabledPropParts ?? []);
-  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
-  const valuePropName = options.valuePropName;
-  const disabledPropName = options.disabledPropName;
-  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName
-    ? propsByName.get(valuePropName)?.attribute
-    : undefined;
-  const disabledAttr = disabledPropName
-    ? propsByName.get(disabledPropName)?.attribute
-    : undefined;
-  const omittedParts = omittedEmbeddedPartNames(options);
+  const omittedParts = getOmittedEmbeddedPartNames(options);
 
   return contract.parts
     .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const propsName = `${componentName}Props`;
-      const tag = part.element;
-      const valueHandling = valuePropParts.has(part.name);
-      const protocolValueHandling = protocolValuePropParts.has(part.name);
-      const disabledHandling = disabledPropParts.has(part.name);
-      if (valueHandling && (!valuePropName || !valueAttr)) {
-        throw new Error(
-          `${contract.name}/${part.name}: valuePropName must reference a contract prop.`,
-        );
-      }
-      if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-        throw new Error(
-          `${contract.name}/${part.name}: disabledPropName must reference a contract prop.`,
-        );
-      }
+      const {
+        tag,
+        valuePropName,
+        disabledPropName,
+        propsByName,
+        valueAttr,
+        disabledAttr,
+        valueHandling,
+        protocolValueHandling,
+        disabledHandling,
+        defaultTypeHandling,
+        ssrState,
+        ssrPart,
+      } = createPartGenerationContext(part, contract, options);
       const destructured = [
         valueHandling ? valuePropName : undefined,
         disabledHandling ? disabledPropName : undefined,
@@ -173,21 +126,19 @@ function reactPartComponentSource(contract, options) {
       ]
         .filter(Boolean)
         .join(", ");
-      const typeAttr = defaultTypeParts.has(part.name)
+      const typeAttr = defaultTypeHandling
         ? `\n      type={props.type ?? "${options.defaultTypeValue}"}`
         : "";
       const valueAttribute = protocolValueHandling
         ? `\n${reactDataAttributeLine({ attribute: valueAttr, attributeConst: propsByName.get(valuePropName)?.attributeConst }, valuePropName)}`
         : "";
       const nativeDisabledAttribute =
-        disabledHandling && supportsDisabledAttribute(tag)
+        disabledHandling && supportsNativeDisabledAttribute(tag)
           ? `\n      disabled={${disabledPropName}}`
           : "";
       const disabledAttribute = disabledHandling
         ? `${nativeDisabledAttribute}\n${reactDataAttributeLine({ attribute: disabledAttr, attributeConst: propsByName.get(disabledPropName)?.attributeConst }, `${disabledPropName} ? "true" : undefined`)}`
         : "";
-      const ssrState = options.ssrSelectedState;
-      const ssrPart = ssrState?.parts?.[part.name];
       const ssrStateSetup =
         ssrPart && valueHandling
           ? `
@@ -232,26 +183,26 @@ function createReactWrapperSource({
   optionsNames,
   generatorOptions,
 }) {
-  const root = contract.parts.find((part) => part.name === "root");
-  if (!root)
-    throw new Error(`${contract.name}: missing root part in contract.`);
-  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
-
-  const controlledProp = contract.props.find((prop) => prop.controlled);
-  const defaultProp = controlledProp
-    ? contract.props.find(
-        (prop) => prop.name === `default${pascalCase(controlledProp.name)}`,
-      )
-    : undefined;
-  const optionNames = optionsNames.filter((name) => name !== "controlled");
-  // Event callbacks come from contract.events; never from optionsNames
-  const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter(
-    (name) => !name.startsWith("on"),
-  );
-  const contractPropsByName = new Map(
-    contract.props.map((prop) => [prop.name, prop]),
-  );
+  const {
+    root,
+    polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
+    controlledProp,
+    defaultProp,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+  } = createRootGenerationContext({
+    contract,
+    optionsTypeName,
+    optionsNames,
+    generatorOptions,
+  });
   const destructuredOptions = nonCallbackOptionNames.map((name) => {
     const defaultValue = contractPropsByName.get(name)?.defaultValue;
     return defaultValue === undefined ? name : `${name} = "${defaultValue}"`;
@@ -262,15 +213,10 @@ function createReactWrapperSource({
     "children",
     "...props",
   ].join(",\n  ");
-  const behaviorOptionNames = controlledProp
-    ? [...nonCallbackOptionNames, "controlled"]
-    : nonCallbackOptionNames;
   const effectDeps = behaviorOptionNames.join(", ");
   const behaviorOptions = behaviorOptionNames
     .map((name) => `      ${name},`)
     .join("\n");
-  const hasDisabledOption = optionNames.includes("disabled");
-  const hasLoadingOption = optionNames.includes("loading");
   const effectiveDisabledExpression =
     [hasDisabledOption ? "disabled" : null, hasLoadingOption ? "loading" : null]
       .filter(Boolean)
@@ -322,9 +268,6 @@ function createReactWrapperSource({
 `
       : "";
 
-  const publicOptionsType = controlledProp
-    ? `Omit<${optionsTypeName}, "controlled">`
-    : optionsTypeName;
   const rootElementType = polymorphicRootPropName
     ? "HTMLElement"
     : htmlElementType(root.element);
@@ -398,9 +341,6 @@ function createReactWrapperSource({
   const listenerTeardownBlock = listenerTeardownLines
     ? `${listenerTeardownLines}\n`
     : "";
-  const polymorphicNativeElement =
-    generatorOptions.polymorphicNativeElement ?? root.element;
-  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
   const rootElementSource = polymorphicRootPropName
     ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
   const isNativeElement = Component === "${polymorphicNativeElement}";
@@ -507,38 +447,19 @@ ${reactPartComponentSource(contract, generatorOptions)}`;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function createReactArtifact({
-  contractSource,
-  controllerSource,
-  primitiveFiles = [],
-  contractExportName,
-  generatorOptions = {},
-}) {
-  const { publicContractSource, contract } = parseContractSource(
-    contractSource,
-    contractExportName,
-  );
-  validateGeneratorOptions(contract, generatorOptions);
-  const behaviorClassName = `${contract.componentName}Behavior`;
-  const optionsTypeName = `${contract.componentName}Options`;
-  const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
-  const { behaviorSource, usedHelpers } = extractControllerBehavior(
-    controllerSource,
-    contract.componentName,
-  );
-
-  const helperImports = usedHelpers.map((h) =>
-    h === "BambiBehavior" ? "type BambiBehavior" : h,
-  );
-  const helperImportLine =
-    helperImports.length > 0
-      ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
-      : "";
-
-  const primitivesBlock = primitiveFiles
-    .map((src) => inlinePrimitiveSource(src))
-    .filter(Boolean)
-    .join("\n\n");
+export function createReactArtifact(options) {
+  const {
+    publicContractSource,
+    contract,
+    behaviorClassName,
+    optionsTypeName,
+    optionsNames,
+    behaviorSource,
+    usedHelpers,
+    helperImportLine,
+    primitivesBlock,
+  } = prepareArtifactGeneration(options);
+  const { generatorOptions = {} } = options;
 
   const content = `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
 import * as React from "react";

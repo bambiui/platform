@@ -10,6 +10,37 @@ export function pascalCase(value) {
     .join("");
 }
 
+export function htmlElementType(element) {
+  return `HTML${pascalCase(element)}Element`;
+}
+
+// HTML platform semantics used by generated wrappers. Keep these generic and
+// element-based; component-specific behavior belongs in contracts/controllers
+// or explicit generator metadata.
+export function supportsNativeDisabledAttribute(element) {
+  return [
+    "button",
+    "fieldset",
+    "input",
+    "optgroup",
+    "option",
+    "select",
+    "textarea",
+  ].includes(element);
+}
+
+export function literalValue(value, quote = '"') {
+  return typeof value === "string" ? `${quote}${value}${quote}` : String(value);
+}
+
+export function getOmittedEmbeddedPartNames(options) {
+  return new Set(
+    (options.embeddedParts ?? [])
+      .filter((part) => part.omitChildComponent)
+      .map((part) => part.childPartName),
+  );
+}
+
 function makeProject() {
   return new Project({
     useInMemoryFileSystem: true,
@@ -418,4 +449,193 @@ export function extractControllerBehavior(source, componentName) {
     .replace(/\n$/u, "");
 
   return { behaviorSource, usedHelpers };
+}
+
+// ── Artifact generation preparation ──────────────────────────────────────
+
+export function prepareArtifactGeneration({
+  contractSource,
+  controllerSource,
+  primitiveFiles = [],
+  contractExportName,
+  generatorOptions = {},
+}) {
+  const { publicContractSource, contract } = parseContractSource(
+    contractSource,
+    contractExportName,
+  );
+  validateGeneratorOptions(contract, generatorOptions);
+  const behaviorClassName = `${contract.componentName}Behavior`;
+  const optionsTypeName = `${contract.componentName}Options`;
+  const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
+  const { behaviorSource, usedHelpers } = extractControllerBehavior(
+    controllerSource,
+    contract.componentName,
+  );
+
+  const helperImports = usedHelpers.map((helper) =>
+    helper === "BambiBehavior" ? "type BambiBehavior" : helper,
+  );
+  const helperImportLine =
+    helperImports.length > 0
+      ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
+      : "";
+
+  const primitivesBlock = primitiveFiles
+    .map((src) => inlinePrimitiveSource(src))
+    .filter(Boolean)
+    .join("\n\n");
+
+  return {
+    publicContractSource,
+    contract,
+    behaviorClassName,
+    optionsTypeName,
+    optionsNames,
+    behaviorSource,
+    usedHelpers,
+    helperImportLine,
+    primitivesBlock,
+  };
+}
+
+export function getEmbeddedChildrenForPart(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find(
+        (candidate) => candidate.name === embedded.childPartName,
+      );
+      return child ? { embedded, child } : undefined;
+    })
+    .filter(Boolean);
+}
+
+export function createPartGenerationContext(part, contract, options) {
+  const valuePropParts = new Set([
+    ...(options.valuePropParts ?? []),
+    ...Object.keys(options.ssrSelectedState?.parts ?? {}),
+  ]);
+  const protocolValuePropParts = new Set(options.valuePropParts ?? []);
+  const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const defaultTypeParts = new Set(options.defaultTypeParts ?? []);
+  const valuePropName = options.valuePropName;
+  const disabledPropName = options.disabledPropName;
+  const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const valueAttr = valuePropName
+    ? propsByName.get(valuePropName)?.attribute
+    : undefined;
+  const disabledAttr = disabledPropName
+    ? propsByName.get(disabledPropName)?.attribute
+    : undefined;
+  const tag = part.element;
+  const valueHandling = valuePropParts.has(part.name);
+  const protocolValueHandling = protocolValuePropParts.has(part.name);
+  const disabledHandling = disabledPropParts.has(part.name);
+  const defaultTypeHandling = defaultTypeParts.has(part.name);
+
+  if (valueHandling && (!valuePropName || !valueAttr)) {
+    throw new Error(
+      `${contract.name}/${part.name}: valuePropName must reference a contract prop.`,
+    );
+  }
+  if (disabledHandling && (!disabledPropName || !disabledAttr)) {
+    throw new Error(
+      `${contract.name}/${part.name}: disabledPropName must reference a contract prop.`,
+    );
+  }
+
+  const ssrState = options.ssrSelectedState;
+  const ssrPart = ssrState?.parts?.[part.name];
+
+  return {
+    tag,
+    valuePropParts,
+    protocolValuePropParts,
+    disabledPropParts,
+    defaultTypeParts,
+    valuePropName,
+    disabledPropName,
+    propsByName,
+    valueAttr,
+    disabledAttr,
+    valueHandling,
+    protocolValueHandling,
+    disabledHandling,
+    defaultTypeHandling,
+    ssrState,
+    ssrPart,
+  };
+}
+
+export function createRootGenerationContext({
+  contract,
+  optionsTypeName,
+  optionsNames,
+  generatorOptions,
+}) {
+  const root = contract.parts.find((part) => part.name === "root");
+  if (!root)
+    throw new Error(`${contract.name}: missing root part in contract.`);
+
+  const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
+  const polymorphicNativeElement =
+    generatorOptions.polymorphicNativeElement ?? root.element;
+  const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
+  const controlledProp = contract.props.find((prop) => prop.controlled);
+  const defaultProp = controlledProp
+    ? contract.props.find(
+        (prop) => prop.name === `default${pascalCase(controlledProp.name)}`,
+      )
+    : undefined;
+  const optionNames = optionsNames.filter((name) => name !== "controlled");
+  const eventCallbacks = contract.events ?? [];
+  const nonCallbackOptionNames = optionNames.filter(
+    (name) => !name.startsWith("on"),
+  );
+  const contractPropsByName = new Map(
+    contract.props.map((prop) => [prop.name, prop]),
+  );
+  const publicOptionsType = controlledProp
+    ? `Omit<${optionsTypeName}, "controlled">`
+    : optionsTypeName;
+  const behaviorOptionNames = controlledProp
+    ? [...nonCallbackOptionNames, "controlled"]
+    : nonCallbackOptionNames;
+  const hasDisabledOption = optionNames.includes("disabled");
+  const hasLoadingOption = optionNames.includes("loading");
+  const hasEventCallbacks = eventCallbacks.length > 0;
+
+  return {
+    root,
+    polymorphicRootPropName,
+    polymorphicNativeElement,
+    polymorphicTypeDefault,
+    controlledProp,
+    defaultProp,
+    optionNames,
+    eventCallbacks,
+    nonCallbackOptionNames,
+    contractPropsByName,
+    publicOptionsType,
+    behaviorOptionNames,
+    hasDisabledOption,
+    hasLoadingOption,
+    hasEventCallbacks,
+  };
+}
+
+export function componentIndexFile(contract, extension) {
+  const parts = contract.parts.filter((part) => part.name !== "root");
+  const rootExport = `export { default as ${contract.componentName} } from "./${contract.componentName}.${extension}";`;
+  const partExports = parts
+    .map(
+      (part) =>
+        `export { default as ${contract.componentName}${pascalCase(part.name)} } from "./${contract.componentName}${pascalCase(part.name)}.${extension}";`,
+    )
+    .join("\n");
+  return `// Generated by scripts/registry-refresh.mjs. Do not edit by hand.
+${rootExport}
+${partExports}
+`;
 }

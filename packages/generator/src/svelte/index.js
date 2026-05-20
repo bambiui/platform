@@ -1,6 +1,7 @@
 import {
   componentIndexFile,
   createPartGenerationContext,
+  getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   pascalCase,
   prepareArtifactGeneration,
@@ -29,17 +30,13 @@ function svelteEmbeddedAttributeLine(attribute) {
 }
 
 function svelteEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? []).map((attribute) => svelteEmbeddedAttributeLine(attribute)).join("");
       return `  <${child.element}
     ${child.attribute}=""${attrs}
   />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 

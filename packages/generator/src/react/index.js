@@ -1,5 +1,6 @@
 import {
   createPartGenerationContext,
+  getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
   pascalCase,
@@ -85,13 +86,8 @@ function reactEmbeddedAttributeLine(attribute) {
 }
 
 function reactEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find(
-        (candidate) => candidate.name === embedded.childPartName,
-      );
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? [])
         .map((attribute) => reactEmbeddedAttributeLine(attribute))
         .join("");
@@ -99,7 +95,6 @@ function reactEmbeddedChildrenSource(part, contract, options) {
 ${reactMarkerAttributeLine(child, "        ")}${attrs}
       />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 

@@ -1,5 +1,6 @@
 import {
   createPartGenerationContext,
+  getEmbeddedChildrenForPart,
   getOmittedEmbeddedPartNames,
   htmlElementType,
   pascalCase,
@@ -62,17 +63,13 @@ function solidEmbeddedAttributeLine(attribute) {
 }
 
 function solidEmbeddedChildrenSource(part, contract, options) {
-  return (options.embeddedParts ?? [])
-    .filter((embedded) => embedded.parentPartName === part.name)
-    .map((embedded) => {
-      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
-      if (!child) return "";
+  return getEmbeddedChildrenForPart(part, contract, options)
+    .map(({ embedded, child }) => {
       const attrs = (embedded.attributes ?? []).map((attribute) => solidEmbeddedAttributeLine(attribute)).join("");
       return `      <${child.element}
         ${child.attribute}=""${attrs}
       />`;
     })
-    .filter(Boolean)
     .join("\n");
 }
 

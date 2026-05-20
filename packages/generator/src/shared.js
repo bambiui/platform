@@ -492,6 +492,18 @@ export function prepareArtifactGeneration({
   };
 }
 
+export function getEmbeddedChildrenForPart(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find(
+        (candidate) => candidate.name === embedded.childPartName,
+      );
+      return child ? { embedded, child } : undefined;
+    })
+    .filter(Boolean);
+}
+
 export function createPartGenerationContext(part, contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),

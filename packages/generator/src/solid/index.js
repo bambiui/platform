@@ -23,6 +23,14 @@ function htmlElementType(element) {
   return `HTML${pascalCase(element)}Element`;
 }
 
+function supportsDisabledAttribute(element) {
+  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
+}
+
+function omittedEmbeddedPartNames(options) {
+  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
+}
+
 // ── Part interfaces and components ────────────────────────────────────────
 
 function solidPartPropsSource(contract, options) {
@@ -32,8 +40,10 @@ function solidPartPropsSource(contract, options) {
   ]);
   const valuePropName = options.valuePropName;
 
+  const omittedParts = omittedEmbeddedPartNames(options);
+
   return contract.parts
-    .filter((part) => part.name !== "root")
+    .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const valueProp = valuePropParts.has(part.name) ? `\n  ${valuePropName}: string;` : "";
@@ -54,6 +64,29 @@ function solidSsrAttributeLine(attribute) {
   return `\n      ${name}={hasSelectedValue() ? (isSelected() ? ${solidLiteral(attribute.active)} : ${solidLiteral(attribute.inactive)}) : undefined}`;
 }
 
+function solidEmbeddedAttributeLine(attribute) {
+  const name = attribute.solidName ?? attribute.name;
+  if (attribute.selected) return `\n        ${name}={hasSelectedValue() ? isSelected() : undefined}`;
+  if (attribute.propName) return `\n        ${name}={local.${attribute.propName}}`;
+  if (attribute.value !== undefined) return `\n        ${name}={${solidLiteral(attribute.value)}}`;
+  return `\n        ${name}=""`;
+}
+
+function solidEmbeddedChildrenSource(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
+      if (!child) return "";
+      const attrs = (embedded.attributes ?? []).map((attribute) => solidEmbeddedAttributeLine(attribute)).join("");
+      return `      <${child.element}
+        ${child.attribute}=""${attrs}
+      />`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 function solidPartComponentSource(contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -67,9 +100,10 @@ function solidPartComponentSource(contract, options) {
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
   const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
   const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
+  const omittedParts = omittedEmbeddedPartNames(options);
 
   return contract.parts
-    .filter((part) => part.name !== "root")
+    .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const propsName = `${componentName}Props`;
@@ -94,8 +128,9 @@ function solidPartComponentSource(contract, options) {
 
       const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={local.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={local.${valuePropName}}` : "";
+      const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n      disabled={local.${disabledPropName}}` : "";
       const disabledAttribute = disabledHandling
-        ? `\n      disabled={local.${disabledPropName}}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
+        ? `${nativeDisabledAttribute}\n      ${disabledAttr}={local.${disabledPropName} ? "true" : undefined}`
         : "";
       const ssrState = options.ssrSelectedState;
       const ssrPart = ssrState?.parts?.[part.name];
@@ -106,6 +141,8 @@ function solidPartComponentSource(contract, options) {
       const ssrAttrs = ssrPart && valueHandling
         ? ssrPart.attributes.map((attribute) => solidSsrAttributeLine(attribute)).join("")
         : "";
+      const embeddedChildren = solidEmbeddedChildrenSource(part, contract, options);
+      const embeddedChildrenBlock = embeddedChildren ? `${embeddedChildren}\n` : "";
 
       return `export function ${componentName}(props: ${propsName}) {
   const [local, rest] = splitProps(props, [${splitList}]);
@@ -115,7 +152,7 @@ ${ssrStateSetup}
       {...rest}${typeAttr}${disabledAttribute}
       ${part.attribute}=""${valueAttribute}${ssrAttrs}
     >
-      {local.children}
+${embeddedChildrenBlock}      {local.children}
     </${tag}>
   );
 }`;
@@ -345,7 +382,7 @@ ${rootAttrs}${controlledLine}
         ${root.attribute}=""
 ${rootAttrsSsr}${controlledLineSsr}
       >
-        {local.children}
+        {resolvedChildren()}
       </${rootTag}>
     </SsrSelectedValueContext.Provider>
   );`
@@ -371,8 +408,10 @@ ${behaviorOptions}
 ${cleanupBlock}
   });
 
-${ssrState ? "" : "  const resolvedChildren = children(() => local.children);\n"}  createEffect(() => {
-${ssrState ? "" : "    resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered\n"}    if (behavior) {
+  const resolvedChildren = children(() => local.children);
+  createEffect(() => {
+    resolvedChildren(); // re-sync aria/state when child parts are conditionally rendered
+    if (behavior) {
       behavior.update?.({
 ${behaviorOptions}
       });
@@ -412,7 +451,7 @@ export function createSolidArtifact({ contractSource, controllerSource, primitiv
     "onMount",
     "onCleanup",
     "splitProps",
-    generatorOptions.ssrSelectedState ? null : "children",
+    "children",
     generatorOptions.ssrSelectedState ? "useContext" : null,
     "type JSX",
   ].filter(Boolean).join(", ");

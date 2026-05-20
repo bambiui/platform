@@ -14,6 +14,8 @@ const forbiddenFileNames = new Set([
   "types.ts",
   "tabs.contract.ts",
   "tabs.controller.ts",
+  "radio-group.contract.ts",
+  "radio-group.controller.ts",
   "create-react-adapter.ts",
   "create-react-part.tsx",
   "use-bambi-controller.ts",
@@ -29,6 +31,8 @@ const forbiddenStrings = [
   "@bambiui/adapters",
   "tabs.contract",
   "tabs.controller",
+  "radio-group.contract",
+  "radio-group.controller",
 ];
 
 const templates = [
@@ -41,7 +45,9 @@ const templates = [
       "bambiui.config.json",
       "src/styles/bambi.css",
       "src/styles/tabs.css",
+      "src/styles/radio-group.css",
       "src/components/ui/tabs/index.tsx",
+      "src/components/ui/radio-group/index.tsx",
       "src/components/ui/bambi-helpers.ts",
     ],
   },
@@ -54,7 +60,9 @@ const templates = [
       "bambiui.config.json",
       "src/styles/bambi.css",
       "src/styles/tabs.css",
+      "src/styles/radio-group.css",
       "src/components/ui/tabs/index.tsx",
+      "src/components/ui/radio-group/index.tsx",
       "src/components/ui/bambi-helpers.ts",
     ],
   },
@@ -67,11 +75,17 @@ const templates = [
       "bambiui.config.json",
       "src/styles/bambi.css",
       "src/styles/tabs.css",
+      "src/styles/radio-group.css",
       "src/components/ui/tabs/Tabs.svelte",
       "src/components/ui/tabs/TabsList.svelte",
       "src/components/ui/tabs/TabsTrigger.svelte",
       "src/components/ui/tabs/TabsContent.svelte",
       "src/components/ui/tabs/index.ts",
+      "src/components/ui/radio-group/RadioGroup.svelte",
+      "src/components/ui/radio-group/RadioGroupItem.svelte",
+      "src/components/ui/radio-group/RadioGroupIndicator.svelte",
+      "src/components/ui/radio-group/RadioGroupLabel.svelte",
+      "src/components/ui/radio-group/index.ts",
       "src/components/ui/bambi-helpers.ts",
     ],
   },
@@ -84,11 +98,17 @@ const templates = [
       "bambiui.config.json",
       "src/styles/bambi.css",
       "src/styles/tabs.css",
+      "src/styles/radio-group.css",
       "src/components/ui/tabs/Tabs.vue",
       "src/components/ui/tabs/TabsList.vue",
       "src/components/ui/tabs/TabsTrigger.vue",
       "src/components/ui/tabs/TabsContent.vue",
       "src/components/ui/tabs/index.ts",
+      "src/components/ui/radio-group/RadioGroup.vue",
+      "src/components/ui/radio-group/RadioGroupItem.vue",
+      "src/components/ui/radio-group/RadioGroupIndicator.vue",
+      "src/components/ui/radio-group/RadioGroupLabel.vue",
+      "src/components/ui/radio-group/index.ts",
       "src/components/ui/bambi-helpers.ts",
     ],
   },
@@ -99,6 +119,7 @@ function getChildEnv() {
   for (const key of Object.keys(env)) {
     if (key.toLowerCase().includes("bambiui")) delete env[key];
   }
+  env.NUXT_TELEMETRY_DISABLED = "1";
   return env;
 }
 
@@ -112,9 +133,13 @@ async function run(command, options = {}) {
     env: getChildEnv(),
     stdio: "inherit",
   });
-  const code = await new Promise((resolve) => { child.on("close", resolve); });
+  const code = await new Promise((resolve) => {
+    child.on("close", resolve);
+  });
   if (code !== 0) {
-    throw new Error(`Command failed in ${options.cwd ?? repoRoot}: ${command.join(" ")}`);
+    throw new Error(
+      `Command failed in ${options.cwd ?? repoRoot}: ${command.join(" ")}`,
+    );
   }
 }
 
@@ -136,7 +161,7 @@ async function walkFiles(dir) {
   const files = [];
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...await walkFiles(full));
+    if (entry.isDirectory()) files.push(...(await walkFiles(full)));
     else if (entry.isFile()) files.push(full);
   }
   return files;
@@ -151,7 +176,9 @@ async function assertNoForbiddenOutput(dir) {
     const content = await readFile(filePath, "utf8");
     for (const forbidden of forbiddenStrings) {
       if (content.includes(forbidden)) {
-        throw new Error(`Template output contains forbidden string "${forbidden}": ${filePath}`);
+        throw new Error(
+          `Template output contains forbidden string "${forbidden}": ${filePath}`,
+        );
       }
     }
   }
@@ -163,18 +190,43 @@ for (const template of templates) {
 
   if (shouldInstall) {
     const hasLock = existsSync(path.join(templateDir, "package-lock.json"));
-    await run(hasLock ? ["npm", "ci"] : ["npm", "install"], { cwd: templateDir });
+    await run(hasLock ? ["npm", "ci"] : ["npm", "install"], {
+      cwd: templateDir,
+    });
   } else if (!existsSync(path.join(templateDir, "node_modules"))) {
     throw new Error(
       `${template.name} has no node_modules. Run pnpm smoke:templates -- --install first.`,
     );
   }
 
-  await run([process.execPath, cliEntry, "init", "--yes",
-    "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
+  await run([
+    process.execPath,
+    cliEntry,
+    "init",
+    "--yes",
+    "--framework",
+    template.framework,
+    "--cwd",
+    templateDir,
+    "--registry-url",
+    repoRoot,
+  ]);
 
-  await run([process.execPath, cliEntry, "add", "tabs", "--force",
-    "--framework", template.framework, "--cwd", templateDir, "--registry-url", repoRoot]);
+  for (const component of ["tabs", "radio-group"]) {
+    await run([
+      process.execPath,
+      cliEntry,
+      "add",
+      component,
+      "--force",
+      "--framework",
+      template.framework,
+      "--cwd",
+      templateDir,
+      "--registry-url",
+      repoRoot,
+    ]);
+  }
 
   assertFiles(templateDir, template.expectedFiles);
   await assertNoForbiddenOutput(path.join(templateDir, "src/components/ui"));

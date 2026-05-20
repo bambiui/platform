@@ -23,6 +23,37 @@ function htmlElementType(element) {
   return `HTML${pascalCase(element)}Element`;
 }
 
+function supportsDisabledAttribute(element) {
+  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
+}
+
+function omittedEmbeddedPartNames(options) {
+  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
+}
+
+function vueEmbeddedAttributeLine(attribute) {
+  const name = attribute.vueName ?? attribute.name;
+  if (attribute.selected) return `\n      :${name}="hasSelectedValue ? isSelected : undefined"`;
+  if (attribute.propName) return `\n      :${name}="props.${attribute.propName}"`;
+  if (attribute.value !== undefined) return `\n      :${name}="${vueLiteral(attribute.value)}"`;
+  return `\n      ${name}=""`;
+}
+
+function vueEmbeddedChildrenSource(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
+      if (!child) return "";
+      const attrs = (embedded.attributes ?? []).map((attribute) => vueEmbeddedAttributeLine(attribute)).join("");
+      return `    <${child.element}
+      ${child.attribute}=""${attrs}
+    />`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 function vuePartFile(part, options, contract) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -36,7 +67,6 @@ function vuePartFile(part, options, contract) {
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
   const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
   const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-
   const valueHandling = valuePropParts.has(part.name);
   const protocolValueHandling = protocolValuePropParts.has(part.name);
   const disabledHandling = disabledPropParts.has(part.name);
@@ -48,7 +78,6 @@ function vuePartFile(part, options, contract) {
   }
 
   const tag = part.element;
-
   const propTypeParts = [
     valueHandling ? `  ${valuePropName}: string;` : null,
     disabledHandling ? `  ${disabledPropName}?: boolean;` : null,
@@ -60,8 +89,9 @@ function vuePartFile(part, options, contract) {
 
   const typeAttr = defaultTypeParts.has(part.name) ? `\n    type="${options.defaultTypeValue}"` : "";
   const valueAttribute = protocolValueHandling ? `\n    :${valueAttr}="props.${valuePropName}"` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    :disabled="props.${disabledPropName}"` : "";
   const disabledAttribute = disabledHandling
-    ? `\n    :disabled="props.${disabledPropName}"\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
+    ? `${nativeDisabledAttribute}\n    :${disabledAttr}="props.${disabledPropName} ? 'true' : undefined"`
     : "";
   const ssrState = options.ssrSelectedState;
   const ssrPart = ssrState?.parts?.[part.name];
@@ -72,6 +102,8 @@ const isSelected = computed(() => selectedValue?.value === props.${ssrState.valu
   const ssrAttrs = ssrPart && valueHandling
     ? ssrPart.attributes.map((attribute) => vueSsrAttributeLine(attribute)).join("")
     : "";
+  const embeddedChildren = vueEmbeddedChildrenSource(part, contract, options);
+  const embeddedChildrenBlock = embeddedChildren ? `${embeddedChildren}\n` : "";
 
   const propsDecl = propTypeParts
     ? `const props = defineProps<Props>();`
@@ -89,6 +121,7 @@ ${ssrStateSetup}
     v-bind="$attrs"${typeAttr}${disabledAttribute}
     ${part.attribute}=""${valueAttribute}${ssrAttrs}
   >
+${embeddedChildrenBlock}
     <slot />
   </${tag}>
 </template>
@@ -324,13 +357,17 @@ export function createVueArtifact({ contractSource, controllerSource, primitiveF
   });
 
   // Part components
-  for (const part of contract.parts.filter((p) => p.name !== "root")) {
+  const omittedParts = omittedEmbeddedPartNames(generatorOptions);
+  for (const part of contract.parts.filter((p) => p.name !== "root" && !omittedParts.has(p.name))) {
     const fileName = `${contract.componentName}${pascalCase(part.name)}.vue`;
     files[fileName] = vuePartFile(part, generatorOptions, contract);
   }
 
   // Re-export index
-  files["index.ts"] = vueIndexFile(contract);
+  files["index.ts"] = vueIndexFile({
+    ...contract,
+    parts: contract.parts.filter((p) => !omittedParts.has(p.name)),
+  });
 
   return { files, usedHelpers };
 }

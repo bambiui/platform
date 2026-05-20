@@ -10,3 +10,10 @@ export * from "./components/button/button.contract.js";
 export { TabsController } from "./components/tabs/tabs.controller.js";
 export type { TabsOptions, TabsOrientation, TabsValueChangeDetail } from "./components/tabs/tabs.controller.js";
 export * from "./components/tabs/tabs.contract.js";
+export { RadioGroupController } from "./components/radio-group/radio-group.controller.js";
+export type {
+  RadioGroupOptions,
+  RadioGroupOrientation,
+  RadioGroupValueChangeDetail,
+} from "./components/radio-group/radio-group.controller.js";
+export * from "./components/radio-group/radio-group.contract.js";

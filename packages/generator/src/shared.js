@@ -258,6 +258,19 @@ export function validateGeneratorOptions(contract, options = {}) {
       }
     }
   }
+
+  for (const embedded of options.embeddedParts ?? []) {
+    for (const field of ["parentPartName", "childPartName"]) {
+      if (!partNames.has(embedded[field])) {
+        throw new Error(`${contract.name}: generator option embeddedParts.${field} references unknown part "${embedded[field]}".`);
+      }
+    }
+    for (const attribute of embedded.attributes ?? []) {
+      if (attribute.propName !== undefined && !propNames.has(attribute.propName)) {
+        throw new Error(`${contract.name}: generator option embeddedParts attribute references unknown prop "${attribute.propName}".`);
+      }
+    }
+  }
 }
 
 // ── Primitive inlining ────────────────────────────────────────────────────

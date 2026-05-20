@@ -1,6 +1,12 @@
 "use client";
 import { Button } from "@/src/components/ui/button";
 import {
+  RadioGroup,
+  RadioGroupIndicator,
+  RadioGroupItem,
+  RadioGroupLabel,
+} from "@/src/components/ui/radio-group";
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -23,6 +29,16 @@ export default function Home() {
           <p>Password content</p>
         </TabsContent>
       </Tabs>
+      <RadioGroup defaultValue="comfortable" name="density">
+        <RadioGroupItem value="compact">
+          <RadioGroupIndicator />
+          <RadioGroupLabel>Compact</RadioGroupLabel>
+        </RadioGroupItem>
+        <RadioGroupItem value="comfortable">
+          <RadioGroupIndicator />
+          <RadioGroupLabel>Comfortable</RadioGroupLabel>
+        </RadioGroupItem>
+      </RadioGroup>
     </div>
   );
 }

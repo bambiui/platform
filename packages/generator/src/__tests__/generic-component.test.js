@@ -253,3 +253,121 @@ describe("createArtifact — polymorphic single-root button", () => {
     expect(outputs.vue.files["Button.vue"]).toContain(":aria-disabled=\"!isNativeElement && effectiveDisabled ? 'true' : undefined\"");
   });
 });
+
+const radioGroupContractSource = `import { defineContract } from "../../../contract/define-contract.js";
+
+export const RADIO_GROUP_ROOT = "data-bambi-radio-group" as const;
+export const RADIO_GROUP_ITEM = "data-bambi-radio-group-item" as const;
+export const RADIO_GROUP_INPUT = "data-bambi-radio-group-input" as const;
+export const RADIO_GROUP_INDICATOR = "data-bambi-radio-group-indicator" as const;
+export const RADIO_GROUP_LABEL = "data-bambi-radio-group-label" as const;
+export const RADIO_GROUP_VALUE = "data-value" as const;
+export const RADIO_GROUP_DEFAULT_VALUE = "data-default-value" as const;
+export const RADIO_GROUP_DISABLED = "data-disabled" as const;
+export const RADIO_GROUP_CONTROLLED = "data-controlled" as const;
+export const RADIO_GROUP_EVENT_VALUE_CHANGE = "bambi:value-change" as const;
+
+export const radioGroupContract = defineContract({
+  name: "radio-group",
+  parts: [
+    { name: "root", selector: \`[\${RADIO_GROUP_ROOT}]\`, attribute: RADIO_GROUP_ROOT, element: "div" },
+    { name: "item", selector: \`[\${RADIO_GROUP_ITEM}]\`, attribute: RADIO_GROUP_ITEM, element: "div" },
+    { name: "input", selector: \`[\${RADIO_GROUP_INPUT}]\`, attribute: RADIO_GROUP_INPUT, element: "input" },
+    { name: "indicator", selector: \`[\${RADIO_GROUP_INDICATOR}]\`, attribute: RADIO_GROUP_INDICATOR, element: "span" },
+    { name: "label", selector: \`[\${RADIO_GROUP_LABEL}]\`, attribute: RADIO_GROUP_LABEL, element: "label" },
+  ],
+  props: {
+    value: { type: "string", attribute: RADIO_GROUP_VALUE, controlled: true },
+    defaultValue: { type: "string", attribute: RADIO_GROUP_DEFAULT_VALUE },
+    controlled: { type: "boolean", attribute: RADIO_GROUP_CONTROLLED },
+    disabled: { type: "boolean", attribute: RADIO_GROUP_DISABLED },
+  },
+  events: {
+    valueChange: { name: RADIO_GROUP_EVENT_VALUE_CHANGE, detail: "object" },
+  },
+} as const);
+`;
+
+const radioGroupControllerSource = `export interface RadioGroupOptions {
+  value?: string;
+  defaultValue?: string;
+  disabled?: boolean;
+  controlled?: boolean;
+}
+
+export interface RadioGroupValueChangeDetail {
+  value: string;
+}
+
+export class RadioGroupController {
+  constructor(private root: Element, private options: RadioGroupOptions = {}) {}
+  sync(): void {}
+  update(options: RadioGroupOptions = {}): void {
+    this.options = { ...this.options, ...options };
+  }
+  destroy(): void {}
+}
+`;
+
+describe("createArtifact — native radio group item", () => {
+  const generatorOptions = {
+    valuePropName: "value",
+    valuePropParts: ["item"],
+    disabledPropName: "disabled",
+    disabledPropParts: ["item"],
+    embeddedParts: [
+      {
+        parentPartName: "item",
+        childPartName: "input",
+        omitChildComponent: true,
+        attributes: [
+          { name: "type", value: "radio" },
+          { name: "value", propName: "value" },
+          { name: "disabled", propName: "disabled" },
+          { name: "checked", selected: true },
+          { name: "readOnly", svelteName: "readonly", vueName: "readonly", value: true },
+        ],
+      },
+    ],
+    ssrSelectedState: {
+      selectedPropNames: ["value", "defaultValue"],
+      valuePropName: "value",
+      contextName: "radio-value",
+      parts: {
+        item: {
+          attributes: [{ name: "data-state", active: "checked", inactive: "unchecked" }],
+        },
+      },
+    },
+  };
+
+  it("generates item components with native radio inputs and no public input component", () => {
+    const react = createArtifact({
+      framework: "react",
+      contractSource: radioGroupContractSource,
+      controllerSource: radioGroupControllerSource,
+      contractExportName: "radioGroupContract",
+      generatorOptions,
+    });
+    const svelte = createArtifact({
+      framework: "svelte",
+      contractSource: radioGroupContractSource,
+      controllerSource: radioGroupControllerSource,
+      contractExportName: "radioGroupContract",
+      generatorOptions,
+    });
+
+    expect(react.files["index.tsx"]).toContain('type={"radio"}');
+    expect(react.files["index.tsx"]).toContain("data-bambi-radio-group-input");
+    expect(react.files["index.tsx"]).toContain("onValueChange?:");
+    expect(Object.keys(svelte.files).sort()).toEqual([
+      "RadioGroup.svelte",
+      "RadioGroupIndicator.svelte",
+      "RadioGroupItem.svelte",
+      "RadioGroupLabel.svelte",
+      "index.ts",
+    ]);
+    expect(svelte.files["RadioGroupItem.svelte"]).toContain('type={"radio"}');
+    expect(svelte.files["index.ts"]).not.toContain("RadioGroupInput");
+  });
+});

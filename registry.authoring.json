@@ -222,6 +222,124 @@
         "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
         "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
       }
+    },
+    "radio-group": {
+      "name": "radio-group",
+      "contract": "packages/core/src/components/radio-group/radio-group.contract.ts",
+      "contractFiles": [
+        "packages/core/contract/types.ts",
+        "packages/core/contract/define-contract.ts"
+      ],
+      "controller": "packages/core/src/components/radio-group/radio-group.controller.ts",
+      "primitiveFiles": ["packages/core/src/primitives/roving-focus.ts"],
+      "style": "packages/registry/src/styles/radio-group.css",
+      "generatedCss": "packages/registry/generated/radio-group/radio-group.css",
+      "generatedFiles": {
+        "react": [
+          "packages/registry/generated/radio-group/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/radio-group/solid/index.tsx"
+        ],
+        "svelte": [
+          "packages/registry/generated/radio-group/svelte/RadioGroup.svelte",
+          "packages/registry/generated/radio-group/svelte/RadioGroupItem.svelte",
+          "packages/registry/generated/radio-group/svelte/RadioGroupIndicator.svelte",
+          "packages/registry/generated/radio-group/svelte/RadioGroupLabel.svelte",
+          "packages/registry/generated/radio-group/svelte/index.ts"
+        ],
+        "vue": [
+          "packages/registry/generated/radio-group/vue/RadioGroup.vue",
+          "packages/registry/generated/radio-group/vue/RadioGroupItem.vue",
+          "packages/registry/generated/radio-group/vue/RadioGroupIndicator.vue",
+          "packages/registry/generated/radio-group/vue/RadioGroupLabel.vue",
+          "packages/registry/generated/radio-group/vue/index.ts"
+        ]
+      },
+      "generator": {
+        "react": {
+          "valuePropName": "value",
+          "valuePropParts": ["item"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["item"],
+          "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
+          "ssrSelectedState": {
+            "selectedPropNames": ["value", "defaultValue"],
+            "valuePropName": "value",
+            "contextName": "bambi-radio-group-value",
+            "parts": {
+              "item": {
+                "attributes": [
+                  { "name": "data-state", "active": "checked", "inactive": "unchecked" }
+                ]
+              }
+            }
+          }
+        },
+        "solid": {
+          "valuePropName": "value",
+          "valuePropParts": ["item"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["item"],
+          "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
+          "ssrSelectedState": {
+            "selectedPropNames": ["value", "defaultValue"],
+            "valuePropName": "value",
+            "contextName": "bambi-radio-group-value",
+            "parts": {
+              "item": {
+                "attributes": [
+                  { "name": "data-state", "active": "checked", "inactive": "unchecked" }
+                ]
+              }
+            }
+          }
+        },
+        "svelte": {
+          "valuePropName": "value",
+          "valuePropParts": ["item"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["item"],
+          "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
+          "ssrSelectedState": {
+            "selectedPropNames": ["value", "defaultValue"],
+            "valuePropName": "value",
+            "contextName": "bambi-radio-group-value",
+            "parts": {
+              "item": {
+                "attributes": [
+                  { "name": "data-state", "active": "checked", "inactive": "unchecked" }
+                ]
+              }
+            }
+          }
+        },
+        "vue": {
+          "valuePropName": "value",
+          "valuePropParts": ["item"],
+          "disabledPropName": "disabled",
+          "disabledPropParts": ["item"],
+          "embeddedParts": [{ "parentPartName": "item", "childPartName": "input", "omitChildComponent": true, "attributes": [{ "name": "type", "value": "radio" }, { "name": "value", "propName": "value" }, { "name": "disabled", "propName": "disabled" }, { "name": "checked", "selected": true }, { "name": "readOnly", "svelteName": "readonly", "vueName": "readonly", "value": true }] }],
+          "ssrSelectedState": {
+            "selectedPropNames": ["value", "defaultValue"],
+            "valuePropName": "value",
+            "contextName": "bambi-radio-group-value",
+            "parts": {
+              "item": {
+                "attributes": [
+                  { "name": "data-state", "active": "checked", "inactive": "unchecked" }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "exports": {
+        "react": ["RadioGroup", "RadioGroupItem", "RadioGroupIndicator", "RadioGroupLabel"],
+        "solid": ["RadioGroup", "RadioGroupItem", "RadioGroupIndicator", "RadioGroupLabel"],
+        "svelte": ["RadioGroup", "RadioGroupItem", "RadioGroupIndicator", "RadioGroupLabel"],
+        "vue": ["RadioGroup", "RadioGroupItem", "RadioGroupIndicator", "RadioGroupLabel"]
+      }
     }
   }
 }

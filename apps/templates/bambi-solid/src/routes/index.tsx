@@ -1,5 +1,16 @@
 import { Button } from "../components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import {
+  RadioGroup,
+  RadioGroupIndicator,
+  RadioGroupItem,
+  RadioGroupLabel,
+} from "../components/ui/radio-group";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 
 export default function Home() {
   return (
@@ -18,6 +29,16 @@ export default function Home() {
           <p>Password content</p>
         </TabsContent>
       </Tabs>
+      <RadioGroup defaultValue="comfortable" name="density">
+        <RadioGroupItem value="compact">
+          <RadioGroupIndicator />
+          <RadioGroupLabel>Compact</RadioGroupLabel>
+        </RadioGroupItem>
+        <RadioGroupItem value="comfortable">
+          <RadioGroupIndicator />
+          <RadioGroupLabel>Comfortable</RadioGroupLabel>
+        </RadioGroupItem>
+      </RadioGroup>
     </div>
   );
 }

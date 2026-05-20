@@ -24,6 +24,7 @@ const isSelected = computed(() => selectedValue?.value === props.value);
     :aria-selected="hasSelectedValue ? (isSelected ? true : false) : undefined"
     :tabindex="hasSelectedValue ? (isSelected ? 0 : -1) : undefined"
   >
+
     <slot />
   </button>
 </template>

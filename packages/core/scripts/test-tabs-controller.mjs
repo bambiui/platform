@@ -21,6 +21,7 @@ try {
 
 const rootDir = path.resolve(import.meta.dirname, "..");
 const outDir = await mkdtemp(path.join(tmpdir(), "bambi-tabs-controller-"));
+await writeFile(path.join(outDir, "package.json"), '{"type":"module"}\n');
 
 async function transpile(from, to = from, transform = (source) => source) {
   const source = transform(

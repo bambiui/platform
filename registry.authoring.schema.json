@@ -153,6 +153,42 @@
               "minProperties": 1
             }
           }
+        },
+        "embeddedParts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/embeddedPart" },
+          "minItems": 1
+        }
+      }
+    },
+    "embeddedPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parentPartName", "childPartName"],
+      "properties": {
+        "parentPartName": { "type": "string", "minLength": 1 },
+        "childPartName": { "type": "string", "minLength": 1 },
+        "omitChildComponent": { "type": "boolean" },
+        "attributes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/embeddedPartAttribute" }
+        }
+      }
+    },
+    "embeddedPartAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "reactName": { "type": "string", "minLength": 1 },
+        "solidName": { "type": "string", "minLength": 1 },
+        "svelteName": { "type": "string", "minLength": 1 },
+        "vueName": { "type": "string", "minLength": 1 },
+        "propName": { "type": "string", "minLength": 1 },
+        "selected": { "type": "boolean" },
+        "value": {
+          "anyOf": [{ "type": "string" }, { "type": "number" }, { "type": "boolean" }]
         }
       }
     },

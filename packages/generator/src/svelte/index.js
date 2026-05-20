@@ -19,6 +19,37 @@ function svelteSsrAttributeLine(attribute) {
   return `\n    ${name}={hasSelectedValue ? (isSelected ? ${svelteLiteral(attribute.active)} : ${svelteLiteral(attribute.inactive)}) : undefined}`;
 }
 
+function supportsDisabledAttribute(element) {
+  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
+}
+
+function omittedEmbeddedPartNames(options) {
+  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
+}
+
+function svelteEmbeddedAttributeLine(attribute) {
+  const name = attribute.svelteName ?? attribute.name;
+  if (attribute.selected) return `\n    ${name}={hasSelectedValue ? isSelected : undefined}`;
+  if (attribute.propName) return `\n    ${name}={${attribute.propName}}`;
+  if (attribute.value !== undefined) return `\n    ${name}={${svelteLiteral(attribute.value)}}`;
+  return `\n    ${name}=""`;
+}
+
+function svelteEmbeddedChildrenSource(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
+      if (!child) return "";
+      const attrs = (embedded.attributes ?? []).map((attribute) => svelteEmbeddedAttributeLine(attribute)).join("");
+      return `  <${child.element}
+    ${child.attribute}=""${attrs}
+  />`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 function sveltePartFile(part, options, contract) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -32,7 +63,6 @@ function sveltePartFile(part, options, contract) {
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
   const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
   const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
-
   const valueHandling = valuePropParts.has(part.name);
   const protocolValueHandling = protocolValuePropParts.has(part.name);
   const disabledHandling = disabledPropParts.has(part.name);
@@ -54,8 +84,9 @@ function sveltePartFile(part, options, contract) {
 
   const typeAttr = defaultTypeParts.has(part.name) ? "\n    type={type}" : "";
   const valueAttribute = protocolValueHandling ? `\n    ${valueAttr}={${valuePropName}}` : "";
+  const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n    disabled={${disabledPropName}}` : "";
   const disabledAttribute = disabledHandling
-    ? `\n    disabled={${disabledPropName}}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
+    ? `${nativeDisabledAttribute}\n    ${disabledAttr}={${disabledPropName} ? "true" : undefined}`
     : "";
   const ssrState = options.ssrSelectedState;
   const ssrPart = ssrState?.parts?.[part.name];
@@ -66,6 +97,8 @@ const isSelected = $derived(selectedValue?.() === ${ssrState.valuePropName});` :
   const ssrAttrs = ssrPart && valueHandling
     ? ssrPart.attributes.map((attribute) => svelteSsrAttributeLine(attribute)).join("")
     : "";
+  const embeddedChildren = svelteEmbeddedChildrenSource(part, contract, options);
+  const embeddedChildrenBlock = embeddedChildren ? `${embeddedChildren}\n` : "";
 
   const propsInterface = `\ninterface Props {\n${propDecls ? propDecls + "\n" : ""}  children?: Snippet;\n  [key: string]: unknown;\n}`;
 
@@ -87,7 +120,7 @@ ${ssrStateSetup}
   {...props}${typeAttr}${disabledAttribute}
   ${part.attribute}=""${valueAttribute}${ssrAttrs}
 >
-  {@render children?.()}
+${embeddedChildrenBlock}  {@render children?.()}
 </${tag}>
 `;
 }
@@ -326,13 +359,17 @@ export function createSvelteArtifact({ contractSource, controllerSource, primiti
   });
 
   // Part components
-  for (const part of contract.parts.filter((p) => p.name !== "root")) {
+  const omittedParts = omittedEmbeddedPartNames(generatorOptions);
+  for (const part of contract.parts.filter((p) => p.name !== "root" && !omittedParts.has(p.name))) {
     const fileName = `${contract.componentName}${pascalCase(part.name)}.svelte`;
     files[fileName] = sveltePartFile(part, generatorOptions, contract);
   }
 
   // Re-export index
-  files["index.ts"] = svelteIndexFile(contract);
+  files["index.ts"] = svelteIndexFile({
+    ...contract,
+    parts: contract.parts.filter((p) => !omittedParts.has(p.name)),
+  });
 
   return { files, usedHelpers };
 }

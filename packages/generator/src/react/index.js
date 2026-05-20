@@ -23,6 +23,14 @@ function htmlElementType(element) {
   return `HTML${pascalCase(element)}Element`;
 }
 
+function supportsDisabledAttribute(element) {
+  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
+}
+
+function omittedEmbeddedPartNames(options) {
+  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
+}
+
 function reactPartPropsSource(contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -30,8 +38,10 @@ function reactPartPropsSource(contract, options) {
   ]);
   const valuePropName = options.valuePropName;
 
+  const omittedParts = omittedEmbeddedPartNames(options);
+
   return contract.parts
-    .filter((part) => part.name !== "root")
+    .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const valueProp = valuePropParts.has(part.name) ? `\n  ${valuePropName}: string;` : "";
@@ -52,6 +62,29 @@ function reactSsrAttributeLine(attribute) {
   return `\n      ${name}={hasSelectedValue ? (isSelected ? ${reactLiteral(attribute.active)} : ${reactLiteral(attribute.inactive)}) : undefined}`;
 }
 
+function reactEmbeddedAttributeLine(attribute) {
+  const name = attribute.reactName ?? attribute.name;
+  if (attribute.selected) return `\n        ${name}={hasSelectedValue ? isSelected : undefined}`;
+  if (attribute.propName) return `\n        ${name}={${attribute.propName}}`;
+  if (attribute.value !== undefined) return `\n        ${name}={${reactLiteral(attribute.value)}}`;
+  return `\n        ${name}=""`;
+}
+
+function reactEmbeddedChildrenSource(part, contract, options) {
+  return (options.embeddedParts ?? [])
+    .filter((embedded) => embedded.parentPartName === part.name)
+    .map((embedded) => {
+      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
+      if (!child) return "";
+      const attrs = (embedded.attributes ?? []).map((attribute) => reactEmbeddedAttributeLine(attribute)).join("");
+      return `      <${child.element}
+        ${child.attribute}=""${attrs}
+      />`;
+    })
+    .filter(Boolean)
+    .join("\n");
+}
+
 function reactPartComponentSource(contract, options) {
   const valuePropParts = new Set([
     ...(options.valuePropParts ?? []),
@@ -65,9 +98,10 @@ function reactPartComponentSource(contract, options) {
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
   const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
   const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
+  const omittedParts = omittedEmbeddedPartNames(options);
 
   return contract.parts
-    .filter((part) => part.name !== "root")
+    .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
       const propsName = `${componentName}Props`;
@@ -89,7 +123,8 @@ function reactPartComponentSource(contract, options) {
       ].filter(Boolean).join(", ");
       const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={props.type ?? "${options.defaultTypeValue}"}` : "";
       const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={${valuePropName}}` : "";
-      const disabledAttribute = disabledHandling ? `\n      disabled={${disabledPropName}}\n      ${disabledAttr}={${disabledPropName} ? "true" : undefined}` : "";
+      const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n      disabled={${disabledPropName}}` : "";
+      const disabledAttribute = disabledHandling ? `${nativeDisabledAttribute}\n      ${disabledAttr}={${disabledPropName} ? "true" : undefined}` : "";
       const ssrState = options.ssrSelectedState;
       const ssrPart = ssrState?.parts?.[part.name];
       const ssrStateSetup = ssrPart && valueHandling ? `
@@ -99,6 +134,8 @@ function reactPartComponentSource(contract, options) {
       const ssrAttrs = ssrPart && valueHandling
         ? ssrPart.attributes.map((attribute) => reactSsrAttributeLine(attribute)).join("")
         : "";
+      const embeddedChildren = reactEmbeddedChildrenSource(part, contract, options);
+      const embeddedChildrenBlock = embeddedChildren ? `${embeddedChildren}\n` : "";
 
       return `export function ${componentName}({ ${destructured} }: ${propsName}) {
 ${ssrStateSetup}
@@ -107,7 +144,7 @@ ${ssrStateSetup}
       {...props}${typeAttr}${disabledAttribute}
       ${part.attribute}=""${valueAttribute}${ssrAttrs}
     >
-      {children}
+${embeddedChildrenBlock}      {children}
     </${tag}>
   );
 }`;

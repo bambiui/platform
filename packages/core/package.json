@@ -51,6 +51,11 @@
       "import": "./src/components/button/index.ts",
       "default": "./src/components/button/index.ts"
     },
+    "./components/radio-group": {
+      "types": "./src/components/radio-group/index.ts",
+      "import": "./src/components/radio-group/index.ts",
+      "default": "./src/components/radio-group/index.ts"
+    },
     "./primitives": {
       "types": "./src/primitives/index.ts",
       "import": "./src/primitives/index.ts",
@@ -65,6 +70,7 @@
   "scripts": {
     "check-types": "tsc -p tsconfig.json",
     "test:tabs": "node scripts/test-tabs-controller.mjs",
-    "test:roving-focus": "node scripts/test-roving-focus.mjs"
+    "test:roving-focus": "node scripts/test-roving-focus.mjs",
+    "test:radio-group": "node scripts/test-radio-group-controller.mjs"
   }
 }

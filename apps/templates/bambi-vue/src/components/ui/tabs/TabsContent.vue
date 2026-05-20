@@ -19,6 +19,7 @@ const isSelected = computed(() => selectedValue?.value === props.value);
     :data-state="hasSelectedValue ? (isSelected ? 'active' : 'inactive') : undefined"
     :hidden="hasSelectedValue ? (isSelected ? false : true) : undefined"
   >
+
     <slot />
   </div>
 </template>

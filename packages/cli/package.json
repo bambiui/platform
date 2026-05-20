@@ -1,6 +1,6 @@
 {
   "name": "bambiui",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "CLI for adding bambiui component source files to your app.",
   "keywords": [
     "bambiui",

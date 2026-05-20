@@ -1,4 +1,7 @@
-import { createRovingFocus, type RovingFocus } from "@bambiui/core/primitives/roving-focus";
+import {
+  createRovingFocus,
+  type RovingFocus,
+} from "@bambiui/core/primitives/roving-focus";
 import {
   TABS_TRIGGER,
   TABS_CONTENT,
@@ -16,7 +19,11 @@ import {
   type TabsValueChangeDetail,
 } from "./tabs.contract.js";
 
-export type { TabsActivationMode, TabsOrientation, TabsValueChangeDetail } from "./tabs.contract.js";
+export type {
+  TabsActivationMode,
+  TabsOrientation,
+  TabsValueChangeDetail,
+} from "./tabs.contract.js";
 export { tabsContract } from "./tabs.contract.js";
 
 // ── Inlined types ─────────────────────────────────────────────────────────
@@ -54,7 +61,10 @@ function getBoolAttr(el: Element, name: string): boolean {
   return el.getAttribute(name) === "true";
 }
 
-function dispatchTabsEvent(element: Element, detail: TabsValueChangeDetail): void {
+function dispatchTabsEvent(
+  element: Element,
+  detail: TabsValueChangeDetail,
+): void {
   element.dispatchEvent(
     new CustomEvent<TabsValueChangeDetail>(TABS_EVENT_VALUE_CHANGE, {
       bubbles: true,
@@ -92,30 +102,26 @@ export class TabsController implements BambiController {
     this.rovingFocus?.destroy();
     this.bindAbort = new AbortController();
 
-    const orientation = (
-      this.options.orientation ??
-      getAttr(this.root, TABS_ORIENTATION, "horizontal")
-    ) as TabsOrientation;
+    const orientation = (this.options.orientation ??
+      getAttr(this.root, TABS_ORIENTATION, "horizontal")) as TabsOrientation;
 
     setAttr(this.root, TABS_ORIENTATION, orientation);
     setAttr(
       this.root,
       TABS_ACTIVATION_MODE,
-      this.options.activationMode ?? getAttr(this.root, TABS_ACTIVATION_MODE, "automatic"),
+      this.options.activationMode ??
+        getAttr(this.root, TABS_ACTIVATION_MODE, "automatic"),
     );
     if (this.options.disabled !== undefined) {
       setAttr(this.root, TABS_DISABLED, this.options.disabled ? "true" : null);
     }
 
-    // Set aria-orientation on all tablist elements
-    for (const list of Array.from(this.root.querySelectorAll(`[${TABS_LIST}]`))) {
-      list.setAttribute("role", "tablist");
-      list.setAttribute("aria-orientation", orientation);
-    }
+    this.syncTabLists(orientation);
 
     const value =
       (this.options.value ?? getAttr(this.root, TABS_VALUE, "")) ||
-      (this.options.defaultValue ?? getAttr(this.root, TABS_DEFAULT_VALUE, "")) ||
+      (this.options.defaultValue ??
+        getAttr(this.root, TABS_DEFAULT_VALUE, "")) ||
       this.firstTriggerValue();
 
     // Apply initial state without dispatching any events (mount is not a user interaction)
@@ -128,26 +134,28 @@ export class TabsController implements BambiController {
     const prev = this.options;
     this.options = { ...this.options, ...options };
 
-    const orientation = (
-      this.options.orientation ??
-      getAttr(this.root, TABS_ORIENTATION, "horizontal")
-    ) as TabsOrientation;
+    const orientation = (this.options.orientation ??
+      getAttr(this.root, TABS_ORIENTATION, "horizontal")) as TabsOrientation;
     setAttr(this.root, TABS_ORIENTATION, orientation);
     setAttr(this.root, TABS_ACTIVATION_MODE, this.activationMode());
     if (this.options.disabled !== undefined) {
       setAttr(this.root, TABS_DISABLED, this.options.disabled ? "true" : null);
     }
-    for (const list of Array.from(this.root.querySelectorAll(`[${TABS_LIST}]`))) {
-      list.setAttribute("role", "tablist");
-      list.setAttribute("aria-orientation", orientation);
-    }
+    this.syncTabLists(orientation);
 
-    if (options.orientation !== undefined && options.orientation !== prev.orientation) {
+    if (
+      options.orientation !== undefined &&
+      options.orientation !== prev.orientation
+    ) {
       this.rovingFocus?.destroy();
       this.rovingFocus = this.createRovingFocusInstance(orientation);
     }
 
-    if (options.value !== undefined && options.value !== prev.value && options.value) {
+    if (
+      options.value !== undefined &&
+      options.value !== prev.value &&
+      options.value
+    ) {
       // Prop update — apply state silently, no event dispatch
       this.applyState(options.value);
     } else if (this.currentValue) {
@@ -162,7 +170,17 @@ export class TabsController implements BambiController {
   }
 
   private firstTriggerValue(): string | null {
-    return this.root.querySelector(`[${TABS_TRIGGER}]`)?.getAttribute(TABS_VALUE) ?? null;
+    return (
+      this.root.querySelector(`[${TABS_TRIGGER}]`)?.getAttribute(TABS_VALUE) ??
+      null
+    );
+  }
+
+  private syncTabLists(orientation: TabsOrientation): void {
+    for (const list of this.root.querySelectorAll(`[${TABS_LIST}]`)) {
+      list.setAttribute("role", "tablist");
+      list.setAttribute("aria-orientation", orientation);
+    }
   }
 
   private triggers(): Element[] {
@@ -181,7 +199,10 @@ export class TabsController implements BambiController {
     if (!isControlled) setAttr(this.root, TABS_VALUE, newValue);
     this.currentValue = newValue;
 
-    for (const trigger of this.triggers()) {
+    const triggers = this.triggers();
+    const contents = this.contents();
+
+    for (const trigger of triggers) {
       const val = trigger.getAttribute(TABS_VALUE) ?? "";
       if (!trigger.id) trigger.id = `${this._id}-trigger-${val}`;
       trigger.setAttribute("role", "tab");
@@ -198,12 +219,13 @@ export class TabsController implements BambiController {
       }
     }
 
-    for (const content of this.contents()) {
+    for (const content of contents) {
       const val = content.getAttribute(TABS_VALUE) ?? "";
       if (!content.id) content.id = `${this._id}-content-${val}`;
       content.setAttribute("role", "tabpanel");
       content.setAttribute("aria-labelledby", `${this._id}-trigger-${val}`);
-      if (!content.hasAttribute("tabindex")) content.setAttribute("tabindex", "0");
+      if (!content.hasAttribute("tabindex"))
+        content.setAttribute("tabindex", "0");
 
       const isActive = val === newValue;
       setAttr(content, TABS_STATE, isActive ? "active" : "inactive");
@@ -229,10 +251,12 @@ export class TabsController implements BambiController {
   }
 
   private activationMode(): TabsActivationMode {
-    return (
-      this.options.activationMode ??
-      getAttr(this.root, TABS_ACTIVATION_MODE, "automatic")
-    ) as TabsActivationMode;
+    return (this.options.activationMode ??
+      getAttr(
+        this.root,
+        TABS_ACTIVATION_MODE,
+        "automatic",
+      )) as TabsActivationMode;
   }
 
   private focusTrigger(trigger: Element): void {
@@ -248,14 +272,17 @@ export class TabsController implements BambiController {
     return createRovingFocus(this.root, {
       orientation,
       getItems: () => {
-        if (this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED)) return [];
+        if (this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED))
+          return [];
         return this.triggers();
       },
       isDisabled: (el) =>
-        getBoolAttr(el, TABS_DISABLED) || el.getAttribute("aria-disabled") === "true",
+        getBoolAttr(el, TABS_DISABLED) ||
+        el.getAttribute("aria-disabled") === "true",
       onFocus: (el) => {
         this.focusTrigger(el);
-        if (this.activationMode() === "automatic") this.activateFocusedTrigger(el);
+        if (this.activationMode() === "automatic")
+          this.activateFocusedTrigger(el);
       },
       onActivate: (el) => this.activateFocusedTrigger(el),
     });
@@ -267,7 +294,8 @@ export class TabsController implements BambiController {
     this.root.addEventListener(
       "click",
       (event: Event) => {
-        const disabled = this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED);
+        const disabled =
+          this.options.disabled ?? getBoolAttr(this.root, TABS_DISABLED);
         if (disabled) return;
 
         const target = (event.target as Element).closest(`[${TABS_TRIGGER}]`);
@@ -286,9 +314,8 @@ export class TabsController implements BambiController {
       { signal },
     );
 
-    const orientation = (
-      this.options.orientation ?? getAttr(this.root, TABS_ORIENTATION, "horizontal")
-    ) as TabsOrientation;
+    const orientation = (this.options.orientation ??
+      getAttr(this.root, TABS_ORIENTATION, "horizontal")) as TabsOrientation;
     this.rovingFocus = this.createRovingFocusInstance(orientation);
   }
 }

@@ -1,4 +1,7 @@
-import { createRovingFocus, type RovingFocus } from "@bambiui/core/primitives/roving-focus";
+import {
+  createRovingFocus,
+  type RovingFocus,
+} from "@bambiui/core/primitives/roving-focus";
 import {
   RADIO_GROUP_CONTROLLED,
   RADIO_GROUP_DEFAULT_VALUE,
@@ -20,7 +23,10 @@ import {
   type RadioGroupValueChangeDetail,
 } from "./radio-group.contract.js";
 
-export type { RadioGroupOrientation, RadioGroupValueChangeDetail } from "./radio-group.contract.js";
+export type {
+  RadioGroupOrientation,
+  RadioGroupValueChangeDetail,
+} from "./radio-group.contract.js";
 export { radioGroupContract } from "./radio-group.contract.js";
 
 export interface BambiController {
@@ -61,14 +67,20 @@ function getBoolAttr(el: Element, name: string): boolean {
   return el.getAttribute(name) === "true";
 }
 
-function dispatchRadioGroupEvent(element: Element, detail: RadioGroupValueChangeDetail): void {
+function dispatchRadioGroupEvent(
+  element: Element,
+  detail: RadioGroupValueChangeDetail,
+): void {
   element.dispatchEvent(
-    new CustomEvent<RadioGroupValueChangeDetail>(RADIO_GROUP_EVENT_VALUE_CHANGE, {
-      bubbles: true,
-      cancelable: false,
-      composed: false,
-      detail,
-    }),
+    new CustomEvent<RadioGroupValueChangeDetail>(
+      RADIO_GROUP_EVENT_VALUE_CHANGE,
+      {
+        bubbles: true,
+        cancelable: false,
+        composed: false,
+        detail,
+      },
+    ),
   );
 }
 
@@ -87,7 +99,8 @@ export class RadioGroupController implements BambiController {
   constructor(root: Element, options: RadioGroupOptions = {}) {
     this.root = root;
     this.options = options;
-    this._id = root.id || `bambi-radio-group-${++RadioGroupController._idCounter}`;
+    this._id =
+      root.id || `bambi-radio-group-${++RadioGroupController._idCounter}`;
     this.fallbackName = `${this._id}-name`;
     this.destroyAbort = new AbortController();
     this.bindAbort = new AbortController();
@@ -102,7 +115,8 @@ export class RadioGroupController implements BambiController {
 
     const initialValue =
       (this.options.value ?? getAttr(this.root, RADIO_GROUP_VALUE, "")) ||
-      (this.options.defaultValue ?? getAttr(this.root, RADIO_GROUP_DEFAULT_VALUE, "")) ||
+      (this.options.defaultValue ??
+        getAttr(this.root, RADIO_GROUP_DEFAULT_VALUE, "")) ||
       this.checkedInputValue() ||
       this.firstEnabledValue();
 
@@ -148,7 +162,11 @@ export class RadioGroupController implements BambiController {
     setAttr(this.root, RADIO_GROUP_DISABLED, this.disabled() ? "true" : null);
     setAttr(this.root, RADIO_GROUP_REQUIRED, this.required() ? "true" : null);
     setAttr(this.root, RADIO_GROUP_INVALID, this.invalid() ? "true" : null);
-    setAttr(this.root, RADIO_GROUP_CONTROLLED, this.controlled() ? "true" : null);
+    setAttr(
+      this.root,
+      RADIO_GROUP_CONTROLLED,
+      this.controlled() ? "true" : null,
+    );
     setAttr(this.root, "aria-orientation", this.orientation());
     setAttr(this.root, "aria-required", this.required() ? "true" : null);
     setAttr(this.root, "aria-invalid", this.invalid() ? "true" : null);
@@ -163,10 +181,12 @@ export class RadioGroupController implements BambiController {
   }
 
   private orientation(): RadioGroupOrientation {
-    return (
-      this.options.orientation ??
-      getAttr(this.root, RADIO_GROUP_ORIENTATION, "vertical")
-    ) as RadioGroupOrientation;
+    return (this.options.orientation ??
+      getAttr(
+        this.root,
+        RADIO_GROUP_ORIENTATION,
+        "vertical",
+      )) as RadioGroupOrientation;
   }
 
   private loop(): boolean {
@@ -176,19 +196,28 @@ export class RadioGroupController implements BambiController {
   }
 
   private name(): string {
-    return (this.options.name ?? getAttr(this.root, RADIO_GROUP_NAME, "")) || this.fallbackName;
+    return (
+      (this.options.name ?? getAttr(this.root, RADIO_GROUP_NAME, "")) ||
+      this.fallbackName
+    );
   }
 
   private controlled(): boolean {
-    return this.options.controlled ?? getBoolAttr(this.root, RADIO_GROUP_CONTROLLED);
+    return (
+      this.options.controlled ?? getBoolAttr(this.root, RADIO_GROUP_CONTROLLED)
+    );
   }
 
   private disabled(): boolean {
-    return this.options.disabled ?? getBoolAttr(this.root, RADIO_GROUP_DISABLED);
+    return (
+      this.options.disabled ?? getBoolAttr(this.root, RADIO_GROUP_DISABLED)
+    );
   }
 
   private required(): boolean {
-    return this.options.required ?? getBoolAttr(this.root, RADIO_GROUP_REQUIRED);
+    return (
+      this.options.required ?? getBoolAttr(this.root, RADIO_GROUP_REQUIRED)
+    );
   }
 
   private invalid(): boolean {
@@ -200,7 +229,9 @@ export class RadioGroupController implements BambiController {
   }
 
   private inputs(): HTMLInputElement[] {
-    return Array.from(this.root.querySelectorAll(`[${RADIO_GROUP_INPUT}]`)).filter(
+    return Array.from(
+      this.root.querySelectorAll(`[${RADIO_GROUP_INPUT}]`),
+    ).filter(
       (input): input is HTMLInputElement => input instanceof HTMLInputElement,
     );
   }
@@ -219,7 +250,9 @@ export class RadioGroupController implements BambiController {
   }
 
   private valueForItem(item: Element): string {
-    return item.getAttribute(RADIO_GROUP_VALUE) ?? this.inputFor(item)?.value ?? "";
+    return (
+      item.getAttribute(RADIO_GROUP_VALUE) ?? this.inputFor(item)?.value ?? ""
+    );
   }
 
   private checkedInputValue(): string | null {
@@ -227,7 +260,11 @@ export class RadioGroupController implements BambiController {
   }
 
   private firstEnabledValue(): string | null {
-    const item = this.items().find((candidate) => !this.isItemDisabled(candidate));
+    return this.firstEnabledValueFromItems(this.items());
+  }
+
+  private firstEnabledValueFromItems(items: Element[]): string | null {
+    const item = items.find((candidate) => !this.isItemDisabled(candidate));
     return item ? this.valueForItem(item) : null;
   }
 
@@ -237,11 +274,18 @@ export class RadioGroupController implements BambiController {
 
   private applyState(value: string | null): void {
     const selectedValue = value ?? "";
-    if (!this.controlled() && value) setAttr(this.root, RADIO_GROUP_VALUE, value);
-    if (!value && !this.controlled()) setAttr(this.root, RADIO_GROUP_VALUE, null);
+    if (!this.controlled() && value)
+      setAttr(this.root, RADIO_GROUP_VALUE, value);
+    if (!value && !this.controlled())
+      setAttr(this.root, RADIO_GROUP_VALUE, null);
     this.currentValue = value;
 
-    for (const item of this.items()) {
+    const items = this.items();
+    const firstEnabledValue = value
+      ? null
+      : this.firstEnabledValueFromItems(items);
+
+    for (const item of items) {
       const itemValue = this.valueForItem(item);
       const input = this.inputFor(item);
       const itemDisabled = getBoolAttr(item, RADIO_GROUP_DISABLED);
@@ -262,7 +306,8 @@ export class RadioGroupController implements BambiController {
         input.checked = checked;
         input.disabled = disabled;
         input.required = this.required();
-        input.tabIndex = checked || (!value && itemValue === this.firstEnabledValue()) ? 0 : -1;
+        input.tabIndex =
+          checked || (!value && itemValue === firstEnabledValue) ? 0 : -1;
         input.setAttribute("aria-invalid", this.invalid() ? "true" : "false");
       }
 
@@ -271,11 +316,15 @@ export class RadioGroupController implements BambiController {
       }
 
       const label = item.querySelector(`[${RADIO_GROUP_LABEL}]`);
-      if (label instanceof HTMLLabelElement && input && !label.htmlFor) label.htmlFor = input.id;
+      if (label instanceof HTMLLabelElement && input && !label.htmlFor)
+        label.htmlFor = input.id;
     }
   }
 
-  private applyValue(newValue: string, source: RadioGroupValueChangeDetail["source"]): void {
+  private applyValue(
+    newValue: string,
+    source: RadioGroupValueChangeDetail["source"],
+  ): void {
     if (!newValue || newValue === this.currentValue || this.disabled()) {
       this.applyState(this.currentValue);
       return;
@@ -288,7 +337,11 @@ export class RadioGroupController implements BambiController {
       this.applyState(this.currentValue);
     }
 
-    dispatchRadioGroupEvent(this.root, { value: newValue, previousValue, source });
+    dispatchRadioGroupEvent(this.root, {
+      value: newValue,
+      previousValue,
+      source,
+    });
   }
 
   private focusInput(input: Element): void {
@@ -325,7 +378,8 @@ export class RadioGroupController implements BambiController {
         const target = event.target;
         if (!(target instanceof Element)) return;
         const item = target.closest(`[${RADIO_GROUP_ITEM}]`);
-        if (!item || !this.root.contains(item) || this.isItemDisabled(item)) return;
+        if (!item || !this.root.contains(item) || this.isItemDisabled(item))
+          return;
         event.preventDefault();
         this.inputFor(item)?.focus();
         this.applyValue(this.valueForItem(item), "click");
@@ -337,7 +391,11 @@ export class RadioGroupController implements BambiController {
       "change",
       (event) => {
         const target = event.target;
-        if (!(target instanceof HTMLInputElement) || !target.hasAttribute(RADIO_GROUP_INPUT)) return;
+        if (
+          !(target instanceof HTMLInputElement) ||
+          !target.hasAttribute(RADIO_GROUP_INPUT)
+        )
+          return;
         const item = this.itemForInput(target);
         if (item) this.applyValue(this.valueForItem(item), "programmatic");
       },
@@ -353,7 +411,8 @@ export class RadioGroupController implements BambiController {
             this.applyState(this.options.value ?? this.currentValue);
           } else {
             const value =
-              (this.options.defaultValue ?? getAttr(this.root, RADIO_GROUP_DEFAULT_VALUE, "")) ||
+              (this.options.defaultValue ??
+                getAttr(this.root, RADIO_GROUP_DEFAULT_VALUE, "")) ||
               this.checkedInputValue() ||
               this.firstEnabledValue();
             this.applyState(value);

@@ -214,6 +214,7 @@ function createReactWrapperSource({
     "...props",
   ].join(",\n  ");
   const effectDeps = behaviorOptionNames.join(", ");
+  const lifecycleDeps = polymorphicRootPropName ?? "";
   const behaviorOptions = behaviorOptionNames
     .map((name) => `      ${name},`)
     .join("\n");
@@ -431,7 +432,7 @@ ${behaviorOptions}
 ${listenerTeardownBlock}      behaviorRef.current = null;
       behavior.destroy();
     };
-  }, [${effectDeps}]);
+  }, [${lifecycleDeps}]);
 
   React.useEffect(() => {
     behaviorRef.current?.update?.({

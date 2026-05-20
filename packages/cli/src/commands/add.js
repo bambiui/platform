@@ -74,9 +74,10 @@ export async function addComponent(componentName, flags) {
     /** @type {Record<string, string | undefined>} */ (flags),
   );
   const manifest = await readRegistryManifest(registryUrl);
-  const component = /** @type {{ name: string, css?: string, cssHash?: string, files: Record<string, string[]>, helpers?: Record<string, string[]>, hashes?: Record<string, Record<string, string>>, exports?: Record<string, string[]> }} */ (
-    getRegistryComponent(manifest, componentName)
-  );
+  const component =
+    /** @type {{ name: string, css?: string, cssHash?: string, files: Record<string, string[]>, helpers?: Record<string, string[]>, hashes?: Record<string, Record<string, string>>, exports?: Record<string, string[]> }} */ (
+      getRegistryComponent(manifest, componentName)
+    );
 
   const frameworkFiles = component.files?.[framework];
   if (!frameworkFiles || frameworkFiles.length === 0) {
@@ -103,58 +104,77 @@ export async function addComponent(componentName, flags) {
       {
         expectedHash: manifest.styles?.globalHash,
         transform: (content) => {
-          const preserved = existingCssImports.filter((line) => !content.includes(line.trim()));
-          return preserved.length > 0 ? `${preserved.join("")}${content}` : content;
+          const preserved = existingCssImports.filter(
+            (line) => !content.includes(line.trim()),
+          );
+          return preserved.length > 0
+            ? `${preserved.join("")}${content}`
+            : content;
         },
       },
     ),
   );
 
-  for (const filePath of frameworkFiles) {
-    results.push(
-      await copyRegistryFile(
+  const fileResultsPromise = Promise.all(
+    frameworkFiles.map((filePath) =>
+      copyRegistryFile(
         registryUrl,
         filePath,
         path.join(outputDir, path.basename(filePath)),
         force,
         { expectedHash: component.hashes?.[framework]?.[filePath] },
       ),
-    );
-  }
+    ),
+  );
 
-  if (component.css) {
-    const cssDestination = path.join(path.dirname(styleFile), path.basename(component.css));
-    results.push(
-      await copyRegistryFile(
-        registryUrl,
-        component.css,
-        cssDestination,
-        force,
-        { expectedHash: component.cssHash },
-      ),
-    );
-
-    results.push(
-      await ensureCssImport(styleFile, cssDestination),
-    );
-  }
+  const cssDestination = component.css
+    ? path.join(path.dirname(styleFile), path.basename(component.css))
+    : undefined;
+  const cssResultPromise =
+    component.css && cssDestination
+      ? copyRegistryFile(registryUrl, component.css, cssDestination, force, {
+          expectedHash: component.cssHash,
+        })
+      : undefined;
 
   const sharedSrc = manifest.shared;
   const needsHelper = (component.helpers?.[framework] ?? []).length > 0;
-  if (sharedSrc && needsHelper) {
-    results.push(
-      await copyRegistryFile(
-        registryUrl,
-        sharedSrc,
-        path.join(cwd, componentDir, "bambi-helpers.ts"),
-        force,
-        { expectedHash: manifest.sharedHash },
-      ),
-    );
+  const helperResultPromise =
+    sharedSrc && needsHelper
+      ? copyRegistryFile(
+          registryUrl,
+          sharedSrc,
+          path.join(cwd, componentDir, "bambi-helpers.ts"),
+          force,
+          { expectedHash: manifest.sharedHash },
+        )
+      : undefined;
+
+  const [fileResults, cssResult, helperResult] = await Promise.all([
+    fileResultsPromise,
+    cssResultPromise,
+    helperResultPromise,
+  ]);
+
+  results.push(...fileResults);
+
+  if (cssResult && cssDestination) {
+    results.push(cssResult);
+    results.push(await ensureCssImport(styleFile, cssDestination));
+  }
+
+  if (helperResult) {
+    results.push(helperResult);
   }
 
   const frameworkExports = component.exports?.[framework];
-  return { config, framework, componentName, results, exports: frameworkExports };
+  return {
+    config,
+    framework,
+    componentName,
+    results,
+    exports: frameworkExports,
+  };
 }
 
 /**

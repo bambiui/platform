@@ -16,7 +16,10 @@ let result;
 beforeAll(async () => {
   contractSource = await readFile(`${tabsDir}/tabs.contract.ts`, "utf8");
   controllerSource = await readFile(`${tabsDir}/tabs.controller.ts`, "utf8");
-  rovingFocusSource = await readFile(`${primitivesDir}/roving-focus.ts`, "utf8");
+  rovingFocusSource = await readFile(
+    `${primitivesDir}/roving-focus.ts`,
+    "utf8",
+  );
   result = createArtifact({
     framework: "vue",
     contractSource,
@@ -41,7 +44,13 @@ beforeAll(async () => {
               { name: "role", value: "tab" },
               { name: "data-state", active: "active", inactive: "inactive" },
               { name: "aria-selected", active: true, inactive: false },
-              { name: "tabIndex", svelteName: "tabindex", vueName: "tabindex", active: 0, inactive: -1 },
+              {
+                name: "tabIndex",
+                svelteName: "tabindex",
+                vueName: "tabindex",
+                active: 0,
+                inactive: -1,
+              },
             ],
           },
           content: {
@@ -89,8 +98,8 @@ describe("createArtifact — tabs/vue", () => {
     expect(result.files["Tabs.vue"]).toContain("computed(");
   });
 
-  it("Tabs.vue uses onUpdated for dynamic slot/child tracking", () => {
-    expect(result.files["Tabs.vue"]).toContain("onUpdated(");
+  it("Tabs.vue avoids duplicate onUpdated controller updates", () => {
+    expect(result.files["Tabs.vue"]).not.toContain("onUpdated");
   });
 
   it("Tabs.vue uses script setup syntax", () => {
@@ -144,8 +153,12 @@ describe("createArtifact — tabs/vue", () => {
 
 describe("createArtifact — tabs/vue event bridge", () => {
   it("Tabs.vue declares TabsProps interface with onValueChange", () => {
-    expect(result.files["Tabs.vue"]).toContain("interface TabsProps extends Omit<TabsOptions, \"controlled\">");
-    expect(result.files["Tabs.vue"]).toContain("onValueChange?: (detail: TabsValueChangeDetail) => void;");
+    expect(result.files["Tabs.vue"]).toContain(
+      'interface TabsProps extends Omit<TabsOptions, "controlled">',
+    );
+    expect(result.files["Tabs.vue"]).toContain(
+      "onValueChange?: (detail: TabsValueChangeDetail) => void;",
+    );
   });
 
   it("Tabs.vue uses defineProps with TabsProps", () => {
@@ -153,13 +166,19 @@ describe("createArtifact — tabs/vue event bridge", () => {
   });
 
   it("Tabs.vue uses AbortController for event listener cleanup", () => {
-    expect(result.files["Tabs.vue"]).toContain("const eventAbort = new AbortController()");
+    expect(result.files["Tabs.vue"]).toContain(
+      "const eventAbort = new AbortController()",
+    );
     expect(result.files["Tabs.vue"]).toContain("eventAbort.abort()");
   });
 
   it("Tabs.vue listens to TABS_EVENT_VALUE_CHANGE and forwards to callback", () => {
-    expect(result.files["Tabs.vue"]).toContain("rootRef.value!.addEventListener(TABS_EVENT_VALUE_CHANGE");
-    expect(result.files["Tabs.vue"]).toContain("props.onValueChange?.(e.detail)");
+    expect(result.files["Tabs.vue"]).toContain(
+      "rootRef.value!.addEventListener(TABS_EVENT_VALUE_CHANGE",
+    );
+    expect(result.files["Tabs.vue"]).toContain(
+      "props.onValueChange?.(e.detail)",
+    );
     expect(result.files["Tabs.vue"]).toContain("{ signal: eventAbort.signal }");
   });
 
@@ -170,14 +189,17 @@ describe("createArtifact — tabs/vue event bridge", () => {
     const constructorBlock = src.slice(constructorStart, constructorEnd);
     expect(constructorBlock).not.toContain("onValueChange");
 
-    const watchStart = src.indexOf("behavior?.update?.({", src.indexOf("watch("));
+    const watchStart = src.indexOf(
+      "behavior?.update?.({",
+      src.indexOf("watch("),
+    );
     const watchEnd = src.indexOf("});", watchStart);
     expect(src.slice(watchStart, watchEnd)).not.toContain("onValueChange");
   });
 });
 
 describe("createArtifact — tabs/vue $attrs order guard", () => {
-  it("Tabs.vue: v-bind=\"$attrs\" appears before data-bambi-tabs protocol attr", () => {
+  it('Tabs.vue: v-bind="$attrs" appears before data-bambi-tabs protocol attr', () => {
     const src = result.files["Tabs.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
     const protocolIdx = src.indexOf('data-bambi-tabs=""');
@@ -186,7 +208,7 @@ describe("createArtifact — tabs/vue $attrs order guard", () => {
     expect(attrsIdx).toBeLessThan(protocolIdx);
   });
 
-  it("TabsList.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-list protocol attr", () => {
+  it('TabsList.vue: v-bind="$attrs" appears before data-bambi-tabs-list protocol attr', () => {
     const src = result.files["TabsList.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
     const protocolIdx = src.indexOf('data-bambi-tabs-list=""');
@@ -195,7 +217,7 @@ describe("createArtifact — tabs/vue $attrs order guard", () => {
     expect(attrsIdx).toBeLessThan(protocolIdx);
   });
 
-  it("TabsTrigger.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-trigger protocol attr", () => {
+  it('TabsTrigger.vue: v-bind="$attrs" appears before data-bambi-tabs-trigger protocol attr', () => {
     const src = result.files["TabsTrigger.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
     const protocolIdx = src.indexOf('data-bambi-tabs-trigger=""');
@@ -204,7 +226,7 @@ describe("createArtifact — tabs/vue $attrs order guard", () => {
     expect(attrsIdx).toBeLessThan(protocolIdx);
   });
 
-  it("TabsContent.vue: v-bind=\"$attrs\" appears before data-bambi-tabs-content protocol attr", () => {
+  it('TabsContent.vue: v-bind="$attrs" appears before data-bambi-tabs-content protocol attr', () => {
     const src = result.files["TabsContent.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
     const protocolIdx = src.indexOf('data-bambi-tabs-content=""');
@@ -213,28 +235,28 @@ describe("createArtifact — tabs/vue $attrs order guard", () => {
     expect(attrsIdx).toBeLessThan(protocolIdx);
   });
 
-  it("Tabs.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+  it('Tabs.vue: v-bind="$attrs" appears before :data-value protocol attr', () => {
     const src = result.files["Tabs.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
-    const valueIdx = src.indexOf(':data-value=');
+    const valueIdx = src.indexOf(":data-value=");
     expect(attrsIdx).toBeGreaterThanOrEqual(0);
     expect(valueIdx).toBeGreaterThanOrEqual(0);
     expect(attrsIdx).toBeLessThan(valueIdx);
   });
 
-  it("TabsTrigger.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+  it('TabsTrigger.vue: v-bind="$attrs" appears before :data-value protocol attr', () => {
     const src = result.files["TabsTrigger.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
-    const valueIdx = src.indexOf(':data-value=');
+    const valueIdx = src.indexOf(":data-value=");
     expect(attrsIdx).toBeGreaterThanOrEqual(0);
     expect(valueIdx).toBeGreaterThanOrEqual(0);
     expect(attrsIdx).toBeLessThan(valueIdx);
   });
 
-  it("TabsContent.vue: v-bind=\"$attrs\" appears before :data-value protocol attr", () => {
+  it('TabsContent.vue: v-bind="$attrs" appears before :data-value protocol attr', () => {
     const src = result.files["TabsContent.vue"];
     const attrsIdx = src.indexOf('v-bind="$attrs"');
-    const valueIdx = src.indexOf(':data-value=');
+    const valueIdx = src.indexOf(":data-value=");
     expect(attrsIdx).toBeGreaterThanOrEqual(0);
     expect(valueIdx).toBeGreaterThanOrEqual(0);
     expect(attrsIdx).toBeLessThan(valueIdx);
@@ -243,7 +265,13 @@ describe("createArtifact — tabs/vue $attrs order guard", () => {
 
 describe("createArtifact — tabs/vue fixture match", () => {
   const registryDir = `${root}/packages/registry/generated/tabs/vue`;
-  const fixtureFiles = ["Tabs.vue", "TabsList.vue", "TabsTrigger.vue", "TabsContent.vue", "index.ts"];
+  const fixtureFiles = [
+    "Tabs.vue",
+    "TabsList.vue",
+    "TabsTrigger.vue",
+    "TabsContent.vue",
+    "index.ts",
+  ];
   const fixtures = {};
 
   beforeAll(async () => {

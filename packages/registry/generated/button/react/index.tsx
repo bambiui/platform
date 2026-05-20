@@ -97,8 +97,6 @@ export function Button({
 }: ButtonProps) {
   const rootRef = React.useRef<HTMLElement>(null);
   const behaviorRef = React.useRef<ButtonBehavior | null>(null);
-  const controlled = false;
-
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -117,7 +115,7 @@ export function Button({
       behaviorRef.current = null;
       behavior.destroy();
     };
-  }, []);
+  }, [as, variant, size, disabled, loading]);
 
   React.useEffect(() => {
     behaviorRef.current?.update?.({
@@ -127,7 +125,7 @@ export function Button({
       disabled,
       loading,
     });
-  }, [as, variant, size, disabled, loading, children]);
+  }, [as, variant, size, disabled, loading]);
 
   const Component = (as ?? "button") as keyof React.JSX.IntrinsicElements;
   const isNativeElement = Component === "button";
@@ -138,18 +136,16 @@ export function Button({
     {
       ...props,
       ref: rootRef,
-      "data-bambi-button": "",
+      [BUTTON_ROOT]: "",
       type: isNativeElement ? ((props as { type?: string }).type ?? "button") : undefined,
       disabled: isNativeElement ? effectiveDisabled : undefined,
       "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
       "aria-busy": loading ? "true" : undefined,
-      "data-variant": variant,
-      "data-size": size,
+      [BUTTON_VARIANT]: variant,
+      [BUTTON_SIZE]: size,
       "data-disabled": effectiveDisabled ? "true" : undefined,
-      "data-loading": loading ? "true" : undefined,
+      [BUTTON_LOADING]: loading ? "true" : undefined,
     },
     children,
   );
 }
-
-

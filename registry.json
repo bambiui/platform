@@ -10,8 +10,12 @@
     "button": {
       "name": "button",
       "files": {
-        "react": ["packages/registry/generated/button/react/index.tsx"],
-        "solid": ["packages/registry/generated/button/solid/index.tsx"],
+        "react": [
+          "packages/registry/generated/button/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/button/solid/index.tsx"
+        ],
         "svelte": [
           "packages/registry/generated/button/svelte/Button.svelte",
           "packages/registry/generated/button/svelte/index.ts"
@@ -22,20 +26,48 @@
         ]
       },
       "exports": {
-        "react": ["Button"],
-        "solid": ["Button"],
-        "svelte": ["Button"],
-        "vue": ["Button"]
+        "react": [
+          "Button"
+        ],
+        "solid": [
+          "Button"
+        ],
+        "svelte": [
+          "Button"
+        ],
+        "vue": [
+          "Button"
+        ]
       },
       "helpers": {
-        "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "solid": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "svelte": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "vue": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"]
+        "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "solid": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "svelte": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "vue": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ]
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/button/react/index.tsx": "5eeb2933c84c8abacb6174d79e03cd5b72cbdae049b4b2c6287ad2621c329d1a"
+          "packages/registry/generated/button/react/index.tsx": "4bad58dc165eb1b51b4882da51b66dd62f8203f79410b7311e16f9195cea52ed"
         },
         "solid": {
           "packages/registry/generated/button/solid/index.tsx": "a2bd31821736cf0314eab71a3065fdce8611019a1adc9d148b7e88d2693e2b73"
@@ -56,8 +88,12 @@
       "name": "tabs",
       "css": "packages/registry/generated/tabs/tabs.css",
       "files": {
-        "react": ["packages/registry/generated/tabs/react/index.tsx"],
-        "solid": ["packages/registry/generated/tabs/solid/index.tsx"],
+        "react": [
+          "packages/registry/generated/tabs/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/tabs/solid/index.tsx"
+        ],
         "svelte": [
           "packages/registry/generated/tabs/svelte/Tabs.svelte",
           "packages/registry/generated/tabs/svelte/TabsList.svelte",
@@ -74,33 +110,73 @@
         ]
       },
       "helpers": {
-        "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "solid": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "svelte": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "vue": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"]
+        "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "solid": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "svelte": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "vue": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ]
       },
       "exports": {
-        "react": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "solid": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "svelte": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"],
-        "vue": ["Tabs", "TabsList", "TabsTrigger", "TabsContent"]
+        "react": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ],
+        "solid": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ],
+        "svelte": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ],
+        "vue": [
+          "Tabs",
+          "TabsList",
+          "TabsTrigger",
+          "TabsContent"
+        ]
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/tabs/react/index.tsx": "34e86ce0dec70d2fe773ffb160b43a2bd279dfa792fcac82c4a3a17b95276e6c"
+          "packages/registry/generated/tabs/react/index.tsx": "8d21282cc4491a0322390bf855815d06a098ce957d6e5191b04fccfb7d94341e"
         },
         "solid": {
-          "packages/registry/generated/tabs/solid/index.tsx": "354364f20e0c40e3492a92255b684b76d3a6245a6b793811701186e222a711bf"
+          "packages/registry/generated/tabs/solid/index.tsx": "e9f36b20ea101cc2047e2c0b658a26b4b0952c98d7c29e7923c1fc0a0977d345"
         },
         "svelte": {
-          "packages/registry/generated/tabs/svelte/Tabs.svelte": "6e9672be561580c9e0ade064b0a5fe0e799f08a86a47b93f4d51bdd5388b18a9",
+          "packages/registry/generated/tabs/svelte/Tabs.svelte": "bc1c73c15daeff0aa42db1067f5a8096a0d93a13ea0ecbbbcb8a3399c4629c16",
           "packages/registry/generated/tabs/svelte/TabsList.svelte": "4351fde3dc125167324adcefbcdc7936cb4936c76b57137eb4498c0bada21aff",
           "packages/registry/generated/tabs/svelte/TabsTrigger.svelte": "af09f38deec5767fae9b1a4bffe696da76b4c0c2e23fbfbe8b2cf02509376f4a",
           "packages/registry/generated/tabs/svelte/TabsContent.svelte": "f2052ebeb397089708a45dc8e9ce1e4e45fff14941c0877a4903503cbd8a6e79",
           "packages/registry/generated/tabs/svelte/index.ts": "7547cd4514db1aaafa15c16d88460ba9c1a3a482b3fa1f33673857f5c432921b"
         },
         "vue": {
-          "packages/registry/generated/tabs/vue/Tabs.vue": "7b232314d633b864ca7f9ad80bad47b9695fa8922259fcd52212477bdccb5328",
+          "packages/registry/generated/tabs/vue/Tabs.vue": "f87ed79c34fb89f60e0303f73a5ede61dd901ca4cc157ee7187926aa900330d0",
           "packages/registry/generated/tabs/vue/TabsList.vue": "b3f33f468bb90639ba26c413023c82671dad19a22ac6dc083731e210b9114c8a",
           "packages/registry/generated/tabs/vue/TabsTrigger.vue": "1c9c127c36a79e0e4f579d0636d5e50ea3f9739d0c8ec8e0f27db1f1e055470e",
           "packages/registry/generated/tabs/vue/TabsContent.vue": "e1e82b00139aca4c015b15044aefea4b58ea97e4f05f9d947509eb90de760a5e",
@@ -113,8 +189,12 @@
       "name": "radio-group",
       "css": "packages/registry/generated/radio-group/radio-group.css",
       "files": {
-        "react": ["packages/registry/generated/radio-group/react/index.tsx"],
-        "solid": ["packages/registry/generated/radio-group/solid/index.tsx"],
+        "react": [
+          "packages/registry/generated/radio-group/react/index.tsx"
+        ],
+        "solid": [
+          "packages/registry/generated/radio-group/solid/index.tsx"
+        ],
         "svelte": [
           "packages/registry/generated/radio-group/svelte/RadioGroup.svelte",
           "packages/registry/generated/radio-group/svelte/RadioGroupItem.svelte",
@@ -131,10 +211,30 @@
         ]
       },
       "helpers": {
-        "react": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "solid": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "svelte": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"],
-        "vue": ["BambiBehavior", "getAttr", "setAttr", "getBoolAttr"]
+        "react": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "solid": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "svelte": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ],
+        "vue": [
+          "BambiBehavior",
+          "getAttr",
+          "setAttr",
+          "getBoolAttr"
+        ]
       },
       "exports": {
         "react": [
@@ -164,20 +264,20 @@
       },
       "hashes": {
         "react": {
-          "packages/registry/generated/radio-group/react/index.tsx": "f1ee3e438cecb8d5096c00fd0d396460c5e2d73c76f4c77dfb29a986e5a1d88c"
+          "packages/registry/generated/radio-group/react/index.tsx": "a0c55020b70d48d677b3cf39b0aef1629eb1855f030704560b0aa0083956eaf3"
         },
         "solid": {
-          "packages/registry/generated/radio-group/solid/index.tsx": "d056ab2f05a16ba4d65dad01e792c75987abb36b5c6dbb88af1cd706603b8ae4"
+          "packages/registry/generated/radio-group/solid/index.tsx": "bcfd64533b9f50e8b329aaca99a5138e13c0cb7237ecad9cbf29ddeb0113b41c"
         },
         "svelte": {
-          "packages/registry/generated/radio-group/svelte/RadioGroup.svelte": "ee29c3be7adf36b6ff3bed9c3c261738c492b24f514fc5cdad57c63d42a267fe",
+          "packages/registry/generated/radio-group/svelte/RadioGroup.svelte": "ece210df5702406fa0f5e783af3ec121d8f54935379df92c88914e8be7e8081e",
           "packages/registry/generated/radio-group/svelte/RadioGroupItem.svelte": "ae3bc50df15f39ff072a6da65d685b2b27594cbb44313b39765dbd1fece61c61",
           "packages/registry/generated/radio-group/svelte/RadioGroupIndicator.svelte": "5b9f7ccfa4ad2b63b0ad5f65fbf8e529d55536c05cb8263c08bb57d5c5e48cdf",
           "packages/registry/generated/radio-group/svelte/RadioGroupLabel.svelte": "adfb6d04ca7dba3550412c477a957dc7ba66145f5e431e5413f0c3e12544cc57",
           "packages/registry/generated/radio-group/svelte/index.ts": "6230c50c9d5da5058fc3e6d594825df5b80e96bfd128a654255832ab9b820720"
         },
         "vue": {
-          "packages/registry/generated/radio-group/vue/RadioGroup.vue": "c422ab05008e1400062fe0d6645315e73ccecee3eeb11eca2b84f7e841debd4f",
+          "packages/registry/generated/radio-group/vue/RadioGroup.vue": "a3bd3cabc0495e9a5911283fd49a41140ee7eeae5e1d766a7b4110c4c1c5663e",
           "packages/registry/generated/radio-group/vue/RadioGroupItem.vue": "a7be1804c6fbabd91c404c7f4202aedc1d55b74ce5e213f60d39af5929444bb4",
           "packages/registry/generated/radio-group/vue/RadioGroupIndicator.vue": "ee3f1815ec9e4957909eb27ee8eadf76914a5897dbe01c1bc67f247c78578f86",
           "packages/registry/generated/radio-group/vue/RadioGroupLabel.vue": "edc58d856414fc07997a1658c735931edab036a3aa4a596b27ec0d0b692f5fc8",

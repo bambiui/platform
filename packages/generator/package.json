@@ -12,6 +12,7 @@
     "./vue": "./src/vue/index.js"
   },
   "scripts": {
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "test": "vitest run"
   },
   "dependencies": {

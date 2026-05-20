@@ -6,6 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {

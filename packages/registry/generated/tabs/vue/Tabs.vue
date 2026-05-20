@@ -28,17 +28,17 @@ export interface TabsValueChangeDetail {
 
 
 interface RovingFocusOptions {
-  
+
   orientation?: "horizontal" | "vertical" | "both";
-  
+
   loop?: boolean;
-  
+
   getItems: () => Element[];
-  
+
   isDisabled?: (item: Element) => boolean;
-  
+
   onFocus: (item: Element) => void;
-  
+
   onActivate?: (item: Element) => void;
 }
 

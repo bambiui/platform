@@ -68,6 +68,7 @@
     }
   },
   "scripts": {
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "check-types": "tsc -p tsconfig.json",
     "test:tabs": "node scripts/test-tabs-controller.mjs",
     "test:roving-focus": "node scripts/test-roving-focus.mjs",

@@ -27,6 +27,7 @@
   },
   "scripts": {
     "check": "pnpm run check-types && pnpm run smoke",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "check-types": "tsc --noEmit",
     "smoke": "node scripts/smoke.js"
   },

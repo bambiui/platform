@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3012",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"

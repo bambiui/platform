@@ -26,17 +26,17 @@ export interface TabsValueChangeDetail {
 
 
 interface RovingFocusOptions {
-  
+
   orientation?: "horizontal" | "vertical" | "both";
-  
+
   loop?: boolean;
-  
+
   getItems: () => Element[];
-  
+
   isDisabled?: (item: Element) => boolean;
-  
+
   onFocus: (item: Element) => void;
-  
+
   onActivate?: (item: Element) => void;
 }
 
@@ -364,11 +364,11 @@ export interface TabsProps extends Omit<TabsOptions, "controlled">, Omit<React.C
   onValueChange?: (detail: TabsValueChangeDetail) => void;
 }
 
-export interface TabsListProps extends React.ComponentPropsWithoutRef<"div"> {
-}
+export type TabsListProps = React.ComponentPropsWithoutRef<"div">;
 
 export interface TabsTriggerProps extends React.ComponentPropsWithoutRef<"button"> {
   value: string;
+  disabled?: boolean;
 }
 
 export interface TabsContentProps extends React.ComponentPropsWithoutRef<"div"> {
@@ -390,7 +390,6 @@ export function Tabs({
   const controlled = value !== undefined;
   const selectedValue = value ?? defaultValue;
   const onValueChangeRef = React.useRef(onValueChange);
-  onValueChangeRef.current = onValueChange;
 
   React.useEffect(() => {
     if (value !== undefined && defaultValue !== undefined) {
@@ -399,6 +398,9 @@ export function Tabs({
       );
     }
   }, [defaultValue, value]);
+  React.useEffect(() => {
+    onValueChangeRef.current = onValueChange;
+  }, [onValueChange]);
 
   React.useEffect(() => {
     const root = rootRef.current;
@@ -426,7 +428,7 @@ export function Tabs({
       behaviorRef.current = null;
       behavior.destroy();
     };
-  }, []);
+  }, [value, defaultValue, orientation, activationMode, disabled, controlled]);
 
   React.useEffect(() => {
     behaviorRef.current?.update?.({
@@ -437,19 +439,19 @@ export function Tabs({
       disabled,
       controlled,
     });
-  }, [value, defaultValue, orientation, activationMode, disabled, children]);
+  }, [value, defaultValue, orientation, activationMode, disabled, controlled]);
 
   const rootElement = (
     <div
       {...props}
       ref={rootRef}
-      data-bambi-tabs=""
-      data-value={value}
-      data-default-value={defaultValue}
-      data-orientation={orientation}
-      data-activation-mode={activationMode}
-      data-disabled={disabled ? "true" : undefined}
-      data-controlled={controlled ? "true" : undefined}
+      {...{ [TABS_ROOT]: "" }}
+      {...{ [TABS_VALUE]: value }}
+      {...{ [TABS_DEFAULT_VALUE]: defaultValue }}
+      {...{ [TABS_ORIENTATION]: orientation }}
+      {...{ [TABS_ACTIVATION_MODE]: activationMode }}
+      {...{ [TABS_DISABLED]: disabled ? "true" : undefined }}
+      {...{ [TABS_CONTROLLED]: controlled ? "true" : undefined }}
     >
       {children}
     </div>
@@ -463,7 +465,7 @@ export function TabsList({ children, ...props }: TabsListProps) {
   return (
     <div
       {...props}
-      data-bambi-tabs-list=""
+      {...{ [TABS_LIST]: "" }}
     >
       {children}
     </div>
@@ -480,9 +482,9 @@ export function TabsTrigger({ value, disabled, children, ...props }: TabsTrigger
       {...props}
       type={props.type ?? "button"}
       disabled={disabled}
-      data-disabled={disabled ? "true" : undefined}
-      data-bambi-tabs-trigger=""
-      data-value={value}
+      {...{ [TABS_DISABLED]: disabled ? "true" : undefined }}
+      {...{ [TABS_TRIGGER]: "" }}
+      {...{ [TABS_VALUE]: value }}
       role={"tab"}
       data-state={hasSelectedValue ? (isSelected ? "active" : "inactive") : undefined}
       aria-selected={hasSelectedValue ? (isSelected ? true : false) : undefined}
@@ -501,8 +503,8 @@ export function TabsContent({ value, children, ...props }: TabsContentProps) {
   return (
     <div
       {...props}
-      data-bambi-tabs-content=""
-      data-value={value}
+      {...{ [TABS_CONTENT]: "" }}
+      {...{ [TABS_VALUE]: value }}
       role={"tabpanel"}
       data-state={hasSelectedValue ? (isSelected ? "active" : "inactive") : undefined}
       hidden={hasSelectedValue ? (isSelected ? false : true) : undefined}

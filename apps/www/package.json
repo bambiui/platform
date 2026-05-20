@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev --port 3000",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "build": "astro build",
     "check-types": "astro check",
     "preview": "astro preview"

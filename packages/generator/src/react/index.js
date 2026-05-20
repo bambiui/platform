@@ -10,13 +10,9 @@ import {
 // ── React attribute helpers ────────────────────────────────────────────────
 
 function reactAttributeValue(prop) {
-  if (prop.name === "controlled") return "controlled ? \"true\" : undefined";
+  if (prop.name === "controlled") return 'controlled ? "true" : undefined';
   if (prop.type === "boolean") return `${prop.name} ? "true" : undefined`;
   return prop.name;
-}
-
-function reactAttributeLine(prop) {
-  return `      ${prop.attribute}={${reactAttributeValue(prop)}}`;
 }
 
 function htmlElementType(element) {
@@ -24,11 +20,39 @@ function htmlElementType(element) {
 }
 
 function supportsDisabledAttribute(element) {
-  return ["button", "fieldset", "input", "optgroup", "option", "select", "textarea"].includes(element);
+  return [
+    "button",
+    "fieldset",
+    "input",
+    "optgroup",
+    "option",
+    "select",
+    "textarea",
+  ].includes(element);
+}
+
+function reactDataAttributeLine(attribute, expression, indent = "      ") {
+  return attribute.attributeConst
+    ? `${indent}{...{ [${attribute.attributeConst}]: ${expression} }}`
+    : `${indent}${attribute.attribute}={${expression}}`;
+}
+
+function reactMarkerAttributeLine(attribute, indent = "      ") {
+  return reactDataAttributeLine(attribute, '""', indent);
+}
+
+function reactObjectAttributeLine(attribute, expression, indent = "      ") {
+  return attribute.attributeConst
+    ? `${indent}[${attribute.attributeConst}]: ${expression},`
+    : `${indent}"${attribute.attribute}": ${expression},`;
 }
 
 function omittedEmbeddedPartNames(options) {
-  return new Set((options.embeddedParts ?? []).filter((part) => part.omitChildComponent).map((part) => part.childPartName));
+  return new Set(
+    (options.embeddedParts ?? [])
+      .filter((part) => part.omitChildComponent)
+      .map((part) => part.childPartName),
+  );
 }
 
 function reactPartPropsSource(contract, options) {
@@ -37,6 +61,8 @@ function reactPartPropsSource(contract, options) {
     ...Object.keys(options.ssrSelectedState?.parts ?? {}),
   ]);
   const valuePropName = options.valuePropName;
+  const disabledPropParts = new Set(options.disabledPropParts ?? []);
+  const disabledPropName = options.disabledPropName;
 
   const omittedParts = omittedEmbeddedPartNames(options);
 
@@ -44,9 +70,18 @@ function reactPartPropsSource(contract, options) {
     .filter((part) => part.name !== "root" && !omittedParts.has(part.name))
     .map((part) => {
       const componentName = `${contract.componentName}${pascalCase(part.name)}`;
-      const valueProp = valuePropParts.has(part.name) ? `\n  ${valuePropName}: string;` : "";
+      const valueProp = valuePropParts.has(part.name)
+        ? `\n  ${valuePropName}: string;`
+        : "";
+      const disabledProp = disabledPropParts.has(part.name)
+        ? `\n  ${disabledPropName}?: boolean;`
+        : "";
+      const extraProps = `${valueProp}${disabledProp}`;
 
-      return `export interface ${componentName}Props extends React.ComponentPropsWithoutRef<"${part.element}"> {${valueProp}
+      if (!extraProps)
+        return `export type ${componentName}Props = React.ComponentPropsWithoutRef<"${part.element}">;`;
+
+      return `export interface ${componentName}Props extends React.ComponentPropsWithoutRef<"${part.element}"> {${extraProps}
 }`;
     })
     .join("\n\n");
@@ -58,15 +93,18 @@ function reactLiteral(value) {
 
 function reactSsrAttributeLine(attribute) {
   const name = attribute.reactName ?? attribute.name;
-  if (attribute.value !== undefined) return `\n      ${name}={${reactLiteral(attribute.value)}}`;
+  if (attribute.value !== undefined)
+    return `\n      ${name}={${reactLiteral(attribute.value)}}`;
   return `\n      ${name}={hasSelectedValue ? (isSelected ? ${reactLiteral(attribute.active)} : ${reactLiteral(attribute.inactive)}) : undefined}`;
 }
 
 function reactEmbeddedAttributeLine(attribute) {
   const name = attribute.reactName ?? attribute.name;
-  if (attribute.selected) return `\n        ${name}={hasSelectedValue ? isSelected : undefined}`;
+  if (attribute.selected)
+    return `\n        ${name}={hasSelectedValue ? isSelected : undefined}`;
   if (attribute.propName) return `\n        ${name}={${attribute.propName}}`;
-  if (attribute.value !== undefined) return `\n        ${name}={${reactLiteral(attribute.value)}}`;
+  if (attribute.value !== undefined)
+    return `\n        ${name}={${reactLiteral(attribute.value)}}`;
   return `\n        ${name}=""`;
 }
 
@@ -74,11 +112,15 @@ function reactEmbeddedChildrenSource(part, contract, options) {
   return (options.embeddedParts ?? [])
     .filter((embedded) => embedded.parentPartName === part.name)
     .map((embedded) => {
-      const child = contract.parts.find((candidate) => candidate.name === embedded.childPartName);
+      const child = contract.parts.find(
+        (candidate) => candidate.name === embedded.childPartName,
+      );
       if (!child) return "";
-      const attrs = (embedded.attributes ?? []).map((attribute) => reactEmbeddedAttributeLine(attribute)).join("");
+      const attrs = (embedded.attributes ?? [])
+        .map((attribute) => reactEmbeddedAttributeLine(attribute))
+        .join("");
       return `      <${child.element}
-        ${child.attribute}=""${attrs}
+${reactMarkerAttributeLine(child, "        ")}${attrs}
       />`;
     })
     .filter(Boolean)
@@ -96,8 +138,12 @@ function reactPartComponentSource(contract, options) {
   const valuePropName = options.valuePropName;
   const disabledPropName = options.disabledPropName;
   const propsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
-  const valueAttr = valuePropName ? propsByName.get(valuePropName)?.attribute : undefined;
-  const disabledAttr = disabledPropName ? propsByName.get(disabledPropName)?.attribute : undefined;
+  const valueAttr = valuePropName
+    ? propsByName.get(valuePropName)?.attribute
+    : undefined;
+  const disabledAttr = disabledPropName
+    ? propsByName.get(disabledPropName)?.attribute
+    : undefined;
   const omittedParts = omittedEmbeddedPartNames(options);
 
   return contract.parts
@@ -110,39 +156,66 @@ function reactPartComponentSource(contract, options) {
       const protocolValueHandling = protocolValuePropParts.has(part.name);
       const disabledHandling = disabledPropParts.has(part.name);
       if (valueHandling && (!valuePropName || !valueAttr)) {
-        throw new Error(`${contract.name}/${part.name}: valuePropName must reference a contract prop.`);
+        throw new Error(
+          `${contract.name}/${part.name}: valuePropName must reference a contract prop.`,
+        );
       }
       if (disabledHandling && (!disabledPropName || !disabledAttr)) {
-        throw new Error(`${contract.name}/${part.name}: disabledPropName must reference a contract prop.`);
+        throw new Error(
+          `${contract.name}/${part.name}: disabledPropName must reference a contract prop.`,
+        );
       }
       const destructured = [
         valueHandling ? valuePropName : undefined,
         disabledHandling ? disabledPropName : undefined,
         "children",
         "...props",
-      ].filter(Boolean).join(", ");
-      const typeAttr = defaultTypeParts.has(part.name) ? `\n      type={props.type ?? "${options.defaultTypeValue}"}` : "";
-      const valueAttribute = protocolValueHandling ? `\n      ${valueAttr}={${valuePropName}}` : "";
-      const nativeDisabledAttribute = disabledHandling && supportsDisabledAttribute(tag) ? `\n      disabled={${disabledPropName}}` : "";
-      const disabledAttribute = disabledHandling ? `${nativeDisabledAttribute}\n      ${disabledAttr}={${disabledPropName} ? "true" : undefined}` : "";
+      ]
+        .filter(Boolean)
+        .join(", ");
+      const typeAttr = defaultTypeParts.has(part.name)
+        ? `\n      type={props.type ?? "${options.defaultTypeValue}"}`
+        : "";
+      const valueAttribute = protocolValueHandling
+        ? `\n${reactDataAttributeLine({ attribute: valueAttr, attributeConst: propsByName.get(valuePropName)?.attributeConst }, valuePropName)}`
+        : "";
+      const nativeDisabledAttribute =
+        disabledHandling && supportsDisabledAttribute(tag)
+          ? `\n      disabled={${disabledPropName}}`
+          : "";
+      const disabledAttribute = disabledHandling
+        ? `${nativeDisabledAttribute}\n${reactDataAttributeLine({ attribute: disabledAttr, attributeConst: propsByName.get(disabledPropName)?.attributeConst }, `${disabledPropName} ? "true" : undefined`)}`
+        : "";
       const ssrState = options.ssrSelectedState;
       const ssrPart = ssrState?.parts?.[part.name];
-      const ssrStateSetup = ssrPart && valueHandling ? `
+      const ssrStateSetup =
+        ssrPart && valueHandling
+          ? `
   const selectedValue = React.useContext(SsrSelectedValueContext);
   const hasSelectedValue = selectedValue !== undefined;
-  const isSelected = selectedValue === ${ssrState.valuePropName};` : "";
-      const ssrAttrs = ssrPart && valueHandling
-        ? ssrPart.attributes.map((attribute) => reactSsrAttributeLine(attribute)).join("")
+  const isSelected = selectedValue === ${ssrState.valuePropName};`
+          : "";
+      const ssrAttrs =
+        ssrPart && valueHandling
+          ? ssrPart.attributes
+              .map((attribute) => reactSsrAttributeLine(attribute))
+              .join("")
+          : "";
+      const embeddedChildren = reactEmbeddedChildrenSource(
+        part,
+        contract,
+        options,
+      );
+      const embeddedChildrenBlock = embeddedChildren
+        ? `${embeddedChildren}\n`
         : "";
-      const embeddedChildren = reactEmbeddedChildrenSource(part, contract, options);
-      const embeddedChildrenBlock = embeddedChildren ? `${embeddedChildren}\n` : "";
 
       return `export function ${componentName}({ ${destructured} }: ${propsName}) {
 ${ssrStateSetup}
   return (
     <${tag}
       {...props}${typeAttr}${disabledAttribute}
-      ${part.attribute}=""${valueAttribute}${ssrAttrs}
+${reactMarkerAttributeLine(part)}${valueAttribute}${ssrAttrs}
     >
 ${embeddedChildrenBlock}      {children}
     </${tag}>
@@ -152,20 +225,33 @@ ${embeddedChildrenBlock}      {children}
     .join("\n\n");
 }
 
-function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions }) {
+function createReactWrapperSource({
+  contract,
+  behaviorClassName,
+  optionsTypeName,
+  optionsNames,
+  generatorOptions,
+}) {
   const root = contract.parts.find((part) => part.name === "root");
-  if (!root) throw new Error(`${contract.name}: missing root part in contract.`);
+  if (!root)
+    throw new Error(`${contract.name}: missing root part in contract.`);
   const polymorphicRootPropName = generatorOptions.polymorphicRootPropName;
 
   const controlledProp = contract.props.find((prop) => prop.controlled);
   const defaultProp = controlledProp
-    ? contract.props.find((prop) => prop.name === `default${pascalCase(controlledProp.name)}`)
+    ? contract.props.find(
+        (prop) => prop.name === `default${pascalCase(controlledProp.name)}`,
+      )
     : undefined;
   const optionNames = optionsNames.filter((name) => name !== "controlled");
   // Event callbacks come from contract.events; never from optionsNames
   const eventCallbacks = contract.events ?? [];
-  const nonCallbackOptionNames = optionNames.filter((name) => !name.startsWith("on"));
-  const contractPropsByName = new Map(contract.props.map((prop) => [prop.name, prop]));
+  const nonCallbackOptionNames = optionNames.filter(
+    (name) => !name.startsWith("on"),
+  );
+  const contractPropsByName = new Map(
+    contract.props.map((prop) => [prop.name, prop]),
+  );
   const destructuredOptions = nonCallbackOptionNames.map((name) => {
     const defaultValue = contractPropsByName.get(name)?.defaultValue;
     return defaultValue === undefined ? name : `${name} = "${defaultValue}"`;
@@ -176,17 +262,19 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     "children",
     "...props",
   ].join(",\n  ");
-  const effectDeps = [...nonCallbackOptionNames, "children"].join(", ");
   const behaviorOptionNames = controlledProp
     ? [...nonCallbackOptionNames, "controlled"]
     : nonCallbackOptionNames;
-  const behaviorOptions = behaviorOptionNames.map((name) => `      ${name},`).join("\n");
+  const effectDeps = behaviorOptionNames.join(", ");
+  const behaviorOptions = behaviorOptionNames
+    .map((name) => `      ${name},`)
+    .join("\n");
   const hasDisabledOption = optionNames.includes("disabled");
   const hasLoadingOption = optionNames.includes("loading");
-  const effectiveDisabledExpression = [
-    hasDisabledOption ? "disabled" : null,
-    hasLoadingOption ? "loading" : null,
-  ].filter(Boolean).join(" || ") || "false";
+  const effectiveDisabledExpression =
+    [hasDisabledOption ? "disabled" : null, hasLoadingOption ? "loading" : null]
+      .filter(Boolean)
+      .join(" || ") || "false";
 
   const rootAttrs = contract.props
     .filter((prop) => prop.name !== "controlled")
@@ -194,7 +282,7 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
       if (polymorphicRootPropName && prop.name === "disabled") {
         return `      ${prop.attribute}={effectiveDisabled ? "true" : undefined}`;
       }
-      return reactAttributeLine(prop);
+      return reactDataAttributeLine(prop, reactAttributeValue(prop));
     })
     .join("\n");
   const rootObjectAttrs = contract.props
@@ -203,14 +291,27 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
       if (polymorphicRootPropName && prop.name === "disabled") {
         return `      "${prop.attribute}": effectiveDisabled ? "true" : undefined,`;
       }
-      return `      "${prop.attribute}": ${reactAttributeValue(prop)},`;
+      return reactObjectAttributeLine(prop, reactAttributeValue(prop));
     })
     .join("\n");
-  const controlledAttr = contract.props.find((prop) => prop.name === "controlled");
-  const controlledLine = controlledAttr ? `\n      ${controlledAttr.attribute}={controlled ? "true" : undefined}` : "";
-  const controlledObjectLine = controlledAttr ? `\n      "${controlledAttr.attribute}": controlled ? "true" : undefined,` : "";
-  const controlledExpression = controlledProp ? `${controlledProp.name} !== undefined` : "false";
-  const controlledWarning = controlledProp && defaultProp ? `
+  const controlledAttr = contract.props.find(
+    (prop) => prop.name === "controlled",
+  );
+  const controlledLine = controlledAttr
+    ? `\n${reactDataAttributeLine(controlledAttr, 'controlled ? "true" : undefined')}`
+    : "";
+  const controlledObjectLine = controlledAttr
+    ? `\n${reactObjectAttributeLine(controlledAttr, 'controlled ? "true" : undefined')}`
+    : "";
+  const controlledExpression = controlledProp
+    ? `${controlledProp.name} !== undefined`
+    : "false";
+  const controlledDeclaration = controlledProp
+    ? `  const controlled = ${controlledExpression};\n`
+    : "";
+  const controlledWarning =
+    controlledProp && defaultProp
+      ? `
   React.useEffect(() => {
     if (${controlledProp.name} !== undefined && ${defaultProp.name} !== undefined) {
       console.warn(
@@ -218,53 +319,90 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
       );
     }
   }, [${defaultProp.name}, ${controlledProp.name}]);
-` : "";
+`
+      : "";
 
   const publicOptionsType = controlledProp
     ? `Omit<${optionsTypeName}, "controlled">`
     : optionsTypeName;
-  const rootElementType = polymorphicRootPropName ? "HTMLElement" : htmlElementType(root.element);
+  const rootElementType = polymorphicRootPropName
+    ? "HTMLElement"
+    : htmlElementType(root.element);
   const rootRefType = polymorphicRootPropName ? "HTMLElement" : rootElementType;
   const rootPropsType = polymorphicRootPropName
     ? `Omit<React.HTMLAttributes<HTMLElement>, keyof ${publicOptionsType}>`
     : `Omit<React.ComponentPropsWithoutRef<"${root.element}">, keyof ${publicOptionsType}>`;
   const ssrState = generatorOptions.ssrSelectedState;
   const ssrSelectedExpression = ssrState?.selectedPropNames?.join(" ?? ");
-  const ssrContextDecl = ssrState ? "\nconst SsrSelectedValueContext = React.createContext<string | undefined>(undefined);\n" : "";
-  const ssrSelectedValueLine = ssrState ? `  const selectedValue = ${ssrSelectedExpression};\n` : "";
+  const ssrContextDecl = ssrState
+    ? "\nconst SsrSelectedValueContext = React.createContext<string | undefined>(undefined);\n"
+    : "";
+  const ssrSelectedValueLine = ssrState
+    ? `  const selectedValue = ${ssrSelectedExpression};\n`
+    : "";
 
-  const eventCallbackPropLines = eventCallbacks.map((ev) => {
-    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
-    return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
-  }).join("\n");
+  const eventCallbackPropLines = eventCallbacks
+    .map((ev) => {
+      const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+      return `  ${ev.callbackName}?: (detail: ${detailType}) => void;`;
+    })
+    .join("\n");
 
-  const callbackRefLines = eventCallbacks.map((ev) =>
-    `  const ${ev.callbackName}Ref = React.useRef(${ev.callbackName});\n  ${ev.callbackName}Ref.current = ${ev.callbackName};`
-  ).join("\n");
+  const callbackRefLines = eventCallbacks
+    .map(
+      (ev) =>
+        `  const ${ev.callbackName}Ref = React.useRef(${ev.callbackName});`,
+    )
+    .join("\n");
 
-  const listenerSetupLines = eventCallbacks.map((ev) => {
-    const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
-    return [
-      `    const ${ev.callbackName}Handler = (event: Event) => {`,
-      `      const e = event as CustomEvent<${detailType}>;`,
-      `      ${ev.callbackName}Ref.current?.(e.detail);`,
-      `    };`,
-      `    root.addEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`,
-    ].join("\n");
-  }).join("\n");
+  const callbackRefUpdateEffects = eventCallbacks
+    .map(
+      (ev) =>
+        `  React.useEffect(() => {\n    ${ev.callbackName}Ref.current = ${ev.callbackName};\n  }, [${ev.callbackName}]);`,
+    )
+    .join("\n\n");
 
-  const listenerTeardownLines = eventCallbacks.map((ev) =>
-    `      root.removeEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`
-  ).join("\n");
+  const listenerSetupLines = eventCallbacks
+    .map((ev) => {
+      const detailType = `${contract.componentName}${pascalCase(ev.key)}Detail`;
+      return [
+        `    const ${ev.callbackName}Handler = (event: Event) => {`,
+        `      const e = event as CustomEvent<${detailType}>;`,
+        `      ${ev.callbackName}Ref.current?.(e.detail);`,
+        `    };`,
+        `    root.addEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`,
+      ].join("\n");
+    })
+    .join("\n");
 
-  const eventInterfaceExtra = eventCallbackPropLines ? `\n${eventCallbackPropLines}` : "";
-  const polymorphicInterfaceExtra = polymorphicRootPropName ? "\n  [key: string]: unknown;" : "";
+  const listenerTeardownLines = eventCallbacks
+    .map(
+      (ev) =>
+        `      root.removeEventListener(${ev.eventConstName}, ${ev.callbackName}Handler);`,
+    )
+    .join("\n");
+
+  const eventInterfaceExtra = eventCallbackPropLines
+    ? `\n${eventCallbackPropLines}`
+    : "";
+  const polymorphicInterfaceExtra = polymorphicRootPropName
+    ? "\n  [key: string]: unknown;"
+    : "";
   const callbackRefsBlock = callbackRefLines ? `${callbackRefLines}\n` : "";
-  const listenerSetupBlock = listenerSetupLines ? `\n${listenerSetupLines}\n` : "";
-  const listenerTeardownBlock = listenerTeardownLines ? `${listenerTeardownLines}\n` : "";
-  const polymorphicNativeElement = generatorOptions.polymorphicNativeElement ?? root.element;
+  const callbackRefUpdateBlock = callbackRefUpdateEffects
+    ? `${callbackRefUpdateEffects}\n\n`
+    : "";
+  const listenerSetupBlock = listenerSetupLines
+    ? `\n${listenerSetupLines}\n`
+    : "";
+  const listenerTeardownBlock = listenerTeardownLines
+    ? `${listenerTeardownLines}\n`
+    : "";
+  const polymorphicNativeElement =
+    generatorOptions.polymorphicNativeElement ?? root.element;
   const polymorphicTypeDefault = generatorOptions.polymorphicTypeDefault;
-  const rootElementSource = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
+  const rootElementSource = polymorphicRootPropName
+    ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
   const isNativeElement = Component === "${polymorphicNativeElement}";
   const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
@@ -273,25 +411,27 @@ function createReactWrapperSource({ contract, behaviorClassName, optionsTypeName
     {
       ...props,
       ref: rootRef,
-      "${root.attribute}": "",
+${reactObjectAttributeLine(root, '""')}
       type: isNativeElement ? ((props as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}) : undefined,
       disabled: isNativeElement ? effectiveDisabled : undefined,
       "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
-      "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
+      "aria-busy": ${hasLoadingOption ? 'loading ? "true" : undefined' : "undefined"},
 ${rootObjectAttrs}${controlledObjectLine}
     },
     children,
-  );` : `  const rootElement = (
+  );`
+    : `  const rootElement = (
     <${root.element}
       {...props}
       ref={rootRef}
-      ${root.attribute}=""
+${reactMarkerAttributeLine(root)}
 ${rootAttrs}${controlledLine}
     >
       {children}
     </${root.element}>
   );`;
-  const originalRootReturn = polymorphicRootPropName ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
+  const originalRootReturn = polymorphicRootPropName
+    ? `  const Component = (${polymorphicRootPropName} ?? "${root.element}") as keyof React.JSX.IntrinsicElements;
   const isNativeElement = Component === "${polymorphicNativeElement}";
   const effectiveDisabled = Boolean(${effectiveDisabledExpression});
 
@@ -300,19 +440,20 @@ ${rootAttrs}${controlledLine}
     {
       ...props,
       ref: rootRef,
-      "${root.attribute}": "",
+${reactObjectAttributeLine(root, '""')}
       type: isNativeElement ? ((props as { type?: string }).type ?? ${polymorphicTypeDefault ? `"${polymorphicTypeDefault}"` : "undefined"}) : undefined,
       disabled: isNativeElement ? effectiveDisabled : undefined,
       "aria-disabled": !isNativeElement && effectiveDisabled ? "true" : undefined,
-      "aria-busy": ${hasLoadingOption ? "loading ? \"true\" : undefined" : "undefined"},
+      "aria-busy": ${hasLoadingOption ? 'loading ? "true" : undefined' : "undefined"},
 ${rootObjectAttrs}${controlledObjectLine}
     },
     children,
-  );` : `  return (
+  );`
+    : `  return (
     <${root.element}
       {...props}
       ref={rootRef}
-      ${root.attribute}=""
+${reactMarkerAttributeLine(root)}
 ${rootAttrs}${controlledLine}
     >
       {children}
@@ -336,9 +477,7 @@ export function ${contract.componentName}({
 }: ${contract.componentName}Props) {
   const rootRef = React.useRef<${rootRefType}>(null);
   const behaviorRef = React.useRef<${behaviorClassName} | null>(null);
-  const controlled = ${controlledExpression};
-${ssrSelectedValueLine}${callbackRefsBlock}${controlledWarning}
-  React.useEffect(() => {
+${controlledDeclaration}${ssrSelectedValueLine}${callbackRefsBlock}${controlledWarning}${callbackRefUpdateBlock}  React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 ${listenerSetupBlock}
@@ -352,7 +491,7 @@ ${behaviorOptions}
 ${listenerTeardownBlock}      behaviorRef.current = null;
       behavior.destroy();
     };
-  }, []);
+  }, [${effectDeps}]);
 
   React.useEffect(() => {
     behaviorRef.current?.update?.({
@@ -368,18 +507,33 @@ ${reactPartComponentSource(contract, generatorOptions)}`;
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
-export function createReactArtifact({ contractSource, controllerSource, primitiveFiles = [], contractExportName, generatorOptions = {} }) {
-  const { publicContractSource, contract } = parseContractSource(contractSource, contractExportName);
+export function createReactArtifact({
+  contractSource,
+  controllerSource,
+  primitiveFiles = [],
+  contractExportName,
+  generatorOptions = {},
+}) {
+  const { publicContractSource, contract } = parseContractSource(
+    contractSource,
+    contractExportName,
+  );
   validateGeneratorOptions(contract, generatorOptions);
   const behaviorClassName = `${contract.componentName}Behavior`;
   const optionsTypeName = `${contract.componentName}Options`;
   const optionsNames = parseOptionsNames(controllerSource, optionsTypeName);
-  const { behaviorSource, usedHelpers } = extractControllerBehavior(controllerSource, contract.componentName);
+  const { behaviorSource, usedHelpers } = extractControllerBehavior(
+    controllerSource,
+    contract.componentName,
+  );
 
-  const helperImports = usedHelpers.map((h) => (h === "BambiBehavior" ? "type BambiBehavior" : h));
-  const helperImportLine = helperImports.length > 0
-    ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
-    : "";
+  const helperImports = usedHelpers.map((h) =>
+    h === "BambiBehavior" ? "type BambiBehavior" : h,
+  );
+  const helperImportLine =
+    helperImports.length > 0
+      ? `import { ${helperImports.join(", ")} } from "../bambi-helpers";\n`
+      : "";
 
   const primitivesBlock = primitiveFiles
     .map((src) => inlinePrimitiveSource(src))
@@ -396,5 +550,5 @@ ${behaviorSource}
 ${createReactWrapperSource({ contract, behaviorClassName, optionsTypeName, optionsNames, generatorOptions })}
 `;
 
-  return { files: { "index.tsx": content }, usedHelpers };
+  return { files: { "index.tsx": `${content.trimEnd()}\n` }, usedHelpers };
 }

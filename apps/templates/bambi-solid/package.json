@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vinxi dev --port 3011",
+    "lint": "eslint \"**/*.{js,mjs,cjs,ts,tsx}\"",
     "build": "vinxi build",
     "start": "vinxi start",
     "typecheck": "tsc --noEmit"

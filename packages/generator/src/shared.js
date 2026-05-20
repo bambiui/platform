@@ -11,18 +11,24 @@ export function pascalCase(value) {
 }
 
 function makeProject() {
-  return new Project({ useInMemoryFileSystem: true, skipAddingFilesFromTsConfig: true });
+  return new Project({
+    useInMemoryFileSystem: true,
+    skipAddingFilesFromTsConfig: true,
+  });
 }
 
 function unwrapAs(node) {
-  return node && node.getKind() === SyntaxKind.AsExpression ? node.getExpression() : node;
+  return node && node.getKind() === SyntaxKind.AsExpression
+    ? node.getExpression()
+    : node;
 }
 
 function stringLiteralValue(node) {
   if (!node) return undefined;
   const kind = node.getKind();
   if (kind === SyntaxKind.StringLiteral) return node.getLiteralValue();
-  if (kind === SyntaxKind.AsExpression) return stringLiteralValue(node.getExpression());
+  if (kind === SyntaxKind.AsExpression)
+    return stringLiteralValue(node.getExpression());
   return undefined;
 }
 
@@ -56,9 +62,13 @@ export function parseContractSource(source, contractExportName) {
 
   const contractIdx = statements.findIndex((s) => {
     if (s.getKind() !== SyntaxKind.VariableStatement) return false;
-    return s.getDeclarationList().getDeclarations().some((d) => d.getName() === contractExportName);
+    return s
+      .getDeclarationList()
+      .getDeclarations()
+      .some((d) => d.getName() === contractExportName);
   });
-  if (contractIdx === -1) throw new Error(`Unable to find contract: ${contractExportName}`);
+  if (contractIdx === -1)
+    throw new Error(`Unable to find contract: ${contractExportName}`);
 
   const contractStmt = statements[contractIdx];
 
@@ -71,28 +81,39 @@ export function parseContractSource(source, contractExportName) {
   const contractDecl = contractStmt.getDeclarationList().getDeclarations()[0];
   const callExpr = unwrapAs(contractDecl.getInitializer());
   if (callExpr.getKind() !== SyntaxKind.CallExpression) {
-    throw new Error(`${contractExportName}: expected CallExpression, got ${callExpr.getKindName()}`);
+    throw new Error(
+      `${contractExportName}: expected CallExpression, got ${callExpr.getKindName()}`,
+    );
   }
 
   const arg = unwrapAs(callExpr.getArguments()[0]);
   if (arg.getKind() !== SyntaxKind.ObjectLiteralExpression) {
-    throw new Error(`${contractExportName}: expected an ObjectLiteralExpression as the defineContract argument`);
+    throw new Error(
+      `${contractExportName}: expected an ObjectLiteralExpression as the defineContract argument`,
+    );
   }
 
   const nameProp = arg.getProperty("name");
   if (!nameProp || nameProp.getKind() !== SyntaxKind.PropertyAssignment) {
-    throw new Error(`${contractExportName}: missing or invalid 'name' property`);
+    throw new Error(
+      `${contractExportName}: missing or invalid 'name' property`,
+    );
   }
   const nameStr = stringLiteralValue(nameProp.getInitializer());
-  if (!nameStr) throw new Error(`${contractExportName}: 'name' must be a string literal`);
+  if (!nameStr)
+    throw new Error(`${contractExportName}: 'name' must be a string literal`);
 
   const partsProp = arg.getProperty("parts");
   if (!partsProp || partsProp.getKind() !== SyntaxKind.PropertyAssignment) {
-    throw new Error(`${contractExportName}: missing or invalid 'parts' property`);
+    throw new Error(
+      `${contractExportName}: missing or invalid 'parts' property`,
+    );
   }
   const partsArr = unwrapAs(partsProp.getInitializer());
   if (partsArr.getKind() !== SyntaxKind.ArrayLiteralExpression) {
-    throw new Error(`${contractExportName}: 'parts' must be an ArrayLiteralExpression`);
+    throw new Error(
+      `${contractExportName}: 'parts' must be an ArrayLiteralExpression`,
+    );
   }
 
   const parts = [];
@@ -104,13 +125,20 @@ export function parseContractSource(source, contractExportName) {
     const elAttrProp = obj.getProperty("attribute");
     const elElemProp = obj.getProperty("element");
     if (
-      !elNameProp || elNameProp.getKind() !== SyntaxKind.PropertyAssignment ||
-      !elAttrProp || elAttrProp.getKind() !== SyntaxKind.PropertyAssignment ||
-      !elElemProp || elElemProp.getKind() !== SyntaxKind.PropertyAssignment
-    ) continue;
+      !elNameProp ||
+      elNameProp.getKind() !== SyntaxKind.PropertyAssignment ||
+      !elAttrProp ||
+      elAttrProp.getKind() !== SyntaxKind.PropertyAssignment ||
+      !elElemProp ||
+      elElemProp.getKind() !== SyntaxKind.PropertyAssignment
+    )
+      continue;
 
     const partName = stringLiteralValue(elNameProp.getInitializer());
-    const { attribute, attributeConst } = resolveAttrNode(elAttrProp.getInitializer(), constMap);
+    const { attribute, attributeConst } = resolveAttrNode(
+      elAttrProp.getInitializer(),
+      constMap,
+    );
     const element = stringLiteralValue(elElemProp.getInitializer());
     if (!partName || !attribute || !element) continue;
 
@@ -119,11 +147,15 @@ export function parseContractSource(source, contractExportName) {
 
   const propsProp = arg.getProperty("props");
   if (!propsProp || propsProp.getKind() !== SyntaxKind.PropertyAssignment) {
-    throw new Error(`${contractExportName}: missing or invalid 'props' property`);
+    throw new Error(
+      `${contractExportName}: missing or invalid 'props' property`,
+    );
   }
   const propsObj = unwrapAs(propsProp.getInitializer());
   if (propsObj.getKind() !== SyntaxKind.ObjectLiteralExpression) {
-    throw new Error(`${contractExportName}: 'props' must be an ObjectLiteralExpression`);
+    throw new Error(
+      `${contractExportName}: 'props' must be an ObjectLiteralExpression`,
+    );
   }
 
   const props = [];
@@ -135,8 +167,15 @@ export function parseContractSource(source, contractExportName) {
     if (propObj.getKind() !== SyntaxKind.ObjectLiteralExpression) continue;
 
     const attrPropNode = propObj.getProperty("attribute");
-    if (!attrPropNode || attrPropNode.getKind() !== SyntaxKind.PropertyAssignment) continue;
-    const { attribute, attributeConst } = resolveAttrNode(attrPropNode.getInitializer(), constMap);
+    if (
+      !attrPropNode ||
+      attrPropNode.getKind() !== SyntaxKind.PropertyAssignment
+    )
+      continue;
+    const { attribute, attributeConst } = resolveAttrNode(
+      attrPropNode.getInitializer(),
+      constMap,
+    );
     if (!attribute) continue;
 
     const typePropNode = propObj.getProperty("type");
@@ -155,11 +194,19 @@ export function parseContractSource(source, contractExportName) {
 
     const defaultValueNode = propObj.getProperty("defaultValue");
     const defaultValue =
-      defaultValueNode && defaultValueNode.getKind() === SyntaxKind.PropertyAssignment
+      defaultValueNode &&
+      defaultValueNode.getKind() === SyntaxKind.PropertyAssignment
         ? stringLiteralValue(defaultValueNode.getInitializer())
         : undefined;
 
-    props.push({ name: propName, attributeConst, attribute, type, controlled, defaultValue });
+    props.push({
+      name: propName,
+      attributeConst,
+      attribute,
+      type,
+      controlled,
+      defaultValue,
+    });
   }
 
   const eventsProp = arg.getProperty("events");
@@ -173,8 +220,13 @@ export function parseContractSource(source, contractExportName) {
         const evObj = unwrapAs(ep.getInitializer());
         if (evObj.getKind() !== SyntaxKind.ObjectLiteralExpression) continue;
         const namePropNode = evObj.getProperty("name");
-        if (!namePropNode || namePropNode.getKind() !== SyntaxKind.PropertyAssignment) continue;
-        const { attribute: eventConstValue, attributeConst: eventConstName } = resolveAttrNode(namePropNode.getInitializer(), constMap);
+        if (
+          !namePropNode ||
+          namePropNode.getKind() !== SyntaxKind.PropertyAssignment
+        )
+          continue;
+        const { attribute: eventConstValue, attributeConst: eventConstName } =
+          resolveAttrNode(namePropNode.getInitializer(), constMap);
         if (!eventConstValue) continue;
         const callbackName = `on${pascalCase(key)}`;
         events.push({ key, callbackName, eventConstName, eventConstValue });
@@ -184,7 +236,13 @@ export function parseContractSource(source, contractExportName) {
 
   return {
     publicContractSource,
-    contract: { name: nameStr, componentName: pascalCase(nameStr), parts, props, events },
+    contract: {
+      name: nameStr,
+      componentName: pascalCase(nameStr),
+      parts,
+      props,
+      events,
+    },
   };
 }
 
@@ -193,7 +251,8 @@ export function parseContractSource(source, contractExportName) {
 export function parseOptionsNames(source, optionsTypeName) {
   const sf = makeProject().createSourceFile("controller.ts", source);
   const iface = sf.getInterface(optionsTypeName);
-  if (!iface) throw new Error(`Unable to parse options interface: ${optionsTypeName}`);
+  if (!iface)
+    throw new Error(`Unable to parse options interface: ${optionsTypeName}`);
   return iface
     .getMembers()
     .filter((m) => m.getKind() === SyntaxKind.PropertySignature)
@@ -211,34 +270,52 @@ export function validateGeneratorOptions(contract, options = {}) {
     ["disabledPropParts", "disabledPropName"],
   ]) {
     if (options[partsField] !== undefined && options[propField] === undefined) {
-      throw new Error(`${contract.name}: generator option ${partsField} requires ${propField}.`);
+      throw new Error(
+        `${contract.name}: generator option ${partsField} requires ${propField}.`,
+      );
     }
   }
 
   for (const field of ["valuePropName", "disabledPropName"]) {
     const propName = options[field];
     if (propName !== undefined && !propNames.has(propName)) {
-      throw new Error(`${contract.name}: generator option ${field} references unknown prop "${propName}".`);
+      throw new Error(
+        `${contract.name}: generator option ${field} references unknown prop "${propName}".`,
+      );
     }
   }
 
   for (const field of ["valuePropParts", "disabledPropParts"]) {
     for (const partName of options[field] ?? []) {
       if (!partNames.has(partName)) {
-        throw new Error(`${contract.name}: generator option ${field} references unknown part "${partName}".`);
+        throw new Error(
+          `${contract.name}: generator option ${field} references unknown part "${partName}".`,
+        );
       }
     }
   }
 
-  if (options.polymorphicRootPropName !== undefined && typeof options.polymorphicRootPropName !== "string") {
-    throw new Error(`${contract.name}: generator option polymorphicRootPropName must be a string.`);
+  if (
+    options.polymorphicRootPropName !== undefined &&
+    typeof options.polymorphicRootPropName !== "string"
+  ) {
+    throw new Error(
+      `${contract.name}: generator option polymorphicRootPropName must be a string.`,
+    );
   }
-  if (options.defaultTypeParts !== undefined && options.defaultTypeValue === undefined) {
-    throw new Error(`${contract.name}: generator option defaultTypeParts requires defaultTypeValue.`);
+  if (
+    options.defaultTypeParts !== undefined &&
+    options.defaultTypeValue === undefined
+  ) {
+    throw new Error(
+      `${contract.name}: generator option defaultTypeParts requires defaultTypeValue.`,
+    );
   }
   for (const partName of options.defaultTypeParts ?? []) {
     if (!partNames.has(partName)) {
-      throw new Error(`${contract.name}: generator option defaultTypeParts references unknown part "${partName}".`);
+      throw new Error(
+        `${contract.name}: generator option defaultTypeParts references unknown part "${partName}".`,
+      );
     }
   }
 
@@ -246,15 +323,21 @@ export function validateGeneratorOptions(contract, options = {}) {
   if (ssrState !== undefined) {
     for (const propName of ssrState.selectedPropNames ?? []) {
       if (!propNames.has(propName)) {
-        throw new Error(`${contract.name}: generator option ssrSelectedState.selectedPropNames references unknown prop "${propName}".`);
+        throw new Error(
+          `${contract.name}: generator option ssrSelectedState.selectedPropNames references unknown prop "${propName}".`,
+        );
       }
     }
     if (!propNames.has(ssrState.valuePropName)) {
-      throw new Error(`${contract.name}: generator option ssrSelectedState.valuePropName references unknown prop "${ssrState.valuePropName}".`);
+      throw new Error(
+        `${contract.name}: generator option ssrSelectedState.valuePropName references unknown prop "${ssrState.valuePropName}".`,
+      );
     }
     for (const partName of Object.keys(ssrState.parts ?? {})) {
       if (!partNames.has(partName)) {
-        throw new Error(`${contract.name}: generator option ssrSelectedState.parts references unknown part "${partName}".`);
+        throw new Error(
+          `${contract.name}: generator option ssrSelectedState.parts references unknown part "${partName}".`,
+        );
       }
     }
   }
@@ -262,12 +345,19 @@ export function validateGeneratorOptions(contract, options = {}) {
   for (const embedded of options.embeddedParts ?? []) {
     for (const field of ["parentPartName", "childPartName"]) {
       if (!partNames.has(embedded[field])) {
-        throw new Error(`${contract.name}: generator option embeddedParts.${field} references unknown part "${embedded[field]}".`);
+        throw new Error(
+          `${contract.name}: generator option embeddedParts.${field} references unknown part "${embedded[field]}".`,
+        );
       }
     }
     for (const attribute of embedded.attributes ?? []) {
-      if (attribute.propName !== undefined && !propNames.has(attribute.propName)) {
-        throw new Error(`${contract.name}: generator option embeddedParts attribute references unknown prop "${attribute.propName}".`);
+      if (
+        attribute.propName !== undefined &&
+        !propNames.has(attribute.propName)
+      ) {
+        throw new Error(
+          `${contract.name}: generator option embeddedParts attribute references unknown prop "${attribute.propName}".`,
+        );
       }
     }
   }
@@ -287,6 +377,7 @@ export function inlinePrimitiveSource(source) {
     .getFullText()
     .replace(/\/\*\*[\s\S]*?\*\//gu, "")
     .replace(/^\s*\/\/.*\n/gmu, "")
+    .replace(/[ \t]+$/gmu, "")
     .trim();
 }
 
@@ -317,7 +408,10 @@ export function extractControllerBehavior(source, componentName) {
   const behaviorSource = sf
     .getFullText()
     .replaceAll("implements BambiController", "implements BambiBehavior")
-    .replaceAll(`export class ${componentName}Controller`, `class ${componentName}Behavior`)
+    .replaceAll(
+      `export class ${componentName}Controller`,
+      `class ${componentName}Behavior`,
+    )
     .replaceAll(`${componentName}Controller`, `${componentName}Behavior`)
     .replace(/\/\*\*[\s\S]*?\*\//gu, "")
     .replace(/^\s*\/\/.*\n/gmu, "")

@@ -1,0 +1,45 @@
+{
+  "name": "bambiui",
+  "version": "0.0.0",
+  "description": "Markup-first, source-distributed UI components with a local-file-copy CLI.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "bin": {
+    "bambi": "dist-cli/index.js",
+    "bambiui": "dist-cli/index.js"
+  },
+  "files": [
+    "dist-cli",
+    "src/core",
+    "src/styles",
+    "README.md",
+    "CONTRIBUTING.md",
+    "docs"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:cli": "vite build --config vite.cli.config.ts",
+    "prepack": "pnpm build:cli",
+    "check": "pnpm build && pnpm check:cli && pnpm smoke:templates",
+    "check:publish": "pnpm check && pnpm smoke:pack",
+    "check:cli": "tsc --project tsconfig.cli.json && pnpm smoke:cli",
+    "check:generated": "pnpm smoke:cli",
+    "smoke:templates": "pnpm build:cli && node scripts/smoke-templates.mjs",
+    "templates:update": "pnpm build:cli && node scripts/update-templates.mjs",
+    "smoke:pack": "node scripts/smoke-pack.mjs",
+    "check-types": "tsc && tsc --project tsconfig.cli.json",
+    "bambi": "pnpm build:cli && node dist-cli/index.js",
+    "smoke:cli": "pnpm build:cli && node scripts/smoke-cli.mjs",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12"
+  }
+}

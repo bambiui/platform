@@ -1,0 +1,5 @@
+{
+  "framework": "react",
+  "outDir": "src/components/ui",
+  "styleFile": "src/styles/bambi.css"
+}

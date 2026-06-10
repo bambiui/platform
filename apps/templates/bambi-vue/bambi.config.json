@@ -1,0 +1,5 @@
+{
+  "framework": "vue",
+  "outDir": "src/components/ui",
+  "styleFile": "src/styles/bambi.css"
+}

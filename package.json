@@ -1,6 +1,6 @@
 {
   "name": "bambiui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Markup-first, source-distributed UI components with a local-file-copy CLI.",
   "type": "module",
   "license": "UNLICENSED",

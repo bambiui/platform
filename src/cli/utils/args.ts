@@ -6,6 +6,7 @@ export interface CliFlags {
   framework?: string;
   json: boolean;
   outDir?: string;
+  registryUrl?: string;
   plan: boolean;
   styleFile?: string;
   yes: boolean;

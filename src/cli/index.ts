@@ -25,6 +25,7 @@ Options:
   --framework vanilla|react|solid|svelte|vue Framework override
   --out-dir <path>                           Generated file destination (default: generated)
   --style-file <path>                        CSS entry destination (default: generated/styles/index.css)
+  --registry-url <url-or-path>               Registry host (default: https://bambiui.com)
   --cwd <path>                               Target project (default: current directory)
   --dry-run                                  Print planned file operations without writing
   --force                                    Overwrite existing files

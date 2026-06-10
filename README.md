@@ -25,6 +25,7 @@ bambi list --json
 bambi add button
 bambi add tabs --framework react
 bambi add tabs --plan
+bambi add tabs --registry-url https://bambiui.com
 ```
 
 Supported framework targets:
@@ -42,7 +43,7 @@ These components are authored in this repo under `src/core/components` and gener
 - `button`
 - `tabs`
 
-The local registry supports vanilla output plus framework-native generated wrappers for React, Solid, Svelte, and Vue.
+The public registry is served from `https://bambiui.com/registry.json` with generated source files under `https://bambiui.com/registry/generated/`. The local registry metadata supports vanilla output plus framework-native generated wrappers for React, Solid, Svelte, and Vue.
 
 Run `bambi list` to see the currently available components.
 

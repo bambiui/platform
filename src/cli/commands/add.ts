@@ -3,16 +3,23 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { registry, type ComponentName } from "../../registry/registry";
 import {
-  createInstallBundle,
   generateInstallPlan,
-  resolveInstallPlan,
   writeInstallFiles,
+  type GeneratedFile,
+  type InstallPlan,
   type InstallWriterHost,
+  type ResolvedInstallFile,
 } from "../../generator";
 import type { CliFlags } from "../utils/args";
 import type { WriteResult } from "../utils/files";
 import { getConfig, type CliFramework } from "../utils/framework";
-import { resolveLocalSource } from "../utils/source";
+import {
+  createRegistryFileIndex,
+  getRegistryUrl,
+  readRegistryFile,
+  readRegistryManifest,
+  verifyRegistryFile,
+} from "../utils/registry";
 import { didYouMean } from "../utils/suggest";
 
 export interface AddComponentResult {
@@ -90,6 +97,86 @@ function resolveComponentSelection(
   );
 }
 
+function getRegistryGeneratedPath(
+  generatedRoot: string,
+  framework: CliFramework,
+  target: string,
+): string {
+  return path.posix.join(generatedRoot, framework, target);
+}
+
+async function resolveRemoteInstallPlan(
+  plan: InstallPlan,
+  framework: CliFramework,
+  registryUrl: string,
+): Promise<ResolvedInstallFile[]> {
+  const manifest = await readRegistryManifest(registryUrl);
+
+  if (!manifest.frameworks.includes(framework)) {
+    throw new Error(
+      `Registry at ${registryUrl} does not support framework "${framework}".`,
+    );
+  }
+
+  for (const component of plan.components) {
+    if (!manifest.components.includes(component)) {
+      throw new Error(
+        `Registry at ${registryUrl} does not include component "${component}".`,
+      );
+    }
+  }
+
+  const generatedRoot = manifest.entrypoints.generated;
+  const fileIndex = createRegistryFileIndex(manifest);
+  const files: ResolvedInstallFile[] = [];
+
+  for (const file of plan.files) {
+    if (file.kind === "text") {
+      files.push({
+        target: file.target,
+        content: file.content,
+        managed: file.managed,
+      });
+      continue;
+    }
+
+    files.push(
+      await resolveRemoteCopyFile(
+        file,
+        framework,
+        registryUrl,
+        generatedRoot,
+        fileIndex,
+      ),
+    );
+  }
+
+  return files;
+}
+
+async function resolveRemoteCopyFile(
+  file: Extract<GeneratedFile, { kind: "copy" }>,
+  framework: CliFramework,
+  registryUrl: string,
+  generatedRoot: string,
+  fileIndex: ReturnType<typeof createRegistryFileIndex>,
+): Promise<ResolvedInstallFile> {
+  const registryPath = getRegistryGeneratedPath(
+    generatedRoot,
+    framework,
+    file.target,
+  );
+  const content = await readRegistryFile(registryUrl, registryPath);
+
+  verifyRegistryFile(registryPath, content, fileIndex.get(registryPath));
+
+  return {
+    target: file.target,
+    content,
+    managed: false,
+  };
+}
+
 async function ensureCssImport(
   styleFile: string,
   cssFile: string,
@@ -161,9 +248,9 @@ export async function createAddPlan(
     components,
     framework: config.framework,
   });
-  const files = resolveInstallPlan(plan, resolveLocalSource).map((file) => ({
+  const files = plan.files.map((file) => ({
     target: path.posix.join(config.outDir, file.target),
-    managed: Boolean(file.managed),
+    managed: file.kind === "text" ? Boolean(file.managed) : false,
   }));
 
   return {
@@ -186,26 +273,24 @@ export async function addComponent(
   const rootDir = path.join(cwd, config.outDir);
   const installedComponents = await getInstalledComponentNames(rootDir);
   const components = resolveComponentSelection(installedComponents, requested);
-  const bundle = await createInstallBundle(
-    {
-      components,
-      framework: config.framework,
-    },
-    resolveLocalSource,
+  const plan = generateInstallPlan({
+    components,
+    framework: config.framework,
+  });
+  const files = await resolveRemoteInstallPlan(
+    plan,
+    config.framework,
+    getRegistryUrl(flags),
   );
 
-  if (!bundle.ok) {
-    throw new Error(bundle.issues.map((issue) => issue.message).join("\n"));
-  }
-
   const managedUpdatePaths = new Set(
-    bundle.files
+    files
       .filter((file) => file.managed)
       .map((file) => path.join(rootDir, file.target)),
   );
   const existingBefore = new Set<string>();
   const result = await writeInstallFiles(
-    bundle.files,
+    files,
     createNodeWriterHost(managedUpdatePaths, existingBefore, flags.dryRun),
     {
       rootDir,

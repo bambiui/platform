@@ -2,7 +2,7 @@
 
 Markup-first, source-distributed UI components with a local-file-copy CLI.
 
-This is the new standalone bambiui repo. It keeps the lightweight `src/core -> src/generator -> src/registry -> src/cli` flow from `bambi-vanilla` and currently focuses on the locally authored `button` and `tabs` components.
+This is the standalone bambiui platform repo. It keeps the lightweight `src/core -> src/generator -> src/registry -> src/cli` flow and currently focuses on the locally authored `button` and `tabs` components.
 
 ## Quick start
 

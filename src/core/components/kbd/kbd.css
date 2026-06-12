@@ -1,0 +1,53 @@
+[data-bambi-kbd] {
+  --bambi-kbd-height-sm: 1.25rem;
+  --bambi-kbd-height-md: 1.5rem;
+  --bambi-kbd-height-lg: 1.75rem;
+  --bambi-kbd-min-width-sm: var(--bambi-kbd-height-sm);
+  --bambi-kbd-min-width-md: var(--bambi-kbd-height-md);
+  --bambi-kbd-min-width-lg: var(--bambi-kbd-height-lg);
+  --bambi-kbd-padding-x-sm: var(--bambi-space-1, 0.25rem);
+  --bambi-kbd-padding-x-md: var(--bambi-space-1-5, 0.375rem);
+  --bambi-kbd-padding-x-lg: var(--bambi-space-2, 0.5rem);
+  --bambi-kbd-radius: var(--bambi-radius-sm, 0.375rem);
+  --bambi-kbd-border-width: 1px;
+  --bambi-kbd-border: var(--bambi-border, oklch(90% 0.01 271));
+  --bambi-kbd-bg: var(--bambi-muted, oklch(95% 0.008 271));
+  --bambi-kbd-fg: var(--bambi-foreground, oklch(9% 0 0));
+  --bambi-kbd-font-family: var(--bambi-font-mono, ui-monospace, monospace);
+  --bambi-kbd-font-size-sm: 0.6875rem;
+  --bambi-kbd-font-size-md: var(--bambi-text-xs, 0.75rem);
+  --bambi-kbd-font-size-lg: var(--bambi-text-sm, 0.875rem);
+  --bambi-kbd-font-weight: var(--bambi-font-weight-medium, 500);
+  --bambi-kbd-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--bambi-kbd-min-width-sm);
+  height: var(--bambi-kbd-height-sm);
+  padding-inline: var(--bambi-kbd-padding-x-sm);
+  border: var(--bambi-kbd-border-width) solid var(--bambi-kbd-border);
+  border-radius: var(--bambi-kbd-radius);
+  background: var(--bambi-kbd-bg);
+  color: var(--bambi-kbd-fg);
+  box-shadow: var(--bambi-kbd-shadow);
+  font-family: var(--bambi-kbd-font-family);
+  font-size: var(--bambi-kbd-font-size-sm);
+  font-weight: var(--bambi-kbd-font-weight);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+[data-bambi-kbd][data-size='md'] {
+  min-width: var(--bambi-kbd-min-width-md);
+  height: var(--bambi-kbd-height-md);
+  padding-inline: var(--bambi-kbd-padding-x-md);
+  font-size: var(--bambi-kbd-font-size-md);
+}
+
+[data-bambi-kbd][data-size='lg'] {
+  min-width: var(--bambi-kbd-min-width-lg);
+  height: var(--bambi-kbd-height-lg);
+  padding-inline: var(--bambi-kbd-padding-x-lg);
+  font-size: var(--bambi-kbd-font-size-lg);
+}

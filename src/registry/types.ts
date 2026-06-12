@@ -1,6 +1,6 @@
 import type { ParsedComponent } from "../generator/parse-component";
 
-export type ComponentName = "badge" | "button" | "tabs";
+export type ComponentName = "badge" | "button" | "kbd" | "tabs";
 
 export type FrameworkTarget = "vanilla" | "react" | "solid" | "svelte" | "vue";
 

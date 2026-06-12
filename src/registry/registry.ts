@@ -1,4 +1,4 @@
-import { badge, button, tabs } from "../core/components";
+import { badge, button, kbd, tabs } from "../core/components";
 import { parseComponent } from "../generator/parse-component";
 import { reactFramework } from "./frameworks/react";
 import { solidFramework } from "./frameworks/solid";
@@ -94,6 +94,24 @@ export const registry: BambiRegistry = {
         helper("a11y.ts"),
       ],
       styles: [componentStyle("button", "button.css")],
+      ssr: {
+        reactAttrs: true,
+      },
+    },
+    kbd: {
+      name: "kbd",
+      exportName: "kbd",
+      parsed: parseComponent(kbd),
+      files: [componentFile("kbd")],
+      helpers: [
+        helper("define-component.ts"),
+        helper("props.ts"),
+        helper("attributes.ts"),
+        helper("events.ts"),
+        helper("parts.ts"),
+        helper("a11y.ts"),
+      ],
+      styles: [componentStyle("kbd", "kbd.css")],
       ssr: {
         reactAttrs: true,
       },

@@ -1,9 +1,10 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { registry, type ComponentName } from "../../registry/registry";
 import {
   generateInstallPlan,
+  resolveInstallPlan,
   writeInstallFiles,
   type GeneratedFile,
   type InstallPlan,
@@ -103,6 +104,23 @@ function getRegistryGeneratedPath(
   target: string,
 ): string {
   return path.posix.join(generatedRoot, framework, target);
+}
+
+function resolveLocalSourceInstallPlan(
+  plan: InstallPlan,
+  sourceDir: string,
+): ResolvedInstallFile[] {
+  const root = path.resolve(sourceDir);
+
+  return resolveInstallPlan(plan, (source) => {
+    const filePath = path.resolve(root, source);
+
+    if (!filePath.startsWith(`${root}${path.sep}`)) {
+      throw new Error(`Unsafe local source path "${source}".`);
+    }
+
+    return readFileSync(filePath, "utf8");
+  });
 }
 
 async function resolveRemoteInstallPlan(
@@ -277,11 +295,13 @@ export async function addComponent(
     components,
     framework: config.framework,
   });
-  const files = await resolveRemoteInstallPlan(
-    plan,
-    config.framework,
-    getRegistryUrl(flags),
-  );
+  const files = flags.localSourceDir
+    ? resolveLocalSourceInstallPlan(plan, flags.localSourceDir)
+    : await resolveRemoteInstallPlan(
+        plan,
+        config.framework,
+        getRegistryUrl(flags),
+      );
 
   const managedUpdatePaths = new Set(
     files

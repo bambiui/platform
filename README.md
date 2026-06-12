@@ -52,6 +52,7 @@ Run `bambi list` to see the currently available components.
 Architecture and contribution docs:
 
 - [`docs/architecture.md`](docs/architecture.md)
+- [`docs/component-migration.md`](docs/component-migration.md)
 - [`CONTRIBUTING.md`](CONTRIBUTING.md)
 
 ```sh
@@ -91,4 +92,4 @@ This verifies the local build, CLI smoke tests, template installs, and a real `p
 
 ## Migration note
 
-This repo is intended to replace the old `platform` monorepo as a fresh, standalone codebase. New components should be authored in `src/core/components` and exposed through `src/registry` when they are ready.
+This repo is intended to replace the old `platform` monorepo as a fresh, standalone codebase. New components should be authored in `src/core/components` and exposed through `src/registry` when they are ready. Follow [`docs/component-migration.md`](docs/component-migration.md) for the migration checklist and token requirements.

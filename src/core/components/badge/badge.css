@@ -1,0 +1,75 @@
+[data-bambi-badge] {
+  --bambi-badge-height-sm: 1.25rem;
+  --bambi-badge-height-md: 1.5rem;
+  --bambi-badge-height-lg: 1.75rem;
+  --bambi-badge-padding-x-sm: var(--bambi-space-2, 0.5rem);
+  --bambi-badge-padding-x-md: var(--bambi-space-2, 0.5rem);
+  --bambi-badge-padding-x-lg: var(--bambi-space-3, 0.75rem);
+  --bambi-badge-radius: var(--bambi-radius-full, 9999px);
+  --bambi-badge-border-width: 1px;
+  --bambi-badge-font-size-sm: var(--bambi-text-xs, 0.75rem);
+  --bambi-badge-font-size-md: var(--bambi-text-xs, 0.75rem);
+  --bambi-badge-font-size-lg: var(--bambi-text-sm, 0.875rem);
+  --bambi-badge-font-weight: var(--bambi-font-weight-medium, 500);
+  --bambi-badge-letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bambi-space-1, 0.25rem);
+  min-width: 0;
+  height: var(--bambi-badge-height-sm);
+  padding-inline: var(--bambi-badge-padding-x-sm);
+  border: var(--bambi-badge-border-width) solid transparent;
+  border-radius: var(--bambi-badge-radius);
+  font: inherit;
+  font-size: var(--bambi-badge-font-size-sm);
+  font-weight: var(--bambi-badge-font-weight);
+  line-height: 1;
+  letter-spacing: var(--bambi-badge-letter-spacing);
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+[data-bambi-badge][data-size='md'] {
+  height: var(--bambi-badge-height-md);
+  padding-inline: var(--bambi-badge-padding-x-md);
+  font-size: var(--bambi-badge-font-size-md);
+}
+
+[data-bambi-badge][data-size='lg'] {
+  height: var(--bambi-badge-height-lg);
+  padding-inline: var(--bambi-badge-padding-x-lg);
+  font-size: var(--bambi-badge-font-size-lg);
+}
+
+[data-bambi-badge][data-variant='default'] {
+  color: var(--bambi-badge-default-fg, var(--bambi-intent-primary-fg, var(--bambi-primary-foreground, white)));
+  background: var(--bambi-badge-default-bg, var(--bambi-intent-primary-bg, var(--bambi-primary, oklch(55% 0.22 271))));
+}
+
+[data-bambi-badge][data-variant='secondary'] {
+  color: var(--bambi-badge-secondary-fg, var(--bambi-intent-secondary-fg, var(--bambi-secondary-foreground, oklch(9% 0 0))));
+  background: var(--bambi-badge-secondary-bg, var(--bambi-intent-secondary-bg, var(--bambi-secondary, oklch(95% 0.008 271))));
+}
+
+[data-bambi-badge][data-variant='outline'] {
+  color: var(--bambi-badge-outline-fg, var(--bambi-foreground, oklch(9% 0 0)));
+  background: var(--bambi-badge-outline-bg, transparent);
+  border-color: var(--bambi-badge-outline-border, var(--bambi-border, oklch(90% 0.01 271)));
+}
+
+[data-bambi-badge][data-variant='danger'] {
+  color: var(--bambi-badge-danger-fg, var(--bambi-intent-danger-fg, var(--bambi-danger-foreground, white)));
+  background: var(--bambi-badge-danger-bg, var(--bambi-intent-danger-bg, var(--bambi-danger, oklch(65% 0.233 28))));
+}
+
+[data-bambi-badge][data-variant='success'] {
+  color: var(--bambi-badge-success-fg, var(--bambi-intent-success-fg, var(--bambi-success-foreground, oklch(9% 0 0))));
+  background: var(--bambi-badge-success-bg, var(--bambi-intent-success-bg, var(--bambi-success, oklch(73% 0.194 153))));
+}
+
+[data-bambi-badge][data-variant='warning'] {
+  color: var(--bambi-badge-warning-fg, var(--bambi-intent-warning-fg, var(--bambi-warning-foreground, oklch(9% 0 0))));
+  background: var(--bambi-badge-warning-bg, var(--bambi-intent-warning-bg, var(--bambi-warning, oklch(78% 0.159 74))));
+}

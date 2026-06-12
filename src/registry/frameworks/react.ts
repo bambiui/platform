@@ -19,6 +19,7 @@ import {
   partPropInterfaceName,
   propDefaultsDestructure,
   propLines,
+  propNames,
   reactPartAttributeLines,
   reactRootAttributeLines,
   reactRootObjectAttributeLines,
@@ -71,23 +72,46 @@ ${attrLines}
     .join("\n");
 }
 
+function nativePropsType(tag: string, omittedProps: string[] = []): string {
+  const omitted = omittedProps.length
+    ? omittedProps.map((name) => JSON.stringify(name)).join(" | ")
+    : "never";
+
+  return `Omit<ComponentPropsWithoutRef<${JSON.stringify(tag)}>, ${omitted}>`;
+}
+
 function createPartSource(
   component: ParsedComponent,
   part: ParsedPart,
 ): string {
   const name = partComponentName(component, part);
   const propsName = partPropInterfaceName(component, part);
+  const partProps = component.props.filter(
+    (prop) => prop.name === "value" && Boolean(prop.attr),
+  );
+  const partPropNames = propNames({ ...component, props: partProps });
+  const partPropDefinitions = partProps.length
+    ? `\n${propLines({ ...component, props: partProps })}`
+    : "";
+  const destructuredProps = partPropNames.length
+    ? `{\n      ${partPropNames.join(",\n      ")},\n      ...props\n    }`
+    : "props";
+  const partAttrLines = [
+    reactPartAttributeLines(part),
+    ...partProps.map((prop) => `        ${prop.attr}={${prop.name}}`),
+  ].join("\n");
 
   return `
-export interface ${propsName} extends HTMLAttributes<HTMLElement> {}
+export interface ${propsName} extends ${nativePropsType(part.tag, partPropNames)} {${partPropDefinitions}
+}
 
 export const ${name} = forwardRef<HTMLElement, ${propsName}>(
-  function ${name}(props, forwardedRef) {
+  function ${name}(${destructuredProps}, forwardedRef) {
     return (
       <${part.tag}
         {...props}
         ref={forwardedRef as never}
-${reactPartAttributeLines(part)}
+${partAttrLines}
       />
     );
   },
@@ -99,6 +123,7 @@ function createComponentSource(component: ParsedComponent): string {
   const name = rootComponentName(component);
   const propsName = componentPropInterfaceName(component);
   const behavior = componentBehaviorExportName(component);
+  const propsBase = nativePropsType(component.tag, propNames(component));
   const defaults = propDefaultsDestructure(component);
   const behaviorOptions = behaviorOptionsObject(component);
   const behaviorUpdate = behaviorUpdateObject(component);
@@ -112,13 +137,13 @@ function createComponentSource(component: ParsedComponent): string {
   useEffect,
   useImperativeHandle,
   useRef,
-  type HTMLAttributes,
+  type ComponentPropsWithoutRef,
   type ReactNode,
 } from "react";
 import { ${behavior} } from "${componentModuleImport(component)}";
 import "${componentStyleImport(component)}";
 
-export interface ${propsName} extends HTMLAttributes<HTMLElement> {
+export interface ${propsName} extends ${propsBase} {
 ${propLines(component)}
   children?: ReactNode;
 }

@@ -1,4 +1,4 @@
-import { button, tabs } from "../core/components";
+import { badge, button, tabs } from "../core/components";
 import { parseComponent } from "../generator/parse-component";
 import { reactFramework } from "./frameworks/react";
 import { solidFramework } from "./frameworks/solid";
@@ -62,6 +62,24 @@ export const registry: BambiRegistry = {
     vue: vueFramework,
   },
   components: {
+    badge: {
+      name: "badge",
+      exportName: "badge",
+      parsed: parseComponent(badge),
+      files: [componentFile("badge")],
+      helpers: [
+        helper("define-component.ts"),
+        helper("props.ts"),
+        helper("attributes.ts"),
+        helper("events.ts"),
+        helper("parts.ts"),
+        helper("a11y.ts"),
+      ],
+      styles: [componentStyle("badge", "badge.css")],
+      ssr: {
+        reactAttrs: true,
+      },
+    },
     button: {
       name: "button",
       exportName: "button",
